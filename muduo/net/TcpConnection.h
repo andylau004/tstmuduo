@@ -155,8 +155,15 @@ private:
     const InetAddress peerAddr_;
     ConnectionCallback connectionCallback_;
     MessageCallback messageCallback_;
-    WriteCompleteCallback writeCompleteCallback_;
-    HighWaterMarkCallback highWaterMarkCallback_;
+
+    // 数据发送完毕的回调函数 即所有的用户数据都拷贝到内核缓冲区回调该函数
+    // 如果对等方接受不及时 受到通告窗口的控制 内核发送缓存不足 这个时候 就会将用户数据添加到应用层发送缓冲区outbuffer
+    // 可能会撑爆outbuffer 解决方法:调整发送频率 关注writeCompleCallback
+
+    // 将所有的数据都发送完 writeCompleCallback回调 继续发送
+    WriteCompleteCallback writeCompleteCallback_;// 低水位回调函数
+    HighWaterMarkCallback highWaterMarkCallback_;// 高水位回调函数 outbuffer快满了
+
     CloseCallback closeCallback_;
     size_t highWaterMark_;
     Buffer inputBuffer_;
