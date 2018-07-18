@@ -1,0 +1,365 @@
+// Copyright 2010, Shuo Chen.  All rights reserved.
+// http://code.google.com/p/muduo/
+//
+// Use of this source code is governed by a BSD-style license
+// that can be found in the License file.
+
+// Author: Shuo Chen (chenshuo at chenshuo dot com)
+#include <stdio.h>
+#include <ostream>
+
+#include <muduo/net/EventLoop.h>
+
+#include <muduo/base/Logging.h>
+#include <muduo/base/Mutex.h>
+#include <muduo/net/Channel.h>
+#include <muduo/net/Poller.h>
+#include <muduo/net/SocketsOps.h>
+#include <muduo/net/TimerQueue.h>
+
+#include <boost/bind.hpp>
+
+#include <signal.h>
+#include <sys/eventfd.h>
+#include <unistd.h>
+
+using namespace muduo;
+using namespace muduo::net;
+
+namespace
+{
+__thread EventLoop* t_loopInThisThread = 0;
+
+const int kPollTimeMs = -1/*10000*/;
+
+int createEventfd()
+{
+    int evtfd = ::eventfd(0, EFD_NONBLOCK | EFD_CLOEXEC);
+    if (evtfd < 0)
+    {
+        LOG_SYSERR << "Failed in eventfd";
+        abort();
+    }
+    return evtfd;
+}
+
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+class IgnoreSigPipe
+{
+public:
+    IgnoreSigPipe()
+    {
+        ::signal(SIGPIPE, SIG_IGN);
+        // LOG_TRACE << "Ignore SIGPIPE";
+    }
+};
+#pragma GCC diagnostic error "-Wold-style-cast"
+
+IgnoreSigPipe initObj;
+}
+
+EventLoop* EventLoop::getEventLoopOfCurrentThread()
+{
+    return t_loopInThisThread;
+}
+
+
+EventLoop::EventLoop()
+    : looping_(false),
+      quit_(false),
+      eventHandling_(false),
+      callingPendingFunctors_(false),
+      iteration_(0),
+      threadId_(CurrentThread::tid()),
+      poller_(Poller::newDefaultPoller(this)),
+      timerQueue_(new TimerQueue(this)),
+      wakeupFd_(createEventfd()),
+      wakeupChannel_(new Channel(this, wakeupFd_)),
+      currentActiveChannel_(NULL)
+{
+    LOG_INFO << "wakeupFd_=" << wakeupFd_;
+
+//    LOG_DEBUG << "EventLoop created " << this << " in thread " << threadId_;
+    if (t_loopInThisThread)
+    {
+        LOG_FATAL << "Another EventLoop " << t_loopInThisThread
+                  << " exists in this thread " << threadId_;
+    }
+    else
+    {
+        t_loopInThisThread = this;
+    }
+
+    wakeupChannel_->setReadCallback(boost::bind(&EventLoop::handleRead, this));
+    // we are always reading the wakeupfd
+    wakeupChannel_->enableReading();
+}
+
+EventLoop::~EventLoop()
+{
+    LOG_DEBUG << "EventLoop " << this << " of thread " << threadId_
+              << " destructs in thread " << CurrentThread::tid();
+
+    wakeupChannel_->disableAll();
+    wakeupChannel_->remove();
+
+    ::close(wakeupFd_);
+    t_loopInThisThread = NULL;
+}
+
+//事件循环,该函数不能跨线程调用，只能在创建该对象的线程中调用
+/*
+ * IO线程平时阻塞在事件循环EventLoop::loop()的poll调用中，为了让IO线程能立刻执行用户回调，需要唤醒它。传统的方法是使用管道pipe，IO线程始终监视此管道的readable事件，在需要唤醒的时候，其他线程往管道里写一个字节，这样IO线程就从IO多路复用阻塞调用中返回。linux中使用eventfd，可以更高效地唤醒，因为它不必管理缓冲区。
+
+eventfd 是一个比 pipe 更高效的线程间事件通知机制，一方面它比 pipe 少用一个 file descripor，节省了资源；另一方面，eventfd 的缓冲区管理也简单得多，全部“buffer” 只有定长8 bytes，不像 pipe 那样可能有不定长的真正 buffer。
+ * */
+void EventLoop::loop()
+{
+    assert(!looping_);
+    assertInLoopThread();
+    looping_ = true;
+    quit_    = false;  // FIXME: what if someone calls quit() before loop() ?
+    LOG_TRACE << "EventLoop " << this << " start looping";
+
+    while (!quit_)
+    {
+        activeChannels_.clear();
+        //调用poll获得当前活动事件的channel列表（其实是将有活动事件的fd对应的channel填入activechannels_），然后依次调用每个channel的handleEvent函数
+        pollReturnTime_ = poller_->poll(kPollTimeMs, &activeChannels_);
+        ++iteration_;
+
+        if (Logger::logLevel() <= Logger::TRACE) {
+            printActiveChannels();
+        }
+        if ( activeChannels_.size() ) {
+            LOG_INFO << "activeChannels_size=" << activeChannels_.size();
+        }
+
+        // TODO sort channel by priority
+        eventHandling_ = true;
+        for (ChannelList::iterator it = activeChannels_.begin(); it != activeChannels_.end(); ++it) {
+            currentActiveChannel_ = *it;
+            currentActiveChannel_->handleEvent(pollReturnTime_);
+        }
+        currentActiveChannel_ = NULL;
+        eventHandling_ = false;
+
+        //执行等待队列中的回调函数
+        doPendingFunctors();
+    }
+
+    LOG_TRACE << "EventLoop " << this << " stop looping";
+    looping_ = false;
+}
+
+void EventLoop::quit()
+{
+    quit_ = true;
+    // There is a chance that loop() just executes while(!quit_) and exits,
+    // then EventLoop destructs, then we are accessing an invalid object.
+    // Can be fixed using mutex_ in both places.
+    if (!isInLoopThread())
+    {
+        LOG_DEBUG << "!IsInloopThread" << ", threadId_=" << threadId_;// << ", curtid=" << CurrentThread::tid() ;
+        wakeup();
+    }
+}
+
+/*
+1、不是简单地在临界区内依次调用Functor，而是把回调列表swap到functors中，这样一方面减小了临界区的长度（意味着不会阻塞其它线程的queueInLoop()），另一方面，也避免了死锁（因为Functor可能再次调用queueInLoop()）
+
+2、由于doPendingFunctors()调用的Functor可能再次调用queueInLoop(cb)，这时，queueInLoop()就必须wakeup()，否则新增的cb可能就不能及时调用了
+
+3、muduo没有反复执行doPendingFunctors()直到pendingFunctors_为空而是每次poll 返回就执行一次，这是有意的，否则IO线程可能陷入死循环，无法处理IO事件。*/
+void EventLoop::queueInLoop(const Functor& cb)
+{
+    {
+        MutexLockGuard lock(mutex_);
+        pendingFunctors_.push_back(cb);
+    }
+    /*
+     * runInLoop的实现：需要使用eventfd唤醒的两种情况 (1) 调用queueInLoop的线程不是当前IO线程。(2)是当前IO线程并且正在调用pendingFunctor。
+     * */
+    if (!isInLoopThread() || callingPendingFunctors_)
+    {
+        char tmpout[ 2048 ] = {0};
+        sprintf( tmpout, "queueInLoop trig Functor& cb isInLoopThread: %d eventloopTid_: %d callingPendingFunctors_: %d",
+                 isInLoopThread(), threadId_, //CurrentThread::tid(),
+                 callingPendingFunctors_ );
+        LOG_INFO << tmpout;
+        wakeup();
+    }
+}
+
+size_t EventLoop::queueSize() const
+{
+    MutexLockGuard lock(mutex_);
+    return pendingFunctors_.size();
+}
+
+TimerId EventLoop::runAt(const Timestamp& time, const TimerCallback& cb)
+{
+    return timerQueue_->addTimer(cb, time, 0.0);
+}
+
+TimerId EventLoop::runAfter(double delay, const TimerCallback& cb)
+{
+    Timestamp time(addTime(Timestamp::now(), delay));
+    return runAt(time, cb);
+}
+
+TimerId EventLoop::runEvery(double interval, const TimerCallback& cb)
+{
+    Timestamp time(addTime(Timestamp::now(), interval));
+    return timerQueue_->addTimer(cb, time, interval);
+}
+
+void EventLoop::runInLoop(const Functor& cb)
+{
+    if (isInLoopThread())
+    {
+        LOG_INFO << ( "aaaaaaaaaaaaaaaaaaaaaaaaaa" );
+        cb();
+    }
+    else
+    {
+        LOG_INFO << ( "bbbbbbbbbbbbbbbbbbbbbbbbbb" );
+        queueInLoop(cb);
+    }
+}
+
+#ifdef __GXX_EXPERIMENTAL_CXX0X__
+// FIXME: remove duplication
+void EventLoop::runInLoop(Functor&& cb)
+{
+    if (isInLoopThread()) {
+        LOG_INFO << ( "new aaaaaaaaaaaaaaaaaaaaaaaaaa" );
+        cb();
+    }
+    else {
+        LOG_INFO << ( "new bbbbbbbbbbbbbbbbbbbbbbbbbb" );
+        queueInLoop(std::move(cb));
+    }
+}
+void EventLoop::queueInLoop(Functor&& cb)
+{
+    {
+        MutexLockGuard lock(mutex_);
+        pendingFunctors_.push_back(std::move(cb));  // emplace_back
+    }
+    if (!isInLoopThread() || callingPendingFunctors_) {
+        char tmpout[ 2048 ] = {0};
+        sprintf( tmpout, "queueInLoop trig Functor&& cb isInLoopThread: %d eventloopTid_: %d  callingPendingFunctors_: %d",
+                 isInLoopThread(), threadId_, /*CurrentThread::tid(),*/ callingPendingFunctors_ );
+        LOG_INFO << tmpout;
+        wakeup();
+    }
+}
+
+TimerId EventLoop::runAt(const Timestamp& time, TimerCallback&& cb)
+{
+    return timerQueue_->addTimer(std::move(cb), time, 0.0);
+}
+
+TimerId EventLoop::runAfter(double delay, TimerCallback&& cb)
+{
+    Timestamp time(addTime(Timestamp::now(), delay));
+    return runAt(time, std::move(cb));
+}
+
+TimerId EventLoop::runEvery(double interval, TimerCallback&& cb)
+{
+    Timestamp time(addTime(Timestamp::now(), interval));
+    return timerQueue_->addTimer(std::move(cb), time, interval);
+}
+#endif
+
+void EventLoop::cancel(TimerId timerId)
+{
+    return timerQueue_->cancel(timerId);
+}
+
+void EventLoop::updateChannel(Channel* channel)
+{
+    assert(channel->ownerLoop() == this);
+    assertInLoopThread();
+    poller_->updateChannel(channel);
+}
+
+void EventLoop::removeChannel(Channel* channel)
+{
+    assert(channel->ownerLoop() == this);
+    assertInLoopThread();
+    if (eventHandling_)
+    {
+        assert(currentActiveChannel_ == channel ||
+               std::find(activeChannels_.begin(), activeChannels_.end(), channel) == activeChannels_.end());
+    }
+    poller_->removeChannel(channel);
+}
+
+bool EventLoop::hasChannel(Channel* channel)
+{
+    assert(channel->ownerLoop() == this);
+    assertInLoopThread();
+    return poller_->hasChannel(channel);
+}
+
+void EventLoop::abortNotInLoopThread()
+{
+    LOG_FATAL << "EventLoop::abortNotInLoopThread - EventLoop " << this
+              << " was created in threadId_ = " << threadId_
+              << ", current thread id = " <<  CurrentThread::tid();
+}
+
+void EventLoop::wakeup()
+{
+    uint64_t one = 1;
+    ssize_t n = sockets::write(wakeupFd_, &one, sizeof one);
+    if (n != sizeof one)
+    {
+        LOG_ERROR << "EventLoop::wakeup() writes " << n << " bytes instead of 8";
+    }
+}
+
+void EventLoop::handleRead()
+{
+    uint64_t one = 1;
+    ssize_t n = sockets::read(wakeupFd_, &one, sizeof one);
+    if (n != sizeof one) {
+        LOG_ERROR << "EventLoop::handleRead() reads " << n << " bytes instead of 8";
+    }
+}
+
+void EventLoop::doPendingFunctors()
+{
+    std::vector<Functor> functors;
+    callingPendingFunctors_ = true;
+
+    {
+        MutexLockGuard lock(mutex_);
+        functors.swap(pendingFunctors_);
+    }
+
+    char tmpout[ 2048 ] = { 0 };
+    if ( functors.size() )
+        sprintf( tmpout, "doPendingFunctors work functors_size=%ld", functors.size() );
+    else
+        sprintf( tmpout, "doPendingFunctors work size==0" );
+    LOG_INFO << tmpout;
+
+    for (size_t i = 0; i < functors.size(); ++i) {
+        functors[i]();
+    }
+
+    callingPendingFunctors_ = false;
+}
+
+void EventLoop::printActiveChannels() const
+{
+    for (ChannelList::const_iterator it = activeChannels_.begin(); it != activeChannels_.end(); ++it) {
+        const Channel* ch = *it;
+        LOG_TRACE << "{" << ch->reventsToString() << "} ";
+    }
+}
+

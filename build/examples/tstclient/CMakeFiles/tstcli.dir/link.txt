@@ -1,0 +1,1 @@
+/usr/bin/c++    -rdynamic CMakeFiles/tstcli.dir/main.cpp.o  -o ../../tstcli ../../muduo/net/libmuduo_net.a ../../muduo/base/libmuduo_base.a -lpthread -lrt 
