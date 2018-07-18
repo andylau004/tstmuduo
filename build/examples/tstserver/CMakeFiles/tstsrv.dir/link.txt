@@ -1,1 +1,0 @@
-/usr/bin/c++    -rdynamic CMakeFiles/tstsrv.dir/main.cpp.o CMakeFiles/tstsrv.dir/parent.cpp.o CMakeFiles/tstsrv.dir/child.cpp.o CMakeFiles/tstsrv.dir/pubhead.cpp.o  -o ../../tstsrv ../../muduo/base/libmuduo_base.a ../../muduo/net/libmuduo_net.a ../../muduo/base/libmuduo_base.a -lpthread -lrt 

@@ -1,1 +1,0 @@
-/usr/bin/c++    -rdynamic CMakeFiles/httpserver_test.dir/tests/HttpServer_test.cc.o  -o httpserver_test libmuduo_http.a ../libmuduo_net.a ../../base/libmuduo_base.a -lpthread -lrt 
