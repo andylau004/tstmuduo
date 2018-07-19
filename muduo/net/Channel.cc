@@ -90,6 +90,7 @@ void Channel::handleEvent(Timestamp receiveTime) {
 }
 
 //根据revents_的值(目前活动的事件)分别调用不同的用户回调，也就是说channel对象处理fd上各种类型的事件，与events_无关(?)
+//这里利用了Channel对象的“多态性”，如果是普通socket，可读事件就会调用预先设置的回调函数；但是如果是侦听socket，则调用Aceptor对象的handleRead()
 void Channel::handleEventWithGuard(Timestamp receiveTime)
 {
     eventHandling_ = true;
@@ -117,11 +118,14 @@ void Channel::handleEventWithGuard(Timestamp receiveTime)
     // POLLRDHUP 关闭连接或者关闭半连接
     if (revents_ & (POLLIN | POLLPRI | POLLRDHUP))// 对等放调用close关闭连接 会受到POLLRDHUP POLLPRI(带外数据)
     {
+        //当是侦听socket时，readCallback_指向Acceptor::handleRead
+        //当是客户端socket时，调用TcpConnection::handleRead
         LOG_INFO << "revents_=" << revents_ << " readCallback_";
         if (readCallback_) readCallback_(receiveTime);// 产生可读事件 调用读函数
     }
     if (revents_ & POLLOUT)
     {
+        //如果是连接状态服的socket，则writeCallback_指向Connector::handleWrite()
         LOG_INFO << "revents_=" << revents_ << " writeCallback_";
         if (writeCallback_) writeCallback_();// 可写事件的产生 调用写的回调函数
     }

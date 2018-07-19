@@ -173,6 +173,8 @@ void EventLoop::quit()
 3、muduo没有反复执行doPendingFunctors()直到pendingFunctors_为空而是每次poll 返回就执行一次，这是有意的，否则IO线程可能陷入死循环，无法处理IO事件。*/
 void EventLoop::queueInLoop(const Functor& cb)
 {
+    //这里增加业务逻辑是增加执行任务的函数指针的，增加的任务保存在成员变量pendingFunctors_中，这个变量是一个函数指针数组（vector对象），执行的时候，调用每个函数就可以了。
+    //上面的代码先利用一个栈变量将成员变量pendingFunctors_里面的函数指针换过来，接下来对这个栈变量进行操作就可以了，这样减少了锁的粒度。因为成员变量pendingFunctors_在增加任务的时候，也会被用到，设计到多个线程操作，所以要加锁，增加任务的地方是：
     {
         MutexLockGuard lock(mutex_);
         pendingFunctors_.push_back(cb);
