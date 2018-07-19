@@ -32,6 +32,11 @@ EventLoopThread::EventLoopThread(const ThreadInitCallback& cb,
     //    printf( "callback_ addr: %p\n", &callback_ );
 }
 
+// 此EventLoop的退出流程：
+// 1.EventLoopThread对象过期
+// 2.如果loop_不为NULL，说明正在执行（因为loop初始为NULL，一旦运行起来，就再也不是NULL）
+// 需要将内部的EventLoop关闭
+// 3.join线程
 EventLoopThread::~EventLoopThread()
 {
     exiting_ = true;
@@ -45,11 +50,15 @@ EventLoopThread::~EventLoopThread()
     }
 }
 
+// 开启线程，并且返回持有的EventLoop的指针
 EventLoop* EventLoopThread::startLoop()
 {
     assert(!thread_.started());
     thread_.start();
 
+    // 这里存在一个race Condition
+    // 线程刚刚启动时，里面的EventLoop的指针还没有赋给loop_，所以
+    // 这里需要等待，当指针赋值成功后，cond_会通知这里继续执行
     {
         MutexLockGuard lock(mutex_);
         while (loop_ == NULL)

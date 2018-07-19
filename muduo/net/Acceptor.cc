@@ -24,20 +24,22 @@
 using namespace muduo;
 using namespace muduo::net;
 
+// Acceptor这类对象，内部持有一个Channel，和TcpConnection相同，必须在构造函数中设置各种回调函数
+// 然后在其他动作中开始监听，向epoll注册fd
 Acceptor::Acceptor(EventLoop* loop, const InetAddress& listenAddr, bool reuseport)
     : loop_(loop),
-      acceptSocket_(sockets::createNonblockingOrDie(listenAddr.family())),
-      acceptChannel_(loop, acceptSocket_.fd()),
+      acceptSocket_(sockets::createNonblockingOrDie(listenAddr.family())),// 创建listenfd
+      acceptChannel_(loop, acceptSocket_.fd()),// 创建listenfd对应的Channel
       listenning_(false),
-      idleFd_(::open("/dev/null", O_RDONLY | O_CLOEXEC))
+      idleFd_(::open("/dev/null", O_RDONLY | O_CLOEXEC))// 打开一个空的fd，用于占位
 {
     assert(idleFd_ >= 0);
 
-    acceptSocket_.setReuseAddr(true);
-    acceptSocket_.setReusePort(reuseport);
-    acceptSocket_.bindAddress(listenAddr);
+    acceptSocket_.setReuseAddr(true);// 复用addr
+    acceptSocket_.setReusePort(reuseport);// 复用port
+    acceptSocket_.bindAddress(listenAddr);// 绑定ip和port
 
-    acceptChannel_.setReadCallback(boost::bind(&Acceptor::handleRead, this));
+    acceptChannel_.setReadCallback(boost::bind(&Acceptor::handleRead, this));//设置Channel的read回调函数
 }
 
 Acceptor::~Acceptor()
@@ -83,6 +85,7 @@ void Acceptor::handleRead()//当epoll监听到listenfd时，开始执行此回�
         // Read the section named "The special problem of
         // accept()ing when you can't" in libev's doc.
         // By Marc Lehmann, author of libev.
+
         /*
          * 本进程的fd达到上限后无法为新连接创建socket描述符
          * 既然没有socketfd来表示这个连接，也就无法close它
@@ -96,6 +99,11 @@ void Acceptor::handleRead()//当epoll监听到listenfd时，开始执行此回�
          * 随后立即close调它，这样就优雅地断开了客户端连接
          * 最后重新打开一个空闲文档，把"坑"占住，以备情况再发生
          */
+
+        // 这里处理fd达到上限有一个技巧，就是先占住一个空的fd，然后当fd满的时候，先关闭此占位fd，然后
+        // 迅速接受新的tcp连接，然后关闭它，然后再次打开此fd
+        // 这样的好处是能够及时通知客户端，服务器的fd已经满。
+        // 事实上，这里还可以提供给用户一个回调函数，提供fd满时的更具体信息
         if (errno == EMFILE)//fd的数目达到上限
         {
             ::close(idleFd_);//关闭占位fd

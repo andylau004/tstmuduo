@@ -20,7 +20,9 @@
 
 // INADDR_ANY use (type)value casting.
 #pragma GCC diagnostic ignored "-Wold-style-cast"
+// INADDR_ANY表示可以绑定任何一块网卡
 static const in_addr_t kInaddrAny = INADDR_ANY;
+// INADDR_LOOPBACK表示本地环路测试
 static const in_addr_t kInaddrLoopback = INADDR_LOOPBACK;
 #pragma GCC diagnostic error "-Wold-style-cast"
 
@@ -48,6 +50,7 @@ static const in_addr_t kInaddrLoopback = INADDR_LOOPBACK;
 using namespace muduo;
 using namespace muduo::net;
 
+// 使用静态断言，保证addr和InetAddress的size相同，保证兼容性
 BOOST_STATIC_ASSERT(sizeof(InetAddress) == sizeof(struct sockaddr_in6));
 BOOST_STATIC_ASSERT(offsetof(sockaddr_in, sin_family) == 0);
 BOOST_STATIC_ASSERT(offsetof(sockaddr_in6, sin6_family) == 0);
