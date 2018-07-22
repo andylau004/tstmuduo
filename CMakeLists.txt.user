@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 4.6.1, 2018-07-18T16:48:56. -->
+<!-- Written by QtCreator 4.6.1, 2018-07-22T17:37:28. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -277,7 +277,7 @@
     <value type="QString" key="CMakeProjectManager.CMakeRunConfiguation.Title">tstcli</value>
     <value type="QString" key="CMakeProjectManager.CMakeRunConfiguration.Arguments"></value>
     <value type="QString" key="CMakeProjectManager.CMakeRunConfiguration.UserWorkingDirectory"></value>
-    <value type="QString" key="CMakeProjectManager.CMakeRunConfiguration.UserWorkingDirectory.default">/home/fy/WorkDir/ldd_work/c++_work/build-tstMuduo-Desktop_Qt_5_11_0_GCC_64bit-Default</value>
+    <value type="QString" key="CMakeProjectManager.CMakeRunConfiguration.UserWorkingDirectory.default">/tmp/QtCreator-eEqBmy/qtc-cmake-lUrAbjaH</value>
     <value type="int" key="PE.EnvironmentAspect.Base">2</value>
     <valuelist type="QVariantList" key="PE.EnvironmentAspect.Changes"/>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">tstcli</value>
@@ -333,7 +333,7 @@
     <value type="QString" key="CMakeProjectManager.CMakeRunConfiguation.Title">tstsrv</value>
     <value type="QString" key="CMakeProjectManager.CMakeRunConfiguration.Arguments"></value>
     <value type="QString" key="CMakeProjectManager.CMakeRunConfiguration.UserWorkingDirectory"></value>
-    <value type="QString" key="CMakeProjectManager.CMakeRunConfiguration.UserWorkingDirectory.default">/home/fy/WorkDir/ldd_work/c++_work/build-tstMuduo-Desktop_Qt_5_11_0_GCC_64bit-Default</value>
+    <value type="QString" key="CMakeProjectManager.CMakeRunConfiguration.UserWorkingDirectory.default">/tmp/QtCreator-eEqBmy/qtc-cmake-lUrAbjaH</value>
     <value type="int" key="PE.EnvironmentAspect.Base">-1</value>
     <valuelist type="QVariantList" key="PE.EnvironmentAspect.Changes"/>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">tstsrv</value>
@@ -389,7 +389,7 @@
     <value type="QString" key="CMakeProjectManager.CMakeRunConfiguation.Title">httpserver_test</value>
     <value type="QString" key="CMakeProjectManager.CMakeRunConfiguration.Arguments"></value>
     <value type="QString" key="CMakeProjectManager.CMakeRunConfiguration.UserWorkingDirectory"></value>
-    <value type="QString" key="CMakeProjectManager.CMakeRunConfiguration.UserWorkingDirectory.default">/home/fy/WorkDir/ldd_work/c++_work/build-tstMuduo-Desktop_Qt_5_11_0_GCC_64bit-Default/muduo/net/http</value>
+    <value type="QString" key="CMakeProjectManager.CMakeRunConfiguration.UserWorkingDirectory.default">/tmp/QtCreator-eEqBmy/qtc-cmake-lUrAbjaH/muduo/net/http</value>
     <value type="int" key="PE.EnvironmentAspect.Base">2</value>
     <valuelist type="QVariantList" key="PE.EnvironmentAspect.Changes"/>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">httpserver_test</value>
