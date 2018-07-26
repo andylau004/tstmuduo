@@ -50,6 +50,8 @@ using namespace muduo::net;
 
 #include "muduo/base/convert.h"
 
+#include "muduo/base/Atomic.h"
+
 
 
 class CTestServer {
@@ -310,6 +312,17 @@ int main(int argc, char *argv[])
     std::setlocale(LC_ALL, "en_US.utf8");
     Logger::setLogLevel(Logger::DEBUG);
 //    LOG_INFO << "pid = " << getpid() << ", tid = " << CurrentThread::tid();
+
+    std::string sttt = "12345";
+    LOG_INFO << "sttt=" << sttt.substr(1);
+    return 1;
+
+    AtomicInt64 tmp64;
+    LOG_INFO << "tmp64=" << tmp64.get();
+    tmp64.add(1);
+    LOG_INFO << "tmp64=" << tmp64.getAndAdd(2);
+    LOG_INFO << "tmp64=" << tmp64.get();
+    return 1;
 
     tst_shared_Ptr_1(); return 1;
 
