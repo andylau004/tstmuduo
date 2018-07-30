@@ -2,11 +2,13 @@
 
 
 
-
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -gdwarf-2 -Wno-deprecated -ffunction-sections -W -Wall -pthread -Wno-missing-braces -Wparentheses -std=c++11" )
 
 
 add_subdirectory(tstclient)
 add_subdirectory(tstserver)
+
+add_subdirectory(tstalgor)
 
 
 #if(CARES_INCLUDE_DIR AND CARES_LIBRARY)
@@ -34,3 +36,4 @@ add_subdirectory(tstserver)
 #else()
 #  add_subdirectory(procmon EXCLUDE_FROM_ALL)
 #endif()
+

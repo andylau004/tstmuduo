@@ -5,6 +5,7 @@
 
 #include <sstream>
 
+#include <random>
 
 
 
@@ -51,6 +52,12 @@ using namespace muduo::net;
 #include "muduo/base/convert.h"
 
 #include "muduo/base/Atomic.h"
+
+
+#include <iostream>
+#include <random>
+#include <cstdlib>
+using namespace std;
 
 
 
@@ -307,11 +314,106 @@ void tst_convert_1() {
 
 }
 
+int64_t GetRandom64() {
+
+//    int ittt = 123;
+//    auto xxxx = ittt;
+//    std::cout << "xxxx=" << xxxx << std::endl;
+//    return 1;
+
+
+    {
+//        std::random_device  rd;
+//        std::mt19937 mt(rd());
+//        // 产生10个随机数
+//        for(int i = 0; i < 10; i++) {
+//            cout << mt() << endl;
+//        }
+
+    }
+
+    {
+//        std::random_device rd; // 種子產生器
+//        std::mt19937 gen = std::mt19937(rd()); //使用mt19937引擎
+//        std::uniform_real_distribution<> dis(-1, 1); //使用平均分佈
+
+//        auto randfun = std::bind(dis, gen); //將引擎和分佈綁在一起變成新函數 randfun
+
+//        cout<<randfun()<<' '<<randfun()<<' '<<randfun()<<endl; //可以直接重複呼叫
+    }
+
+    {
+        independent_bits_engine<default_random_engine,64,unsigned long long int> engine;
+        engine.seed(time(NULL));//设定随机数种子
+
+        for(int i=0;i<100;i++)   //获得100个随机数
+        {
+            std::cout<<engine()<<std::endl;
+        }
+    }
+
+//    //engine.discard(8);     //跳过8次，相当于执行8次engine()而不输出结果
+//    //engine.max()           //获得最大值
+//    //engine.min()           //获得最小值
+
+    return 0;
+}
+
+void tst_string_1() {
+
+    {
+        std::string strDigit = "123467";
+        int tmp = convert<int>(strDigit);
+        std::cout << "tmp=" << tmp << std::endl;
+        return ;
+    }
+    {
+        std::string strTest = "/data/linkdood/im/vrvfile (1)";
+
+        strTest = strTest.substr(strTest.find("("));
+        std::cout << "strTest=" << strTest << std::endl;
+
+        // '('
+        if (strTest.at(0) == '(' && strTest.at(strTest.length() - 1) == ')') {
+            std::cout << "ok find it" << std::endl;
+
+            strTest = strTest.substr(1, strTest.length() - 2);
+            std::cout << "strTest=" << strTest << std::endl;
+
+        }
+        return ;
+    }
+
+
+    {
+        uint64_t newFileCode = 7755548965449811111222;
+
+        std::string str_newCode = convert<std::string>(newFileCode+1);
+        std::cout << "str_newCode=" << str_newCode <<  std::endl;
+        return ;
+    }
+
+    std::string sonFileCode = "77555489654498";
+
+    if (sonFileCode.length() > 4) {
+        sonFileCode = sonFileCode.substr(sonFileCode.length() - 4);
+        std::cout << "sonFileCode.length() > 4, sonFileCode=" << sonFileCode << std::endl;
+    } else {
+        std::cout << "sonFileCode.length() < 4 " << std::endl;
+    }
+
+}
+
 int main(int argc, char *argv[])
 {
     std::setlocale(LC_ALL, "en_US.utf8");
     Logger::setLogLevel(Logger::DEBUG);
 //    LOG_INFO << "pid = " << getpid() << ", tid = " << CurrentThread::tid();
+
+    tst_string_1(); return 1;
+
+    GetRandom64();
+    return 1;
 
     std::string sttt = "12345";
     LOG_INFO << "sttt=" << sttt.substr(1);

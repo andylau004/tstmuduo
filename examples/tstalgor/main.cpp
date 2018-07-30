@@ -283,6 +283,16 @@ int main(int argc, char *argv[])
     Logger::setLogLevel(Logger::DEBUG);
     LOG_INFO << "pid = " << getpid() << ", tid = " << CurrentThread::tid();
 
+    uint64_t ufileId = -123;
+
+    if ( (int64_t)ufileId < 0 ) {
+        std::cout << "ufileId < 0, ufileId=" << ufileId << std::endl;
+    } else {
+        std::cout << "ufileId >= 0, ufileId=" << ufileId << std::endl;
+    }
+    return 1;
+
+
     std::string addFile_      = "insert into @table \
 (fileId,pid,ownerId,fileName,fileType,fileSuffix,filePath,fileSize,encryptFileSize,secretKey,\
 uploaderId,uploaderName,md5Hash,sha1Hash,createdAt,updatedAt,deletedAt,fileCode,orderNum,\
