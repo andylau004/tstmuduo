@@ -19,13 +19,13 @@
 #include <vector>
 
 
-template <class T>
-void delete_object(T *& t) {
-    if (t) {
-        delete t;
-        t = NULL;
-    }
-}
+//template <class T>
+//void delete_object(T *& t) {
+//    if (t) {
+//        delete t;
+//        t = NULL;
+//    }
+//}
 
 
 

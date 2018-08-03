@@ -48,15 +48,15 @@ private:
 };
 
 
-// convert<int8_t> 获取到ASCII码
-template <typename out, class in>
-out convert(const in & value) {
-    std::stringstream stream;
-    stream << value;
-    out r;
-    stream >> r;
-    return r;
-}
+//// convert<int8_t> 获取到ASCII码
+//template <typename out, class in>
+//out convert(const in & value) {
+//    std::stringstream stream;
+//    stream << value;
+//    out r;
+//    stream >> r;
+//    return r;
+//}
 
 
 

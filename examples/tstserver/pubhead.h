@@ -13,3 +13,4 @@
 
 class CTest_enabled_shared;
 typedef boost::shared_ptr<CTest_enabled_shared> CTest_enabled_shared_Ptr;
+

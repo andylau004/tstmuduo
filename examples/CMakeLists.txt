@@ -9,6 +9,7 @@ add_subdirectory(tstclient)
 add_subdirectory(tstserver)
 
 add_subdirectory(tstalgor)
+#add_subdirectory(${CMAKE_SOURCE_DIR}/thirdpart/rapidjson)
 
 
 #if(CARES_INCLUDE_DIR AND CARES_LIBRARY)

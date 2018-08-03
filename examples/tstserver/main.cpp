@@ -7,14 +7,15 @@
 
 #include <random>
 
+#include <set>
 
 
 #include <boost/bind.hpp>
 
 #include <stdio.h>
 
-
-
+#include <time.h>
+#include <sys/time.h>
 #include "tst_1.h"
 
 #include "codeconvert.h"
@@ -58,6 +59,67 @@ using namespace muduo::net;
 #include <random>
 #include <cstdlib>
 using namespace std;
+
+
+#include "thirdpart/rapidjson/document.h"
+#include "thirdpart/rapidjson/writer.h"
+#include "thirdpart/rapidjson/stringbuffer.h"
+#include "thirdpart/rapidjson/filereadstream.h"
+
+#include "muduo/base/common.h"
+
+
+using namespace rapidjson;
+
+
+// template classes for retrieving values from RapidJson document
+template <typename T, typename P>
+struct safeGetter {
+    static bool get(T& ret, const P& doc, const char* key) { return false; }
+};
+
+template <typename P>
+struct safeGetter<std::string, P> {
+    static bool get(std::string& ret, const P& doc, const char* key) {
+        if (doc.HasMember(key)) {
+            if (doc[key].GetType() == rapidjson::kObjectType) {
+                StringBuffer sb;
+                Writer<StringBuffer> writer(sb);
+                doc[key].Accept(writer);
+                ret = sb.GetString();
+                return true;
+            }
+
+            ret = doc[key].GetString();
+            return true;
+        }
+        return false;
+    }
+};
+
+template <typename P>
+struct safeGetter<int, P> {
+    static bool get(int& ret, const P& doc, const char* key) {
+        if (doc.HasMember(key)) {
+            ret = doc[key].GetInt();
+            return true;
+        }
+        return false;
+    }
+};
+
+template <typename P>
+struct safeGetter<int64_t, P> {
+    static bool get(int64_t& ret, const P& doc, const char* key) {
+        if (doc.HasMember(key)) {
+            ret = doc[key].GetInt64();
+            return true;
+        }
+        return false;
+    }
+};
+
+
 
 
 
@@ -314,52 +376,292 @@ void tst_convert_1() {
 
 }
 
-int64_t GetRandom64() {
+//int64_t GetRandom64() {
 
-//    int ittt = 123;
-//    auto xxxx = ittt;
-//    std::cout << "xxxx=" << xxxx << std::endl;
-//    return 1;
+////    int ittt = 123;
+////    auto xxxx = ittt;
+////    std::cout << "xxxx=" << xxxx << std::endl;
+////    return 1;
 
 
-    {
-//        std::random_device  rd;
-//        std::mt19937 mt(rd());
-//        // 产生10个随机数
-//        for(int i = 0; i < 10; i++) {
-//            cout << mt() << endl;
+//    {
+////        std::random_device  rd;
+////        std::mt19937 mt(rd());
+////        // 产生10个随机数
+////        for(int i = 0; i < 10; i++) {
+////            cout << mt() << endl;
+////        }
+
+//    }
+
+//    {
+////        std::random_device rd; // 種子產生器
+////        std::mt19937 gen = std::mt19937(rd()); //使用mt19937引擎
+////        std::uniform_real_distribution<> dis(-1, 1); //使用平均分佈
+
+////        auto randfun = std::bind(dis, gen); //將引擎和分佈綁在一起變成新函數 randfun
+
+////        cout<<randfun()<<' '<<randfun()<<' '<<randfun()<<endl; //可以直接重複呼叫
+//    }
+
+//    {
+//        independent_bits_engine<default_random_engine,64,unsigned long long int> engine;
+//        engine.seed(time(NULL));//设定随机数种子
+
+//        for(int i=0;i<100;i++)   //获得100个随机数
+//        {
+//            std::cout<<engine()<<std::endl;
 //        }
+//    }
 
+////    //engine.discard(8);     //跳过8次，相当于执行8次engine()而不输出结果
+////    //engine.max()           //获得最大值
+////    //engine.min()           //获得最小值
+
+//    return 0;
+//}
+
+
+std::string  constructUpdateSql( const std::string& inCode ) {
+    std::string retSql;
+
+    std::string strCurMisec = GetCurMilliSecond_string();
+
+    retSql = "update @table set ";
+
+    retSql += " validity=1, ";
+    retSql += " pid=-1, ";
+
+    retSql += (std::string(" updatedAt=") + strCurMisec + ", ");
+    retSql += (std::string(" deletedAt=") + strCurMisec + " ");
+
+    retSql += " where 1 = 1 and fileId not in(1,2) ";
+    retSql += " and fileCode like CONCAT(";
+    retSql += inCode;
+    retSql += ",'%')";
+
+    return retSql;
+}
+
+
+void tst_bindFunction_1() {
+
+}
+
+// 定义回调函数类型
+typedef function<int (int x,int y)>  CallBackFunction;
+//typedef int (*CallBackFunction)(int x, int y);             // 不能用于bind函数返回类型
+
+// 类定义
+class CMethod2
+{
+    typedef CMethod2 this_type;
+public:
+    CMethod2() {}
+    ~CMethod2() {}
+public:
+    int Add(int x,int y)                 // 1.类非静态成员函数作为回调函数
+    {
+        return x + y;
+    }
+    static int AddS(int x,int y)         // 2.类静态成员函数作为回调函数
+    {
+        return x + y;
+    }
+};
+
+int Add(int x,int y)                     // 3.非类成员函数作为回调函数
+{
+    return x + y;
+}
+
+// 测试接口
+void Test()
+{
+    int x = 10;
+    int y = 10;
+    CMethod2 mtd1;
+    CMethod2 &mtd2 = mtd1;
+    CMethod2 *mtd3 = &mtd1;
+    // 1.对象、对象引用、对象指针都可用于bind绑定类非静态成员函数绑定的实例
+    CallBackFunction callBack1 = bind(&CMethod2::Add,&mtd1,_1,_2);
+    CallBackFunction callBack2 = bind(&CMethod2::Add,&mtd2,_1,_2);
+    CallBackFunction callBack3 = bind(&CMethod2::Add,mtd3,_1,_2);
+    cout << "callBack1 Result:" << callBack1(x,y) << endl;
+    cout << "callBack2 Result:" << callBack2(x,y) << endl;
+    cout << "callBack3 Result:" << callBack3(x,y) << endl;
+//    return ;
+
+    // 2.静态成员函数作为回调
+    //CallBackFunction callBack4 = CMethod2::AddS;
+    CallBackFunction callBack4 = bind(CMethod2::AddS,_1,_2);
+    cout << "callBack4 Result:" << callBack4(x,y) << endl;
+    // 3.非成员函数作为回调
+    //CallBackFunction callBack5 = Add;
+    CallBackFunction callBack5 = bind(Add,_1,_2);
+    cout << "callBack5 Result:" << callBack5(x,y) << endl;
+}
+
+typedef struct _tagTest {
+
+    int i1;
+
+    int i2;
+
+    int i3;
+
+    std::string str1;
+    std::string str2;
+
+    _tagTest() {
+        i1 = i2 = -1;
     }
 
-    {
-//        std::random_device rd; // 種子產生器
-//        std::mt19937 gen = std::mt19937(rd()); //使用mt19937引擎
-//        std::uniform_real_distribution<> dis(-1, 1); //使用平均分佈
+} TestSt;
 
-//        auto randfun = std::bind(dis, gen); //將引擎和分佈綁在一起變成新函數 randfun
 
-//        cout<<randfun()<<' '<<randfun()<<' '<<randfun()<<endl; //可以直接重複呼叫
+void tst_rightVal( bool bInput ) {
+    bInput = true;
+    std::cout << "bInput=" << bInput << std::endl;
+}
+class demo {
+public:
+    demo() {
+        std::cout << "demo cst" << std::endl;
     }
-
+    ~demo() {
+        std::cout << "demo dst" << std::endl;
+    }
+    void show() {
+        std::cout << "call show" << std::endl;
+    }
+};
+///weak_ptr -> shared_ptr
+void my_weak_ptr() {
     {
-        independent_bits_engine<default_random_engine,64,unsigned long long int> engine;
-        engine.seed(time(NULL));//设定随机数种子
-
-        for(int i=0;i<100;i++)   //获得100个随机数
+        std::weak_ptr<demo> wkPtr;
         {
-            std::cout<<engine()<<std::endl;
+    //        auto sptr = std::make_shared<demo>();
+            std::shared_ptr<demo> sptr(new demo());
+            wkPtr = sptr;
+
+            std::cout << "share user_cout=" << sptr.use_count() << std::endl;
+            std::cout << "weak user_cout="  << wkPtr.use_count() << std::endl;
+            std::cout << "--------------------" << std::endl;
+
+            auto pTmp = wkPtr.lock();
+            std::cout << "--------------------" << std::endl;
+            std::cout << "share user_cout=" << sptr.use_count() << std::endl;
+            std::cout << "weak user_cout="  << wkPtr.use_count() << std::endl;
+            std::cout << "--------------------" << std::endl;
+
+            if (!wkPtr.expired()) {
+                printf( "shared_ptr is ok\n" );
+                std::cout << "share user_cout=" << sptr.use_count() << std::endl;
+                std::cout << "weak user_cout="  << wkPtr.use_count() << std::endl;
+                pTmp->show();
+            }
+        }
+        if (wkPtr.expired()) {
+            std::cout << "sharedptr_Obj is destroyed" <<std::endl;
         }
     }
 
-//    //engine.discard(8);     //跳过8次，相当于执行8次engine()而不输出结果
-//    //engine.max()           //获得最大值
-//    //engine.min()           //获得最小值
 
-    return 0;
+//    {
+//        auto sptr = std::make_shared<demo>();
+//        wptr = sptr;
+//        auto sptr2 = wptr.lock();
+//        if (!wptr.expired()){///等价于sptr2 != nullptr
+//            printf("shared_ptr ok\n");
+//            sptr2->show();
+//        }
+//    }
+//    if (wptr.expired()){
+//        printf("shared_ptr deleted\n");
+//    }
 }
 
 void tst_string_1() {
+    {
+        tst_rightVal( false );
+        return ;
+    }
+
+    {
+        std::string strName = "123.txt";
+        int dotPos = strName.find(".");
+        if (dotPos != std::string::npos) {
+            std::string strJustName = strName.substr(0, dotPos);
+            std::cout << "justName=" << strJustName << std::endl;
+
+            std::string strExt = strName.substr(dotPos+1);
+            std::cout << "strExt=" << strExt << std::endl;
+        }
+        return;
+    }
+    {
+        TestSt ttt1;
+        TestSt ttt2;
+
+        ttt1.str1 = "11123";
+        ttt1.str2 = "334455";
+
+        ttt2 = ttt1;
+        std::cout << "i1=" << ttt2.i1 << std::endl;
+        std::cout << "i2=" << ttt2.i2 << std::endl;
+        std::cout << "i3=" << ttt2.i3 << std::endl;
+        std::cout << "str1=" << ttt2.str1 << std::endl;
+        std::cout << "str2=" << ttt2.str2 << std::endl;
+
+//        TestSt ttt1;
+//        std::cout << "i1=" << ttt1.i1 << std::endl;
+//        std::cout << "i2=" << ttt1.i2 << std::endl;
+//        std::cout << "i3=" << ttt1.i3 << std::endl;
+        return ;
+    }
+//    Test(); return ;
+
+    {
+
+        std::cout << "1=" << constructUpdateSql("123456") << std::endl;
+
+
+//        std::set<int64_t> setDel;
+//        setDel.insert( 777 );setDel.insert( 222 );setDel.insert( 888 );
+
+//        for ( auto& oneId : setDel ) {
+//            std::cout << "oneId=" << oneId << std::endl;
+//        }
+return;
+    }
+    {
+        //    sql_DeleFiles = "delete from @table where (fileId = 13811196572 or fileId = 15321920256);";
+
+        std::set<std::string> setDel;
+        setDel.insert( "123" );setDel.insert( "888" );setDel.insert( "777" );
+
+        int icout = 0;
+        std::string strTmpSql = "( ";
+        for (auto& oneId : setDel) {
+            strTmpSql += "fileId = ";
+            strTmpSql += oneId;
+
+            if (++icout < setDel.size()) {
+                strTmpSql += " or ";
+            }
+        }
+
+        strTmpSql += " )";
+
+        std::cout << "strTmpSql=" << strTmpSql << std::endl;
+
+        std::string sql_DeleFiles = "delete from @table where ";
+        sql_DeleFiles += strTmpSql;
+        std::cout << "sql_DeleFiles=" << sql_DeleFiles << std::endl;
+
+        return ;
+    }
 
     {
         std::string strDigit = "123467";
@@ -404,11 +706,111 @@ void tst_string_1() {
 
 }
 
+
+inline std::string doc2string(const rapidjson::Document& doc) {
+    rapidjson::StringBuffer buffer;
+    rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+    doc.Accept(writer);
+    return buffer.GetString();
+}
+std::string makeResultJson(int code, const std::string& message, const std::string& result) {
+    rapidjson::Document doc;
+    doc.SetObject();
+    rapidjson::Document::AllocatorType& allocator = doc.GetAllocator();
+    doc.AddMember("code", code, allocator);
+    doc.AddMember("msg", rapidjson::Value().SetString(message.c_str(), message.length(), allocator), allocator);
+    doc.AddMember("result", rapidjson::Value().SetString(result.c_str(), result.length(), allocator), allocator);
+    return doc2string(doc);
+}
+
+void tst_str_2() {
+
+    {
+        std::vector<int64_t> ownerIds;
+        ownerIds.push_back( 776988766 );ownerIds.push_back( 887623446 );ownerIds.push_back( 123498765 );
+
+        std::string tmpIds = " and ownerId in (";
+        if (ownerIds.size()) {
+            int icout = 0;
+            for ( auto& oneId : ownerIds) {
+                tmpIds += convert<std::string>(oneId);
+
+                if (++icout < ownerIds.size()) {
+                    tmpIds += ", ";
+                }
+            }
+
+            tmpIds += ")";
+        }
+        std::cout << "tmpIds=" << tmpIds << std::endl;
+
+        return ;
+    }
+
+    std::string tn111 = "IM_FILE_TABLE";
+    std::string tmpSql = "123___fileNamexxx ttt";
+    tmpSql.replace(tmpSql.find("fileName"), strlen("fileName"), tn111);
+
+    std::cout << "tmpSql=" << tmpSql << std::endl;
+    return ;
+
+    std::cout << "result=" << makeResultJson( 123, "testkey", "tstvalue111" ) << std::endl;
+    return ;
+
+    std::string sql_queryTreeFolder;
+
+    sql_queryTreeFolder = "SELECT * FROM \
+( \
+ SELECT * FROM @table WHERE ownerId = (?) AND fileType = 2 AND pid = (?) \
+ UNION \
+ SELECT * FROM @table WHERE fileType= 4 AND pid = (?) \
+ ) AS T3 WHERE T3.deletedAt IS NULL";
+
+            const static std::string kCloudFileTableName = "IM_FILE";
+            std::string tn = kCloudFileTableName;
+
+            std::string tmpUpdateSql = sql_queryTreeFolder;
+    tmpUpdateSql.replace(tmpUpdateSql.find("@table"), strlen("@table"), tn);
+    tmpUpdateSql.replace(tmpUpdateSql.find("@table"), strlen("@table"), tn);
+    std::cout << "tmpUpdateSql=" << tmpUpdateSql << std::endl;
+}
+
+void tst_json_parse() {
+
+    char* pfile = GetSmallFileContent("./tmp.json", NULL);
+    const std::string json = pfile;
+
+    rapidjson::Document doc;
+    doc.Parse(json.c_str());
+    if (doc.HasParseError())
+        return ;
+
+    std::string get_string;
+    safeGetter<std::string, Document>::get(get_string, doc, "tststring");
+
+    int64_t get_i64 = -1;
+    safeGetter<int64_t, Document>::get(get_i64, doc, "tstin64");
+
+    int get_i = -1;
+    safeGetter<int, Document>::get(get_i, doc, "tstint");
+
+    std::cout << "get_string=" << get_string << std::endl;
+    std::cout << "get_i64=" << get_i64 << std::endl;
+    std::cout << "get_i=" << get_i << std::endl;
+}
+
 int main(int argc, char *argv[])
 {
     std::setlocale(LC_ALL, "en_US.utf8");
     Logger::setLogLevel(Logger::DEBUG);
 //    LOG_INFO << "pid = " << getpid() << ", tid = " << CurrentThread::tid();
+
+    tst_json_parse(); return 1;
+
+
+    tst_str_2(); return 1;
+
+     my_weak_ptr(); return 1;
 
     tst_string_1(); return 1;
 

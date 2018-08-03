@@ -34,7 +34,7 @@ option( _debug "Debug option" ON )
 
 
 include_directories("${CMAKE_SOURCE_DIR}")
-
+include_directories(${CMAKE_SOURCE_DIR}/thirdpart/rapidjson)
 
 aux_source_directory(. SRC_LIST)
 aux_source_directory(./muduo/base BASE_LIST)

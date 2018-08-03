@@ -17,10 +17,15 @@ set(base_SRCS
   Thread.cc
   ThreadPool.cc
   convert.cpp
+  common.cpp
+  timerutil.cpp
   )
+
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -gdwarf-2 -Wno-deprecated -ffunction-sections -W -Wall -pthread -Wno-missing-braces -Wparentheses -std=c++11" )
 
 add_library(muduo_base ${base_SRCS})
 target_link_libraries(muduo_base pthread rt)
+
 
 #add_library(muduo_base_cpp11 ${base_SRCS})
 #target_link_libraries(muduo_base_cpp11 pthread rt)
