@@ -69,7 +69,17 @@ using namespace std;
 #include "muduo/base/common.h"
 
 
+#include <boost/algorithm/string.hpp>
+#include <boost/tuple/tuple.hpp>
+
 using namespace rapidjson;
+
+
+#include "stockfactory.h"
+#include "booststockfactory.h"
+
+
+
 
 
 // template classes for retrieving values from RapidJson document
@@ -775,7 +785,78 @@ void tst_str_2() {
     std::cout << "tmpUpdateSql=" << tmpUpdateSql << std::endl;
 }
 
+
+// 处理只有一对括号，且需要后面加入大量 (?,?....) 场景
+bool ConstructInsertSql( std::string& in_sql ) {
+    std::string str_ret;
+
+    std::string cpy_sql = in_sql;
+
+    size_t leftPos = cpy_sql.find('(');
+    if (leftPos == std::string::npos) {
+//        LOG_WARN("construct left failed!, insql=" << in_sql);
+        return false;
+    }
+
+    std::string strLeft = cpy_sql.substr(0, leftPos+1);
+//    LOG_INFO("construct right strLeft=" << strLeft);
+
+    size_t rightPos = cpy_sql.find(')');
+    if (rightPos == std::string::npos) {
+//        LOG_WARN("construct right failed!, insql=" << in_sql);
+        return false;
+    }
+
+    std::string strMid = cpy_sql.substr(leftPos+1, rightPos-leftPos-1);
+//    LOG_INFO << "construct right strRight=" << strMid;
+
+    int num = count(strMid.begin(), strMid.end(), ',');
+    if (!num) {
+//        LOG_WARN("construct count failed!, insql=" << in_sql);
+        return false;
+    }
+
+    std::string strInsertLeft  = " values ( ";
+    std::string strInsertRight = ")";
+
+    for (int i = 0; i <= num; i++ ) {
+        if (i == num)
+            strInsertLeft += "? ";
+        else
+            strInsertLeft += "?, ";
+    }
+
+    std::string lastRet;
+    lastRet = strLeft + strMid + ")" + strInsertLeft + strInsertRight;
+//    LOG_INFO << "lastRet=" << lastRet;
+    in_sql = lastRet;
+    return true;
+}
+
+
+inline void setSqlTable(std::string& sql, const std::string& tableName) {
+    boost::algorithm::replace_all(sql, "@table", tableName);
+}
+
 void tst_json_parse() {
+    {
+    std::string strStmt = "INSERT INTO @table (name, permission, uploadSize, totalSize, createdAt, orderNum, isShow, roleType, status) @table VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?) @table @table";
+
+    setSqlTable(strStmt, "IM_FILE");
+    std::cout << "strStmt=" << strStmt << std::endl;
+        return ;
+    }
+    {
+        std::string sql_addOneUser_ = "insert into @table \
+     (userId, username, headImg, createdAt, updatedAt) ";
+
+        bool bCheck = ConstructInsertSql( sql_addOneUser_ );
+        if (!bCheck) {
+//            LOG_WARN( "addOneUser_ sql construct failed! sql=" << sql_addOneUser_ );
+        }
+        std::cout << "sql_addOneUser_=" << sql_addOneUser_ << std::endl;
+        return ;
+    }
 
     char* pfile = GetSmallFileContent("./tmp.json", NULL);
     const std::string json = pfile;
@@ -799,18 +880,87 @@ void tst_json_parse() {
     std::cout << "get_i=" << get_i << std::endl;
 }
 
+
+std::tuple<std::string, int> giveName(void)
+{
+    std::string cw("Caroline");
+    int a(2013);
+    std::tuple<std::string, int> t = std::make_tuple(cw, a);
+    return t;
+}
+
+void SetOneValue(int64_t& pVal, int64_t newVal) {
+    pVal = newVal;
+}
+void SetTuple( std::tuple< int64_t, int64_t, int64_t >& onetuple ) {
+//    onetuple = std::make_tuple( 987654290, 13123428866, 98755123);
+
+//    std::get<0>(onetuple) = 987654290;
+    SetOneValue( (std::get<0>(onetuple)), 987654290);
+//    std::get<1>(onetuple) = 13123428866;
+    SetOneValue( (std::get<1>(onetuple)), 13123428866);
+    std::get<2>(onetuple) = 98755123;
+
+}
+void tst_tuple_1() {
+
+    std::tuple< int64_t, int64_t, int64_t > permissionT;
+    SetTuple(permissionT);
+    std::cout << "index1=" << std::get<0>(permissionT) << std::endl;
+    std::cout << "index2=" << std::get<1>(permissionT) << std::endl;
+    std::cout << "index3=" << std::get<2>(permissionT) << std::endl;
+
+    return ;
+    std::tuple< int, double, std::string > t1(64, 128.001, "name111");
+    std::tuple<std::string, std::string, int > t2 = std::make_tuple("v1", "v2", 256);
+
+    size_t num = std::tuple_size<decltype(t1)>::value;
+    std::cout << "num=" << num << std::endl;
+
+    //获取第1个值的元素类型
+    std::tuple_element<1, decltype(t1)>::type cnt = std::get<1>(t1);
+    std::cout << "cnt = " << cnt << std::endl;
+
+    //比较
+    std::tuple<int, int> ti(24, 48);
+    std::tuple<double, double> td(28.0, 56.0);
+    bool b = (ti < td);
+    std::cout << "b = " << b << std::endl;
+
+    //tuple作为返回值
+    auto a = giveName();
+    std::cout << "name: " << get<0>(a)
+            << " years: " << get<1>(a) << std::endl;
+
+}
+
+void genRandom64() {
+    AtomicInt64 s_seed;
+    int64_t itmp = s_seed.addAndGet(1);
+    std::cout << "tmp=" << itmp <<std::endl;
+}
+
 int main(int argc, char *argv[])
 {
     std::setlocale(LC_ALL, "en_US.utf8");
     Logger::setLogLevel(Logger::DEBUG);
 //    LOG_INFO << "pid = " << getpid() << ", tid = " << CurrentThread::tid();
 
+
+
+//    tst_sf_1(); return 1;
+
+    tst_stock_f_1(); return 1;
+
+
+    tst_tuple_1(); return 1;
+
     tst_json_parse(); return 1;
 
 
     tst_str_2(); return 1;
 
-     my_weak_ptr(); return 1;
+    my_weak_ptr(); return 1;
 
     tst_string_1(); return 1;
 
