@@ -940,13 +940,129 @@ void genRandom64() {
     std::cout << "tmp=" << itmp <<std::endl;
 }
 
+void string_substr_1() {
+
+    std::string fileReMark = "1234-777";
+    if (fileReMark.size()) {
+        size_t rPos = fileReMark.rfind("-");
+        if (rPos != std::string::npos) {
+            fileReMark = fileReMark.substr(0, rPos);
+            std::cout << "fileReMark=" << fileReMark << std::endl;
+//            retFileBean.fileReMark = (fileReMark + "-" + retFileBean.fileName);
+        } else {
+//            retFileBean.fileReMark = retFileBean.fileName;
+        }
+    }
+
+}
+
+void tst_xx( int iIdx, int iCpyIdx ) {
+    std::cout << "iIdx=" << iIdx << " iCpyIdx=" << iCpyIdx << std::endl;
+}
+
+
+void tst_sprintf() {
+    std::vector < int > v_ints;
+    v_ints.push_back( 23 ); v_ints.push_back( 21 ); v_ints.push_back( 3 ); v_ints.push_back( 34 );
+    std::cout << "begin=" << *(v_ints.begin()) << std::endl;
+    std::cout << "front=" << (v_ints.front()) << std::endl;
+
+    return ;
+
+    std::string tst_string;
+//    std::cout << tst_string.size() ? "no null string" : "null string" << std::endl;
+
+    int v1 = 123;
+    int v2 = 456;
+    std::cout << (tst_string.size() == 0 ? v1 : v2) << std::endl;
+    std::cout << std::endl;
+
+#define PUSH_MESSAGE_SUCCESS 1
+#define PUSH_MESSAGE_ERROR   22
+    bool bExec = false;
+    std::cout << (bExec ? PUSH_MESSAGE_SUCCESS : PUSH_MESSAGE_ERROR) << std::endl;
+    std::cout << std::endl;
+    return ;
+
+    char tmpbuff[2048] = {0};
+    sprintf( tmpbuff, "1235=%s", "" );
+    std::cout << "tmpbuffer=" << tmpbuff << std::endl;
+}
+
+
+/*
+description：
+输入两个整数n和sum，从数列1，2，3.......n 中随意取几个数，使其和等于sum，要求将其中所有的可能组合列出来。
+
+方法1：
+注意到取n，和不取n个区别即可，考虑是否取第n个数的策略，可以转化为一个只和前n-1个数相关的问题。
+如果取第n个数，那么问题就转化为"取前n-1个数使得它们的和为sum-n"，对应的代码语句就是sumOfkNumber(sum - n, n - 1)；
+如果不取第n个数，那么问题就转化为"取前n-1个数使得他们的和为sum"，对应的代码语句为sumOfkNumber(sum, n - 1)。
+
+<<编程之法>>
+参考：https://github.com/julycoding/The-Art-Of-Programming-By-July/blob/master/ebook/zh/02.03.md
+author: JasonZhou
+date：  2016-03-15
+*/
+
+#include<iostream>
+#include <list>
+using namespace std;
+
+list<int>list1;
+void SumOfkNumber(int sum, int n) {
+    // 递归出口
+    if (n <= 0 || sum <= 0) return;
+
+    // 输出找到的结果
+    if (sum == n) {
+        // 反转list
+        list1.reverse();
+        for (list<int>::iterator iter = list1.begin(); iter != list1.end(); iter++)
+            cout << *iter << " + ";
+        cout << n <<endl;
+        list1.reverse();//此处还需反转回来
+    }
+
+    list1.push_front(n);      //典型的01背包问题
+    SumOfkNumber(sum - n, n - 1);   //“放”n，前n-1个数“填满”sum-n
+    list1.pop_front();
+    SumOfkNumber(sum, n - 1);     //不“放”n，n-1个数“填满”sum
+}
+void tst_sum_1() {
+    int n=9, sum=10;
+    SumOfkNumber(sum, n);
+}
+
 int main(int argc, char *argv[])
 {
     std::setlocale(LC_ALL, "en_US.utf8");
     Logger::setLogLevel(Logger::DEBUG);
 //    LOG_INFO << "pid = " << getpid() << ", tid = " << CurrentThread::tid();
 
+    tst_sum_1(); return 1;
 
+    tst_sprintf();
+//    int tmpIn = 1;
+//    tst_xx(tmpIn++, tmpIn);
+//    tst_xx(tmpIn++, tmpIn);
+    return 1;
+
+    string_substr_1(); return 1;
+
+    int64_t tmpVal = -1;
+    if (tmpVal > 0) {
+        std::cout << "tmpVal > 0, tmpVal=" << tmpVal << std::endl;
+    } else {
+        std::cout << "tmpVal <= 0, tmpVal=" << tmpVal << std::endl;
+    }
+    return 1;
+
+
+    OneFile tstfile;
+    tst_typeid(tstfile); return 1;
+
+    tst_wkPtr_use(); return 1;
 
 //    tst_sf_1(); return 1;
 

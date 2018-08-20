@@ -1,12 +1,14 @@
 
 
-
+#include "stockfactory.h"
 
 #include "muduo/base/Mutex.h"
 #include "muduo/base/Thread.h"
 
 
 #include <boost/noncopyable.hpp>
+#include <boost/thread/thread.hpp>
+#include <iostream>
 
 #include <memory>
 #include <unordered_map>
@@ -37,13 +39,11 @@ public:
     Stock(const string& name)
         : name_(name)
     {
-//        printf("curtid=%d Stock[%p] %s\n", muduo::CurrentThread::tid(), this, name_.c_str());
         LOG_INFO << " cst stock=" << this;
     }
 
     ~Stock()
     {
-//        printf("curtid=%d ~Stock[%p] %s\n", muduo::CurrentThread::tid(), this, name_.c_str());
         LOG_INFO << " dst stock=" << this;
     }
 
@@ -67,11 +67,13 @@ public:
         pStock = wkStock.lock();
         if (!pStock)
         {
+            LOG_INFO << "no found stock=" << key /*<< " mapsize=" << stocks_.size() << " firstkey=" << stocks_.begin()->first*/;
             pStock.reset(new Stock(key),
                          [this] (Stock* stock) { deleteStock(stock); });
             wkStock = pStock;
 
-            LOG_INFO << "get stock=" << pStock.get() << " usecout=" << pStock.use_count();
+            LOG_INFO << "Create new stock, stock=" << pStock.get();
+//            LOG_INFO << "get stock=" << pStock.get() << " usecout=" << pStock.use_count();
         }
         return pStock;
     }
@@ -81,14 +83,13 @@ private:
 */
     void deleteStock(Stock* delStockObj)
     {
-        LOG_INFO << " deleteStock in delObj stock=" << delStockObj;
+        LOG_INFO << " deleteStock in delObj stock=" << delStockObj << " key=" << delStockObj->key();
         if (delStockObj)
         {
             sleepMs(500);
             muduo::MutexLockGuard lock(mutex_);
 #ifdef REPRODUCE_BUG
-//            printf("tid=%d erase %zd\n", muduo::CurrentThread::tid(), stocks_.erase(stock->key()));
-            LOG_INFO << " ************* delkey=" << delStockObj->key();
+            LOG_INFO << " ************* delkey=" << delStockObj->key() << " mapsize=" << stocks_.size();
 #else
             auto it = stocks_.find(delStockObj->key());
             assert(it != stocks_.end());
@@ -100,23 +101,23 @@ private:
             }
 #endif
         }
+        LOG_INFO << " mapsize=" << stocks_.size() << " firstkey=" << stocks_.begin()->first;
         delete delStockObj;  // sorry, I lied
     }
 
+private:
     mutable muduo::MutexLock mutex_;
-    std::unordered_map<string, std::weak_ptr<Stock>> stocks_;
+    std::unordered_map< string, std::weak_ptr<Stock> > stocks_;
 };
 
 void threadB(StockFactory* factory)
 {
     sleepMs(250);
     auto stock = factory->get("MS");
-//    printf("tid=%d stock=%p usecout=%d\n", muduo::CurrentThread::tid(), stock.get(), stock.use_count());
     LOG_INFO << " stock=" << stock.get() << " usecount=" << stock.use_count();
 
     sleepMs(500);
     auto stock2 = factory->get("MS");
-//    printf("tid=%d stock2=%p usecout=%d\n", muduo::CurrentThread::tid(), stock2.get(), stock2.use_count());
     LOG_INFO << " stock2=" << stock2.get() << " usecount=" << stock2.use_count();
     if (stock != stock2)
     {
@@ -127,7 +128,6 @@ void threadB(StockFactory* factory)
 void tst_stock_f_1()
 {
     LOG_INFO << "main tid=" << muduo::CurrentThread::tid() /*<< std::endl << std::endl*/;
-//    printf( "main tid=%d\n", muduo::CurrentThread::tid() );
 
     StockFactory factory;
     muduo::Thread thr( [&factory] { threadB(&factory); }, "thrB" );
@@ -136,7 +136,6 @@ void tst_stock_f_1()
     LOG_INFO << ( "(((((((((((((((((((((((((((((" );
     {
         auto stock = factory.get("MS");
-//        printf("tid=%d stock=%p\n", muduo::CurrentThread::tid(), stock.get());
         LOG_INFO << ", stock=" << stock.get() << " usecout=" << stock.use_count();
     }
     LOG_INFO << "))))))))))))))))))))))))))))))";
@@ -144,4 +143,60 @@ void tst_stock_f_1()
     thr.join();
 }
 
+
+class CTestUse {
+public:
+    CTestUse(){
+        m_val = 123;
+        std::cout << "CTestUser cst" << std::endl;
+    }
+    virtual ~CTestUse() {
+        m_val = -1;
+        std::cout << "~CTestUser dst" << std::endl;
+    }
+    void print_val(){
+        std::cout << "val=" << m_val << std::endl;
+    }
+private:
+    int m_val;
+};
+
+
+
+void threadFunc(boost::weak_ptr<CTestUse> gpPtr) {
+//    std::cout << "work thread=" << muduo::CurrentThread::tid() << std::endl;
+    LOG_INFO << "threadFunc start";
+    LOG_INFO << "usecount=" << gpPtr.use_count();
+
+    if (gpPtr.expired()) {
+        LOG_INFO << "Ptr is expired";
+    } else {
+        LOG_INFO << "Ptr is work";
+    }
+}
+
+
+void tst_userId(OneUser& inUserBean) {
+    LOG_INFO << "user name=" << typeid(inUserBean).name();
+}
+void tst_typeid(OneFile& inFile) {
+    LOG_INFO << "file name=" << typeid(inFile).name();
+
+    OneUser inUser;
+    tst_userId(inUser);
+}
+
+void tst_wkPtr_use() {
+
+    LOG_INFO << "wkPtr use start";
+
+    boost::weak_ptr<CTestUse> wkPtr;
+    {
+        boost::shared_ptr<CTestUse> share_Ptr(new CTestUse);
+        wkPtr = (share_Ptr);
+    }
+    boost::thread workThread( boost::bind(&threadFunc, wkPtr) );
+
+    getchar();
+}
 
