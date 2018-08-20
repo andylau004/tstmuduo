@@ -10,11 +10,11 @@
 
 
 
+#include <iostream>
+#include <queue>
 
 
-#include "tst_1.h"
 
-#include "codeconvert.h"
 
 #include <iostream>
 #include <string>
@@ -22,24 +22,27 @@
 #include <stack>
 #include <vector>
 #include <fstream>
-using namespace std;
+
+
+
+#include <stdio.h>
+#include <thread>
+
+
+#include <boost/bind.hpp>
+
 
 //#include "poco/Bugcheck.h"
 //#include "poco/Foundation.h"
-
 //#include "poco/Alignment.h"
 
 #include "muduo/net/InetAddress.h"
-
 #include "muduo/net/Channel.h"
-
 #include "muduo/net/EventLoop.h"
 #include "muduo/net/EventLoopThread.h"
 #include "muduo/net/EventLoopThreadPool.h"
 #include "muduo/net/TcpServer.h"
-
 #include "muduo/base/Logging.h"
-
 #include "muduo/net/TcpClient.h"
 
 #include "discardserver.h"
@@ -50,15 +53,21 @@ using namespace std;
 #include "cpp11fun.h"
 
 
-#include <boost/bind.hpp>
+#include "tst_1.h"
+#include "codeconvert.h"
 
-#include <stdio.h>
-#include <thread>
+
+#include "boost_use_1.h"
+#include "trie_tree.h"
+
 
 
 using namespace std;
 using namespace muduo;
 using namespace muduo::net;
+
+
+
 
 
 const int MAX_LENGTH_INSERT_SORT = 17;
@@ -402,6 +411,7 @@ public:
 
     virtual void abc() {std::cout << "abc" << std::endl;}
     virtual void def() {std::cout << "def" << std::endl;}
+    virtual void hij() {std::cout << "hij" << std::endl;}
 private:
     static int s_ivalue;
 };
@@ -588,14 +598,17 @@ int partion_1(int a[], int left, int right, int length) {
     while (left < right) {
         while (left < right && a[right] >= pivot)
             right --;
-        if (left == right) {
-            std::cout << "111 left==right break" << std::endl;
-            break;
-        }
+//        if (left == right) {
+//            std::cout << "111 left==right break" << std::endl;
+//            break;
+//        }
 
         std::cout << "111 ready swap a[" << left << "]=" << a[left]
                   << ", a[" << right << "]=" << a[right] << ", pivot=" << pivot << std::endl;
-        std::swap(a[left], a[right]);
+        if (left < right) {
+//            std::swap(a[left], a[right]);
+            a[left++] = a[right];//将比key小的元素移到低端
+        }
 
 //        std::cout              << "swap begin----" << std::endl;
         for (size_t i = 0; i != 10; ++i)
@@ -605,26 +618,31 @@ int partion_1(int a[], int left, int right, int length) {
         std::cout << std::endl;
 
 //        std::cout << "left=" << left << ", right=" << right << std::endl;
-        while (left < right && a[left] <= pivot)
+        while (left < right && a[left] < pivot)
             left ++;
-        if (left == right) {
-            std::cout << "222 left==right break" << std::endl;
-            break;
-        }
+//        if (left == right) {
+//            std::cout << "222 left==right break" << std::endl;
+//            break;
+//        }
 
         std::cout << "222 ready swap a[" << left << "]=" << a[left]
                   << ", a[" << right << "]=" << a[right] << ", pivot=" << pivot << std::endl;
-        std::swap(a[left], a[right]);
+        if (left < right) {
+//            std::swap(a[left], a[right]);
+            a[right--] = a[left];//将比key大的元素移到高端
+        }
+
         for (size_t i = 0; i != 10; ++i)
             std::cout << a[i] << " ";
 //        std::cout << std::endl << "swap end----" << std::endl << std::endl;
         std::cout << std::endl;
         std::cout << std::endl;
     }
+    a[left] = pivot;
     return left;
 }
 //
-int partion(int a[], int left, int right) {
+int partion(int a[], int left, int right, int length) {
     int flag = a[left];
     int j = left;
 
@@ -658,10 +676,11 @@ void quickSort( int a[], int left, int right, int length ) {
     if (length > MAX_LENGTH_INSERT_SORT) {// 待排序数组长度大于临界值，则进行快速排序
         int pivotLoc; // 记录枢轴(pivot)所在位置
         if (left < right) {// 2. 优化小数组时的排序方案，将快速排序改为插入排序
-    //        pivotLoc = partion(a, left, right, length);// 将arr[low...high]一分为二,并返回枢轴位置
+//            pivotLoc = partion(a, left, right, length);// 将arr[low...high]一分为二,并返回枢轴位置
             pivotLoc = partion_1(a, left, right, length);// 将arr[low...high]一分为二,并返回枢轴位置
             std::cout << "pivotLoc=" << pivotLoc << std::endl;
-            quickSort(a, left, pivotLoc - 1, length);// 递归遍历arr[low...pivotLoc-1]
+
+            quickSort(a, left, pivotLoc/*pivotLoc - 1*/, length);// 递归遍历arr[low...pivotLoc-1]
             quickSort(a, pivotLoc + 1, right, length);// 递归遍历arr[pivotLoc+1...high]
         }
     } else {
@@ -670,24 +689,24 @@ void quickSort( int a[], int left, int right, int length ) {
 
 }
 void tst_qs_111() {
-    int a[10] = {12, 45, 748, 15, 56, 3, 89, 4, 48, 2};
+    int arr[10] = {12, 45, 748, 15, 56, 3, 89, 4, 48, 2};
 //    int a[10] = {2, 3, 4, 12, 15, 45, 48, 56, 89, 748};
 //    int a[] = {5, 1, 9, 3, 7, 4, 8, 6, 2};
-    int length = sizeof(a)/sizeof(int);
+    int length = sizeof(arr)/sizeof(int);
     std::cout << "length=" << length << std::endl;
 
     std::cout << "before sort----" << std::endl;
     for (size_t i = 0; i != length; ++i) {
-        std::cout << a[i] << " ";
+        std::cout << arr[i] << " ";
     }
     std::cout << std::endl;
 
-    quickSort(a, 0, length - 1, length);
+    quickSort(arr, 0, length - 1, length);
 
 //    std::cout << "------------------" << std::endl;
     std::cout << std::endl << "after sort----" << std::endl;
     for (size_t i = 0; i != length; ++i) {
-        cout<<a[i]<<" ";
+        std::cout << arr[i] << " ";
     }
     cout << std::endl;
 }
@@ -711,6 +730,46 @@ void tst_cpu_Use() {
     std::cout << "all thread work done" << std::endl;
 }
 
+void tst_list_print() {
+    std::list< int > list1; list1.push_back(127);list1.push_back(257);list1.push_back(15);
+    list1.reverse();
+    for (list<int>::iterator iter = list1.begin(); iter != list1.end(); iter++)
+        cout << *iter << " + ";
+    std::cout << std::endl;
+
+    std::cout << "-------------------------" << std::endl;
+
+    list1.reverse();
+    for (list<int>::iterator iter = list1.begin(); iter != list1.end(); iter++)
+        cout << *iter << " + ";
+    std::cout << std::endl;
+}
+
+void tst_pri_queue_1() {
+
+    int i = 0;
+    int len = 5;
+    int a[/*len*/] = {3,5,9,6,2};
+
+    priority_queue<int> qi;
+    for(i = 0; i < len; i++)
+        qi.push(a[i]);
+
+    for(i = 0; i < len; i++)
+    {
+        std::cout << qi.top() << " ";
+        qi.pop();
+    }
+    std::cout << std::endl;
+
+    typedef struct  _tagNode
+    {
+        int m_val;
+         _tagNode() : m_val(-1) {}
+    }Node;
+
+}
+
 int main(int argc, char *argv[])
 {
     Logger::setLogLevel(Logger::DEBUG);
@@ -725,8 +784,25 @@ std::cout << "c" << std::endl;
     tst_qs_111();  return 1;
     tst_list_qs(); return 1;
 
+
+//    trie_tree_1(); return 1;
+
+//    int sum = 0, minSum = 0, maxSum = INT_MIN;
+//    std::cout << "maxSum=" << maxSum << std::endl;
+//    return 1;
+
+    TestMemberFunction();
+    TestBoostBind();
+
+    return 1;
+
+    tst_pri_queue_1(); return 1;
+    tst_class_1(); return 1;
+    return 1;
+
+
     tst_host_net_shunxu(); return 1;
-//    tst_class_1(); return 1;
+//
 
     tst_int64_1(); return 1;
 
