@@ -39,8 +39,12 @@ using namespace std;
 
 void trie_tree_1();
 
+//
+void yinyongBind();
 
 
+
+void print_time ();
 
 
 

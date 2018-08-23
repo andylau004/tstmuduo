@@ -85,4 +85,96 @@ void trie_tree_1() {
 }
 
 
+void yinyongBind() {
+    class A
+    {
+    public:
+        virtual void print()
+        {
+            cout<<"A"<<endl;
+        }
+    };
+
+    class B:public A
+    {
+    public:
+        /*virtual*/ void print()
+        {
+            cout<<"B"<<endl;
+        }
+    };
+//    B b;
+
+//    A* pBObj = new B();
+//    A& a=b;
+
+//    a.print();
+//    pBObj->print();
+
+    A a;
+    B b;
+    a = b;
+a.print();
+b.print();
+}
+
+
+#include <sys/time.h>
+#include <time.h>
+#include <unistd.h>
+
+
+uint64_t GetCurMilliSecond() {
+    struct timeval tv;
+    gettimeofday(&tv,NULL);
+//    printf("second:%ld\n",tv.tv_sec);  //秒
+//    printf("millisecond:%ld\n",tv.tv_sec*1000 + tv.tv_usec/1000);  //毫秒
+    return (tv.tv_sec*1000 + tv.tv_usec/1000);
+}
+
+void print_time ()
+{
+    uint64_t ucur = GetCurMilliSecond();
+    std::cout << "ucr=" << ucur << std::endl;
+    {
+        struct timeval tv;
+        struct tm* ptm;
+        char time_string[40];
+        long milliseconds = 0;
+
+        /* 获得日期时间，并转化为 struct tm。 */
+//        gettimeofday(&tv, NULL);
+        tv.tv_sec = ucur/1000;
+        ptm = localtime (&tv.tv_sec);
+        /* 格式化日期和时间，精确到秒为单位。*/
+
+        strftime (time_string, sizeof (time_string), "%Y-%m-%d %H:%M:%S", ptm);
+        /* 从微秒计算毫秒。*/
+//        milliseconds = tv.tv_usec / 1000;
+//        /* 以秒为单位打印格式化后的时间日期，小数点后为毫秒。*/
+        printf ("%s.%03ld\n", time_string, milliseconds);
+
+    }
+    sleep(3);
+
+    {
+        struct timeval tv;
+        struct tm* ptm;
+        char time_string[40];
+        long milliseconds;
+
+        /* 获得日期时间，并转化为 struct tm。 */
+        gettimeofday(&tv, NULL);
+        ptm = localtime (&tv.tv_sec);
+        /* 格式化日期和时间，精确到秒为单位。*/
+        strftime (time_string, sizeof (time_string), "%Y-%m-%d %H:%M:%S", ptm);
+        /* 从微秒计算毫秒。*/
+        milliseconds = tv.tv_usec / 1000;
+        /* 以秒为单位打印格式化后的时间日期，小数点后为毫秒。*/
+        printf ("%s.%03ld\n", time_string, milliseconds);
+
+    }
+}
+
+
 

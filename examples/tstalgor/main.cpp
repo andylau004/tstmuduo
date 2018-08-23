@@ -70,7 +70,7 @@ using namespace muduo::net;
 
 
 
-const int MAX_LENGTH_INSERT_SORT = 17;
+const int MAX_LENGTH_INSERT_SORT = 7;
 
 
 class TestClient
@@ -598,16 +598,15 @@ int partion_1(int a[], int left, int right, int length) {
     while (left < right) {
         while (left < right && a[right] >= pivot)
             right --;
-//        if (left == right) {
-//            std::cout << "111 left==right break" << std::endl;
-//            break;
-//        }
-
+        if (left == right) {
+            std::cout << "111 left==right break" << std::endl;
+            break;
+        }
         std::cout << "111 ready swap a[" << left << "]=" << a[left]
                   << ", a[" << right << "]=" << a[right] << ", pivot=" << pivot << std::endl;
         if (left < right) {
-//            std::swap(a[left], a[right]);
-            a[left++] = a[right];//将比key小的元素移到低端
+            std::swap(a[left], a[right]);
+//            a[left++] = a[right];//将比key小的元素移到低端
         }
 
 //        std::cout              << "swap begin----" << std::endl;
@@ -620,16 +619,15 @@ int partion_1(int a[], int left, int right, int length) {
 //        std::cout << "left=" << left << ", right=" << right << std::endl;
         while (left < right && a[left] < pivot)
             left ++;
-//        if (left == right) {
-//            std::cout << "222 left==right break" << std::endl;
-//            break;
-//        }
-
+        if (left == right) {
+            std::cout << "222 left==right break" << std::endl;
+            break;
+        }
         std::cout << "222 ready swap a[" << left << "]=" << a[left]
                   << ", a[" << right << "]=" << a[right] << ", pivot=" << pivot << std::endl;
         if (left < right) {
-//            std::swap(a[left], a[right]);
-            a[right--] = a[left];//将比key大的元素移到高端
+            std::swap(a[left], a[right]);
+//            a[right--] = a[left];//将比key大的元素移到高端
         }
 
         for (size_t i = 0; i != 10; ++i)
@@ -684,7 +682,7 @@ void quickSort( int a[], int left, int right, int length ) {
             quickSort(a, pivotLoc + 1, right, length);// 递归遍历arr[pivotLoc+1...high]
         }
     } else {
-        insertSort(a, left, right, length);
+//        insertSort(a, left, right, length);
     }
 
 }
@@ -694,6 +692,7 @@ void tst_qs_111() {
 //    int a[] = {5, 1, 9, 3, 7, 4, 8, 6, 2};
     int length = sizeof(arr)/sizeof(int);
     std::cout << "length=" << length << std::endl;
+    std::cout << std::endl;
 
     std::cout << "before sort----" << std::endl;
     for (size_t i = 0; i != length; ++i) {
@@ -708,6 +707,7 @@ void tst_qs_111() {
     for (size_t i = 0; i != length; ++i) {
         std::cout << arr[i] << " ";
     }
+    cout << std::endl;
     cout << std::endl;
 }
 
@@ -781,6 +781,20 @@ std::cout << "c++" << std::endl;
 std::cout << "c" << std::endl;
 #endif
 
+    yinyongBind();
+
+//    std::string tmpPath = "";
+//    if ( tmpPath.at(tmpPath.size()-1) == '/' ) {
+//        std::cout << "find ///" << std::endl;
+//        tmpPath = tmpPath.substr(0, tmpPath.size()-1);
+//        std::cout << "aaa tmpPath=" << tmpPath << std::endl;
+//    } else
+//        std::cout << "bbb tmpPath=" << tmpPath << std::endl;
+
+print_time ();
+
+    return 1;
+
     tst_qs_111();  return 1;
     tst_list_qs(); return 1;
 
@@ -823,14 +837,6 @@ return 1;
     tst_sort_1();
     return 1;
 }
-
-//int main()
-//{
-//    //    Logger::setLogLevel(Logger::DEBUG);
-//    //    std::setlocale(LC_ALL, "en_US.utf8");
-
-//    return 1;
-//}
 
 
 
