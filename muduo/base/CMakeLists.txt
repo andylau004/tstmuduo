@@ -2,6 +2,10 @@
 
 
 set(base_SRCS
+
+    BinaryTree.cpp
+
+    Basic.cpp
 #  AsyncLogging.cc
   Condition.cc
   CountDownLatch.cc

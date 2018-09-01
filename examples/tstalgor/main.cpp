@@ -4,30 +4,21 @@
 
 
 
-#include <iostream>
 
+#include <stdio.h>
+
+#include <iostream>
 #include <sstream>
-
-
-
-#include <iostream>
-#include <queue>
-
-
-
 
 #include <iostream>
 #include <string>
 #include <algorithm>
 #include <stack>
 #include <vector>
+#include <queue>
+
 #include <fstream>
-
-
-
-#include <stdio.h>
 #include <thread>
-
 
 #include <boost/bind.hpp>
 
@@ -35,6 +26,8 @@
 //#include "poco/Bugcheck.h"
 //#include "poco/Foundation.h"
 //#include "poco/Alignment.h"
+
+#include "muduo/base/common.h"
 
 #include "muduo/net/InetAddress.h"
 #include "muduo/net/Channel.h"
@@ -59,6 +52,8 @@
 
 #include "boost_use_1.h"
 #include "trie_tree.h"
+#include "classfun.h"
+#include "tstBinaryTree.h"
 
 
 
@@ -66,6 +61,16 @@ using namespace std;
 using namespace muduo;
 using namespace muduo::net;
 
+
+#define VCZH_CHECK_MEMORY_LEAKS 1
+
+#ifdef VCZH_CHECK_MEMORY_LEAKS
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+//#include <crtdbg.h>
+//#define VCZH_CHECK_MEMORY_LEAKS_NEW new(_NORMAL_BLOCK, __FILE__, __LINE__)
+//#define new VCZH_CHECK_MEMORY_LEAKS_NEW
+#endif
 
 
 
@@ -247,7 +252,7 @@ void tst_sort_3() {
     std::cout << std::endl;
 }
 
-// 处理　只有一对　左右括号，且需要后面加入大量(?,?....) 场景
+// 处理只有一对括号，且需要后面加入大量 (?,?....) 场景
 bool ConstructInsertSql( std::string& in_sql ) {
     std::string str_ret;
 
@@ -255,30 +260,30 @@ bool ConstructInsertSql( std::string& in_sql ) {
 
     size_t leftPos = cpy_sql.find('(');
     if (leftPos == std::string::npos) {
-        LOG_INFO << "construct left failed!, insql=" << in_sql;
+//        LOG_WARN("construct left failed!, insql=" << in_sql);
         return false;
     }
 
     std::string strLeft = cpy_sql.substr(0, leftPos+1);
-    LOG_INFO << "construct right strLeft=" << strLeft;
+//    LOG_INFO("construct right strLeft=" << strLeft);
 
     size_t rightPos = cpy_sql.find(')');
     if (rightPos == std::string::npos) {
-        LOG_INFO << "construct right failed!, insql=" << in_sql;
+//        LOG_WARN("construct right failed!, insql=" << in_sql);
         return false;
     }
 
     std::string strMid = cpy_sql.substr(leftPos+1, rightPos-leftPos-1);
-    LOG_INFO << "construct right strRight=" << strMid;
+//    LOG_INFO << "construct right strRight=" << strMid;
 
     int num = count(strMid.begin(), strMid.end(), ',');
     if (!num) {
-        LOG_INFO << "construct count failed!, insql=" << in_sql;
+//        LOG_WARN("construct count failed!, insql=" << in_sql);
         return false;
     }
 
     std::string strInsertLeft  = " values ( ";
-    std::string strInsertRight = " )";
+    std::string strInsertRight = ")";
 
     for (int i = 0; i <= num; i++ ) {
         if (i == num)
@@ -289,10 +294,12 @@ bool ConstructInsertSql( std::string& in_sql ) {
 
     std::string lastRet;
     lastRet = strLeft + strMid + ")" + strInsertLeft + strInsertRight;
-LOG_INFO << "lastRet=" << lastRet;
-
+//    LOG_INFO << "lastRet=" << lastRet;
+    in_sql = lastRet;
     return true;
 }
+
+
 
 
 void tst_int64_1() {
@@ -770,6 +777,181 @@ void tst_pri_queue_1() {
 
 }
 
+void tst_ConstructSql() {
+    std::string strStmt("INSERT INTO @table (id,parentId,title,helpType,linkType,clientType,displayStatus,linkUrl,detailUrl,content,sortNum,createTime,updateTime,status)");
+    bool bCheck = ConstructInsertSql(strStmt);
+    if (!bCheck) {
+//        LOG_WARN( "insert sql construct failed! sql=" << strStmt );
+        std::cout << "failed!!! insert result=" << strStmt << std::endl;
+    } else {
+        std::cout << "successed!!! insert result=" << strStmt << std::endl;
+    }
+}
+
+void ConstructUpdateSystemHelpSql(std::string& _returnSql, const SystemHelp& in_systemHelp) {
+
+    std::string sql = " parentId=";
+    SPLICESQL((in_systemHelp.parentId > 0), _returnSql, sql + convert<std::string>(in_systemHelp.parentId) + ",");
+
+    sql = " title=\'";
+    SPLICESQL((!in_systemHelp.title.empty()), _returnSql, sql + in_systemHelp.title + "\',");
+
+    sql = " helpType=";
+    SPLICESQL((in_systemHelp.helpType > 0), _returnSql, sql + convert<std::string>(in_systemHelp.helpType) + ",");
+
+    sql = " linkType=";
+    SPLICESQL((in_systemHelp.linkType > 0), _returnSql, sql + convert<std::string>(in_systemHelp.linkType) + ",");
+
+    sql = " clientType=\'";
+    SPLICESQL((!in_systemHelp.clientType.empty()), _returnSql, sql + in_systemHelp.clientType + "\',");
+
+    sql = " displayStatus=";
+    SPLICESQL((in_systemHelp.displayStatus > 0), _returnSql, sql + convert<std::string>(in_systemHelp.displayStatus) + ",");
+
+    sql = " linkUrl=\'";
+    SPLICESQL((!in_systemHelp.linkUrl.empty()), _returnSql, sql + in_systemHelp.linkUrl + "\',");
+
+    sql = " detailUrl=\'";
+    SPLICESQL((!in_systemHelp.detailUrl.empty()), _returnSql, sql + in_systemHelp.detailUrl + "\',");
+
+    sql = " content=\'";
+    SPLICESQL((!in_systemHelp.content.empty()), _returnSql, sql + in_systemHelp.content + "\',");
+
+    sql = " sortNum=";
+    SPLICESQL((in_systemHelp.sortNum > 0), _returnSql, sql + convert<std::string>(in_systemHelp.sortNum) + ",");
+
+    sql = " updateTime=";
+    SPLICESQL((in_systemHelp.updateTime > 0), _returnSql, sql + convert<std::string>(in_systemHelp.updateTime) + ",");
+
+    sql = " status=";
+    SPLICESQL((in_systemHelp.status > 0), _returnSql, sql + convert<std::string>(in_systemHelp.status) + ",");
+
+    remove_last_comma(_returnSql);
+
+    _returnSql += (std::string(" where id=") + convert<std::string>(in_systemHelp.id));
+
+}
+
+bool updateSystemHelp(const SystemHelp& in_systemHelp) {
+    std::string strStmt("update @table set ");
+    ConstructUpdateSystemHelpSql(strStmt, in_systemHelp);
+    std::cout << "strStmt=" << strStmt << std::endl;
+    return true;
+}
+
+void tst_systemHelp_use_1() {
+    SystemHelp newObj;
+    newObj.id = 800;
+    newObj.parentId = 97876;
+    newObj.clientType = "tstclient1_type";
+    newObj.createTime = GetCurMilliSecond();
+    updateSystemHelp(newObj);
+}
+void tst_systemHelp_use_2() {
+    std::vector< SystemHelp > vec_Task;
+    for ( int i = 1; i <= 10; ++i ) {
+        SystemHelp newObj;
+        newObj.id = (1024 + i);
+        vec_Task.push_back(newObj);
+    }
+//    for ( int i = 0; i < vec_Task.size(); ++i ) {
+//        vec_Task[i].id += 1000;
+//    }
+    for ( int i = 0; i < vec_Task.size(); ++i ) {
+        std::cout << "i=" << 0 << ", val=" << vec_Task[i].id << std::endl;
+    }
+}
+
+void tst_rand() {
+    srand(time(NULL));
+
+    int count = 20;
+    for (int i = 0; i < count; ++i) {
+        int r = rand()%(10);
+        std::cout << "rand=" << r << std::endl;
+    }
+}
+int tst_rand(int low, int high)
+{
+    return rand()%(high-low+1)+low;
+}
+void tst_randEx() {
+    time_t t;
+    srand(time(&t));
+    for (int i = 0; i < 20; ++i) {
+        std::cout << "out=" << tst_rand(100, 200) << std::endl;
+    }
+}
+
+int foo(int in) { return 32; }
+
+//extern static int s_val;
+void tstMemoryLeak() {
+    boost::function<int(int)> func;
+    func = foo;
+    std::cout << func.empty() << std::endl;
+
+//    func = NULL;
+    func.clear();
+    std::cout << func.empty() << std::endl;
+
+    func = boost::function<int(int)>();
+    std::cout << func.empty() << std::endl;
+    return ;
+
+    char *p = (char*)malloc(1024);
+    sprintf(p, "%s", "abcde");
+    printf("%s\n", p);
+    int *p1 = (int*)malloc(4);
+    *p1 = 100;
+    void *p2 = malloc(256);
+//    free(p1);
+    int a = 2;
+    printf("%d\n", a);
+//    free(p);
+    void *p3 = malloc(124);
+//    free(p2);
+    void *p4 = malloc(23);
+//    free(p4);
+    //    getchar();
+}
+
+class CTestBind {
+public:
+    CTestBind() {
+
+    }
+    virtual ~CTestBind() {
+
+    }
+public:
+    int TestPrint(int param1, const std::string strParam2, int ival3) {
+        std::cout << "param1=" << param1 << ", strParam2=" << strParam2 << ", ival3=" << ival3 << std::endl;
+    }
+};
+
+boost::function< int (int, const std::string, int) > g_tmpFunc;
+void tryPrint() {
+    if (g_tmpFunc) {
+        g_tmpFunc(-1, "-777", 33333);
+    }
+}
+void tst_boostBind_1() {
+    CTestBind ctstBindObj;
+
+//    boost::function< int (int, const std::string, int) > tmpFunc;
+    g_tmpFunc = boost::bind( &CTestBind::TestPrint, &ctstBindObj, 777, "88990", _3 );
+
+    tryPrint();
+}
+
+//==================================================================
+// 《剑指Offer——名企面试官精讲典型编程题》代码
+// 作者：何海涛
+//==================================================================
+
+
+
 int main(int argc, char *argv[])
 {
     Logger::setLogLevel(Logger::DEBUG);
@@ -780,6 +962,26 @@ std::cout << "c++" << std::endl;
 #else
 std::cout << "c" << std::endl;
 #endif
+
+    tst_boostBind_1(); return 1;
+    tstMemoryLeak(); return 1;
+
+    std::cout << "s_val=" << ++ s_val << std::endl;
+    tst_randEx();
+    return 1;
+
+    tst_rand(); return 1;
+    tst_cpy_data();  return 1;
+
+    Print_yinyong(); return 1;
+
+    print_continue_seq(); return 1;
+    tst_systemHelp_use_2(); return 1;
+
+    tst_class_a(); return 1;
+
+    tst_systemHelp_use_1(); return 1;
+    tst_ConstructSql(); return 1;
 
     yinyongBind();
 

@@ -931,6 +931,112 @@ void tst_tuple_1() {
     auto a = giveName();
     std::cout << "name: " << get<0>(a)
             << " years: " << get<1>(a) << std::endl;
+}
+
+template <typename R, typename... T>
+class AbstractSqlHelper {
+public:
+    explicit AbstractSqlHelper(const std::tuple<T...> params) : params_(params) {}
+    typedef R ReturnType;
+
+    virtual void config(sql::PreparedStatement* stmt) = 0; // MUST
+    virtual void getValues(sql::ResultSet* rs) { UNUSED(rs); } // OPTIONAL
+
+    std::vector<R> results() const { return results_; }
+
+protected:
+    /*const */std::tuple<T...>/*&*/ params_;
+    std::vector<R> results_;
+};
+template <class T>
+void test_size(T t)
+{
+    int a[std::tuple_size<T>::value]; // 可在编译时
+    std::cout << "test_size=" << std::tuple_size<T>::value << '\n'; // 或在运行时使用
+}
+
+class CQuerySystemHelp_SqlHelper : public AbstractSqlHelper<int, std::map<std::string, std::string> > {
+public:
+    explicit CQuerySystemHelp_SqlHelper(const std::tuple< std::map<std::string, std::string> >& params) : AbstractSqlHelper(params) {
+
+        Print1();
+
+//        std::cout << "get map beg"  << std::endl;
+//        std::map<std::string, std::string> mapInfo = std::get<0>(params_);
+//        std::cout << "mapInfo=" << mapInfo.size() << std::endl;
+//        std::cout << "get map end"  << std::endl;
+    }
+    ~CQuerySystemHelp_SqlHelper() {
+    }
+    void Print1() {
+        std::cout << "Print1 beg"  << std::endl;
+//        std::cout << "tuplesiz="  << test_size(params_) <<  std::endl;
+
+        std::cout << "get map beg"  << std::endl;
+        const std::map<std::string, std::string>& mapInfo = std::get<0>(params_);
+        std::cout << "get map end"  << std::endl;
+
+        std::cout << "mapInfo=" << mapInfo.size() << std::endl;
+        test_size(params_);
+
+        for (std::map<std::string, std::string>::const_iterator it = mapInfo.begin(); it != mapInfo.end(); it ++) {
+            std::cout << "key=" << it->first << ", val=" << it->second << std::endl;
+        }
+        std::cout << "Print1 end"  << std::endl;
+    }
+    virtual void config(sql::PreparedStatement* stmt) {
+
+    }
+    virtual void getValues(sql::ResultSet* rs) { UNUSED(rs); }
+private:
+//    const std::tuple<T...>& params_;
+};
+
+
+class BaseClass {
+public:
+    BaseClass() { std::cout << "BaseClass const" << std::endl; }
+    virtual ~BaseClass() { std::cout << "BaseClass dest" << std::endl; }
+public:
+    virtual void PrintVal() { std::cout << "BaseClass PrintVal function" << std::endl; }
+    virtual void Log() { std::cout << "BaseClass Log function" << std::endl; }
+};
+class DeriveA : public BaseClass {
+public:
+    DeriveA() { std::cout << "DeriveA const" << std::endl; }
+    virtual ~DeriveA() { std::cout << "DeriveA dest" << std::endl; }
+
+public:
+//    virtual void PrintVal() { std::cout << "DeriveA PrintVal function" << std::endl; }
+//    virtual void Log() { std::cout << "DeriveA Log function" << std::endl; }
+    void PrintVal() { std::cout << "DeriveA PrintVal function" << std::endl; }
+    void Log() { std::cout << "DeriveA Log function" << std::endl; }
+
+};
+
+
+#include <iostream>
+#include <utility>
+
+void tst_tuple_2() {
+
+    DeriveA  aObj;
+    aObj.PrintVal();
+
+    return;
+//    auto p1111 = std::make_pair(1, 3.14);
+//    std::cout << '(' << std::get<0>(p1111) << ", " << std::get<1>(p1111) << ")\n";
+//    std::cout << '(' << std::get<int>(p1111) << ", " << std::get<double>(p1111) << ")\n";
+//    return ;
+
+    std::map<std::string, std::string> map_Param;
+    map_Param["111"] = "1aaa";
+    map_Param["222"] = "2bbb";
+
+    CQuerySystemHelp_SqlHelper helper(std::make_tuple(map_Param));
+    helper.Print1();
+
+    std::cout << "last map_Param=" << map_Param.size() << std::endl;
 
 }
 
@@ -1039,6 +1145,8 @@ int main(int argc, char *argv[])
     std::setlocale(LC_ALL, "en_US.utf8");
     Logger::setLogLevel(Logger::DEBUG);
 //    LOG_INFO << "pid = " << getpid() << ", tid = " << CurrentThread::tid();
+
+    tst_tuple_2(); return 1;
 
     tst_sum_1(); return 1;
 

@@ -16,6 +16,8 @@
 
 #include "muduo/base/Timestamp.h"
 
+#include "muduo/base/common.h"
+
 
 using namespace std;
 using namespace muduo;
@@ -86,6 +88,27 @@ void trie_tree_1() {
 
 
 void yinyongBind() {
+
+    std::map <std::string, std::string> map_param;
+    map_param["123"] = "abc";
+    map_param["223"] = "edf";
+    if (map_param.find("1231") != map_param.end()) {
+        std::cout << "find 123" << std::endl;
+    } else {
+        std::cout << "no find 123" << std::endl;
+        std::cout << "\"888\"=" <<  map_param["888"] << std::endl;
+    }
+
+    {
+        std::string strInx  = "56";
+        std::string strSize = "78901";
+//        int tmp = convert<int>(strInx);
+        std::cout << "Inx=" << convert<int>(strInx) << std::endl;
+        std::cout << "Size=" << convert<int>(strSize) << std::endl;
+        return ;
+    }
+
+
     class A
     {
     public:
