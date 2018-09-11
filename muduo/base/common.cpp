@@ -243,7 +243,15 @@ std::string SplitString( const std::string& s, std::set<std::string>& v, const s
 
 
 
-
+std::string GetFileContent_string( const std::string& inFileName ) {
+    return GetFileContent_string(inFileName.c_str());
+}
+std::string GetFileContent_string( const char* lpszFileName ) {
+    char* pContent = GetSmallFileContent(lpszFileName, NULL);
+    std::string retFile(pContent);
+    free(pContent);
+    return retFile;
+}
 char* GetSmallFileContent( const char* lpszFileName, unsigned int* pFileSize ) {
     FILE* pInfile = fopen( lpszFileName, "rb" );
     if ( pInfile == NULL ) {

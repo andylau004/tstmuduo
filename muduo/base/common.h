@@ -230,6 +230,7 @@ inline void remove_last_comma(std::string& str) {
 
 
 
+
 // convert<int8_t> 获取到ASCII码
 template <typename out, class in>
 out convert(const in & value) {
@@ -314,6 +315,9 @@ bool CopyFileEx( const std::string& srcfile, const std::string& dstfile );
 bool save_file( const char* lpfilename, const std::string& sinput );
 bool save_file( const char* lpfilename, char* inbuffer, size_t insize );
 
+
+std::string GetFileContent_string( const std::string& inFileName );
+std::string GetFileContent_string( const char* lpszFileName );
 char* GetSmallFileContent( const char* lpszFileName, unsigned int* pFileSize );
 unsigned int GetFileSize( const char* lpszFileName );
 

@@ -11,11 +11,13 @@ struct BinaryTreeNode
     BinaryTreeNode*        m_pRight;
 };
 
- BinaryTreeNode* CreateBinaryTreeNode(int value);
- void ConnectTreeNodes(BinaryTreeNode* pParent, BinaryTreeNode* pLeft, BinaryTreeNode* pRight);
- void PrintTreeNode(const BinaryTreeNode* pNode);
- void PrintTree(const BinaryTreeNode* pRoot);
- void DestroyTree(BinaryTreeNode* pRoot);
+
+
+extern BinaryTreeNode* CreateBinaryTreeNode(int value);
+extern void ConnectTreeNodes(BinaryTreeNode* pParent, BinaryTreeNode* pLeft, BinaryTreeNode* pRight);
+extern void PrintTreeNode(const BinaryTreeNode* pNode);
+extern void PrintTree(const BinaryTreeNode* pRoot);
+extern void DestroyTree(BinaryTreeNode* pRoot);
 
 
 //__declspec( dllexport ) BinaryTreeNode* CreateBinaryTreeNode(int value);
