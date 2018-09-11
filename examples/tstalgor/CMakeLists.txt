@@ -14,11 +14,10 @@ project(tstalgo)
 
 set(EXECUTABLE_OUTPUT_PATH ../../)
 
-add_executable(tstalgo main.cpp boost_use_1.h boost_use_1.cpp trie_tree.h trie_tree.cpp lru.h lru.cpp classfun.h classfun.cpp tstBinaryTree.cpp)
-target_link_libraries(tstalgo muduo_base muduo_net rt asan)
+add_executable(tstalgo main.cpp boost_use_1.h boost_use_1.cpp trie_tree.h trie_tree.cpp lru.h lru.cpp classfun.h classfun.cpp tstBinaryTree.cpp quicksort.cpp tstList.cpp tstList.h)
+target_link_libraries(tstalgo muduo_base muduo_net rt  ssl crypto)
 
-
-
+#asan
 
 
 

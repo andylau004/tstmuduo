@@ -147,13 +147,13 @@ b.print();
 #include <unistd.h>
 
 
-uint64_t GetCurMilliSecond() {
-    struct timeval tv;
-    gettimeofday(&tv,NULL);
-//    printf("second:%ld\n",tv.tv_sec);  //秒
-//    printf("millisecond:%ld\n",tv.tv_sec*1000 + tv.tv_usec/1000);  //毫秒
-    return (tv.tv_sec*1000 + tv.tv_usec/1000);
-}
+//uint64_t GetCurMilliSecond() {
+//    struct timeval tv;
+//    gettimeofday(&tv,NULL);
+////    printf("second:%ld\n",tv.tv_sec);  //秒
+////    printf("millisecond:%ld\n",tv.tv_sec*1000 + tv.tv_usec/1000);  //毫秒
+//    return (tv.tv_sec*1000 + tv.tv_usec/1000);
+//}
 
 void print_time ()
 {

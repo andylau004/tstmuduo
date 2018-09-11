@@ -21,6 +21,7 @@
 #include <thread>
 
 #include <boost/bind.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 
 //#include "poco/Bugcheck.h"
@@ -54,6 +55,10 @@
 #include "trie_tree.h"
 #include "classfun.h"
 #include "tstBinaryTree.h"
+#include "quicksort.h"
+
+#include "tstList.h"
+
 
 
 
@@ -74,8 +79,6 @@ using namespace muduo::net;
 
 
 
-
-const int MAX_LENGTH_INSERT_SORT = 7;
 
 
 class TestClient
@@ -535,188 +538,6 @@ int tst_list_qs()
     return 0 ;
 }
 
-// 从数组的两端向中间扫描
-/*
-length=10
-before sort----
-12 45 748 15 56 3 89 4 48 2
-111 ready swap a[0]=12, a[9]=2, pivot=12
-2 45 748 15 56 3 89 4 48 12
-swap end----
-
-222 ready swap a[1]=45, a[9]=12, pivot=12
-111 ready swap a[1]=12, a[7]=4, pivot=12
-2 4 748 15 56 3 89 12 48 45
-swap end----
-
-222 ready swap a[2]=748, a[7]=12, pivot=12
-111 ready swap a[2]=12, a[5]=3, pivot=12
-2 4 3 15 56 12 89 748 48 45
-swap end----
-
-222 ready swap a[3]=15, a[5]=12, pivot=12
-111 ready swap a[3]=12, a[3]=12, pivot=12
-2 4 3 12 56 15 89 748 48 45
-swap end----
-
-222 ready swap a[3]=12, a[3]=12, pivot=12
-111 ready swap a[0]=2, a[0]=2, pivot=2
-2 4 3 12 56 15 89 748 48 45
-swap end----
-
-222 ready swap a[0]=2, a[0]=2, pivot=2
-111 ready swap a[1]=4, a[2]=3, pivot=4
-2 3 4 12 56 15 89 748 48 45
-swap end----
-
-222 ready swap a[2]=4, a[2]=4, pivot=4
-111 ready swap a[4]=56, a[9]=45, pivot=56
-2 3 4 12 45 15 89 748 48 56
-swap end----
-
-222 ready swap a[6]=89, a[9]=56, pivot=56
-111 ready swap a[6]=56, a[8]=48, pivot=56
-2 3 4 12 45 15 48 748 56 89
-swap end----
-
-222 ready swap a[7]=748, a[8]=56, pivot=56
-111 ready swap a[7]=56, a[7]=56, pivot=56
-2 3 4 12 45 15 48 56 748 89
-swap end----
-
-222 ready swap a[7]=56, a[7]=56, pivot=56
-111 ready swap a[4]=45, a[5]=15, pivot=45
-2 3 4 12 15 45 48 56 748 89
-swap end----
-
-222 ready swap a[5]=45, a[5]=45, pivot=45
-111 ready swap a[8]=748, a[9]=89, pivot=748
-2 3 4 12 15 45 48 56 89 748
-swap end----
-
-222 ready swap a[9]=748, a[9]=748, pivot=748
-
-after sort----
-2 3 4 12 15 45 48 56 89 748
- */
-int partion_1(int a[], int left, int right, int length) {
-    int pivot = a[left];
-
-    while (left < right) {
-        while (left < right && a[right] >= pivot)
-            right --;
-        if (left == right) {
-            std::cout << "111 left==right break" << std::endl;
-            break;
-        }
-        std::cout << "111 ready swap a[" << left << "]=" << a[left]
-                  << ", a[" << right << "]=" << a[right] << ", pivot=" << pivot << std::endl;
-        if (left < right) {
-            std::swap(a[left], a[right]);
-//            a[left++] = a[right];//将比key小的元素移到低端
-        }
-
-//        std::cout              << "swap begin----" << std::endl;
-        for (size_t i = 0; i != 10; ++i)
-            std::cout << a[i] << " ";
-//        std::cout << std::endl << "swap end----" << std::endl << std::endl;
-        std::cout << std::endl;
-        std::cout << std::endl;
-
-//        std::cout << "left=" << left << ", right=" << right << std::endl;
-        while (left < right && a[left] < pivot)
-            left ++;
-        if (left == right) {
-            std::cout << "222 left==right break" << std::endl;
-            break;
-        }
-        std::cout << "222 ready swap a[" << left << "]=" << a[left]
-                  << ", a[" << right << "]=" << a[right] << ", pivot=" << pivot << std::endl;
-        if (left < right) {
-            std::swap(a[left], a[right]);
-//            a[right--] = a[left];//将比key大的元素移到高端
-        }
-
-        for (size_t i = 0; i != 10; ++i)
-            std::cout << a[i] << " ";
-//        std::cout << std::endl << "swap end----" << std::endl << std::endl;
-        std::cout << std::endl;
-        std::cout << std::endl;
-    }
-    a[left] = pivot;
-    return left;
-}
-//
-int partion(int a[], int left, int right, int length) {
-    int flag = a[left];
-    int j = left;
-
-    for (int i = left + 1; i <= right; ++ i) {
-
-        if (a[i] < flag) {
-            j ++;
-            if (j != i) {
-                std::swap(a[i], a[j]);
-            }
-        }
-
-    }
-    std::swap(a[j], a[left]);
-    return j;
-}
-void insertSort( int arr[], int left, int right, int length ) {// 对子序列arr[low...high]进行插入排序
-    int i, j, tmp;
-    for (i = left+1; i < right; i++) {// 从下标low+1开始遍历,因为下标为low的已经排好序
-        if (arr[i] < arr[i-1]) {
-            // 如果当前下标对应的记录小于前一位记录,则需要插入,否则不需要插入，直接将记录数增加1
-            tmp = arr[i]; // 记录下标i对应的元素
-            for (j = i-1; j >= left && arr[j] > tmp; j--) {
-                arr[j+1] = arr[j];// 记录后移
-            }
-            arr[j+1] = tmp;
-        }
-    }
-}
-void quickSort( int a[], int left, int right, int length ) {
-    if (length > MAX_LENGTH_INSERT_SORT) {// 待排序数组长度大于临界值，则进行快速排序
-        int pivotLoc; // 记录枢轴(pivot)所在位置
-        if (left < right) {// 2. 优化小数组时的排序方案，将快速排序改为插入排序
-//            pivotLoc = partion(a, left, right, length);// 将arr[low...high]一分为二,并返回枢轴位置
-            pivotLoc = partion_1(a, left, right, length);// 将arr[low...high]一分为二,并返回枢轴位置
-            std::cout << "pivotLoc=" << pivotLoc << std::endl;
-
-            quickSort(a, left, pivotLoc/*pivotLoc - 1*/, length);// 递归遍历arr[low...pivotLoc-1]
-            quickSort(a, pivotLoc + 1, right, length);// 递归遍历arr[pivotLoc+1...high]
-        }
-    } else {
-//        insertSort(a, left, right, length);
-    }
-
-}
-void tst_qs_111() {
-    int arr[10] = {12, 45, 748, 15, 56, 3, 89, 4, 48, 2};
-//    int a[10] = {2, 3, 4, 12, 15, 45, 48, 56, 89, 748};
-//    int a[] = {5, 1, 9, 3, 7, 4, 8, 6, 2};
-    int length = sizeof(arr)/sizeof(int);
-    std::cout << "length=" << length << std::endl;
-    std::cout << std::endl;
-
-    std::cout << "before sort----" << std::endl;
-    for (size_t i = 0; i != length; ++i) {
-        std::cout << arr[i] << " ";
-    }
-    std::cout << std::endl;
-
-    quickSort(arr, 0, length - 1, length);
-
-//    std::cout << "------------------" << std::endl;
-    std::cout << std::endl << "after sort----" << std::endl;
-    for (size_t i = 0; i != length; ++i) {
-        std::cout << arr[i] << " ";
-    }
-    cout << std::endl;
-    cout << std::endl;
-}
 
 void use_cpu() {
 //    std::cout << "tid=" << muduo::CurrentThread::tid() << " is working..." << std::endl;
@@ -950,6 +771,178 @@ void tst_boostBind_1() {
 // 作者：何海涛
 //==================================================================
 
+void tst_catFile() {
+
+    std::string strCmd, file1, file2, lstfile;
+    file1 = "file1";
+    file2 = "file2";
+    lstfile = "lastfile";
+
+    char tmpBuffer[2048] = {0};
+    sprintf(tmpBuffer, "cat %s %s > %s",
+            file1.c_str(), file2.c_str(), lstfile.c_str());
+
+    int iret = system( tmpBuffer );
+    std::cout << "tmpBuffer=" << tmpBuffer << std::endl;
+    std::cout << "iret=" << iret << std::endl;
+
+//    {
+//        char tmpBuffer[2048] = {0};
+//        sprintf(tmpBuffer, "mv %s %s", lstfile.c_str(), file1.c_str());
+
+//        int iret = system( tmpBuffer );
+//        std::cout << "tmpBuffer=" << tmpBuffer << std::endl;
+//        std::cout << "iret=" << iret << std::endl;
+//    }
+
+}
+
+
+int MergeTwoFile(const std::string& file1, const std::string& file2) {
+    std::string c_1 = GetFileContent_string(file1);
+    std::string c_2 = GetFileContent_string(file2);
+
+    std::string strMerged = c_1 + c_2;
+
+//    int ifind = file1.rfind('/');
+//    if (ifind == std::string::npos) {
+//        return -1;
+//    }
+//    std::cout << "i=" <<ifind <<std::endl;
+
+//    return 0;
+    std::string fileMerge = file1;//.substr(0, ifind+1);
+    fileMerge += "123";
+    FILE* pwrite = fopen(fileMerge.c_str(), "wb");
+    if (!pwrite) {
+//        LOG_ERROR(" open write file failed, file=" << fileMerge.c_str());
+        return -1;
+    }
+
+    fwrite(strMerged.c_str(), 1, strMerged.size(), pwrite);
+    fclose(pwrite);
+
+    int iret = rename(fileMerge.c_str(), file1.c_str());
+    std::cout << "iret=" << iret << std::endl;
+    return 0;
+}
+
+void tst_catFileEx() {
+//    std::string file1 = GetFileContent_string("/tmp/file1");
+//    std::string file2 = GetFileContent_string("file2");
+
+//    std::string strAllFile = file1+file2;
+//    FILE* pwrite = fopen("exout", "wb");
+//    fwrite(strAllFile.c_str(), 1, strAllFile.size(), pwrite);
+//    fclose(pwrite);
+//    ::rename("exout", "newexout");
+    MergeTwoFile("/tmp/file1", "file2");
+}
+
+void tst_print_time() {
+#define HOURS_CALC(x)   (x * 365 * 24)
+
+    const char *wday[]={"星期天","星期一","星期二","星期三","星期四","星期五","星期六"};
+    {
+        boost::posix_time::ptime ttt;
+        std::tm t = boost::posix_time::to_tm(ttt);
+//        X509_VERIFY_PARAM_set_time(raw(), ::mktime(&t));
+//        ::mktime(&t);
+        time_t xti = (::mktime(&t));
+        struct tm* p = localtime(&xti);
+        struct tm* pp;
+        time_t tts = timegm(&t);
+
+        printf("1111 %d年%d月%d日 %d:%d:%d %s\n",p->tm_year+1900,p->tm_mon+1,p->tm_mday,p->tm_hour,p->tm_min,p->tm_sec, wday[p->tm_wday]);
+        return ;
+    }
+
+    {
+        time_t timeNow = time(NULL);
+
+        struct tm* p = localtime(&timeNow);
+
+        struct tm* pp;
+
+        printf("1111 %d年%d月%d日 %d:%d:%d %s\n",p->tm_year+1900,p->tm_mon+1,p->tm_mday,p->tm_hour,p->tm_min,p->tm_sec, wday[p->tm_wday]);
+
+        pp = gmtime(&timeNow);
+
+        printf("1111 %d年%d月%d日 %d:%d:%d %s\n",pp->tm_year+1900,pp->tm_mon+1,pp->tm_mday,pp->tm_hour,pp->tm_min,pp->tm_sec, wday[pp->tm_wday]);
+//        return ;
+    }
+
+    {
+        time_t timep;
+
+        time(&timep); /*获取time_t类型的当前时间*/
+        /*用gmtime将time_t类型的时间转换为struct tm类型的时间按，／／没有经过时区转换的UTC时间
+          然后再用asctime转换为我们常见的格式 Fri Jan 11 17:25:24 2008
+        */
+        printf("%s", asctime(gmtime(&timep)));
+    }
+
+    {
+//        time_t timep;
+
+//        time(&timep); /*获取time_t类型当前时间*/
+//        /*转换为常见的字符串：Fri Jan 11 17:04:08 2008*/
+//        printf("%s", ctime(&timep));
+//        char *wday[] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
+        time_t timep;
+        struct tm *p;
+
+        time(&timep); /*获得time_t结构的时间，UTC时间*/
+        p = gmtime(&timep); /*转换为struct tm结构的UTC时间*/
+        //
+        printf("GMT   timeFormat=%d-%d-%d ", 1900 + p->tm_year, 1 + p->tm_mon, p->tm_mday);
+        printf("%d:%d:%d\n", p->tm_hour, p->tm_min, p->tm_sec);
+//        printf("%s %d:%d:%d\n", wday[p->tm_wday], p->tm_hour, p->tm_min, p->tm_sec);
+    }
+
+    {
+        time_t tmp_time;
+        struct tm *ptime;
+        struct tm *tmp;
+        tmp_time = time(NULL);//获取当前时间
+        ptime = localtime(&tmp_time);//转换成 本地时间
+
+        printf("Local timeFormat=%d-%d-%d %d:%d:%d\n",(1900+ptime->tm_year),(1+ptime->tm_mon),ptime->tm_mday,\
+                    ptime->tm_hour,ptime->tm_min,ptime->tm_sec);
+
+        return;
+
+        tmp_time += 30*60;
+        tmp = localtime(&tmp_time);
+        printf("%d-%d-%d %d:%d:%d\n",(1900+tmp->tm_year),(1+tmp->tm_mon),tmp->tm_mday,\
+                    tmp->tm_hour,tmp->tm_min,tmp->tm_sec);
+
+        ptime->tm_min += 30;
+        printf("%d-%d-%d %d:%d:%d\n",(1900+ptime->tm_year),(1+ptime->tm_mon),ptime->tm_mday,\
+                    ptime->tm_hour,ptime->tm_min,ptime->tm_sec);
+        return ;
+    }
+
+//    std::cout << "3 years=" << HOURS_CALC(3) << std::endl;
+//    return;
+
+//    char *wday[] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
+    time_t timep;
+    struct tm *p;
+
+    time(&timep); /*获得time_t结构的时间，UTC时间*/
+    p = localtime(&timep); /*转换为struct tm结构的当地时间*/
+    printf("%d%02d%02d ", 1900 + p->tm_year, 1 + p->tm_mon, p->tm_mday);
+    printf("%02d%02d%02d\n", p->tm_hour, p->tm_min, p->tm_sec);
+//    printf("%s %d:%d:%d\n", wday[p->tm_wday], p->tm_hour, p->tm_min, p->tm_sec);
+
+    std::cout << "aaaaaaaaaaaaaaaaaaaaaaaaaaa" << std::endl;
+
+    timep += 365 * 24 * 60 * 60;
+    p = localtime(&timep); /*转换为struct tm结构的当地时间*/
+    printf("%d%02d%02d ", 1900 + p->tm_year, 1 + p->tm_mon, p->tm_mday);
+    printf("%02d%02d%02d\n", p->tm_hour, p->tm_min, p->tm_sec);
+}
 
 
 int main(int argc, char *argv[])
@@ -962,6 +955,29 @@ std::cout << "c++" << std::endl;
 #else
 std::cout << "c" << std::endl;
 #endif
+
+//    std::cout << std::endl;
+    std::cout << std::endl;
+
+    tst_ListOperation_(); return 1;
+
+tst_print_time(); return 1;
+tst_qs_111(); return 1;
+
+    tst_struct_fun(); return 1;
+
+    tst_vec_quchong();
+    return 1;
+
+//    tst_catFile();
+    tst_catFileEx();
+    return 1;
+
+    tst_maxheap_sort(); return 1;
+
+    tst_qs_111();  return 1;
+
+    ts_PrintLines(); return 1;
 
     tst_boostBind_1(); return 1;
     tstMemoryLeak(); return 1;
@@ -997,7 +1013,6 @@ print_time ();
 
     return 1;
 
-    tst_qs_111();  return 1;
     tst_list_qs(); return 1;
 
 

@@ -144,7 +144,7 @@ void FindContinuousSequence(int sum)
 // ====================测试代码====================
 void Test(const char* testName, int sum)
 {
-    if(testName != nullptr)
+    if(testName != NULL)
         printf("%s for %d begins: \n", testName, sum);
 
     FindContinuousSequence(sum);

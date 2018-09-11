@@ -110,7 +110,7 @@ DateTime
     vint GetCurrentMilliseconds()
     {
         struct timeval tv;
-        gettimeofday(&tv, nullptr);
+        gettimeofday(&tv, NULL);
         return tv.tv_usec / 1000;
     }
 #endif
@@ -122,7 +122,7 @@ DateTime
         GetLocalTime(&systemTime);
         return SystemTimeToDateTime(systemTime);
 #elif defined VCZH_GCC
-        time_t timer = time(nullptr);
+        time_t timer = time(NULL);
         tm* timeinfo = localtime(&timer);
         return ConvertTMToDateTime(timeinfo, GetCurrentMilliseconds());
 #endif
@@ -135,7 +135,7 @@ DateTime
         GetSystemTime(&utcTime);
         return SystemTimeToDateTime(utcTime);
 #elif defined VCZH_GCC
-        time_t timer = time(nullptr);
+        time_t timer = time(NULL);
         tm* timeinfo = gmtime(&timer);
         return ConvertTMToDateTime(timeinfo, GetCurrentMilliseconds());
 #endif
@@ -212,7 +212,7 @@ DateTime
         SystemTimeToTzSpecificLocalTime(NULL, &utcTime, &localTime);
         return SystemTimeToDateTime(localTime);
 #elif defined VCZH_GCC
-        time_t localTimer = time(nullptr);
+        time_t localTimer = time(NULL);
         time_t utcTimer = mktime(gmtime(&localTimer));
         time_t timer = (time_t)(filetime / 1000) + localTimer - utcTimer;
         tm* timeinfo = localtime(&timer);

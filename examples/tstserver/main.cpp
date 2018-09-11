@@ -298,93 +298,93 @@ void tst_shared_Ptr_2() {
 }
 
 // 处理超过128字节ios推送逻辑
-std::string dealExceed128Bytes( const std::string& tip ) {
-    if ( tip.length() <= 128 )
-        return tip;
+//std::string dealExceed128Bytes( const std::string& tip ) {
+//    if ( tip.length() <= 128 )
+//        return tip;
 
-    std::string ret_tip;
+//    std::string ret_tip;
 
-    // 截断128字节数据，且追加后缀 ...
-    const int FIX_MAX_LEN = 128;
-//    if (tip.length() > FIX_MAX_LEN) {
-//        result.promtStKey = "newMSG";
-//        return;
+//    // 截断128字节数据，且追加后缀 ...
+//    const int FIX_MAX_LEN = 128;
+////    if (tip.length() > FIX_MAX_LEN) {
+////        result.promtStKey = "newMSG";
+////        return;
 
-    printf( "tip.length() > 128, tip.length()=%d\n", tip.length() );
-    printf( "FIX_MAX_LEN=%d\n", FIX_MAX_LEN );
-//        LOG_INFO( "tip.length() > 128, tip.length()=" << tip.length() );
-//        size_t tmplen = tip.length();
+//    printf( "tip.length() > 128, tip.length()=%d\n", tip.length() );
+//    printf( "FIX_MAX_LEN=%d\n", FIX_MAX_LEN );
+////        LOG_INFO( "tip.length() > 128, tip.length()=" << tip.length() );
+////        size_t tmplen = tip.length();
 
-        wchar_t tmp_wbuffer[FIX_MAX_LEN + 1]; ::memset( tmp_wbuffer, 0, sizeof(tmp_wbuffer) );
+//        wchar_t tmp_wbuffer[FIX_MAX_LEN + 1]; ::memset( tmp_wbuffer, 0, sizeof(tmp_wbuffer) );
 
-        size_t transferLen = std::mbstowcs(tmp_wbuffer, tip.c_str(), FIX_MAX_LEN);
-//        UNUSED(transferLen);
-//        LOG_INFO( "transferLen=" << transferLen );
-        printf( "transferLen=%d\n", transferLen );
+//        size_t transferLen = std::mbstowcs(tmp_wbuffer, tip.c_str(), FIX_MAX_LEN);
+////        UNUSED(transferLen);
+////        LOG_INFO( "transferLen=" << transferLen );
+//        printf( "transferLen=%d\n", transferLen );
 
-//        std::wstring neww1111 = Convert::convert(tip);
-//        std::wcout << "neww1111=" << neww1111 << std::endl;
+////        std::wstring neww1111 = Convert::convert(tip);
+////        std::wcout << "neww1111=" << neww1111 << std::endl;
 
-        std::wstring ws_tmp = tmp_wbuffer;//ws_tmp = neww1111;
-//        std::wcout << "ws_tmp=" <<ws_tmp << std::endl;
+//        std::wstring ws_tmp = tmp_wbuffer;//ws_tmp = neww1111;
+////        std::wcout << "ws_tmp=" <<ws_tmp << std::endl;
 
-        std::string slst = Convert::convert(ws_tmp);
-//        char lstbuffer[ FIX_MAX_LEN*sizeof(wchar_t) + 1 ];
-//        memset( lstbuffer, 0, FIX_MAX_LEN*sizeof(wchar_t) + 1 );
-//        std::cout << "aaaaaaaaaa=" << FIX_MAX_LEN*sizeof(wchar_t) + 1 << std::endl;//
+//        std::string slst = Convert::convert(ws_tmp);
+////        char lstbuffer[ FIX_MAX_LEN*sizeof(wchar_t) + 1 ];
+////        memset( lstbuffer, 0, FIX_MAX_LEN*sizeof(wchar_t) + 1 );
+////        std::cout << "aaaaaaaaaa=" << FIX_MAX_LEN*sizeof(wchar_t) + 1 << std::endl;//
 
-//        transferLen = std::wcstombs(lstbuffer, tmp_wbuffer, FIX_MAX_LEN*sizeof(wchar_t) + 1);
-//        std::cout << "lst transferLen=" << transferLen << std::endl;//
-//        std::cout << "lstbuffer=" << lstbuffer << std::endl;//
+////        transferLen = std::wcstombs(lstbuffer, tmp_wbuffer, FIX_MAX_LEN*sizeof(wchar_t) + 1);
+////        std::cout << "lst transferLen=" << transferLen << std::endl;//
+////        std::cout << "lstbuffer=" << lstbuffer << std::endl;//
 
-        if (slst.length() == tip.length()) {
-            ret_tip += slst;
-        } else {
-            ret_tip += slst;
-            ret_tip += "...";
-        }
+//        if (slst.length() == tip.length()) {
+//            ret_tip += slst;
+//        } else {
+//            ret_tip += slst;
+//            ret_tip += "...";
+//        }
 
-//        LOG_DEBUG( "last_tip=" << ret_tip.c_str() );
-//        printf( "slst=%s\n", slst.c_str() );
-//        printf( "ret_tip.size=%d&last_tip=%s\n", ret_tip.size(), ret_tip.c_str() );
+////        LOG_DEBUG( "last_tip=" << ret_tip.c_str() );
+////        printf( "slst=%s\n", slst.c_str() );
+////        printf( "ret_tip.size=%d&last_tip=%s\n", ret_tip.size(), ret_tip.c_str() );
+////    }
+//    return ret_tip;
+//}
+
+//// 分析字符串内中文字个数
+//void tst_convert_1() {
+//    {
+//        std::string strShow = "www别个名模意图舞台设计利济路集体推理别个名模意图舞台设计利济路集体推理鸡腿踢腿吱吱吱嘻嘻嘻仔细找是哦里连累哦哦呦喂一直嘻嘻嘻嘻嘻醉咯上课去啦怕怕啊怕怕阿萨很愿意走咯额呃呃呃哦啦JJ集体哦说www上午去  PK哦哦你呃呃呃啊啊啊啊啊啊啊啊啊啊啊 安咯哦哟...";
+//        strShow = "别个名模意图舞台设计利济路集体推理别个名模意图舞台设计利济路集体推理鸡腿踢腿吱吱吱嘻嘻嘻仔细找是哦里连累哦哦呦喂一直嘻嘻嘻嘻嘻醉咯上课去啦怕怕啊怕怕阿萨很愿意走咯额呃呃呃哦啦集体哦说上午去哦哦你呃呃呃啊啊啊啊啊啊啊啊啊啊啊安咯哦哟";
+
+//        strShow = "abcd别个名模意图别个名模意图别个名模意图别个名模意图别个名模意图别个名模意图别个名模意图别个名模意图";
+
+//        std::cout << "strShow=" << strShow << std::endl;
+//        std::cout << "strShowsize=" << strShow.size() << std::endl;
+
+//        std::cout << "countChineseCharsUtf8=" << Convert::countChineseCharsUtf8(strShow) << std::endl;
+//        std::cout << "detectEncoding=" << Convert::getEncodingName(strShow) << std::endl;
+////        std::cout << "countChineseCharsGbk=" << Convert::countChineseCharsGbk(strShow) << std::endl;
+////        std::cout << "countChineseCharsUcs2=" << Convert::countChineseCharsUcs2(strShow) << std::endl;
+
+//        std::string ret = dealExceed128Bytes( strShow );
+
+//        std::cout << "ret=" << ret << std::endl;
+//        std::cout << "ret.size=" << ret.size() << std::endl;
+//        return ;
 //    }
-    return ret_tip;
-}
-
-// 分析字符串内中文字个数
-void tst_convert_1() {
-    {
-        std::string strShow = "www别个名模意图舞台设计利济路集体推理别个名模意图舞台设计利济路集体推理鸡腿踢腿吱吱吱嘻嘻嘻仔细找是哦里连累哦哦呦喂一直嘻嘻嘻嘻嘻醉咯上课去啦怕怕啊怕怕阿萨很愿意走咯额呃呃呃哦啦JJ集体哦说www上午去  PK哦哦你呃呃呃啊啊啊啊啊啊啊啊啊啊啊 安咯哦哟...";
-        strShow = "别个名模意图舞台设计利济路集体推理别个名模意图舞台设计利济路集体推理鸡腿踢腿吱吱吱嘻嘻嘻仔细找是哦里连累哦哦呦喂一直嘻嘻嘻嘻嘻醉咯上课去啦怕怕啊怕怕阿萨很愿意走咯额呃呃呃哦啦集体哦说上午去哦哦你呃呃呃啊啊啊啊啊啊啊啊啊啊啊安咯哦哟";
-
-        strShow = "abcd别个名模意图别个名模意图别个名模意图别个名模意图别个名模意图别个名模意图别个名模意图别个名模意图";
-
-        std::cout << "strShow=" << strShow << std::endl;
-        std::cout << "strShowsize=" << strShow.size() << std::endl;
-
-        std::cout << "countChineseCharsUtf8=" << Convert::countChineseCharsUtf8(strShow) << std::endl;
-        std::cout << "detectEncoding=" << Convert::getEncodingName(strShow) << std::endl;
-//        std::cout << "countChineseCharsGbk=" << Convert::countChineseCharsGbk(strShow) << std::endl;
-//        std::cout << "countChineseCharsUcs2=" << Convert::countChineseCharsUcs2(strShow) << std::endl;
-
-        std::string ret = dealExceed128Bytes( strShow );
-
-        std::cout << "ret=" << ret << std::endl;
-        std::cout << "ret.size=" << ret.size() << std::endl;
-        return ;
-    }
 
 
-    std::string sttt = "别个名模意图舞台设计利济路集体推理别个名模意图舞台设计利济路集体推理鸡腿踢腿吱吱吱嘻嘻嘻仔细找是哦里连累哦哦呦喂一直嘻嘻嘻嘻嘻醉咯上课去啦怕怕啊怕怕阿萨很愿意走咯额呃呃呃哦啦集体哦说上午去哦哦你呃呃呃啊啊啊啊啊啊啊啊啊啊啊安咯哦哟哦只有行么额呃呃呃体现一下喷雾器咯哦哦的啦民工别个名模意图舞台设计利济路集体推理别个名模意图舞台设计利济路集体推理鸡腿踢腿吱吱吱嘻嘻嘻仔细找是哦里连累哦哦呦喂一直嘻嘻嘻嘻嘻醉咯上课去啦怕怕啊怕怕阿萨很愿意走咯额呃呃呃哦啦集体哦说上午去哦哦你呃呃呃啊啊啊啊啊啊啊啊啊啊啊安咯哦哟哦只有行么别个名模意图舞台设计利济路集体推理别个名模意图舞台设计利济路集体推理鸡腿踢腿吱吱吱嘻嘻嘻仔细找是哦里连累哦哦呦喂一直嘻嘻嘻嘻嘻醉咯上课去啦怕怕啊怕怕阿萨很愿意走咯额呃呃呃哦啦集体哦说上午去哦哦你呃呃呃啊啊啊啊啊啊啊啊啊啊啊安咯哦哟别个名模意图舞台设计利济路集体推理别个名模意图舞台设计利济路集体推理鸡腿踢腿吱吱吱嘻嘻嘻仔细找是哦里连累哦哦呦喂一直嘻嘻嘻嘻嘻醉咯上课去啦怕怕啊怕怕阿萨很愿意走咯额呃呃呃哦啦集体哦说上午去哦哦你呃呃呃啊啊啊啊啊啊啊啊啊啊啊安咯哦哟哦只有行么额呃呃呃体现一下喷雾器咯哦哦的啦民工别个";
+//    std::string sttt = "别个名模意图舞台设计利济路集体推理别个名模意图舞台设计利济路集体推理鸡腿踢腿吱吱吱嘻嘻嘻仔细找是哦里连累哦哦呦喂一直嘻嘻嘻嘻嘻醉咯上课去啦怕怕啊怕怕阿萨很愿意走咯额呃呃呃哦啦集体哦说上午去哦哦你呃呃呃啊啊啊啊啊啊啊啊啊啊啊安咯哦哟哦只有行么额呃呃呃体现一下喷雾器咯哦哦的啦民工别个名模意图舞台设计利济路集体推理别个名模意图舞台设计利济路集体推理鸡腿踢腿吱吱吱嘻嘻嘻仔细找是哦里连累哦哦呦喂一直嘻嘻嘻嘻嘻醉咯上课去啦怕怕啊怕怕阿萨很愿意走咯额呃呃呃哦啦集体哦说上午去哦哦你呃呃呃啊啊啊啊啊啊啊啊啊啊啊安咯哦哟哦只有行么别个名模意图舞台设计利济路集体推理别个名模意图舞台设计利济路集体推理鸡腿踢腿吱吱吱嘻嘻嘻仔细找是哦里连累哦哦呦喂一直嘻嘻嘻嘻嘻醉咯上课去啦怕怕啊怕怕阿萨很愿意走咯额呃呃呃哦啦集体哦说上午去哦哦你呃呃呃啊啊啊啊啊啊啊啊啊啊啊安咯哦哟别个名模意图舞台设计利济路集体推理别个名模意图舞台设计利济路集体推理鸡腿踢腿吱吱吱嘻嘻嘻仔细找是哦里连累哦哦呦喂一直嘻嘻嘻嘻嘻醉咯上课去啦怕怕啊怕怕阿萨很愿意走咯额呃呃呃哦啦集体哦说上午去哦哦你呃呃呃啊啊啊啊啊啊啊啊啊啊啊安咯哦哟哦只有行么额呃呃呃体现一下喷雾器咯哦哦的啦民工别个";
 
-    sttt = "www别个名模意图舞台设计利济路集体推理别个名模意图舞台设计利济路集体推理鸡腿踢腿吱吱吱嘻嘻嘻仔细找是哦里连累哦哦呦喂一直嘻嘻嘻嘻嘻醉咯上课去啦怕怕啊怕怕阿萨很愿意走咯额呃呃呃哦啦JJ集体哦说www上午去  PK哦哦你呃呃呃啊啊啊啊啊啊啊啊啊啊啊 安咯哦哟哦只有行么额呃呃呃   体现一下喷雾器咯哦哦的啦 民工别个名模意图舞台设计利济路集体推理别个名模意图舞台设计利济路集体推理鸡腿踢腿吱吱吱嘻嘻嘻仔细找是哦里连累哦哦呦喂一直嘻嘻嘻嘻嘻醉咯上课去啦怕怕啊怕怕阿萨很愿意走咯额呃呃呃哦啦JJ集体哦说www上午去  PK哦哦你呃呃呃啊啊啊啊啊啊啊啊啊啊啊 安咯哦哟哦只有行么别个名模意图舞台设计利济路集体推理别个名模意图舞台设计利济路集体推理鸡腿踢腿吱吱吱嘻嘻嘻仔细找是哦里连累哦哦呦喂一直嘻嘻嘻嘻嘻醉咯上课去啦怕怕啊怕怕阿萨很愿意走咯额呃呃呃哦啦JJ集体哦说www上午去  PK哦哦你呃呃呃啊啊啊啊啊啊啊啊啊啊啊 安咯哦哟哦只有行么额呃呃呃   体现一下喷雾器咯哦哦的啦 民工晚自习王一民敏敏公民踢腿吱吱吱嘻嘻嘻仔细找是呃呃呃   体现一下喷雾器咯哦哦的啦 民工晚自习王一民敏敏公民踢腿吱吱吱嘻嘻嘻仔细找是王一民敏敏公民踢腿吱吱吱嘻嘻嘻仔细找是";
-    sttt = "www.baidu.com阿萨斯哦鞍山市绿卡单拉是打开拉萨的看着你呢，自行车，自行车，自行车，，自行车凯斯齐威王  圣安东尼奥四大纳斯的状况才能做出这些内存模组";
-    std::string ret = dealExceed128Bytes( sttt );
+//    sttt = "www别个名模意图舞台设计利济路集体推理别个名模意图舞台设计利济路集体推理鸡腿踢腿吱吱吱嘻嘻嘻仔细找是哦里连累哦哦呦喂一直嘻嘻嘻嘻嘻醉咯上课去啦怕怕啊怕怕阿萨很愿意走咯额呃呃呃哦啦JJ集体哦说www上午去  PK哦哦你呃呃呃啊啊啊啊啊啊啊啊啊啊啊 安咯哦哟哦只有行么额呃呃呃   体现一下喷雾器咯哦哦的啦 民工别个名模意图舞台设计利济路集体推理别个名模意图舞台设计利济路集体推理鸡腿踢腿吱吱吱嘻嘻嘻仔细找是哦里连累哦哦呦喂一直嘻嘻嘻嘻嘻醉咯上课去啦怕怕啊怕怕阿萨很愿意走咯额呃呃呃哦啦JJ集体哦说www上午去  PK哦哦你呃呃呃啊啊啊啊啊啊啊啊啊啊啊 安咯哦哟哦只有行么别个名模意图舞台设计利济路集体推理别个名模意图舞台设计利济路集体推理鸡腿踢腿吱吱吱嘻嘻嘻仔细找是哦里连累哦哦呦喂一直嘻嘻嘻嘻嘻醉咯上课去啦怕怕啊怕怕阿萨很愿意走咯额呃呃呃哦啦JJ集体哦说www上午去  PK哦哦你呃呃呃啊啊啊啊啊啊啊啊啊啊啊 安咯哦哟哦只有行么额呃呃呃   体现一下喷雾器咯哦哦的啦 民工晚自习王一民敏敏公民踢腿吱吱吱嘻嘻嘻仔细找是呃呃呃   体现一下喷雾器咯哦哦的啦 民工晚自习王一民敏敏公民踢腿吱吱吱嘻嘻嘻仔细找是王一民敏敏公民踢腿吱吱吱嘻嘻嘻仔细找是";
+//    sttt = "www.baidu.com阿萨斯哦鞍山市绿卡单拉是打开拉萨的看着你呢，自行车，自行车，自行车，，自行车凯斯齐威王  圣安东尼奥四大纳斯的状况才能做出这些内存模组";
+//    std::string ret = dealExceed128Bytes( sttt );
 
-    std::cout << "ret=" << ret << std::endl;
-    std::cout << "ret.size=" << ret.size() << std::endl;
+//    std::cout << "ret=" << ret << std::endl;
+//    std::cout << "ret.size=" << ret.size() << std::endl;
 
-}
+//}
 
 //int64_t GetRandom64() {
 
@@ -582,7 +582,7 @@ void my_weak_ptr() {
 //        auto sptr = std::make_shared<demo>();
 //        wptr = sptr;
 //        auto sptr2 = wptr.lock();
-//        if (!wptr.expired()){///等价于sptr2 != nullptr
+//        if (!wptr.expired()){///等价于sptr2 != NULL
 //            printf("shared_ptr ok\n");
 //            sptr2->show();
 //        }
@@ -1204,7 +1204,7 @@ int main(int argc, char *argv[])
 
     tst_shared_Ptr_1(); return 1;
 
-    tst_convert_1(); return 1;
+//    tst_convert_1(); return 1;
 
 //    tst_weakPtr_1(); return 1;
 
