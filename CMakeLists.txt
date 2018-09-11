@@ -47,6 +47,7 @@ aux_source_directory(./muduo/net/poller  POLLER_LIST)
 link_directories(${LIBRARY_OUTPUT_PATH})
 #link_directories(/usr/lib)
 link_directories(/usr/local/lib)
+link_directories(/opt/openssl/lib/)
 
 
 
