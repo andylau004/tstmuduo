@@ -59,6 +59,7 @@
 
 #include "tstList.h"
 
+#include "complexdata.h"
 
 
 
@@ -945,6 +946,7 @@ void tst_print_time() {
 }
 
 
+
 int main(int argc, char *argv[])
 {
     Logger::setLogLevel(Logger::DEBUG);
@@ -958,6 +960,8 @@ std::cout << "c" << std::endl;
 
 //    std::cout << std::endl;
     std::cout << std::endl;
+
+    tst_ComplexDataEntry_(); return 1;
 
     tst_ListOperation_(); return 1;
 

@@ -118,9 +118,13 @@ ListNodeEx* GetMiddleNode(ListNodeEx* phead) {
     ListNodeEx* pQuick = phead;
     ListNodeEx* pSlow  = phead;
 
-    while (pQuick) {
-
+    while (pQuick->next) {
+        pQuick = pQuick->next;
+        pSlow  = pSlow->next;
+        if (pQuick->next)
+            pQuick = pQuick->next;
     }
+    return pSlow;
     return NULL;
 }
 void tst_GetMiddleNode_fun() {
@@ -131,11 +135,149 @@ void tst_GetMiddleNode_fun() {
     std::cout << "GetMiddleNode ret=" << GetMiddleNode(phead)->val << std::endl;
 }
 
+//5. 从尾到头打印单链表
+void RPrintList(ListNodeEx* phead) {
+    if (!phead || !phead->next) return ;
+
+    std::stack<int> stackVal;
+    ListNodeEx* pNode = phead;
+    while (pNode) {
+        stackVal.push(pNode->val);
+        pNode = pNode->next;
+    }
+    while (!stackVal.empty()) {
+        int val = stackVal.top();
+        printf("%d ", val);
+        stackVal.pop();
+    }
+    printf("\n");
+}
+void tst_RPrintList_fun() {
+    ListNodeEx* phead = NULL;
+    for (int i = 0 ; i < 9; ++ i )
+        CreateList(phead, i);
+    RPrintList(phead);
+//    std::cout << "GetMiddleNode ret=" << RPrintList(phead)->val << std::endl;
+}
+
+
+
+//已知两个单链表pHead1 和pHead2 各自有序，把它们合并成一个链表依然有序
+ListNodeEx* MergeTwoList(ListNodeEx* pHead1, ListNodeEx* pHead2) {
+    if (!pHead1) return pHead2;
+    if (!pHead2) return pHead1;
+
+    ListNodeEx* pMerged = NULL;
+    if (pHead1->val < pHead2->val) {
+        pMerged = pHead1;
+        pMerged->next = MergeTwoList(pHead1->next, pHead2);
+    } else {
+        pMerged = pHead2;
+        pMerged = MergeTwoList(pHead1, pHead2->next);
+    }
+    return pMerged;
+}
+void tst_MergeTwoList() {
+    ListNodeEx* phead1 = NULL;
+//    for (int i = 0 ; i < 9; ++ i )
+    CreateList(phead1, 12);CreateList(phead1, 8);CreateList(phead1, 6);
+    PrintList(phead1);
+
+    ListNodeEx* phead2 = NULL;
+//    for (int j = 31; j < 40; ++ j )
+//        CreateList(phead2, j);
+    CreateList(phead2, 198);CreateList(phead2, 89);CreateList(phead2, 13);
+    PrintList(phead2);
+
+    std::cout << "11111111111111" << std::endl;
+    PrintList( MergeTwoList(phead1, phead2) );
+    std::cout << "22222222222222" << std::endl;
+}
+
+
+bool HasCircle(ListNodeEx * pHead) {
+    ListNodeEx * pFast = pHead; // 快指针每次前进两步
+    ListNodeEx * pSlow = pHead; // 慢指针每次前进一步
+    while(pFast != NULL && pFast->next != NULL) {
+        pFast = pFast->next->next;
+        pSlow = pSlow->next;
+        if(pSlow == pFast) // 相遇，存在环
+            return true;
+    }
+    return false;
+}
+
+void tst_CircleList() {
+//    ListNodeEx* phead1 = NULL;
+//    for (int i = 0 ; i < 9; ++ i )
+//        CreateList(phead1, i);
+
+//    ListNodeEx* ptmp = phead1;
+//    while (1) {
+//        if (ptmp->next)
+//    }
+}
+
+//洗牌
+void shufferImpl(int arr[], int length) {
+
+    srand(time(NULL));
+    int index = 0;
+
+    for (int i = length-1; i > 0; -- i) {
+        int index = rand()%(length);
+
+        std::swap( arr[i], arr[index] );
+//        std::cout << "index=" << index << std::endl;
+    }
+    for (int i = 0; i < length; ++i) {
+        std::cout << arr[i] << " ";
+    }
+    std::cout << std::endl;
+
+}
+void tst_shuffle() {
+
+    int arr [10] = {0};
+    for (int i = 0; i < 10; ++ i ) {
+        arr[i] = i;
+    }
+
+    shufferImpl(arr, 10);
+}
+
+void tst_max_array() {
+    int arr[] = { 9, 12, 3, 889, 71, 63, 29, 367,1023 };
+    int max = arr[0];
+    for (int index = 1; index < sizeof(arr)/sizeof(arr[0]); ++index) {
+        if (max < arr[index])
+            max = arr[index];
+    }
+    std::cout << "max=" << max << std::endl;
+}
+
+void tst_printfilecontent() {
+    std::string fileName = "/host_WorkDir/file.txt";
+    std::string strRet = GetFileContent_string(fileName);
+    std::cout << "size=" << strRet.length() << ", strRet=" << strRet <<std::endl;
+
+}
 
 // 测试list操作算法总入口
 int tst_ListOperation_() {
+    tst_printfilecontent(); return 1;
 
-    tst_RGetKthNode_fun(); return 1;
+    tst_max_array(); return 1;
+
+    tst_shuffle(); return 1;
+
+    tst_CircleList(); return 1;
+
+    tst_MergeTwoList(); return 1;
+
+    tst_RPrintList_fun(); return 1;
+
+    tst_GetMiddleNode_fun(); return 1;
 
     tst_RGetKthNode_fun(); return 1;
 

@@ -11,6 +11,8 @@
 
 #include <set>
 #include <queue>
+#include <stack>
+
 #include <sys/time.h>
 #include <unistd.h>
 

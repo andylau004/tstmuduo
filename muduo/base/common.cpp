@@ -247,10 +247,17 @@ std::string GetFileContent_string( const std::string& inFileName ) {
     return GetFileContent_string(inFileName.c_str());
 }
 std::string GetFileContent_string( const char* lpszFileName ) {
+    unsigned int fileSize = 0;
     char* pContent = GetSmallFileContent(lpszFileName, NULL);
-    std::string retFile(pContent);
-    free(pContent);
-    return retFile;
+    if (pContent) {
+//        printf("123\n");
+        std::string retFile(pContent, fileSize);
+        printf("retFileLen=%d\n", retFile.length());
+        free(pContent);
+        return retFile;
+    } else {
+        return "";
+    }
 }
 char* GetSmallFileContent( const char* lpszFileName, unsigned int* pFileSize ) {
     FILE* pInfile = fopen( lpszFileName, "rb" );
@@ -269,6 +276,7 @@ char* GetSmallFileContent( const char* lpszFileName, unsigned int* pFileSize ) {
     char* pContent = (char*)malloc( inFileLen + 1 ); memset( pContent, 0, inFileLen + 1 );
     fread( pContent, sizeof(char), inFileLen, pInfile );
     fclose( pInfile );
+//    std::cout << "filesize=" << inFileLen <<std::endl;
     return pContent;
 }
 
