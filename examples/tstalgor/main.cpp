@@ -61,6 +61,9 @@
 
 #include "complexdata.h"
 
+#include "mergesort.h"
+
+
 
 
 using namespace std;
@@ -77,8 +80,6 @@ using namespace muduo::net;
 //#define VCZH_CHECK_MEMORY_LEAKS_NEW new(_NORMAL_BLOCK, __FILE__, __LINE__)
 //#define new VCZH_CHECK_MEMORY_LEAKS_NEW
 #endif
-
-
 
 
 
@@ -960,6 +961,8 @@ std::cout << "c" << std::endl;
 
 //    std::cout << std::endl;
     std::cout << std::endl;
+
+    tst_MergeSortEntry_(); return 1;
 
     tst_ComplexDataEntry_(); return 1;
 
