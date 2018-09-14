@@ -63,7 +63,7 @@
 
 #include "mergesort.h"
 
-
+#include "heapsort.h"
 
 
 using namespace std;
@@ -962,11 +962,10 @@ std::cout << "c" << std::endl;
 //    std::cout << std::endl;
     std::cout << std::endl;
 
+    tst_HeapSortEntry_();  return 1;
     tst_MergeSortEntry_(); return 1;
-
     tst_ComplexDataEntry_(); return 1;
-
-    tst_ListOperation_(); return 1;
+    tst_ListEntry_(); return 1;
 
 tst_print_time(); return 1;
 tst_qs_111(); return 1;

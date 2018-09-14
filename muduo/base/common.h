@@ -55,6 +55,8 @@
 #define SERVER_CFG_PATH     "/data/linkdood/im/conf/servconfig.json"
 
 
+#define array_size(arr) (sizeof(arr)/sizeof(arr[0]))
+
 #define VRV_ERR -1
 #define VRV_OK 0
 

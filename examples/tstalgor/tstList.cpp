@@ -264,7 +264,7 @@ void tst_printfilecontent() {
 }
 
 // 测试list操作算法总入口
-int tst_ListOperation_() {
+int tst_ListEntry_() {
     tst_printfilecontent(); return 1;
 
     tst_max_array(); return 1;
