@@ -163,7 +163,7 @@ void getMinKByHeap( int arr[], int length, int k, int kHeap[] ) {
 int tst_heapsort_fun_3() {
 //    clock_t Start_time = clock();
     int arrsource[] = {12,45,748,13,56,3,89,4,48,2};
-    int min_heap_k[10] = {0};
+    int min_heap_k[4] = {0};
 
     int ksize     = array_size(min_heap_k);
     int sizeArray = array_size(arrsource);

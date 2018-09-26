@@ -959,11 +959,14 @@ std::cout << "c++" << std::endl;
 std::cout << "c" << std::endl;
 #endif
 
+    CopyFileEx("template-openssl.cnf", "123.cnf");
+    return 1;
+
 //    std::cout << std::endl;
     std::cout << std::endl;
+    tst_MergeSortEntry_(); return 1;
 
     tst_HeapSortEntry_();  return 1;
-    tst_MergeSortEntry_(); return 1;
     tst_ComplexDataEntry_(); return 1;
     tst_ListEntry_(); return 1;
 

@@ -121,58 +121,68 @@ bool CreateFullDir(const std::string& indir) {
 }
 
 bool CopyFileEx( const char* lpszSrc, const char* lpszDst ) {
-    std::ifstream in;
-    in.open(lpszSrc);
-    if (!in) {
-//        LOG_ERROR( "open src file failed, file=" << lpszSrc );
+
+    std::string srcFileContent = GetFileContent_string(lpszSrc);
+    if (srcFileContent.empty()) {
+        LOG_ERROR << "srcFile content is null, srcFile=" << lpszSrc;
         return false;
     }
 
-    std::ofstream out;
-    out.open(lpszDst);
-    if (!out) {
-//        LOG_ERROR( "create new file failed, file=" << lpszDst );
-        in.close();
-        return false;
-    }
-
-    out << in.rdbuf();
-
-    out.close();
-    in.close();
-    return true;
-
-//    boost::system::error_code ec;
-//    try
-//    {
-//        boost::filesystem::copy_file( lpszSrc, lpszDst, boost::filesystem::copy_option::overwrite_if_exists, ec);
-//    }
-//    catch (const boost::filesystem::filesystem_error& e)
-//    {
-//        char tmpbuffer[ 4096 ] = {0};
-//        sprintf( tmpbuffer, "copy_file Error=%s srcfile=%s dstfile=%s", e.what(), lpszSrc, lpszDst );
-// //        printf( tmpbuffer );
-//        LOG_ERROR( tmpbuffer );
-//    }
+    return save_file(lpszDst, srcFileContent);
 }
+
+//bool CopyFileEx( const char* lpszSrc, const char* lpszDst ) {
+//    std::ifstream in;
+//    in.open(lpszSrc);
+//    if (!in) {
+////        LOG_ERROR( "open src file failed, file=" << lpszSrc );
+//        return false;
+//    }
+
+//    std::ofstream out;
+//    out.open(lpszDst);
+//    if (!out) {
+////        LOG_ERROR( "create new file failed, file=" << lpszDst );
+//        in.close();
+//        return false;
+//    }
+
+//    out << in.rdbuf();
+
+//    out.close();
+//    in.close();
+//    return true;
+
+////    boost::system::error_code ec;
+////    try
+////    {
+////        boost::filesystem::copy_file( lpszSrc, lpszDst, boost::filesystem::copy_option::overwrite_if_exists, ec);
+////    }
+////    catch (const boost::filesystem::filesystem_error& e)
+////    {
+////        char tmpbuffer[ 4096 ] = {0};
+////        sprintf( tmpbuffer, "copy_file Error=%s srcfile=%s dstfile=%s", e.what(), lpszSrc, lpszDst );
+//// //        printf( tmpbuffer );
+////        LOG_ERROR( tmpbuffer );
+////    }
+//}
 bool CopyFileEx( const std::string& srcfile, const std::string& dstfile ) {
     return CopyFileEx( srcfile.c_str(), dstfile.c_str() );
 }
 
 bool save_file( const char* lpfilename, const std::string& sinput ) {
-    FILE* f = fopen( lpfilename, "w" );
+    FILE* f = fopen( lpfilename, "wb" );
     if ( !f ) {
-//        cout << "fopen write file: " << lpfilename << " error" << endl;
         LOG_ERROR << "fopen write file: " << lpfilename << " error";
         return false;
     }
-    fwrite( sinput.c_str(), sinput.size(), 1, f);
+    fwrite(sinput.c_str(), sinput.size(), 1, f);
     fclose(f);
     return true;
 }
 
 bool save_file( const char* lpfilename, char* inbuffer, size_t insize ) {
-    FILE* f = fopen( lpfilename, "w" );
+    FILE* f = fopen( lpfilename, "wb" );
     if ( !f ) {
 //        cout << "fopen write file: " << lpfilename << " error" << endl ;
         LOG_ERROR << "fopen write file: " << lpfilename << " error";
