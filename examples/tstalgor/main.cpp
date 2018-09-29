@@ -64,11 +64,21 @@
 #include "mergesort.h"
 
 #include "heapsort.h"
+#include "externMergSort.h"
+
+
+
 
 
 using namespace std;
 using namespace muduo;
 using namespace muduo::net;
+
+
+
+// https://github.com/hehe520/Data-structure-and-algorithm
+// https://github.com/xtaci/algorithms/blob/master/README.md
+
 
 
 #define VCZH_CHECK_MEMORY_LEAKS 1
@@ -959,8 +969,11 @@ std::cout << "c++" << std::endl;
 std::cout << "c" << std::endl;
 #endif
 
-    CopyFileEx("template-openssl.cnf", "123.cnf");
+    tst_Extern_MergeSortEntry_();
     return 1;
+
+//    CopyFileEx("template-openssl.cnf", "123.cnf");
+//    return 1;
 
 //    std::cout << std::endl;
     std::cout << std::endl;

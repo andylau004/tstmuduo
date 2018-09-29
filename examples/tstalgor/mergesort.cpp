@@ -274,14 +274,13 @@ void swap(MinHeapNode *x, MinHeapNode *y)
 // 输出排序结果
 void printArray(int arr[], int size)
 {
-   for (int i=0; i < size; i++)
-       cout << arr[i] << " ";
+    for (int i=0; i < size; i++)
+        cout << arr[i] << " ";
 }
 
 
 int tst_example_1()
 {
-
     int arr[][n] =  {{2, 6, 12, 34},
                      {1, 9, 20, 1000},
                      {23, 34, 90, 2000}};
@@ -300,7 +299,49 @@ int tst_example_1()
 
 
 
+void Merge(int sourceArr[],int tempArr[], int startIndex, int midIndex, int endIndex) {
+    int i = startIndex, j=midIndex+1, k = startIndex;
+    while(i!=midIndex+1 && j!=endIndex+1)
+    {
+        if(sourceArr[i] > sourceArr[j])
+            tempArr[k++] = sourceArr[j++];
+        else
+            tempArr[k++] = sourceArr[i++];
+    }
+    while(i != midIndex+1)
+        tempArr[k++] = sourceArr[i++];
+    while(j != endIndex+1)
+        tempArr[k++] = sourceArr[j++];
+    for(i=startIndex; i<=endIndex; i++)
+        sourceArr[i] = tempArr[i];
+}
+//内部使用递归
+void MergeSort(int sourceArr[], int tempArr[], int startIndex, int endIndex) {
+    int midIndex;
+    if(startIndex < endIndex)
+    {
+        midIndex = (startIndex + endIndex) / 2;
+        MergeSort(sourceArr, tempArr, startIndex, midIndex);
+        MergeSort(sourceArr, tempArr, midIndex+1, endIndex);
+        Merge(sourceArr, tempArr, startIndex, midIndex, endIndex);
+    }
+}
+//归并排序和堆排序、快速排序的比较
+//若从空间复杂度来考虑：首选堆排序，其次是快速排序，最后是归并排序。
+//若从稳定性来考虑，应选取归并排序，因为堆排序和快速排序都是不稳定的。
+//若从平均情况下的排序速度考虑，应该选择快速排序。
+void tst_merge_sort_1() {
+    int a[8] = {50, 10, 20, 30, 70, 40, 80, 60};
+    int i, b[8];
+    MergeSort(a, b, 0, 7);
+    for(i=0; i<8; i++)
+        printf("%d ", a[i]);
+    printf("\n");
+}
+
 int tst_MergeSortEntry_() {
+    tst_merge_sort_1(); return 1;
+
     tst_example_1(); return 0;
 
     tst_NoR_merge_1(); return 0;
