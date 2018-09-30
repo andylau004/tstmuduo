@@ -36,20 +36,19 @@
 #include "muduo/net/TcpClient.h"
 
 
-
-
-
 using namespace std;
 using namespace muduo;
 using namespace muduo::net;
 
-
+#include "tstconnhash.h"
 
 
 int main(int argc, char *argv[])
 {
     Logger::setLogLevel(Logger::DEBUG);
     LOG_INFO << "pid = " << getpid() << ", tid = " << CurrentThread::tid();
+
+    tst_conn_hash_entry(argc, argv);
 
     return 1;
 }
