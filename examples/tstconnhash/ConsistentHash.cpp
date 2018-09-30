@@ -43,6 +43,7 @@ bool ConsistentHash::addRealNode(Node *node){
     string value = node->GetNodeName();//服务器ip
     unsigned int key = hashFunc->GetKey(value);//获取key
     realNode.push_back(node);
+    std::cout << "realName=" << value << ", realKey=" << key << std::endl;
     allNode.insert(make_pair(key, value));
     return true;
 }
@@ -183,6 +184,7 @@ int ConsistentHash::getAllNodeNum(){
 }
 std::string ConsistentHash::showTime(){
     std::ostringstream oss;
+    oss << "allNodeCount=" << allNode.size() << std::endl;
     for (auto it = allNode.begin(); it != allNode.end(); ++it){
         oss << "key : " << it->first << "  \tval : " << it->second << "\n";
     }

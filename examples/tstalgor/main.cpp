@@ -67,6 +67,7 @@
 #include "externMergSort.h"
 
 
+#include "hashfun.h"
 
 
 
@@ -969,6 +970,8 @@ std::cout << "c++" << std::endl;
 std::cout << "c" << std::endl;
 #endif
 
+    tst_hash_fun_entry();
+//    return 1;
     tst_Extern_MergeSortEntry_();
     return 1;
 

@@ -2,6 +2,8 @@
 
 
 set(base_SRCS
+    murmurhash.h
+    murmurhash.cpp
 
     BinaryTree.cpp
 

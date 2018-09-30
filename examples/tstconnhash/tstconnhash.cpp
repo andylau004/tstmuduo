@@ -138,7 +138,7 @@ int tst_conn_hash_entry(int argc, char *argv[]){
 
 //        showTime(csshash);
     }
-    return 1;
+//    return 1;
 
     std::string input;
     std::vector<std::string> v(4);
