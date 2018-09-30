@@ -2,6 +2,8 @@
 
 
 set(base_SRCS
+    color.h
+    color.cpp
     murmurhash.h
     murmurhash.cpp
 

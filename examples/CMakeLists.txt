@@ -11,6 +11,7 @@ add_subdirectory(tstserver)
 
 add_subdirectory(tstalgor)
 add_subdirectory(tstconnhash)
+add_subdirectory(tstlru)
 
 #add_subdirectory(${CMAKE_SOURCE_DIR}/thirdpart/rapidjson)
 

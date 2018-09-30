@@ -99,14 +99,61 @@ int splitCMD(std::string cmd, const char *spl, std::vector<std::string> &v){
     return i;
 }
 
+// 指定某个键值，进行遍历 std::multimap
+void tst_multi_map() {
+    std::multimap < int, std::string > mlt_map;
+    mlt_map.insert( std::make_pair(990, "99233") );
+    mlt_map.insert( std::make_pair(990, "995666") );
+    mlt_map.insert( std::make_pair(990, "9977665") );
+
+    mlt_map.insert( std::make_pair(322, "333233") );
+    mlt_map.insert( std::make_pair(322, "333666") );
+    mlt_map.insert( std::make_pair(322, "3337665") );
+
+    mlt_map.insert( std::make_pair(788, "77733") );
+    mlt_map.insert( std::make_pair(788, "777666") );
+    mlt_map.insert( std::make_pair(788, "7777665") );
+
+//    for (auto it = mlt_map.begin(); it != mlt_map.end(); ++it){
+//        std::cout << "it->first=" << it->first << " second=" << it->second << std::endl;
+//    }
+
+    auto itFind = mlt_map.lower_bound(600);
+    std::cout << "itFind->first=" << itFind->first << " itFind->second=" << itFind->second << std::endl;
+    std::cout << std::endl;
+
+    if (itFind != mlt_map.end()) {
+        std::pair<std::multimap<int, std::string>::iterator, std::multimap<int, std::string>::iterator> ret;
+        ret = mlt_map.equal_range(itFind->first);
+
+        for(auto p_map = ret.first; p_map != ret.second; ++p_map)
+            std::cout << " cccc=" << (*p_map).second;
+        std::cout << std::endl;
+    }
+
+//    int a[8]={10,30,4,11,69,70,96,100};
+//    int pos = lower_bound(a,a+8,12009) - a;
+//    std::cout << "pos=" << pos << std::endl;
+
+//    auto lowIt = allNode.lower_bound(cliKey);
+//    if (lowIt != allNode.end()) {
+//        std::cout << "lowIt key=" << lowIt->first <<
+//                     ", lowIt val=" << lowIt->second << std::endl;
+//    }
+
+}
+
 int tst_conn_hash_entry(int argc, char *argv[]){
     if (argc != 1){
         std::cout << "please input " << argv[0] << std::endl;
         return 0;
     }
+    tst_multi_map();
+//    return 1;
+
 //    printHelp();
 
-    {
+//    {
         ConsistentHash csshash;
         std::cout << "-------------------" << std::endl;
         csshash.addNode("192.168.0.1:8080", 2);
@@ -137,12 +184,12 @@ int tst_conn_hash_entry(int argc, char *argv[]){
         std::cout << std::endl;
 
 //        showTime(csshash);
-    }
+//    }
 //    return 1;
 
     std::string input;
     std::vector<std::string> v(4);
-    ConsistentHash csshash;
+//    ConsistentHash csshash;
     while (1){
         std::cout << "<<<";
         getline(std::cin, input);
@@ -161,6 +208,10 @@ int tst_conn_hash_entry(int argc, char *argv[]){
             }
         }
         else if (v[0] == "del"){
+            for (int i = 0; i < num; ++i) {
+                std::cout << " v[" << i << "]=" << v[i] ;
+            }
+            std::cout << std::endl;
             if (num != 3){
                 printError();
             }

@@ -15,6 +15,45 @@ ConsistentHash::~ConsistentHash(){
         realNode.erase(it++);
     }
 }
+bool ConsistentHash::addRealNode(Node *node){
+    if (!node)
+        return false;
+    string       value = node->GetNodeName();//服务器ip
+    unsigned int key   = hashFunc->GetKey(value);//获取key
+    realNode.push_back(node);
+
+    std::cout << "realName=" << value << ", realKey=" << key << std::endl;
+    allNode.insert(make_pair(key, value));
+    return true;
+}
+bool ConsistentHash::addVirNode(Node *node){
+    if (!node){
+        std::cout << "input node is null" << std::endl;
+        return false;
+    }
+    int vNum = node->GetVNodeNum();
+    if (vNum < 1){
+        std::cout << "vNum < 1 error" << std::endl;
+        return false;
+    }
+    unsigned int key;
+    std::string virName;//虚拟节点名称
+    std::string nodeName = node->GetNodeName();//真实节点名
+    //vNode添加后缀
+    for (int i = 0; i < vNum; ++i) {
+        std::stringstream ss;
+        ss << nodeName << "##" << i + 1;
+//        std::cout << ss.str() << std::endl;
+        ss >> virName;
+//        ss.str().clear();
+
+        key = hashFunc->GetKey(virName);
+        allNode.insert(std::make_pair(key, nodeName));//存的都是真实的名称
+
+        std::cout << "virKey=" << key << ", virName=" << ss.str() << std::endl;
+    }
+    return true;
+}
 bool ConsistentHash::addNode(std::string nodeName, int vNum){
     Node *pNewNode = new Node(nodeName, vNum);
     //对虚拟节点进行push
@@ -37,51 +76,9 @@ bool ConsistentHash::delNode(std::string nodeName){
     delete node;
     return true;
 }
-bool ConsistentHash::addRealNode(Node *node){
-    if (!node)
-        return false;
-    string value = node->GetNodeName();//服务器ip
-    unsigned int key = hashFunc->GetKey(value);//获取key
-    realNode.push_back(node);
-    std::cout << "realName=" << value << ", realKey=" << key << std::endl;
-    allNode.insert(make_pair(key, value));
-    return true;
-}
-bool ConsistentHash::addVirNode(Node *node){
-    if (!node){
-        std::cout << "input node is null" << std::endl;
-        //日志：addVirNode  node为空
-        return false;
-    }
-    int vNum = node->GetVNodeNum();
-    if (vNum < 1){
-        std::cout << "vNum < 1 error" << std::endl;
-        //日志：addVirNode  虚拟节点个数<1
-        return false;
-    }
-    unsigned int key;
-    std::string virName;//虚拟节点名称
-    std::string nodeName = node->GetNodeName();//真实节点名
-//    std::stringstream ss;
-    //vNode添加后缀
-    for (int i = 0; i < vNum; ++i) {
-        std::stringstream ss;
-        ss << nodeName << "##" << i + 1;
-//        std::cout << ss.str() << std::endl;
-        ss >> virName;
-//        ss.str().clear();
-
-        key = hashFunc->GetKey(virName);
-        allNode.insert(std::make_pair(key, nodeName));//存的都是真实的名称
-
-        std::cout << "virName=" << ss.str() << ", virKey=" << key << std::endl;
-    }
-    return true;
-}
 bool ConsistentHash::delRealNode(Node *node){
     if (!node){
         std::cout << "input node is null" << std::endl;
-        //日志：delRealNode node为空
         return false;
     }
     std::string nodeName = node->GetNodeName();
@@ -100,7 +97,6 @@ bool ConsistentHash::delRealNode(Node *node){
 }
 bool ConsistentHash::delVirNode(Node *node){
     if (!node){
-        //日志：delVirNode node为空
         return false;
     }
     int vNum = node->GetVNodeNum(), count;
@@ -150,20 +146,39 @@ std::string ConsistentHash::getServerName(std::string cliName){
 
     auto it = allNode.begin();
 
-    /* 找到第一个比cliKey大的节点 */
-    while (it != allNode.end()){
-        if (cliKey < it->first){
-            serName = it->second;
-            std::cout << "find cliKey < " << it->first << ", serName=" << it->second << std::endl;
-            break;
-        }
-        ++it;
+    auto lowIt = allNode.lower_bound(cliKey);
+    if (lowIt != allNode.end()) {
+        std::cout << "lowbound_It key=" << lowIt->first <<
+                     ", lowbound_It val=" << lowIt->second << std::endl;
     }
-    if (it == allNode.end()){
+    if (lowIt == allNode.end()){
         std::cout << "cliKey not found storeServer, cliKey=" << cliKey << ", cliName=" << cliName << std::endl;
         serName = allNode.begin()->second;
     }
     return serName;
+
+    /* 找到第一个比cliKey大的节点 */
+//    while (it != allNode.end()){
+//        if (cliKey < it->first){
+//            serName = it->second;
+//            std::cout << "find cliKey < " << it->first << ", serName=" << it->second << std::endl;
+
+////            std::pair<std::multimap<unsigned int, std::string>::iterator, std::multimap<unsigned int, std::string>::iterator> ret;
+////            ret = allNode.equal_range(it->first);
+
+////            for(auto tmpIt = ret.first; tmpIt != ret.second; ++tmpIt)
+////                std::cout << " xxx first=" << (*tmpIt).first << " xxx second=" << (*tmpIt).second;
+////            std::cout << std::endl;
+
+//            break;
+//        }
+//        ++it;
+//    }
+//    if (it == allNode.end()){
+//        std::cout << "cliKey not found storeServer, cliKey=" << cliKey << ", cliName=" << cliName << std::endl;
+//        serName = allNode.begin()->second;
+//    }
+//    return serName;
 }
 int ConsistentHash::getVirNum(std::string serName){
     Node *node = nullptr;
