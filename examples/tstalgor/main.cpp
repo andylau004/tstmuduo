@@ -69,6 +69,8 @@
 
 #include "hashfun.h"
 
+#include "linkedlistopr.h"
+#include "stackopr.h"
 
 
 using namespace std;
@@ -969,6 +971,11 @@ std::cout << "c++" << std::endl;
 #else
 std::cout << "c" << std::endl;
 #endif
+
+    tst_stack_entry(); return 1;
+
+    tst_linkedlist_entry();
+    return 1;
 
     tst_hash_fun_entry();
 //    return 1;

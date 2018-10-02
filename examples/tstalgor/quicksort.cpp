@@ -57,7 +57,6 @@ int partion_new(int arr[], int low, int high, int length) {
     int pivotkey = selectMiddleOfThree(arr, low, high);
 
     while (true) {
-
         // 当随着右游标左移，到j = low + 1的时候，
         // 有 a[--j] == pivotkey为true（两者都是基准元素），
         // 自动跳出了while循环，所以就不需要在循环体里再判断 j == low 了
@@ -74,9 +73,7 @@ int partion_new(int arr[], int low, int high, int length) {
         else {
             std::swap(arr[i], arr[j]);
         }
-
     }
-
     std::swap(arr[low], arr[j]);
     printf( "last swap arr[%d]=%d arr[%d]=%d\n", low, arr[low], j, arr[j] );
 
@@ -87,7 +84,6 @@ int partion_new(int arr[], int low, int high, int length) {
     std::cout << std::endl;
     std::cout << "end swap----" << std::endl;
     std::cout << std::endl;
-
     return j;
 }
 void quickSort_new_2( int a[], int left, int right, int length ) {

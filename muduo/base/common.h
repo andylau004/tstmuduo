@@ -43,6 +43,7 @@
 #include <string.h>
 #include <errno.h>
 
+#include <list>
 #include <set>
 #include <map>
 #include <vector>
@@ -84,6 +85,34 @@ void delete_object_array(T ** t) {
         (*t) = NULL;
     }
 }
+
+
+
+template<class CONTAINER>
+void DeleteSecondPtrInContainer( CONTAINER& container ) {
+    if ( container.empty() ) {
+        return;
+    }
+    for( /*CONTAINER::iterator*/auto pIt = container.begin(); pIt != container.end(); ++ pIt ) {
+        SafeDelete( pIt->second );
+    }
+    container.clear();
+}
+
+template<class CONTAINER>
+void PrintInContainer( CONTAINER& container ) {
+    if ( container.empty() ) {
+        return;
+    }
+    for( /*CONTAINER::iterator*/ auto itElem = container.begin(); itElem != container.end(); ++ itElem ) {
+        std::cout << " " << *itElem ;
+    }
+    printf( "\n" );
+}
+
+
+
+
 
 #define IDLE_CTX_TIMEOUT 60   // 1 min
 #define IDLE_CTX_REMOVE  5    //remove idle_ctx numbers once
