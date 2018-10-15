@@ -66,8 +66,8 @@ void Acceptor::handleRead()//当epoll监听到listenfd时，开始执行此回�
     int connfd = acceptSocket_.accept(&peerAddr);
     if (connfd >= 0)
     {
-        // string hostport = peerAddr.toIpPort();
-        //     LOG_TRACE << "Accepts of " << hostport;
+//        string hostport = peerAddr.toIpPort();
+//        LOG_TRACE << "Accepts of " << hostport;
         //这里的回调函数 newConnectionCallback 是在 Acceptor::setNewConnectionCallback(newConnectionCallback) 指定的，
         //TcpServer构造时 new 一个 Acceptor 后，会通过这个函数指定回调函数为 TcpServer::newConnection(int sockfd, const InetAddress& peerAddr)
         /* 接受完连接后回调 newConnectionCallback_

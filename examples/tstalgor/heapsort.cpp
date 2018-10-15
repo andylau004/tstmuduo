@@ -3,9 +3,21 @@
 
 
 
-void heapify(int arr[],int i,int size)
+
+
+
+
+// https://blog.csdn.net/ghoota/article/details/52766299
+// 100亿数据排序
+//1.把这个37GB的大文件，用哈希分成1000个小文件，每个小文件平均38MB左右（理想情况），把100亿个数字对1000取模，模出来的结果在0到999之间，每个结果对应一个文件，所以我这里取的哈希函数是 h = x % 1000，哈希函数取得”好”，能使冲突减小，结果分布均匀。
+//2.拆分完了之后，得到一些几十MB的小文件，那么就可以放进内存里排序了，可以用快速排序，归并排序，堆排序等等。
+//3.1000个小文件内部排好序之后，就要把这些内部有序的小文件，合并成一个大的文件，可以用二叉堆来做1000路合并的操作，每个小文件是一路，合并后的大文件仍然有序。
+//首先遍历1000个文件，每个文件里面取第一个数字，组成 (数字, 文件号) 这样的组合加入到堆里（假设是从小到大排序，用小顶堆），遍历完后堆里有1000个 (数字，文件号) 这样的元素然后不断从堆顶拿元素出来，每拿出一个元素，把它的文件号读取出来，然后去对应的文件里，加一个元素进入堆，直到那个文件被读取完。拿出来的元素当然追加到最终结果的文件里。按照上面的操作，直到堆被取空了，此时最终结果文件里的全部数字就是有序的了。
+//一个32G的大文件，用fopen()打开不会全部加载到内存的，然后for循环遍历啊，把每个数字对1000取模，会得到0到999种结果，然后每种结果在写入到新的文件中，就拆分了
+
+void heapify(int arr[], int i, int size)
 {
-    int left = 2 * i + 1;
+    int left  = 2 * i + 1;
     int right = 2 * i + 2;
     int max = i;
 
@@ -19,7 +31,6 @@ void heapify(int arr[],int i,int size)
         std::swap(arr[0], arr[--size]);
         heapify(arr,0,size);
     }
-
 }
 void heapsort( int arr[], int length ) {
     int i = length;
@@ -36,19 +47,19 @@ void heapsort( int arr[], int length ) {
 //堆排序在时间上类似归并，但是它又是一种原地排序，时间复杂度小于归并的O(n+logn)
 //排序时间与输入无关，最好，最差，平均都是O(nlogn). 不稳定
 int tst_heapsort_fun_1() {
+    OutputDbgInfo tmpout("tst_heapsort_fun_1 begin", "tst_heapsort_fun_1 end");
+
     int arr[] = {8, 3, 6, 1, 4, 5, 2, 7, 9, 0};
     int size = array_size(arr);
     std::cout << "size=" << size << std::endl;
+
     heapsort(arr, size);
 
-    int i = 0;
-    for(; i < size; i++)
+    for(int i = 0; i < size; i++)
         printf("%d ", arr[i]);
     std::cout << std::endl;
     return 0;
 }
-
-
 
 //堆排序的核心是建堆,传入参数为数组，根节点位置，数组长度
 void Heap_build(int a[],int root,int length)
@@ -93,6 +104,7 @@ void Heap_sort(int arr[],int len)
 //另外一种是用一个有序容器保存10000个数，然后其他的数字依次和容器中的最小数字比较，如果大于容器已有的，就插入容器并删除原先最小的那个，而容器仍旧保持有序。
 //这个算法的时间复杂度是O(n)，理论上可能已经没有更好的算法了。
 int tst_heapsort_fun_2() {
+    OutputDbgInfo tmpout("tst_heapsort_fun_2 begin", "tst_heapsort_fun_2 end");
 
 //    clock_t Start_time = clock();
     int arr[] = {12,45,748,12,56,3,89,4,48, 76, 98, 3654, 2};
@@ -107,7 +119,6 @@ int tst_heapsort_fun_2() {
     std::cout<<std::endl;
     std::cout<<std::endl;
 //    std::cout<<"Total running time is: "<<static_cast<double>(End_time-Start_time)/CLOCKS_PER_SEC*1000<<" ms"<<std::endl;
-
 }
 
 
@@ -118,7 +129,6 @@ void k_Heapify(int arr[], int index, int heapsize) {
     int largest = index;
 
     while (left < heapsize) {
-
         if (arr[left] > arr[index]) {
             largest = left;
         }
@@ -142,7 +152,9 @@ void heapInsert(int heap_arr[], int val, int index) {
         if (heap_arr[parent] < heap_arr[index]) {
             std::swap(heap_arr[parent], heap_arr[index]);
             index = parent;
-        } else { break; }
+        } else {
+            break;
+        }
     }
 }
 // N个无序数列内，提取最小K个数 === > 也就是TOP K
@@ -151,7 +163,7 @@ void getMinKByHeap( int arr[], int length, int k, int kHeap[] ) {
     for (int i = 0; i != k; ++i) {
         heapInsert(kHeap, arr[i], i);
     }
-    std::cout << "aaa" <<std::endl;
+//    std::cout << "aaa" <<std::endl;
     for (int i = k; i < length; ++i) {
         if (arr[i] < kHeap[0]) {
             std::swap(kHeap[0], arr[i]);
@@ -159,8 +171,13 @@ void getMinKByHeap( int arr[], int length, int k, int kHeap[] ) {
         }
     }
 }
+void getMinKByHeap_Ex( int arr[], int length, int k, int kHeap[] ) {
+
+}
+
 // N个无序数列内，提取最小K个数 === > 也就是TOP K
 int tst_heapsort_fun_3() {
+    OutputDbgInfo tmpout("tst_heapsort_fun_3 begin", "tst_heapsort_fun_3 end");
 //    clock_t Start_time = clock();
     int arrsource[] = {12,45,748,13,56,3,89,4,48,2};
     int min_heap_k[4] = {0};
@@ -182,12 +199,15 @@ int tst_heapsort_fun_3() {
 /////////////////////////////////////////////////////////////////////////////
 
 void PrintInitHeap() {
-    std::cout << "PrintInitHeap begin" << std::endl;
+    std::cout << std::endl;
+    OutputDbgInfo tmpDbg( "PrintInitHeap begin", "PrintInitHeap end" );
+
 //    int arrsource[] = {12,45,748,13,56,3,89,4,48,2};
-    int arrsource[] = {16,7,3,20,17,8};
+    int arrsource[] = {16, 7, 3, 20, 17, 8};
     int min_heap_k[6] = {0};
     int i = 0;
     int k = array_size(min_heap_k);
+    printf( "heap k=%d\n", k );
 
     // 这样就得到了初始堆
     for (i = 0; i != k; ++i) {
@@ -196,8 +216,8 @@ void PrintInitHeap() {
     for (i = 0; i != k; ++i) {
         std::cout << min_heap_k[i] <<" ";
     }
+
     std::cout << std::endl;
-    std::cout << "PrintInitHeap end" << std::endl;
 }
 
 int g_test;
@@ -207,17 +227,106 @@ public:
     virtual void f(){}
 };
 
+struct  Info
+{
+    std::string strName;
+    double      dbSorce;
+    Info() {
+        dbSorce = 0.00;
+    }
+    bool operator < (const Info& inParam) const {
+        //按score由小到大排列，如果要由大到小排列，使用">"即可；
+        return inParam.dbSorce < dbSorce;
+    }
+};
+
+// 测试优先级队列　重载小于符号，从小到达排序
+//name = alice, sorce = 66
+//name = alice, sorce = 98.7
+//name = bob, sorce = 99
+void tst_priority_queue() {
+    OutputDbgInfo tmpDbg( "tst_priority_queue begin", "tst_priority_queue end" );
+
+    {//默认从大到小排序
+        std::priority_queue < int > pq_int;
+
+        pq_int.push( 123 );pq_int.push( 878 );
+        pq_int.push( 4466 );pq_int.push( 878 );
+        pq_int.push( 1 );pq_int.push( 7 );pq_int.push( 3 );
+
+        while ( !pq_int.empty() ) {
+            std::cout << "val = " << pq_int.top() << std::endl;
+            pq_int.pop();
+        }
+        std::cout << std::endl;
+    }
+
+    {//自定义从小到大排序
+        std::priority_queue < int, vector<int>, greater<int> > pq_int;
+
+        pq_int.push( 123 );pq_int.push( 878 );
+        pq_int.push( 4466 );pq_int.push( 878 );
+        pq_int.push( 1 );pq_int.push( 7 );pq_int.push( 3 );
+
+        while ( !pq_int.empty() ) {
+            std::cout << "val = " << pq_int.top() << std::endl;
+            pq_int.pop();
+        }
+        std::cout << std::endl;
+    }
+    return;
+
+    {
+        std::priority_queue < Info > pqTst;
+        Info tmpInfo;
+        tmpInfo.strName = "alice";
+        tmpInfo.dbSorce = 98.7;
+        pqTst.push(tmpInfo);
+
+        tmpInfo.strName = "bob";
+        tmpInfo.dbSorce = 99;
+        pqTst.push(tmpInfo);
+
+        tmpInfo.strName = "alice";
+        tmpInfo.dbSorce = 66;
+        pqTst.push(tmpInfo);
+
+        while ( !pqTst.empty() ) {
+            std::cout << "name = " << pqTst.top().strName /*<< std::endl;*/
+                      << ", sorce = " << pqTst.top().dbSorce << std::endl;
+            pqTst.pop();
+        }
+    }
+
+}
+
+// 题目：给定一个整形数组，数组是无重复随机无序的，要求打印出所有元素左边第一个大于该元素的值。
+void tst_lowbounder() {
+    std::vector< int > vec_int;
+    vec_int.push_back( 1 ); vec_int.push_back( 18 );vec_int.push_back( 34 );
+    vec_int.push_back( 775 ); vec_int.push_back( 6521 );
+//    vec_int.push_back( 9979987 );
+    std::vector< int >::iterator it = std::lower_bound( vec_int.begin(), vec_int.end(), 99 );
+    std::cout << "it=" << *it << std::endl;
+}
+
+
 int tst_HeapSortEntry_() {
+    tst_lowbounder();
+    return 1;
+
+    tst_priority_queue();
+//    return 1;
 
     PrintInitHeap(); //return 1;
 
-    std::cout << "size A=" << sizeof(A) << std::endl;
-    A aaa;
-    std::cout << "size aaa=" << sizeof(aaa) << std::endl;
+//    std::cout << "size A=" << sizeof(A) << std::endl;
+//    A aaa;
+//    std::cout << "size aaa=" << sizeof(aaa) << std::endl;
 
-//    tst_heapsort_fun_3(); return 0;
+    tst_heapsort_fun_3();// return 0;
 
-    tst_heapsort_fun_2(); return 0;
+    tst_heapsort_fun_2();// return 0;
 
     tst_heapsort_fun_1();
 

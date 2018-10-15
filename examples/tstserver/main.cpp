@@ -1140,6 +1140,8 @@ void tst_sum_1() {
     SumOfkNumber(sum, n);
 }
 
+
+
 int main(int argc, char *argv[])
 {
     std::setlocale(LC_ALL, "en_US.utf8");

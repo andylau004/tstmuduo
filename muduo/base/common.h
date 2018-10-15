@@ -1,9 +1,27 @@
-#ifndef ONEPIECE_BASE_COMMON_H_
-#define ONEPIECE_BASE_COMMON_H_
+#ifndef TST_PRJ_BASE_COMMON_H_
+#define TST_PRJ_BASE_COMMON_H_
+
+
+
+
+
+
+
+
+
+
 
 #include <stdio.h>
 #include <string>
 #include <stdint.h>
+
+
+#include <stdlib.h>
+#include <string.h>
+
+#include <dirent.h>
+#include <unistd.h>
+#include <sys/stat.h>
 
 #include <errno.h>
 
@@ -20,49 +38,25 @@
 #include <sys/time.h>
 #include <ctype.h>
 
-
 #include <map>
 #include <vector>
-
-
-
-
-
-// #include <boost/algorithm/string.hpp>
-// #include <boost/filesystem/path.hpp>
-// #include <boost/filesystem/operations.hpp>
-// #include <boost/format.hpp>
-
-#include <stdlib.h>
-#include <string.h>
-
-#include <dirent.h>
-#include <unistd.h>
-#include <sys/stat.h>
-
-#include <string.h>
-#include <errno.h>
-
 #include <list>
 #include <set>
-#include <map>
-#include <vector>
+
+using namespace std;
 
 
+#define UNUSED(x) ((void)x)
 
+#define array_size(arr)    (sizeof(arr)/sizeof(arr[0]))
 
-//#define LINKDOOD_CFG_PATH 	"/data/linkdood/im/conf/liandoudou.conf"
-#define LINKDOOD_CFG_PATH 	"./liandoudou.conf"
-#define SERVER_CFG_PATH     "/data/linkdood/im/conf/servconfig.json"
-
-
-#define array_size(arr) (sizeof(arr)/sizeof(arr[0]))
 
 #define VRV_ERR -1
-#define VRV_OK 0
+#define VRV_OK  0
 
 #define HYPHEN "-"
-#define SEP "_"
+#define SEP    "_"
+
 
 typedef int SOCKET;
 #define INVALID_SOCKET -1
@@ -85,6 +79,26 @@ void delete_object_array(T ** t) {
         (*t) = NULL;
     }
 }
+
+typedef struct _tag_OutputDbgInfo {
+    _tag_OutputDbgInfo( const std::string& str_in, const std::string& str_out ) {
+        m_str_out = str_out;
+        printf( "\n" );
+        printf( "--------------------%s\n", str_in.c_str() );
+    }
+    _tag_OutputDbgInfo( const char* str_in, const char* str_out ) {
+        m_str_out = str_out ;
+        printf( "\n" );
+        printf ( "--------------------%s\n", str_in );
+    }
+
+    ~_tag_OutputDbgInfo( ) {
+        printf ( "--------------------%s\n", m_str_out.c_str() );
+        printf( "\n" );
+    }
+
+    std::string  m_str_out;
+}OutputDbgInfo;
 
 
 
@@ -136,65 +150,6 @@ void PrintInContainer( CONTAINER& container ) {
 
 #define LISTEN_BACKLOG_AP 512
 
-//buddy
-#define BODDY_DB_ERROR      100006591
-
-//buddyverify
-#define BODDYVF_DB_ERROR    100007091
-
-//chat
-#define CHAT_DB_ERROR       100009591
-
-//group
-#define GROUP_DB_ERROR      100011091
-
-//groupfile
-#define GROUPFILE_DB_ERROR  100012591
-
-//groupmember
-#define GROUPMB_DB_ERROR    100011591
-
-//groupverify
-#define GROUPVF_DB_ERROR    100012091
-
-//imageverify
-#define IMAGE_DB_ERROR      100015591
-
-//login
-#define LOGIN_DB_ERROR      100008091
-#define LOGIN_DB_ERROR_TICKETBEAN_RESSIGN      99
-
-//messagestorage
-#define MESSAGEST_DB_ERROR  100010091
-
-//online
-#define ONLINE_DB_ERROR     100008591
-
-//recommend
-#define RECOMMEND_DB_ERROR  100006091
-
-//registeruser
-#define REG_DB_ERROR        100005591
-
-//setting
-#define SETTING_DB_ERROR    100005091
-
-//timestamp
-#define TS_DB_ERROR         100004091
-
-//user
-#define USER_DB_ERROR       100004591
-
-//verifybox
-#define VERIFYBOX_DB_ERROR  100007591
-
-//verifycode
-#define VERIFYCODE_DB_ERROR 100015091
-
-enum {
-    EntOrgTimeStamp  = 11,
-    EntListTimeStamp = 12
-};
 
 enum TypeProcess {
     P_UNKNOWN = 0,
@@ -441,5 +396,12 @@ private:
 
 
 
-#endif  // ONEPIECE_BASE_COMMON_H_
+
+
+
+
+
+
+
+#endif  // TST_PRJ_BASE_COMMON_H_
 

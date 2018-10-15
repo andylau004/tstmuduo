@@ -2,6 +2,9 @@
 
 
 set(base_SRCS
+    thrift_helper.h
+    thrift_helper.cpp
+
     color.h
     color.cpp
     murmurhash.h

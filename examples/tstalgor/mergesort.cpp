@@ -339,7 +339,64 @@ void tst_merge_sort_1() {
     printf("\n");
 }
 
+
+#include <iostream>
+#include <algorithm>
+#include <string>
+#include <vector>
+#include <random>
+void mergeSort(vector<int>& nums, int l, int r)
+{
+    if (l >= r)
+        return;
+
+    int mid = (l + r) / 2;
+    mergeSort(nums, l, mid);
+    mergeSort(nums, mid + 1, r);
+
+    int i = l, j = mid + 1;
+    vector<int> temp(0);
+    while (i <= mid || j <= r)
+    {
+        if (i > mid || (j <= r && nums[j] <= nums[i]))
+        {
+            temp.push_back(nums[j]);
+            ++j;
+        }
+        else
+        {
+            temp.push_back(nums[i]);
+            ++i;
+        }
+    }
+
+    for (int i = 0; i < temp.size(); ++i)
+    {
+        nums[l + i] = temp[i];
+    }
+}
+void tst_c11_merge() {
+    default_random_engine e;
+    uniform_int_distribution<int> u(0, 1000);
+
+    vector<int> nums(0);
+    for (int i = 0; i < 20; ++i)
+        nums.push_back(u(e));
+
+    for (int i = 0; i < nums.size(); ++i)
+        cout << nums[i] << " ";
+    cout << endl;
+
+    mergeSort(nums, 0, nums.size() - 1);
+
+    for (int i = 0; i < nums.size(); ++i)
+        cout << nums[i] << " ";
+    cout << endl;
+}
+
 int tst_MergeSortEntry_() {
+    tst_c11_merge(); return 1;
+
     tst_merge_sort_1(); return 1;
 
     tst_example_1(); return 0;

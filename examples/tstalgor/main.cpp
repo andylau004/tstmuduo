@@ -72,6 +72,8 @@
 #include "linkedlistopr.h"
 #include "stackopr.h"
 
+#include "bitmapfun.h"
+
 
 using namespace std;
 using namespace muduo;
@@ -972,6 +974,23 @@ std::cout << "c++" << std::endl;
 std::cout << "c" << std::endl;
 #endif
 
+std::cout << "argc=" << argc << std::endl;
+/////////////////////
+    if (argc >= 2) {
+        if ( 0 == strcmp(argv[1], "heapsort"/*, strlen("heapsort")*/) ) {
+            std::cout << "heapsort beg" << std::endl;
+            tst_HeapSortEntry_();
+            return 1;
+        } else if ( 0 == strcmp(argv[1], "mergesort"/*, strlen("heapsort")*/) ) {
+            std::cout << "mergsort beg" << std::endl;
+            tst_MergeSortEntry_(); return 1;
+            return 1;
+        }
+
+    }
+
+    tst_bitmap_entry(); return 1;
+
     tst_stack_entry(); return 1;
 
     tst_linkedlist_entry();
@@ -987,9 +1006,8 @@ std::cout << "c" << std::endl;
 
 //    std::cout << std::endl;
     std::cout << std::endl;
-    tst_MergeSortEntry_(); return 1;
 
-    tst_HeapSortEntry_();  return 1;
+
     tst_ComplexDataEntry_(); return 1;
     tst_ListEntry_(); return 1;
 

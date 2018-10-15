@@ -258,7 +258,7 @@ std::string GetFileContent_string( const std::string& inFileName ) {
 }
 std::string GetFileContent_string( const char* lpszFileName ) {
     unsigned int fileSize = 0;
-    char* pContent = GetSmallFileContent(lpszFileName, NULL);
+    char* pContent = GetSmallFileContent(lpszFileName, &fileSize);
     if (pContent) {
 //        printf("123\n");
         std::string retFile(pContent, fileSize);
