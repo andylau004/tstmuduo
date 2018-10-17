@@ -16,9 +16,10 @@ add_subdirectory(tstlru)
 add_subdirectory(transferserver)
 add_subdirectory(transferclient)
 add_subdirectory(tstthreadpool)
+add_subdirectory(tstprotobuff)
+
 
 #add_subdirectory(${CMAKE_SOURCE_DIR}/thirdpart/rapidjson)
-
 
 #if(CARES_INCLUDE_DIR AND CARES_LIBRARY)
 #  add_subdirectory(cdns)

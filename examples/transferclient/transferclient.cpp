@@ -67,9 +67,9 @@ using namespace muduo::net;
 
 
 
-#include "gen-cpp/transfer_types.h"
+#include "../gen-cpp/transfer_types.h"
 
-#include "gen-cpp/Photo.h"
+#include "../gen-cpp/Photo.h"
 
 
 // 传输二进制文件给服务器(transferserver) 客户端程序

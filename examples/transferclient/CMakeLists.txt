@@ -9,9 +9,9 @@ set(EXECUTABLE_OUTPUT_PATH ../../)
 
 #aux_source_directory(. CODE_LIST)
 
-include_directories(./gen-cpp)
+include_directories(../gen-cpp)
 
-aux_source_directory(./gen-cpp O_GENCPP)
+aux_source_directory(../gen-cpp O_GENCPP)
 
 
 add_executable(${PROJECT_NAME}
