@@ -20,7 +20,7 @@ add_executable(${PROJECT_NAME}
 
 #add_executable(${PROJECT_NAME} ${CODE_LIST})
 
-target_link_libraries(${PROJECT_NAME} muduo_base muduo_net rt thriftnb thrift event ssl crypto)
+target_link_libraries(${PROJECT_NAME} gtest muduo_base muduo_net rt thriftnb thrift event ssl crypto)
 
 
 

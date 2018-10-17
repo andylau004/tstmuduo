@@ -200,7 +200,7 @@ class CThriftServerHelper
 {
 public:
     // set_log_function 是否设置写日志函数，默认设置为debug级别日志
-    CThriftServerHelper(apache::thrift::server::TServerEventHandler* server_event_handler=NULL, bool set_log_function=true);
+    CThriftServerHelper(apache::thrift::server::TServerEventHandler* server_event_handler=nullptr, bool set_log_function=true);
 
     // 启动rpc服务，请注意该调用是同步阻塞的，所以需放最后调用
     // port thrift服务端的监听端口号

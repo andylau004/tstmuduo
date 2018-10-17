@@ -178,19 +178,31 @@ public:
     }
     virtual void* createContext(boost::shared_ptr<TProtocol> input,
                                 boost::shared_ptr<TProtocol> output) {
+        UNUSED(output);
         std::cout << " call createContext " << std::endl;
-        TFramedTransport *tbuf = dynamic_cast<TFramedTransport *>(input->getTransport().get());
-        if ( !tbuf ) {
-            std::cout << " tbuf == null" << std::endl;
+        TFramedTransport* pframetrans = dynamic_cast<TFramedTransport *>(input->getTransport().get());
+        if ( !pframetrans ) {
+            std::cout << " pframetrans == null" << std::endl;
         } else {
-            TSocket *sock = dynamic_cast<TSocket *>(tbuf->getUnderlyingTransport().get());
+            std::cout << " pframetrans != null" << std::endl;
+            TSocket *sock = dynamic_cast<TSocket *>(pframetrans->getUnderlyingTransport().get());
             std::cout << " ip=" << sock->getPeerAddress() << std::endl;
         }
-        // insert when connection open
-//        TBufferedTransport *tbuf = dynamic_cast<TBufferedTransport *>(input->getTransport().get());
+        {
+            // insert when connection open
+            TBufferedTransport* pbufftrans = dynamic_cast<TBufferedTransport *>(input->getTransport().get());
+            if ( !pbufftrans ) {
+                std::cout << " pbufftrans == null" << std::endl;
+            } else {
+                std::cout << " pbufftrans != null" << std::endl;
+//                TSocket *sock = dynamic_cast<TSocket *>(tbuf->getUnderlyingTransport().get());
+//                std::cout << " ip=" << sock->getPeerAddress() << std::endl;
+            }
 //        TSocket *sock = dynamic_cast<TSocket *>(tbuf->getUnderlyingTransport().get());
 //        lock::MutexLock g(&mutex);
 //        thrift_client_ip[pthread_self()] = sock->getPeerAddress();
+
+        }
         return NULL;
     }
     virtual void deleteContext(void* serverContext,
@@ -210,7 +222,7 @@ public:
             socklen_t addrLen;
             addrPtr = tsocket->getCachedAddress(&addrLen);
             if (addrPtr){
-                getnameinfo((sockaddr*)addrPtr,addrLen,(char*)serverContext,32,NULL,0,0) ;
+                getnameinfo((sockaddr*)addrPtr,addrLen,(char*)serverContext,32,NULL,0,0);
                 std::cout << "111111111---------------------------------------" << std::endl;
                 std::cout << "serverContext=" << serverContext << std::endl;
                 std::cout << "111111111---------------------------------------" << std::endl;
@@ -238,7 +250,7 @@ private:
 
 void tst_transfer_server_entry() {
     OutputDbgInfo tmpOut( "tst_transfer_server_entry begin", "tst_transfer_server_entry end" ) ;
-    int srv_port = 9090;
+    uint16_t srv_port = 9090;
 
 //    tst_thrift_threadmanager_fun();
 //    return ;
@@ -247,29 +259,29 @@ void tst_transfer_server_entry() {
     thrift_server_agent.serve(srv_port);
     return;
 
-    boost::shared_ptr<PhotoHandler>     handler(new PhotoHandler());
-    boost::shared_ptr<TProcessor>       processor(new PhotoProcessor(handler));
-    boost::shared_ptr<TProtocolFactory> protocolFactory(new TBinaryProtocolFactory());
+//    boost::shared_ptr<PhotoHandler>     handler(new PhotoHandler());
+//    boost::shared_ptr<TProcessor>       processor(new PhotoProcessor(handler));
+//    boost::shared_ptr<TProtocolFactory> protocolFactory(new TBinaryProtocolFactory());
 
-    boost::shared_ptr<ThreadManager>      threadManager = ThreadManager::newSimpleThreadManager(4);
-    boost::shared_ptr<PosixThreadFactory> threadFactory = boost::shared_ptr<PosixThreadFactory> (new PosixThreadFactory()); //PosixThreadFactory可以自定义（继承于ThreadFactory）
+//    boost::shared_ptr<ThreadManager>      threadManager = ThreadManager::newSimpleThreadManager(4);
+//    boost::shared_ptr<PosixThreadFactory> threadFactory = boost::shared_ptr<PosixThreadFactory> (new PosixThreadFactory()); //PosixThreadFactory可以自定义（继承于ThreadFactory）
 
-    int nStackSize = threadFactory->getStackSize();
-    printf("tst_transfer_server_entry stack size=%d\n", nStackSize); // default value is 1
+//    int nStackSize = threadFactory->getStackSize();
+//    printf("tst_transfer_server_entry stack size=%d\n", nStackSize); // default value is 1
 
-    threadManager->threadFactory(threadFactory);
-    threadManager->start();
+//    threadManager->threadFactory(threadFactory);
+//    threadManager->start();
 
-    TNonblockingServer server(processor, protocolFactory, srv_port, threadManager);
-    printf("BinaryServer beg\n");
-    try {
-        server.serve();
-    }
-    catch(TException e) {
-        printf("Server.serve() failed\n");
-        exit(-1);
-    }
-    printf("BinaryServer end\n");
+//    TNonblockingServer server(processor, protocolFactory, srv_port, threadManager);
+//    printf("BinaryServer beg\n");
+//    try {
+//        server.serve();
+//    }
+//    catch(TException e) {
+//        printf("Server.serve() failed\n");
+//        exit(-1);
+//    }
+//    printf("BinaryServer end\n");
 
 }
 
