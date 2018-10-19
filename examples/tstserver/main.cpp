@@ -734,6 +734,9 @@ std::string makeResultJson(int code, const std::string& message, const std::stri
 }
 
 void tst_str_2() {
+    std::cout << "result=" << makeResultJson( 123, "testkey", "tstvalue111" ) << std::endl;
+    return ;
+
 
     {
         std::vector<int64_t> ownerIds;
@@ -1147,6 +1150,7 @@ int main(int argc, char *argv[])
     std::setlocale(LC_ALL, "en_US.utf8");
     Logger::setLogLevel(Logger::DEBUG);
 //    LOG_INFO << "pid = " << getpid() << ", tid = " << CurrentThread::tid();
+    tst_str_2(); return 1;
 
     tst_tuple_2(); return 1;
 
@@ -1184,7 +1188,6 @@ int main(int argc, char *argv[])
     tst_json_parse(); return 1;
 
 
-    tst_str_2(); return 1;
 
     my_weak_ptr(); return 1;
 

@@ -1,0 +1,145 @@
+//#include "thriftex/server/ex_event_handler.h"
+//#include "thriftex/base/logging.h"
+#include "ex_event_handler.h"
+//#include "thriftex/base/logging.h"
+
+#include <thrift/transport/TSocket.h>
+#include <thrift/transport/TBufferTransports.h>
+
+#include <sys/time.h>
+#include <iostream>
+
+namespace thriftex {
+namespace server {
+
+using apache::thrift::transport::TSocket;
+using apache::thrift::transport::TMemoryBuffer;
+using apache::thrift::transport::TFramedTransport;
+
+/**
+ * Connection info
+ */
+struct ServerContext {
+    std::string remote_host;
+    std::string remote_address;
+    int port;
+};
+
+/**
+ * Process info
+ */
+struct ProcessContext {
+    ServerContext *server_context;
+    ::timeval timeval;
+};
+
+ExServerEventHandler::ExServerEventHandler()
+{}
+
+ExServerEventHandler::~ExServerEventHandler()
+{}
+
+void *
+ExServerEventHandler::createContext(boost::shared_ptr<TProtocol>,
+                                    boost::shared_ptr<TProtocol>) {
+    ServerContext *context = new ServerContext();
+    std::cout << "createContext context=" << context << std::endl;
+
+//    TBufferedTransport *tbuf = dynamic_cast<TBufferedTransport *>(input->getTransport().get());
+//    TSocket *sock = dynamic_cast<TSocket*>(tbuf->getUnderlyingTransport().get());
+
+    return context;
+}
+
+void
+ExServerEventHandler::processContext(void* serverContext,
+                                     boost::shared_ptr<TTransport> transport) {
+    ServerContext *context = static_cast<ServerContext *>(serverContext);
+    std::cout << "processContext context=" << context << std::endl;
+
+    TSocket *tSocket = static_cast<TSocket *>(transport.get());
+    if (context != nullptr && tSocket != nullptr) {
+        context->remote_host = tSocket->getPeerHost();
+        context->remote_address = tSocket->getPeerAddress();
+        context->port = tSocket->getPeerPort();
+
+        std::cout << "processContext beg---------------------------------------" << std::endl;
+//        std::cout << "remote_host=" << context->remote_host << std::endl;
+//        std::cout << "remote_address=" << context->remote_address << std::endl;
+//        std::cout << "remote_port=" << context->port << std::endl;
+        printf( "remote_address=%s remote_port=%d\n",
+                /*context->remote_host.c_str(),*/
+                context->remote_address.c_str(), context->port );
+        std::cout << "processContext end---------------------------------------" << std::endl;
+
+    } else {
+//        EX_ERROR << "Invalid server context or tSocket!\n";
+        printf( "Invalid server context or tSocket!\n" );
+    }
+}
+
+
+void
+ExServerEventHandler::deleteContext(void* serverContext,
+                                    boost::shared_ptr<TProtocol>,
+                                    boost::shared_ptr<TProtocol>) {
+    ServerContext *context = static_cast<ServerContext *>(serverContext);
+    std::cout << "deleteContext context=" << context << std::endl;
+    delete context;
+}
+
+
+ExProcessorEventHandler::ExProcessorEventHandler()
+{}
+
+ExProcessorEventHandler::~ExProcessorEventHandler()
+{}
+
+void *
+ExProcessorEventHandler::getContext(const char *, void *serverContext) {
+    ProcessContext *process_context = new ProcessContext();
+
+    if (gettimeofday(&process_context->timeval, nullptr) != 0) {
+        delete process_context;
+        process_context = nullptr;
+    } else {
+        process_context->server_context = static_cast<ServerContext *>(serverContext);
+    }
+
+    return process_context;
+}
+
+void
+ExProcessorEventHandler::freeContext(void *ctx, const char *) {
+    delete static_cast<ProcessContext *>(ctx);
+    ctx = nullptr;
+}
+
+void
+ExProcessorEventHandler::postWrite(void *ctx, const char *fn_name, uint32_t) {
+    ::timeval timeval_current;
+    ::timeval &timeval_before_ptr =
+            static_cast<ProcessContext *>(ctx)->timeval;
+
+    ServerContext *server_context =
+            static_cast<ProcessContext *>(ctx)->server_context;
+
+    if (gettimeofday(&timeval_current, nullptr) == 0) {
+        int ms = 0;
+        ms =  (timeval_current.tv_sec - timeval_before_ptr.tv_sec) * 1000;
+        ms += (timeval_current.tv_usec - timeval_before_ptr.tv_usec) / 1000;
+
+        if (ms >= this->SLOW_TIME) {
+            std::cout << server_context->remote_host << "("
+                    << server_context->remote_address << ":" << server_context->port
+                    << ") " << fn_name << ".SLOW " << ms << "ms cost\n";
+        } else {
+            std::cout << server_context->remote_host << "("
+                          << server_context->remote_address << ":"
+                          << server_context->port << ") " << fn_name << " "
+                          << ms << "ms cost\n";
+        }
+    }
+}
+
+}}

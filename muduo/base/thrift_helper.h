@@ -26,6 +26,9 @@
 //#include <mooon/utils/string_utils.h>
 //#include <mooon/utils/scoped_ptr.h>
 
+//#include <vector>
+
+
 #include <arpa/inet.h>
 #include <boost/scoped_ptr.hpp>
 #include <thrift/concurrency/PosixThreadFactory.h>
@@ -35,21 +38,18 @@
 #include <thrift/TApplicationException.h>
 #include <thrift/transport/TSocketPool.h>
 #include <thrift/transport/TTransportException.h>
-#include <vector>
 //NET_NAMESPACE_BEGIN
 
 // 用来判断thrift是否已经连接，包括两种情况：
 // 1.从未连接过，也就是还未打开过连接
 // 2.连接被对端关闭了
-inline bool thrift_not_connected(
-        apache::thrift::transport::TTransportException::TTransportExceptionType type)
+inline bool thrift_not_connected(apache::thrift::transport::TTransportException::TTransportExceptionType type)
 {
     return (apache::thrift::transport::TTransportException::NOT_OPEN == type)
             || (apache::thrift::transport::TTransportException::END_OF_FILE == type);
 }
 
-inline bool thrift_not_connected(
-        apache::thrift::transport::TTransportException& ex)
+inline bool thrift_not_connected(apache::thrift::transport::TTransportException& ex)
 {
     apache::thrift::transport::TTransportException::TTransportExceptionType type = ex.getType();
     return thrift_not_connected(type);

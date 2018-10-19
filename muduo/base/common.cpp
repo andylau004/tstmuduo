@@ -20,6 +20,38 @@
 
 #include <random>
 
+#include "muduo/base/CurrentThread.h"
+
+using namespace std;
+using namespace muduo;
+//using namespace muduo::net;
+
+
+_tag_OutputDbgInfo::_tag_OutputDbgInfo( const std::string& str_in, const std::string& str_out ) {
+    m_str_out = str_out;
+    printf( "\n" );
+//    printf( "--------------------%s\n", str_in.c_str() );
+    LOG_INFO << "--------------------" << str_in;
+}
+_tag_OutputDbgInfo::_tag_OutputDbgInfo( const char* str_in, const char* str_out ) {
+    m_str_out = str_out ;
+    printf( "\n" );
+//    printf ( "--------------------%s\n", str_in );
+    LOG_INFO << "--------------------" << str_in;
+}
+
+_tag_OutputDbgInfo::~_tag_OutputDbgInfo( ) {
+//    printf ( "--------------------%s\n", m_str_out.c_str() );
+//    printf( "\n" );
+    LOG_INFO << "--------------------" << m_str_out;
+    printf( "\n" );
+}
+
+//
+
+int CurTid() {
+    return CurrentThread::tid();
+}
 
 /*
     * Parameter(s)  :
@@ -262,7 +294,7 @@ std::string GetFileContent_string( const char* lpszFileName ) {
     if (pContent) {
 //        printf("123\n");
         std::string retFile(pContent, fileSize);
-        printf("retFileLen=%d\n", retFile.length());
+//        printf("retFileLen=%d\n", retFile.length());
         free(pContent);
         return retFile;
     } else {

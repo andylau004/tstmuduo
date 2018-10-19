@@ -14,7 +14,10 @@ struct OneFile {
 
 service Photo {
 
-  bool SendPhoto(1: OneFile onefile)
+      bool SendPhoto(1: OneFile onefile)
+
+
+      i32  Add(1: i32 add1, 2: i32 add2 )
 
 }
 

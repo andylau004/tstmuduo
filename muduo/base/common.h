@@ -38,12 +38,107 @@
 #include <sys/time.h>
 #include <ctype.h>
 
-#include <map>
-#include <vector>
-#include <list>
 #include <set>
+#include <map>
+#include <list>
+#include <deque>
+#include <vector>
+#include <string>
+#include <sstream>
+#include <algorithm>
+#include <stdexcept>
+
+#include <time.h>
+#include <math.h>
+#include <fcntl.h>
+#include <stdio.h>
+#include <stdint.h>
+#include <stddef.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <malloc.h>
+#include <ifaddrs.h>
+#include <sys/time.h>
+#include <sys/types.h>
+#include <sys/statvfs.h>
+#include <semaphore.h>
+#include <arpa/inet.h>
+#include <netinet/in.h>
+
+#include <boost/thread.hpp>
+#include <boost/utility.hpp>
+#include <boost/function.hpp>
+#include <boost/filesystem.hpp>
+#include <boost/shared_ptr.hpp>
+#include <boost/noncopyable.hpp>
+#include <boost/filesystem/exception.hpp>
+#include <boost/enable_shared_from_this.hpp>
+#include <boost/interprocess/detail/atomic.hpp>
+#include <boost/algorithm/string/predicate.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/interprocess/sync/interprocess_semaphore.hpp>
+
+//#include "thirdparty/glog/logging.h"
+
+//#include "codec.h"
+#include "utils.h"
+//#include "md5lib.h"
+#include "errcode.h"
+//#include "configs.h"
+//#include "rw_lock.h"
+#include "exception.h"
+//#include "thread_pool.h"
+#include "thrift_connection_pool.h"
+
+
 
 using namespace std;
+
+
+
+#define MAX_FILE_NAME_LEN 31
+
+#define LOG_INFO_SMART LOG_IF(INFO, (FLAGS_minloglevel <= google::INFO))
+#define LOG_WARNING_SMART LOG_IF(WARNING, (FLAGS_minloglevel <= google::WARNING))
+
+#define CHECK_RET(ret, msg) do { if (!RESULT_IS_SUCCESS(ret)) \
+        ErasureUtils::throw_exception(ret, msg); \
+        } while(0)
+
+#define CHECK_TRUE(exp, msg) do { if (!(exp)) \
+        ErasureUtils::throw_exception(RESULT_ERR_GENERAL, msg); \
+        } while(0)
+
+
+enum ServerStatus {
+    Server_Starting = 0,
+    Server_Running = 1,
+    Server_Suspended = 2,
+    Server_Dead = 3,
+};
+
+/*
+ * 0       7|8     11|12      31
+ * +++++++++++++++++++++++++++++
+ * | nodeid | diskid |  seqid  |
+ * +++++++++++++++++++++++++++++
+ */
+#define NODE_ID_BITS 8
+#define DISK_ID_BITS 4
+#define SEQ_ID_BITS 20
+#define CHUNK_ID_BITS 32
+
+#define NODE_ID_OFFSET (CHUNK_ID_BITS - NODE_ID_BITS)
+#define DISK_ID_OFFSET (NODE_ID_OFFSET - DISK_ID_BITS)
+
+#define NODE_ID(chunkid) (int16_t)(((uint32_t)chunkid >> NODE_ID_OFFSET) & ((1 << NODE_ID_BITS) - 1))
+#define DISK_ID(chunkid) (int8_t)(((uint32_t)chunkid >> DISK_ID_OFFSET) & ((1 << DISK_ID_BITS) - 1))
+#define SEQ_ID(chunkid) (int32_t)(chunkid & ((1 << SEQ_ID_BITS) - 1))
+
+#define MAKE_CHUNK_ID(nodeid, diskid, seqid) (nodeid << NODE_ID_OFFSET | diskid << DISK_ID_OFFSET | seqid)
+
+// -------------------------------------------------------------------------------------------------------
+
 
 
 #define UNUSED(x) ((void)x)
@@ -81,21 +176,10 @@ void delete_object_array(T ** t) {
 }
 
 typedef struct _tag_OutputDbgInfo {
-    _tag_OutputDbgInfo( const std::string& str_in, const std::string& str_out ) {
-        m_str_out = str_out;
-        printf( "\n" );
-        printf( "--------------------%s\n", str_in.c_str() );
-    }
-    _tag_OutputDbgInfo( const char* str_in, const char* str_out ) {
-        m_str_out = str_out ;
-        printf( "\n" );
-        printf ( "--------------------%s\n", str_in );
-    }
+    _tag_OutputDbgInfo( const std::string& str_in, const std::string& str_out );
+    _tag_OutputDbgInfo( const char* str_in, const char* str_out );
 
-    ~_tag_OutputDbgInfo( ) {
-        printf ( "--------------------%s\n", m_str_out.c_str() );
-        printf( "\n" );
-    }
+    ~_tag_OutputDbgInfo( );
 
     std::string  m_str_out;
 }OutputDbgInfo;
@@ -336,7 +420,7 @@ std::string GetCurMilliSecond_string();
 
 int64_t  GetRandom64();
 
-
+int CurTid();
 
 
 ///check time function

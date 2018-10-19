@@ -2,6 +2,13 @@
 
 
 set(base_SRCS
+    errcode.h
+    exception.h
+    thrift_connection_pool.h
+    thrift_connection_pool.cpp
+    utils.h
+    utils.cpp
+
     thrift_helper.h
     thrift_helper.cpp
 
@@ -36,7 +43,7 @@ set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -gdwarf-2 -Wno-deprecated -ffunction-se
 #set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -gdwarf-2 -Wno-deprecated -ffunction-sections -W -Wall -pthread -Wno-missing-braces -Wparentheses" )
 
 add_library(muduo_base ${base_SRCS})
-target_link_libraries(muduo_base pthread rt)
+target_link_libraries(muduo_base pthread rt boost_system)
 
 
 #add_library(muduo_base_cpp11 ${base_SRCS})

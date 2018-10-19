@@ -51,7 +51,6 @@
 
 
 
-
 using namespace apache::thrift;
 using namespace apache::thrift::transport;
 using namespace apache::thrift::protocol;
@@ -78,37 +77,36 @@ using namespace muduo::net;
 #include "muduo/base/thrift_helper.h"
 
 
+#include "ex_event_handler.h"
 
-//using boost::shared_ptr;
+
+using boost::shared_ptr;
+
 
 static boost::shared_ptr<transport::TTransport> g_CurrentTransport = nullptr;
 
 
 // 接受传输文件客户端(transferclient)上传的二进制文件服务器程序
-
 class PhotoHandler : virtual public PhotoIf {
 public:
     PhotoHandler() {
         // Your initialization goes here
     }
 
-    bool SendPhoto(const OneFile& onefile) {
+    virtual bool SendPhoto(const OneFile& onefile) {
         // Your implementation goes here
         printf("SendPhoto Recv Onefile\n");
-        std::cout << "fileName=" << onefile.name << std::endl;
-        std::cout << "file_size=" << onefile.file_size << std::endl;
-        std::cout << "file_size=" << onefile.file_hsh << std::endl;
+//        std::cout << "fileName=" << onefile.name << std::endl;
+        std::cout << "file_size=" << onefile.file_size << " file_size=" << onefile.file_hsh << std::endl;
+//        std::cout << "file_size=" << onefile.file_hsh << std::endl;
 
         save_file("./tmpSaveUploadFile", (char*)onefile.file_buffer.data(), onefile.file_size);
         return true;
     }
-//    void SayToClient(const std::string& msg)
-//    {
-//        shared_ptr<TBinaryProtocol> protocol(new TBinaryProtocol(g_CurrentTransport));
-//        PhotoClient client(protocol);
-//        //Thread.Sleep(1000);
-//        client.SayHello(msg);
-//    }
+    virtual int32_t Add(const int32_t add1, const int32_t add2) {
+        return (add1 + add2);
+//        return 1;
+    }
 };
 
 class MyTask : public Runnable {
@@ -174,6 +172,7 @@ public:
     }
 
     virtual void preServe() {
+//        stdcxx::shared_ptr<int> pre;
         std::cout << " call preServe " << std::endl;
     }
     virtual void* createContext(boost::shared_ptr<TProtocol> input,
@@ -222,11 +221,11 @@ public:
             socklen_t addrLen;
             addrPtr = tsocket->getCachedAddress(&addrLen);
             if (addrPtr){
-                getnameinfo((sockaddr*)addrPtr,addrLen,(char*)serverContext,32,NULL,0,0);
+                getnameinfo((sockaddr*)addrPtr,addrLen,(char*)serverContext,32,nullptr,0,0);
                 std::cout << "111111111---------------------------------------" << std::endl;
                 std::cout << "serverContext=" << serverContext << std::endl;
                 std::cout << "111111111---------------------------------------" << std::endl;
-            }
+            }// test1
 
             {
                 TSocket *sock = static_cast<TSocket *>(transport.get());
@@ -237,8 +236,7 @@ public:
                     std::cout << "getSocketInfo=" << sock->getSocketInfo() << std::endl;
                     std::cout << "222222222---------------------------------------" << std::endl;
                 }
-            }
-
+            }// test2
 
         }
 
@@ -248,14 +246,23 @@ private:
 };
 
 
+typedef struct _tag_KV {
+    int64_t key;
+    char value[8];
+}st_kv;
+
 void tst_transfer_server_entry() {
+    std::cout << "sizeof (st_kv)=" << sizeof (st_kv) << std::endl;
+//    return ;
+
     OutputDbgInfo tmpOut( "tst_transfer_server_entry begin", "tst_transfer_server_entry end" ) ;
     uint16_t srv_port = 9090;
 
 //    tst_thrift_threadmanager_fun();
 //    return ;
 
-    /*common::*/CThriftServerHelper<PhotoHandler, PhotoProcessor> thrift_server_agent((new ClientIPHandler), false);
+//    /*common::*/CThriftServerHelper<PhotoHandler, PhotoProcessor> thrift_server_agent((new ClientIPHandler), false);
+    /*common::*/CThriftServerHelper<PhotoHandler, PhotoProcessor> thrift_server_agent((new thriftex::server::ExServerEventHandler), false);
     thrift_server_agent.serve(srv_port);
     return;
 
