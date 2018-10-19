@@ -110,10 +110,10 @@ int  clientAddImpl_2( int ival ) {
 }
 
 int  clientAddImpl() {
-    std::string strTid =
-            std::string("cur work tid=") + convert<std::string>(CurTid());
+//    std::string strTid =
+//            std::string("cur work tid=") + convert<std::string>(CurTid());
 
-    OutputDbgInfo tmpOut( strTid + " beg---------", strTid + " end---------" );
+    OutputDbgInfo tmpOut( /*strTid +*/ " clientAddImpl beg---------", /*strTid +*/ " clientAddImpl end---------" );
 
     uint32_t uSrvIp = ErasureUtils::str2ip("172.17.0.2");
     boost::shared_ptr<one_sendFile_ThriftConn> oneConn = g_clientPool_sendfile->get_connection( uSrvIp, 9090 );
@@ -137,7 +137,9 @@ int  clientAddImpl() {
         oneFile.__set_file_size(ulFileSize);
         oneFile.__set_file_hsh("12345");
 
-        bool bSend = oneConn->get_client()->SendPhoto(oneFile);
+//        bool bSend = oneConn->get_client()->SendPhoto(oneFile);
+        int iSum = oneConn->get_client()->Add(99, 10);
+        LOG_INFO << "sum=" << iSum;
 
 //        std::cout << "bsend=" << bSend << std::endl;
 //        transport->close();
