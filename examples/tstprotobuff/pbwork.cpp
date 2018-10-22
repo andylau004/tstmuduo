@@ -158,6 +158,10 @@ int loadAddInfo()
 
 
 int tst_protobuff_Work_entry(int argc, char *argv[]) {
+    /*std::cout << */GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+    return 1;
+
     int choice;
     cout << "input choice: 1 for save, 2 for load" << endl;
     cin >> choice;

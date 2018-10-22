@@ -10,7 +10,7 @@ set(EXECUTABLE_OUTPUT_PATH ../../)
 add_executable(${PROJECT_NAME}
     pbwork.h pbwork.cpp
     addressbook.pb.cc addressbook.pb.h
-    addressbook.proto
+    addressbook.proto query.proto
     main.cpp)
 
 
