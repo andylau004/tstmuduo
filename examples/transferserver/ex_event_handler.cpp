@@ -9,6 +9,12 @@
 #include <sys/time.h>
 #include <iostream>
 
+
+#include "muduo/base/common.h"
+#include "muduo/base/CurrentThread.h"
+
+
+
 namespace thriftex {
 namespace server {
 
@@ -43,7 +49,7 @@ void *
 ExServerEventHandler::createContext(boost::shared_ptr<TProtocol>,
                                     boost::shared_ptr<TProtocol>) {
     ServerContext *context = new ServerContext();
-    std::cout << "createContext context=" << context << std::endl;
+    printf( "                                 tid=%d  createContext context=%p\n", CurTid(), context );
 
 //    TBufferedTransport *tbuf = dynamic_cast<TBufferedTransport *>(input->getTransport().get());
 //    TSocket *sock = dynamic_cast<TSocket*>(tbuf->getUnderlyingTransport().get());
@@ -55,22 +61,19 @@ void
 ExServerEventHandler::processContext(void* serverContext,
                                      boost::shared_ptr<TTransport> transport) {
     ServerContext *context = static_cast<ServerContext *>(serverContext);
-    std::cout << "processContext context=" << context << std::endl;
+    printf( "                                 tid=%d  processContext context=%p\n", CurTid(), context );
 
     TSocket *tSocket = static_cast<TSocket *>(transport.get());
     if (context != nullptr && tSocket != nullptr) {
+        tSocket->getPeerHost();
         context->remote_host = tSocket->getPeerHost();
         context->remote_address = tSocket->getPeerAddress();
         context->port = tSocket->getPeerPort();
 
-        std::cout << "processContext beg---------------------------------------" << std::endl;
-//        std::cout << "remote_host=" << context->remote_host << std::endl;
-//        std::cout << "remote_address=" << context->remote_address << std::endl;
-//        std::cout << "remote_port=" << context->port << std::endl;
-        printf( "remote_address=%s remote_port=%d\n",
-                /*context->remote_host.c_str(),*/
-                context->remote_address.c_str(), context->port );
-        std::cout << "processContext end---------------------------------------" << std::endl;
+        printf( "                                 tid=%d  processContext beg\n", CurTid() );
+        printf( "                                 tid=%d  remote_address=%s remote_port=%d\n",
+                CurTid(), context->remote_address.c_str(), context->port );
+        printf( "                                 tid=%d  processContext end\n", CurTid() );
 
     } else {
 //        EX_ERROR << "Invalid server context or tSocket!\n";
@@ -84,7 +87,8 @@ ExServerEventHandler::deleteContext(void* serverContext,
                                     boost::shared_ptr<TProtocol>,
                                     boost::shared_ptr<TProtocol>) {
     ServerContext *context = static_cast<ServerContext *>(serverContext);
-    std::cout << "deleteContext context=" << context << std::endl;
+//    std::cout << "deleteContext context=" << context << std::endl;
+    printf( "                                 tid=%d  deleteContext context=%p\n", CurTid(), context );
     delete context;
 }
 

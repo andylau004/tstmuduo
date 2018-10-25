@@ -35,6 +35,9 @@ option( _debug "Debug option" ON )
 
 include_directories("${CMAKE_SOURCE_DIR}")
 include_directories(${CMAKE_SOURCE_DIR}/thirdpart/rapidjson)
+include_directories(${CMAKE_SOURCE_DIR}/thirdpart/thrift/thrift-0.9.3)
+include_directories(${CMAKE_SOURCE_DIR}/thirdpart/thrift/thrift-0.9.3/lib/cpp/src)
+
 
 aux_source_directory(. SRC_LIST)
 aux_source_directory(./muduo/base BASE_LIST)
@@ -51,6 +54,7 @@ link_directories(/opt/openssl/lib/)
 
 
 
+add_subdirectory(thirdpart/thrift)
 add_subdirectory(muduo/base)
 add_subdirectory(muduo/net)
 

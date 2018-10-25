@@ -3,15 +3,20 @@
 //
 // Author: Shuo Chen (chenshuo at chenshuo dot com)
 
+#include <stdio.h>
 #include <muduo/base/CountDownLatch.h>
+
 
 using namespace muduo;
 
+
 CountDownLatch::CountDownLatch(int count)
-    : mutex_(),
-      condition_(mutex_),
-      count_(count)
+    : mutex_(), condition_(mutex_), count_(count)
 {
+//    printf( "countdownlatch cst this=%p\n", this );
+}
+CountDownLatch::~CountDownLatch() {
+//    printf( "countdownlatch this=%p\n", this );
 }
 
 void CountDownLatch::wait()

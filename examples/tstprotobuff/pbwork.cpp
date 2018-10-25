@@ -20,9 +20,10 @@
 
 
 
-
-
 #include "addressbook.pb.h"
+#include "query.pb.h"
+#include "codec.h"
+
 
 
 using namespace std;
@@ -35,10 +36,13 @@ using namespace muduo;
  *
  * -------------------------------------------*/
 
+
+
+
+
 // 测试protbuff
 
-int saveAddInfo()
-{
+int saveAddInfo() {
     ContactInfo::AddressBook addbook;
     addbook.set_owner("xxx");
 
@@ -138,8 +142,7 @@ void showMsgbyAuto(ContactInfo::AddressBook addbook)
     }
 }
 
-int loadAddInfo()
-{
+int loadAddInfo() {
     ContactInfo::AddressBook addbook;
 
     fstream input("pbinfo.log", ios::in|ios::binary);
@@ -156,11 +159,123 @@ int loadAddInfo()
 }
 
 
+template < typename T >
+void testDescriptor() {
+    std::string type_name = T::descriptor()->full_name();
+    cout << type_name << endl;
+
+    const google::protobuf::Descriptor* descriptor =
+      google::protobuf::DescriptorPool::generated_pool()->FindMessageTypeByName(type_name);
+    assert(descriptor == T::descriptor());
+    cout << "FindMessageTypeByName() = " << descriptor << endl;
+    cout << "T::descriptor()         = " << T::descriptor() << endl;
+    cout << endl;
+
+    const google::protobuf::Message* prototype =
+      google::protobuf::MessageFactory::generated_factory()->GetPrototype(descriptor);
+    assert(prototype == &T::default_instance());
+    cout << "GetPrototype()        = " << prototype << endl;
+    cout << "T::default_instance() = " << &T::default_instance() << endl;
+    cout << endl;
+
+    T* new_obj = dynamic_cast<T*>(prototype->New());
+    assert(new_obj != NULL);
+    assert(new_obj != prototype);
+    assert(typeid(*new_obj) == typeid(T::default_instance()));
+    cout << "prototype->New() = " << new_obj << endl;
+    cout << endl;
+    delete new_obj;
+}
+
+void tst_proto_reflection() {
+    testDescriptor<muduo::Query>();
+    testDescriptor<muduo::Answer>();
+    google::protobuf::Message* newQuery = createMessage("muduo.Query");
+
+    assert(newQuery != NULL);
+    assert(typeid(*newQuery) == typeid(muduo::Query::default_instance()));
+
+    cout << "typeid(*newQuery) = " << typeid(*newQuery).name() << endl;
+    cout << "typeid(muduo::Query::default_instance()) = " << typeid(muduo::Query::default_instance()).name() << endl;
+    cout << "createMessage(\"muduo.Query\") = " << newQuery << endl;
+
+    google::protobuf::Message* newAnswer = createMessage("muduo.Answer");
+    assert(newAnswer != NULL);
+    assert(typeid(*newAnswer) == typeid(muduo::Answer::default_instance()));
+    cout << "createMessage(\"muduo.Answer\") = " << newAnswer << endl;
+
+    delete newQuery;
+    delete newAnswer;
+
+    puts("All pass!!!");
+
+    google::protobuf::ShutdownProtobufLibrary();
+}
+
+void tst_copy_fun() {
+    int  source [ 3 ] = { 1, 3, 2 };
+    int  dest [ 5 ] = {0};
+    std::copy( source, source + 3, dest );
+    for ( int j = 0; j < 3; ++j ) {
+        std::cout << "j=" << dest[j] << std::endl;
+    }
+
+    std::vector < int > vec_intval(3);
+    std::copy( source, source + 3, &vec_intval.front() );
+    for ( int j = 0; j < 3; ++j ) {
+        std::cout << "vec_intval[j]=" << vec_intval[j] << std::endl;
+    }
+}
+
+
+class CTestSharedPtr
+{
+public:
+    CTestSharedPtr() { m_val = -1; std::cout <<"construct CTestSharedPtr\n"; }
+    ~CTestSharedPtr() { std::cout <<"destruct CTestSharedPtr\n"; }
+    void do_something() { std::cout << "do something\n"; }
+private:
+    int  m_val;
+public:
+    int  GetVal() {
+        return m_val;
+    }
+    void SetVal( int inVal ) {
+        m_val = inVal;
+    }
+};
+
+
+void use_const_shared_ptr( const boost::shared_ptr < CTestSharedPtr >& in_ptr ) {
+    in_ptr->GetVal();
+    std::cout << "use_const_shared_ptr usecount=" << in_ptr.use_count() << std::endl;
+}
+void use_shared_ptr( boost::shared_ptr < CTestSharedPtr > in_ptr ) {
+    in_ptr->GetVal();
+    std::cout << "use_shared_ptr usecount=" << in_ptr.use_count() << std::endl;
+}
 
 int tst_protobuff_Work_entry(int argc, char *argv[]) {
-    /*std::cout << */GOOGLE_PROTOBUF_VERIFY_VERSION;
+    GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+    boost::shared_ptr< CTestSharedPtr > pInstance( new CTestSharedPtr );
+    use_shared_ptr( pInstance );
+    std::cout << "aaaaaaaaaaa" << std::endl;
+    std::cout << "usecount=" << pInstance.use_count() << std::endl;
+
+    use_const_shared_ptr( pInstance );
+    std::cout << "bbbbbbbbbbb" << std::endl;
+    std::cout << "usecount=" << pInstance.use_count() << std::endl;
 
     return 1;
+
+    tst_proto_reflection();
+    return 1;
+
+//    tst_copy_fun(); return 1;
+
+    tst_codec_test(); return 1;
+
 
     int choice;
     cout << "input choice: 1 for save, 2 for load" << endl;

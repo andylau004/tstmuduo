@@ -2,6 +2,10 @@
 
 
 set(base_SRCS
+
+    libevent.h
+    libevent.cc
+
     errcode.h
     exception.h
     thrift_connection_pool.h

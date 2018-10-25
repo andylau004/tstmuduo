@@ -16,20 +16,21 @@ namespace muduo
 
 class CountDownLatch : boost::noncopyable
 {
- public:
+public:
 
-  explicit CountDownLatch(int count);
+    explicit CountDownLatch(int count);
+    ~CountDownLatch();
 
-  void wait();
+    void wait();
 
-  void countDown();
+    void countDown();
 
-  int getCount() const;
+    int getCount() const;
 
- private:
-  mutable MutexLock mutex_;
-  Condition condition_;
-  int count_;
+private:
+    mutable MutexLock mutex_;
+    Condition condition_;
+    int count_;
 };
 
 }

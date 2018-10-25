@@ -423,7 +423,7 @@ void CThriftServerHelper<ThriftHandler, ServiceProcessor, ProtocolFactory>::serv
     init2(ip, port, num_worker_threads, num_io_threads);
 
     // 关联
-    if (attached != NULL)
+    if (attached != nullptr)
         _handler->attach(attached);
 
     // 这里也可直接调用serve()，但推荐run()
@@ -438,7 +438,7 @@ void CThriftServerHelper<ThriftHandler, ServiceProcessor, ProtocolFactory>::serv
     init2("0.0.0.0", port, num_worker_threads, num_io_threads);
 
     // 关联
-    if (attached != NULL)
+    if (attached != nullptr)
         _handler->attach(attached);
 
     // 这里也可直接调用serve()，但推荐run()
@@ -457,8 +457,7 @@ void CThriftServerHelper<ThriftHandler, ServiceProcessor, ProtocolFactory>::stop
 template <class ThriftHandler, class ServiceProcessor, class ProtocolFactory>
 void CThriftServerHelper<ThriftHandler, ServiceProcessor, ProtocolFactory>::init1(apache::thrift::server::TServerEventHandler* server_event_handler, bool set_log_function)
 {
-    if (set_log_function)
-    {
+    if (set_log_function) {
         set_thrift_debug_log_function();
     }
 
@@ -479,11 +478,12 @@ void CThriftServerHelper<ThriftHandler, ServiceProcessor, ProtocolFactory>::init
     _thread_manager->threadFactory(_thread_factory);
     _thread_manager->start();
 
-    apache::thrift::server::TNonblockingServer* server = new apache::thrift::server::TNonblockingServer(_processor, _protocol_factory, port, _thread_manager);
+    apache::thrift::server::TNonblockingServer* server
+            = new apache::thrift::server::TNonblockingServer(_processor, _protocol_factory, port, _thread_manager);
+
     server->setNumIOThreads(num_io_threads);
     server->setServerEventHandler(_server_event_handler);
     _server.reset(server);
-
     // 不要调用_server->run()，交给serve()来调用，
     // 因为一旦调用了run()后，调用线程或进程就被阻塞了。
 }

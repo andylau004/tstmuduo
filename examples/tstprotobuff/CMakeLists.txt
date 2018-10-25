@@ -2,6 +2,8 @@
 
 
 
+
+
 project(tstprotobuf)
 
 
@@ -10,6 +12,8 @@ set(EXECUTABLE_OUTPUT_PATH ../../)
 add_executable(${PROJECT_NAME}
     pbwork.h pbwork.cpp
     addressbook.pb.cc addressbook.pb.h
+    codec.h codec.cpp codec_test.cpp
+    query.pb.cc  query.pb.h
     addressbook.proto query.proto
     main.cpp)
 

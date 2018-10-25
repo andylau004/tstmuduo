@@ -43,6 +43,10 @@
 #include <thrift/concurrency/Monitor.h>
 
 
+
+#include <thrift/transport/TSocket.h>
+#include <thrift/protocol/TBinaryProtocol.h>
+
 #include <thrift/protocol/TBinaryProtocol.h>
 #include <thrift/protocol/TJSONProtocol.h>
 #include <thrift/transport/TBufferTransports.h>
@@ -252,7 +256,7 @@ typedef struct _tag_KV {
 }st_kv;
 
 void tst_transfer_server_entry() {
-    std::cout << "sizeof (st_kv)=" << sizeof (st_kv) << std::endl;
+//    std::cout << "sizeof (st_kv)=" << sizeof (st_kv) << std::endl;
 //    return ;
 
     OutputDbgInfo tmpOut( "tst_transfer_server_entry begin", "tst_transfer_server_entry end" ) ;

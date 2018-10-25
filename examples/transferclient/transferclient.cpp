@@ -77,14 +77,20 @@ const uint32_t FLAGS_idle_timeout_sec = 1 * 1000;
 const uint32_t FLAGS_block_wait_ms    = 1 * 1000;
 
 
+boost::shared_ptr< CountDownLatch>    g_pLatch = nullptr;
+
+
+
 typedef ThriftConnectionPool<PhotoIf, PhotoClient> sendFile_ThriftConnectionPool;
 boost::shared_ptr < sendFile_ThriftConnectionPool > g_clientPool_sendfile;
 
 typedef  sendFile_ThriftConnectionPool::TThriftConnection  one_sendFile_ThriftConn;
 
 
-// 传输二进制文件给服务器(transferserver) 客户端程序
+extern int  clientAddImpl();
 
+
+// 传输二进制文件给服务器(transferserver) 客户端程序
 class PhotoHandler : virtual public PhotoIf {
 public:
     PhotoHandler() {
@@ -102,35 +108,20 @@ public:
 
 };
 
-extern int  clientAddImpl();
 
-int  clientAddImpl_2( int ival ) {
-    UNUSED(ival);
-    return clientAddImpl();
-}
 
 int  clientAddImpl() {
-//    std::string strTid =
-//            std::string("cur work tid=") + convert<std::string>(CurTid());
-
     OutputDbgInfo tmpOut( /*strTid +*/ " clientAddImpl beg---------", /*strTid +*/ " clientAddImpl end---------" );
 
     uint32_t uSrvIp = ErasureUtils::str2ip("172.17.0.2");
-    boost::shared_ptr<one_sendFile_ThriftConn> oneConn = g_clientPool_sendfile->get_connection( uSrvIp, 9090 );
+    boost::shared_ptr<one_sendFile_ThriftConn> newClient = g_clientPool_sendfile->get_connection( uSrvIp, 9090 );
 
     {
-//        boost::shared_ptr<TTransport>  transport(new TFramedTransport(oneConn.get(), 10240, 10240));
-//        boost::shared_ptr<TProtocol>   send_prot(new TBinaryProtocol(transport));
-//        transport->open();
-
-//        PhotoClient client(send_prot);
-
         OneFile oneFile;
         const char* lpszFile = "./tstalgo";
 
         unsigned int ulFileSize = GetFileSize(lpszFile);
 //        std::cout << "ulFileSize=" << ulFileSize << std::endl;
-    //    std::cout << "GetFileContent_string=" << GetFileContent_string(lpszFile) << std::endl;
 
         oneFile.__set_name(lpszFile);
         oneFile.__set_file_buffer(GetFileContent_string(lpszFile));
@@ -138,13 +129,20 @@ int  clientAddImpl() {
         oneFile.__set_file_hsh("12345");
 
 //        bool bSend = oneConn->get_client()->SendPhoto(oneFile);
-        int iSum = oneConn->get_client()->Add(99, 10);
+        int iSum = newClient->get_client()->Add(99, 10);
         LOG_INFO << "sum=" << iSum;
-
-//        std::cout << "bsend=" << bSend << std::endl;
-//        transport->close();
     }
+
+    g_pLatch->countDown();
     return 1;
+}
+int  clientAddImpl_2( int ival ) {
+//    LOG_INFO << "hehe";
+//    g_pLatch->countDown();
+//    return 1;
+
+    UNUSED(ival);
+    return clientAddImpl();
 }
 void tst_transfer_client_entry() {
     OutputDbgInfo tmpOut( "tst_transfer_client_entry begin", "tst_transfer_client_entry end" );
@@ -152,9 +150,10 @@ void tst_transfer_client_entry() {
 //    std::cout << std::endl;
 //    std::cout << __FILE__ << ":" << __LINE__ << "  createContext" << std::endl;
 //    return ;
-
 //    std::cout << __FILE__ << ":" << __LINE__ << "  main threadid=" << muduo::CurrentThread::tid() << std::endl;
-    LOG_INFO << "  main threadid=" << muduo::CurrentThread::tid();
+
+    const int max_thread_count = 3;
+    g_pLatch.reset( new CountDownLatch(max_thread_count) );
 
     g_clientPool_sendfile.reset(new sendFile_ThriftConnectionPool(FLAGS_conn_max,
                                                                   FLAGS_conn_maxperhost,
@@ -164,16 +163,15 @@ void tst_transfer_client_entry() {
                                                                   FLAGS_idle_timeout_sec,
                                                                   FLAGS_block_wait_ms));
     muduo::ThreadPool  workpool;
-    workpool.start(2);
+    workpool.start(max_thread_count);
 
-    workpool.run(clientAddImpl);
-    for (int i = 0; i < 1; ++i) {
-//      char buf[32];
-//      snprintf(buf, sizeof buf, "task %d", i);
+//    workpool.run(clientAddImpl);
+    for (int i = 0; i < max_thread_count; ++i) {
         workpool.run( boost::bind(clientAddImpl_2, 12) );
-//      pool.run(boost::bind(printString, std::string(buf)));
     }
-    return ;
+    g_pLatch->wait();
+    std::cout << "all work Done!!!" << std::endl;
+    return;
 
 
     boost::shared_ptr<TSocket> clientSock(new TSocket("127.0.0.1", 9090));
