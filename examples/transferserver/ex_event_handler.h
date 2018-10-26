@@ -52,8 +52,8 @@ public:
      * @param output
      */
     virtual void deleteContext(void* serverContext,
-                               boost::shared_ptr<TProtocol>input,
-                               boost::shared_ptr<TProtocol>output);
+                               boost::shared_ptr<TProtocol> input,
+                               boost::shared_ptr<TProtocol> output);
 };
 
 /**

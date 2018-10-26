@@ -1087,18 +1087,18 @@ void TNonblockingServer::handleEvent(THRIFT_SOCKET fd, short which) {
             return;
         }
 
-     /*
-         * Either notify the ioThread that is assigned this connection to
-         * start processing, or if it is us, we'll just ask this
-         * connection to do its initial state change here.
-         *
-         * (We need to avoid writing to our own notification pipe, to
-         * avoid possible deadlocks if the pipe is full.)
-         *
-         * The IO thread #0 is the only one that handles these listen
-         * events, so unless the connection has been assigned to thread #0
-         * we know it's not on our thread.
-     */
+        /*
+             * Either notify the ioThread that is assigned this connection to
+             * start processing, or if it is us, we'll just ask this
+             * connection to do its initial state change here.
+             *
+             * (We need to avoid writing to our own notification pipe, to
+             * avoid possible deadlocks if the pipe is full.)
+             *
+             * The IO thread #0 is the only one that handles these listen
+             * events, so unless the connection has been assigned to thread #0
+             * we know it's not on our thread.
+         */
         // 当0号iothread 监听到accept事件时，创建connection 并交给相应的iothread处理数据收发(通过管道方式通知相应的iothread)
         if (clientConnection->getIOThreadNumber() == 0) {
             GlobalOutput.printf("getIOThreadNumber() == 0 beg------");

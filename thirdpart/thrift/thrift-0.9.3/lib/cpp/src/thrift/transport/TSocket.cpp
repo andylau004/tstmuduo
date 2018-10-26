@@ -236,9 +236,9 @@ void TSocket::openConnection(struct addrinfo* res) {
         return;
     }
 
-    if (!path_.empty()) {
+    if (!path_.empty()) {//创建unix domain socket
         socket_ = socket(PF_UNIX, SOCK_STREAM, IPPROTO_IP);
-    } else {
+    } else {//创建通用的网络通信socket
         socket_ = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
     }
 
@@ -263,7 +263,7 @@ void TSocket::openConnection(struct addrinfo* res) {
     }
 
     // Linger
-    setLinger(lingerOn_, lingerVal_);
+    setLinger(lingerOn_, lingerVal_);//设置优雅断开连接或关闭连接参数
 
     // No delay
     setNoDelay(noDelay_);
@@ -376,9 +376,9 @@ void TSocket::openConnection(struct addrinfo* res) {
 
 done:
     // Set socket back to normal mode (blocking)
-    THRIFT_FCNTL(socket_, THRIFT_F_SETFL, flags);
+    THRIFT_FCNTL(socket_, THRIFT_F_SETFL, flags);//设置socket到原来的模式了（阻塞）
 
-    if (path_.empty()) {
+    if (path_.empty()) {//如果是unix domain socket就设置缓存地址
         setCachedAddress(res->ai_addr, static_cast<socklen_t>(res->ai_addrlen));
     }
 }
@@ -387,10 +387,10 @@ void TSocket::open() {
     if (isOpen()) {
         return;
     }
-    if (!path_.empty()) {
+    if (!path_.empty()) {//如果unix路径不为空就打开unix domian socket
         unix_open();
     } else {
-        local_open();
+        local_open();//打开通用socket
     }
 }
 
@@ -401,6 +401,7 @@ void TSocket::unix_open() {
     }
 }
 
+// 整个local_open函数就是根据主机名得到所有的网卡信息，然后依次尝试打开，直到打开一个为止就退出循环，如果所有都不成功就抛出一个异常信息。
 void TSocket::local_open() {
 
 #ifdef _WIN32
@@ -427,7 +428,7 @@ void TSocket::local_open() {
     hints.ai_flags = AI_PASSIVE | AI_ADDRCONFIG;
     sprintf(port, "%d", port_);
 
-    error = getaddrinfo(host_.c_str(), port, &hints, &res0);
+    error = getaddrinfo(host_.c_str(), port, &hints, &res0);//根据主机名得到所有网卡地址信息
 
 #ifdef _WIN32
     if (error == WSANO_DATA) {
@@ -447,23 +448,24 @@ void TSocket::local_open() {
 
     // Cycle through all the returned addresses until one
     // connects or push the exception up.
+    // 循环遍历所有的网卡地址信息，直到有一个成功打开
     for (res = res0; res; res = res->ai_next) {
         try {
-            openConnection(res);
-            break;
+            openConnection(res);//调用打开函数
+            break;//成功就退出循环
         } catch (TTransportException&) {
             if (res->ai_next) {
                 close();
             } else {
                 close();
-                freeaddrinfo(res0); // cleanup on failure
+                freeaddrinfo(res0); // 清除地址信息内存和资源
                 throw;
             }
         }
     }
 
     // Free address structure memory
-    freeaddrinfo(res0);
+    freeaddrinfo(res0);//释放地址结构内存
 }
 
 void TSocket::close() {
@@ -493,7 +495,7 @@ uint32_t TSocket::read(uint8_t* buf, uint32_t len) {
     // The following is an approximation of the time interval under which
     // THRIFT_EAGAIN is taken to indicate an out of resources error.
     uint32_t eagainThresholdMicros = 0;
-    if (recvTimeout_) {
+    if (recvTimeout_) {//如果设置了接收超时时间，那么计算最大时间间隔来判断是否系统资源耗尽
         // if a readTimeout is specified along with a max number of recv retries, then
         // the threshold will ensure that the read timeout is not exceeded even in the
         // case of resource errors
@@ -504,11 +506,11 @@ try_again:
     // Read from the socket
     struct timeval begin;
     if (recvTimeout_ > 0) {
-        THRIFT_GETTIMEOFDAY(&begin, NULL);
+        THRIFT_GETTIMEOFDAY(&begin, NULL);//得到开始时间
     } else {
         // if there is no read timeout we don't need the TOD to determine whether
         // an THRIFT_EAGAIN is due to a timeout or an out-of-resource condition.
-        begin.tv_sec = begin.tv_usec = 0;
+        begin.tv_sec = begin.tv_usec = 0;//默认为0，不需要时间来判断是超时了
     }
 
     int got = 0;
@@ -548,35 +550,34 @@ try_again:
 
     // Check for error on read
     if (got < 0) {
-        if (errno_copy == THRIFT_EAGAIN) {
+        if (errno_copy == THRIFT_EAGAIN) {//是否为EAGAIN
             // if no timeout we can assume that resource exhaustion has occurred.
-            if (recvTimeout_ == 0) {
-                throw TTransportException(TTransportException::TIMED_OUT,
-                                          "THRIFT_EAGAIN (unavailable resources)");
+            if (recvTimeout_ == 0) {//如果没有设置超时时间，那么就是资源耗尽错误了！抛出异常
+                throw TTransportException(TTransportException::TIMED_OUT, "THRIFT_EAGAIN (unavailable resources)");
             }
             // check if this is the lack of resources or timeout case
             struct timeval end;
-            THRIFT_GETTIMEOFDAY(&end, NULL);
+            THRIFT_GETTIMEOFDAY(&end, NULL);//得到结束时间，会改变errno，所以前面需要保存就是这个原因
             uint32_t readElapsedMicros = static_cast<uint32_t>(((end.tv_sec - begin.tv_sec) * 1000 * 1000)
                                                                + (end.tv_usec - begin.tv_usec));
 
             if (!eagainThresholdMicros || (readElapsedMicros < eagainThresholdMicros)) {
-                if (retries++ < maxRecvRetries_) {
-                    THRIFT_SLEEP_USEC(50);
+                if (retries++ < maxRecvRetries_) {//重试次数还小于最大重试次数
+                    THRIFT_SLEEP_USEC(50);//睡眠50毫秒
                     goto try_again;
-                } else {
+                } else {//否则就认为是资源不足了
                     throw TTransportException(TTransportException::TIMED_OUT,
                                               "THRIFT_EAGAIN (unavailable resources)");
                 }
             } else {
-                // infer that timeout has been hit
+                // infer that timeout has been hit 推测为超时了
                 throw TTransportException(TTransportException::TIMED_OUT, "THRIFT_EAGAIN (timed out)");
             }
         }
 
         // If interrupted, try again
         if (errno_copy == THRIFT_EINTR && retries++ < maxRecvRetries_) {
-            goto try_again;
+            goto try_again;//如果是中断并且重试次数没有超过
         }
 
         if (errno_copy == THRIFT_ECONNRESET) {
@@ -606,14 +607,14 @@ try_again:
 void TSocket::write(const uint8_t* buf, uint32_t len) {
     uint32_t sent = 0;
 
-    while (sent < len) {
-        uint32_t b = write_partial(buf + sent, len - sent);
+    while (sent < len) {//是否已经发送了指定的字节长度
+        uint32_t b = write_partial(buf + sent, len - sent);//调部分写入函数
         if (b == 0) {
             // This should only happen if the timeout set with SO_SNDTIMEO expired.
             // Raise an exception.
             throw TTransportException(TTransportException::TIMED_OUT, "send timeout expired");
         }
-        sent += b;
+        sent += b;//已经发送的字节数
     }
 }
 
@@ -628,6 +629,7 @@ uint32_t TSocket::write_partial(const uint8_t* buf, uint32_t len) {
 #ifdef MSG_NOSIGNAL
     // Note the use of MSG_NOSIGNAL to suppress SIGPIPE errors, instead we
     // check for the THRIFT_EPIPE return condition and close the socket in that case
+    // 使用这个代替SIGPIPE 错误，代替我们检查返回EPIPE错误条件和关闭socket的情况
     flags |= MSG_NOSIGNAL;
 #endif // ifdef MSG_NOSIGNAL
 
@@ -635,15 +637,15 @@ uint32_t TSocket::write_partial(const uint8_t* buf, uint32_t len) {
 
     if (b < 0) {
         if (THRIFT_GET_SOCKET_ERROR == THRIFT_EWOULDBLOCK || THRIFT_GET_SOCKET_ERROR == THRIFT_EAGAIN) {
-            return 0;
+            return 0;//应该阻塞错误直接返回
         }
+
         // Fail on a send error
-        int errno_copy = THRIFT_GET_SOCKET_ERROR;
+        int errno_copy = THRIFT_GET_SOCKET_ERROR;//保存错误代码
         GlobalOutput.perror("TSocket::write_partial() send() " + getSocketInfo(), errno_copy);
 
-        if (errno_copy == THRIFT_EPIPE || errno_copy == THRIFT_ECONNRESET
-                || errno_copy == THRIFT_ENOTCONN) {
-            close();
+        if (errno_copy == THRIFT_EPIPE || errno_copy == THRIFT_ECONNRESET || errno_copy == THRIFT_ENOTCONN) {
+            close();//连接错误关闭掉socket
             throw TTransportException(TTransportException::NOT_OPEN, "write() send()", errno_copy);
         }
 
@@ -654,7 +656,7 @@ uint32_t TSocket::write_partial(const uint8_t* buf, uint32_t len) {
     if (b == 0) {
         throw TTransportException(TTransportException::NOT_OPEN, "Socket send returned 0.");
     }
-    return b;
+    return b;//返回写入的字节数
 }
 
 std::string TSocket::getHost() {

@@ -46,8 +46,8 @@ ExServerEventHandler::~ExServerEventHandler()
 {}
 
 void *
-ExServerEventHandler::createContext(boost::shared_ptr<TProtocol>,
-                                    boost::shared_ptr<TProtocol>) {
+ExServerEventHandler::createContext(boost::shared_ptr<TProtocol> input,
+                                    boost::shared_ptr<TProtocol> output) {
     ServerContext *context = new ServerContext();
     printf( "                                 tid=%d  createContext context=%p\n", CurTid(), context );
 
@@ -84,8 +84,8 @@ ExServerEventHandler::processContext(void* serverContext,
 
 void
 ExServerEventHandler::deleteContext(void* serverContext,
-                                    boost::shared_ptr<TProtocol>,
-                                    boost::shared_ptr<TProtocol>) {
+                                    boost::shared_ptr<TProtocol> input,
+                                    boost::shared_ptr<TProtocol> output) {
     ServerContext *context = static_cast<ServerContext *>(serverContext);
 //    std::cout << "deleteContext context=" << context << std::endl;
     printf( "                                 tid=%d  deleteContext context=%p\n", CurTid(), context );
