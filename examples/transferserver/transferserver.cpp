@@ -79,7 +79,7 @@ using namespace muduo::net;
 #include "../gen-cpp/Photo.h"
 
 #include "muduo/base/thrift_helper.h"
-
+#include "muduo/base/event_watcher.h"
 
 #include "ex_event_handler.h"
 
@@ -255,12 +255,72 @@ typedef struct _tag_KV {
     char value[8];
 }st_kv;
 
+
+struct demo
+{
+    int Add(int a,int b) {
+        return a+b;
+    }
+    int operator()(int a,int b) {
+        return a+b;
+    }
+};
+
+
+//int g_reads, g_writes, g_fired;
+//int g_total_reads = 0;
+
+void ReadCallback(int idx) {
+//    g_total_reads++;
+//    g_reads++;
+//    if (g_writes > 0) {
+//        int widx = idx + 1;
+//        if (widx >= numPipes) {
+//            widx -= numPipes;
+//        }
+//        g_pipes[widx]->Notify();
+//        g_writes--;
+//        g_fired++;
+//    }
+
+//    if (g_fired == g_reads) {
+//        g_loop->Stop();
+//    }
+}
+//void tt1() {
+//    auto f = std::bind(&ReadCallback, _1);
+//    PipeEventWatcherPtr w(new PipeEventWatcher(nullptr, f));
+//    w->Init();
+//}
+
 void tst_transfer_server_entry() {
 //    std::cout << "sizeof (st_kv)=" << sizeof (st_kv) << std::endl;
 //    return ;
 
+//    tt1(); return ;
+
     OutputDbgInfo tmpOut( "tst_transfer_server_entry begin", "tst_transfer_server_entry end" ) ;
     uint16_t srv_port = 9090;
+
+//    demo a;
+//    demo* pa = &a;
+//    typedef boost::function<void()> Handler;
+//    int iret = 0;
+
+//    Handler funptr = (boost::bind(&demo::Add, pa, 2, 1));
+//    std::cout << "add1=" << boost::bind( &demo::Add, pa, 10, _2 )( 12, 23 ) << std::endl;
+
+//    typedef boost::function<int(int, int)> HandlerEx;
+//    HandlerEx funcEx = (boost::bind(&demo::Add, pa, 2, 1));
+//    std::cout << "addex=" << funcEx( 12, 23 ) << std::endl;
+
+////    Handler testPtr = (boost::bind(&demo::Add, pa, _1, _2));
+////    std::cout << "add_aaa=" << testPtr(3, 5) << std::endl;
+
+////    std::cout << "add=" << funptr() << std::endl;
+////    int iret = funptr();
+//    std::cout << "add2=" << iret << std::endl;
+//    return;
 
 //    tst_thrift_threadmanager_fun();
 //    return ;

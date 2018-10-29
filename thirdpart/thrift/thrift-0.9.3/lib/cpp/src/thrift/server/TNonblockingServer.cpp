@@ -78,6 +78,7 @@
 #include "../../../../../../../../muduo/base/CurrentThread.h"
 #include "../../../../../../../../muduo/base/Logging.h"
 
+#include "../../../../../../../../muduo/base/event_watcher.h"
 
 
 
@@ -390,7 +391,7 @@ public:
     void run() {
         try {
             for (;;) {
-//                std::cout << __FILE__ << ":" << __LINE__ << "    TNonblockingServer::TConnection::Task serverEventHandler_=" << serverEventHandler_ << std::endl;
+                //                std::cout << __FILE__ << ":" << __LINE__ << "    TNonblockingServer::TConnection::Task serverEventHandler_=" << serverEventHandler_ << std::endl;
                 GlobalOutput.printf( "workthread TNonblockingServer::TConnection::Task serverEventHandler_=%p", serverEventHandler_.get() );
                 if (serverEventHandler_) {
                     serverEventHandler_->processContext(connectionContext_, connection_->getTSocket());
@@ -465,6 +466,9 @@ void TNonblockingServer::TConnection::init(THRIFT_SOCKET socket,
     socketState_ = SOCKET_RECV_FRAMING;
     callsForResize_ = 0;
 
+    GlobalOutput.printf( "inputTransport_=%p outputTransport_=%p\n",
+                         inputTransport_.get(), outputTransport_.get() );
+
     // get input/transports
     factoryInputTransport_  = server_->getInputTransportFactory()->getTransport(inputTransport_);
     factoryOutputTransport_ = server_->getOutputTransportFactory()->getTransport(outputTransport_);
@@ -476,18 +480,17 @@ void TNonblockingServer::TConnection::init(THRIFT_SOCKET socket,
     // Set up for any server event handler
     serverEventHandler_ = server_->getEventHandler();
     if (serverEventHandler_) {
-//        std::cout << __FILE__ << ":" << __LINE__ << "    serverEventHandler_ != null" << std::endl;
         GlobalOutput.printf( "serverEventHandler_ != null" );
         connectionContext_ = serverEventHandler_->createContext(inputProtocol_, outputProtocol_);
     } else {
-//        std::cout << __FILE__ << ":" << __LINE__ << "    serverEventHandler_ == null" << std::endl;
-//        printf( "                                 tid=%d  serverEventHandler_ == null\n", CurTid() );
         GlobalOutput.printf( "serverEventHandler_ == null" );
-        connectionContext_ = NULL;
+        connectionContext_ = nullptr;
     }
 
     // Get the processor
     processor_ = server_->getProcessor(inputProtocol_, outputProtocol_, tSocket_);
+    GlobalOutput.printf( "processor_=%p inputProtocol_=%p outputProtocol_=%p tSocket_=%p\n",
+                         processor_.get(), inputProtocol_.get(), outputProtocol_.get(), tSocket_.get() );
 }
 
 void TNonblockingServer::TConnection::workSocket() {
@@ -505,15 +508,15 @@ void TNonblockingServer::TConnection::workSocket() {
         framing.size = readWant_;
 
         try {// determine size of this frame
-            fetch = tSocket_->read(&framing.buf[readBufferPos_],
-                                   uint32_t(sizeof(framing.size) - readBufferPos_));
-            if (fetch == 0) {
-                // Whenever we get here it means a remote disconnect
-                close();
-                return;
-            }
-            readBufferPos_ += fetch;
-        } catch (TTransportException& te) {
+        fetch = tSocket_->read(&framing.buf[readBufferPos_],
+                               uint32_t(sizeof(framing.size) - readBufferPos_));
+        if (fetch == 0) {
+            // Whenever we get here it means a remote disconnect
+            close();
+            return;
+        }
+        readBufferPos_ += fetch;
+    } catch (TTransportException& te) {
             GlobalOutput.printf("TConnection::workSocket(): %s", te.what());
             close();
             return;
@@ -549,13 +552,13 @@ void TNonblockingServer::TConnection::workSocket() {
         assert(readBufferPos_ < readWant_);
 
         try {
-                // Read from the socket
-                fetch = readWant_ - readBufferPos_;
-                got = tSocket_->read(readBuffer_ + readBufferPos_, fetch);
-        } catch (TTransportException& te) {
-                GlobalOutput.printf("TConnection::workSocket(): %s", te.what());
-                close();
-                return;
+        // Read from the socket
+        fetch = readWant_ - readBufferPos_;
+        got = tSocket_->read(readBuffer_ + readBufferPos_, fetch);
+    } catch (TTransportException& te) {
+            GlobalOutput.printf("TConnection::workSocket(): %s", te.what());
+            close();
+            return;
         }
 
         if (got > 0) {
@@ -588,9 +591,9 @@ void TNonblockingServer::TConnection::workSocket() {
         }
 
         try {
-            left = writeBufferSize_ - writeBufferPos_;
-            sent = tSocket_->write_partial(writeBuffer_ + writeBufferPos_, left);
-        } catch (TTransportException& te) {
+        left = writeBufferSize_ - writeBufferPos_;
+        sent = tSocket_->write_partial(writeBuffer_ + writeBufferPos_, left);
+    } catch (TTransportException& te) {
             GlobalOutput.printf("TConnection::workSocket(): %s ", te.what());
             close();
             return;
@@ -635,7 +638,7 @@ void TNonblockingServer::TConnection::transition() {
     // 当connection的一个请求数据read完成时, 封装成任务task交由workpool thread 的线程池处理
     // 3 --
     case APP_READ_REQUEST:
-//        GlobalOutput.printf("TConnection::transition workflow APP_READ_REQUEST");
+        //        GlobalOutput.printf("TConnection::transition workflow APP_READ_REQUEST");
         GlobalOutput.printf("workflow ----------- %d APP_READ_REQUEST", g_work_step++);
 
         // We are done reading the request, package the read buffer into transport
@@ -652,9 +655,9 @@ void TNonblockingServer::TConnection::transition() {
 
         if (server_->isThreadPoolProcessing()) {// 是否是工作线程池模式
             // We are setting up a Task to do this work and we will wait on it
-//            std::cout << __FILE__ << ":" << __LINE__ << "    server_->isThreadPoolProcessing == true" << std::endl;
-//            printf( "                                 tid=%d  server_->isThreadPoolProcessing == true\n", CurTid() );
-//            GlobalOutput.printf("server_->isThreadPoolProcessing == true");
+            //            std::cout << __FILE__ << ":" << __LINE__ << "    server_->isThreadPoolProcessing == true" << std::endl;
+            //            printf( "                                 tid=%d  server_->isThreadPoolProcessing == true\n", CurTid() );
+            //            GlobalOutput.printf("server_->isThreadPoolProcessing == true");
             GlobalOutput.printf("workflow -----------   server_->isThreadPoolProcessing == true");
 
             // Create task and dispatch to the thread manager
@@ -721,7 +724,7 @@ void TNonblockingServer::TConnection::transition() {
         // the writeBuffer_
         // 4 --
     case APP_WAIT_TASK:
-//        GlobalOutput.printf("TConnection::transition workflow APP_WAIT_TASK");
+        //        GlobalOutput.printf("TConnection::transition workflow APP_WAIT_TASK");
         GlobalOutput.printf("workflow ----------- %d APP_WAIT_TASK", g_work_step++);
 
         // We have now finished processing a task and the result has been written
@@ -758,9 +761,9 @@ void TNonblockingServer::TConnection::transition() {
         // right back into the read frame header state
         goto LABEL_APP_INIT;
 
-    // 5 --
+        // 5 --
     case APP_SEND_RESULT:
-//        GlobalOutput.printf("TConnection::transition workflow APP_SEND_RESULT");
+        //        GlobalOutput.printf("TConnection::transition workflow APP_SEND_RESULT");
         GlobalOutput.printf("workflow ----------- %d APP_SEND_RESULT", g_work_step++);
 
         // it's now safe to perform buffer size housekeeping.
@@ -798,7 +801,7 @@ LABEL_APP_INIT:
         return;
 
     case APP_READ_FRAME_SIZE:// 2 -- 读取4字节数据帧头
-//        GlobalOutput.printf("TConnection::transition workflow APP_READ_FRAME_SIZE");
+        //        GlobalOutput.printf("TConnection::transition workflow APP_READ_FRAME_SIZE");
         GlobalOutput.printf("workflow ----------- %d APP_READ_FRAME_SIZE", g_work_step++);
 
         // We just read the request length
@@ -1034,6 +1037,10 @@ void TNonblockingServer::returnConnection(TConnection* connection) {
  */
 void TNonblockingServer::handleEvent(THRIFT_SOCKET fd, short which) {
     (void)which;
+    if ( fd != serverSocket_ ) {
+        GlobalOutput.printf(" fd: %d != serverSocket_: %d fatal error!!!", fd, serverSocket_);
+//        return ;
+    }
     // Make sure that libevent didn't mess up the socket handles
     assert(fd == serverSocket_);
 
@@ -1100,13 +1107,13 @@ void TNonblockingServer::handleEvent(THRIFT_SOCKET fd, short which) {
              * we know it's not on our thread.
          */
         // 当0号iothread 监听到accept事件时，创建connection 并交给相应的iothread处理数据收发(通过管道方式通知相应的iothread)
-        if (clientConnection->getIOThreadNumber() == 0) {
+        if (clientConnection->getIOThreadNumber() == 0) {// 侦听线程不应该处理网络IO
             GlobalOutput.printf("getIOThreadNumber() == 0 beg------");
             clientConnection->transition();
             GlobalOutput.printf("getIOThreadNumber() == 0 end------");
         } else {
-            GlobalOutput.printf("notifyiothread beg------threadNumber=%d", clientConnection->getIOThreadNumber());
-            // 如其名，就是通知iothread，具体是给该线程的pipefd发送this(connectionPtr)指针.
+            GlobalOutput.printf("notifyiothread beg------dst iothread number=%d", clientConnection->getIOThreadNumber());
+            // 把 newConnection 对象, 投递给 iothread 线程, 此处我们考虑用更高性能方式代替poll
             if (!clientConnection->notifyIOThread()) {
                 GlobalOutput.perror("[ERROR] notifyIOThread failed on fresh connection, closing", errno);
                 returnConnection(clientConnection);
@@ -1156,7 +1163,7 @@ void TNonblockingServer::createAndListenOnSocket() {
     }
 
     // Create the server socket
-//    printf( "res->ai_family=%s\n", /*res->ai_family,*/ (res->ai_family == PF_INET) ? "PF_INET" : "unknown type");
+    //    printf( "res->ai_family=%s\n", /*res->ai_family,*/ (res->ai_family == PF_INET) ? "PF_INET" : "unknown type");
     GlobalOutput.printf( "res->ai_family=%s", ((res->ai_family == PF_INET) ? "PF_INET" : "unknown type") );
     s = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
     if (s == -1) {
@@ -1320,26 +1327,27 @@ void TNonblockingServer::registerEvents(event_base* user_event_base) {
 
     // set up the IO threads
     assert(ioThreads_.empty());
-    if (!numIOThreads_) {
-        numIOThreads_ = DEFAULT_IO_THREADS;
-    }
-    numIOThreads_ = 2;
+//    if (!numIOThreads_) {
+//        numIOThreads_ = DEFAULT_IO_THREADS;
+//    }
+    numIOThreads_ = DEFAULT_IO_THREADS;
+
     // User-provided event-base doesn't works for multi-threaded servers
     assert(numIOThreads_ == 1 || !userEventBase_);
 
-    printf( "tid=%d---------------- numIOThreads_: %d created\n", CurTid(), numIOThreads_ );
+    m_listenThread.reset( new TNonblockingIOThread( this, 0, serverSocket_, useHighPriorityIOThreads_ ) );
+
+    GlobalOutput.printf( "numIOThreads_: %d created", numIOThreads_ );
     for (uint32_t id = 0; id < numIOThreads_; ++id) {
         // the first IO thread also does the listening on server socket
-        THRIFT_SOCKET listenFd = (id == 0 ? serverSocket_ : THRIFT_INVALID_SOCKET);
+//        THRIFT_SOCKET listenFd = (id == 0 ? serverSocket_ : THRIFT_INVALID_SOCKET);
 
-        shared_ptr<TNonblockingIOThread> thread(new TNonblockingIOThread(this, id, listenFd, useHighPriorityIOThreads_));
+        shared_ptr<TNonblockingIOThread> thread(new TNonblockingIOThread(this, (id+1)/*id*/, -1/*listenFd*/, useHighPriorityIOThreads_));
         ioThreads_.push_back(thread);
-//        printf( "tid=%d----------------new iothread: %d created\n", CurTid(), thread->GetCurIoThreadId() );
 //        GlobalOutput.printf("new iothread: %d created", CurTid(), thread->GetCurIoThreadId() );
     }
 
-    // Notify handler of the preServe event
-    if (eventHandler_) {
+    if (eventHandler_) {// Notify handler of the preServe event
         eventHandler_->preServe();
     }
 
@@ -1360,11 +1368,10 @@ void TNonblockingServer::registerEvents(event_base* user_event_base) {
                            #endif
                                    false // detached
                                    ));
-
         assert(ioThreadFactory_.get());
 
         // intentionally starting at thread 1, not 0
-        for (uint32_t i = 1; i < ioThreads_.size(); ++i) {
+        for (uint32_t i = 0/*1*/; i < ioThreads_.size(); ++i) {
             shared_ptr<Thread> thread = ioThreadFactory_->newThread(ioThreads_[i]);
             ioThreads_[i]->setThread(thread);
             thread->start();
@@ -1372,7 +1379,8 @@ void TNonblockingServer::registerEvents(event_base* user_event_base) {
     }
 
     // Register the events for the primary (listener) IO thread
-    ioThreads_[0]->registerEvents();
+//    ioThreads_[0]->register_io_events();
+    m_listenThread->register_io_events();
 }
 
 /**
@@ -1382,11 +1390,14 @@ void TNonblockingServer::registerEvents(event_base* user_event_base) {
 // 创建socket监听 创建TNonblockingIOThread 通过Thread启动TNonblockingIOThread
 void TNonblockingServer::serve() {
     if (ioThreads_.empty())
-        registerEvents(NULL);
+        registerEvents(nullptr);
 
     // Run the primary (listener) IO thread loop in our main thread; this will
     // only return when the server is shutting down.
-    ioThreads_[0]->run();
+//    ioThreads_[0]->run();
+
+    // new add
+    m_listenThread->run();
 
     // Ensure all threads are finished before exiting serve()
     for (uint32_t i = 0; i < ioThreads_.size(); ++i) {
@@ -1441,8 +1452,8 @@ void TNonblockingIOThread::createNotificationPipe() {
         GlobalOutput.perror("TNonblockingServer::createNotificationPipe ", EVUTIL_SOCKET_ERROR());
         throw TException("can't create notification pipe");
     }
-    if (evutil_make_socket_nonblocking(notificationPipeFDs_[0]) < 0
-            || evutil_make_socket_nonblocking(notificationPipeFDs_[1]) < 0) {
+    if (evutil_make_socket_nonblocking(notificationPipeFDs_[0]) < 0 ||
+        evutil_make_socket_nonblocking(notificationPipeFDs_[1]) < 0) {
         ::THRIFT_CLOSESOCKET(notificationPipeFDs_[0]);
         ::THRIFT_CLOSESOCKET(notificationPipeFDs_[1]);
         throw TException("TNonblockingServer::createNotificationPipe() THRIFT_O_NONBLOCK");
@@ -1467,21 +1478,20 @@ void TNonblockingIOThread::createNotificationPipe() {
 /**
  * Register the core libevent events onto the proper base.
  */
-void TNonblockingIOThread::registerEvents() {
+void TNonblockingIOThread::register_io_events() {
     threadId_ = Thread::get_current();
 
-    assert(eventBase_ == 0);
+    assert(eventBase_ == nullptr);
     eventBase_ = getServer()->getUserEventBase();
-    if (eventBase_ == NULL) {
+    if (eventBase_ == nullptr) {
         eventBase_ = event_base_new();
         ownEventBase_ = true;
     }
 
-    // Print some libevent stats
-    if (number_ == 0) {
+//    if (number_ == 0) {// Print some libevent stats
         GlobalOutput.printf("TNonblockingServer: using libevent %s method %s",
                             event_get_version(), event_base_get_method(eventBase_));
-    }
+//    }
 
     if (listenSocket_ >= 0) {
         // Register the server event
@@ -1495,12 +1505,11 @@ void TNonblockingIOThread::registerEvents() {
 
         // Add the event and start up the server
         if (-1 == event_add(&serverEvent_, 0)) {
-            throw TException(
-                        "TNonblockingServer::serve(): "
-                        "event_add() failed on server listen event");
+            throw TException("TNonblockingServer::serve(): event_add() failed on server listen event");
         }
-        GlobalOutput.printf("TNonblocking: IO thread #%d registered for listen.", number_);
+        GlobalOutput.printf("TNonblocking: IO thread #%d registered for listen. listenSocket_=%d", number_, listenSocket_);
     }
+
     createNotificationPipe();
 
     // 代码里面的 getNotificationRecvFD 就是拿这个 socket pair 管道的读文件描述符，
@@ -1509,23 +1518,21 @@ void TNonblockingIOThread::registerEvents() {
     // 其实第二种事件非常好理解，可以类比多线程编程里面的任务队列，
     // 不同线程之间共享着同一个任务队列来进行消息的传递。 而在 TNonblockingServer 里面，则通过该管道进行消息的传递。
     event_set(&notificationEvent_, getNotificationRecvFD(),
-              EV_READ | EV_PERSIST,
-              TNonblockingIOThread::notifyHandler, this);
+              EV_READ | EV_PERSIST, TNonblockingIOThread::notifyHandler, this);
     event_base_set(eventBase_, &notificationEvent_);// Attach to the base
-//    printf( "tid=%d----------------cur notifyHandler registered\n", CurTid() );
-//    LOG_INFO << "cur notifyHandler registered" << std::endl;
-//    GlobalOutput.printf("cur notifyHandler registered", number_);
 
     if (-1 == event_add(&notificationEvent_, 0)) {// Add the event and start up the server
-        throw TException(
-                    "TNonblockingServer::serve(): "
-                    "event_add() failed on task-done notification event");
+        throw TException("TNonblockingServer::serve(): event_add() failed on task-done notification event");
     }
-//    GlobalOutput.printf("TNonblocking: IO thread #%d registered for notify.", number_);
+    GlobalOutput.printf( "%s registered for notify.", (listenSocket_ >= 0 ? ("listen thread") : ("work iothread")) );
 
-    GlobalOutput.printf( "%s%d registered for notify.",
-                         (listenSocket_ >= 0 ? ("main iothread: ") : ("work iothread: ")),
-                         CurTid() );
+//    auto tmpFuncPtr = boost::bind(&TNonblockingIOThread::notifyHandler, _1, _2, _3);
+//    watcher_notify_.reset( new PipeEventWatcher(eventBase_, tmpFuncPtr) );
+//    watcher_notify_->Init();
+//    watcher_notify_->AsyncWait();
+//    GlobalOutput.printf( "%s registered for notify.", (listenSocket_ >= 0 ? ("listen thread") : ("work iothread")) );
+
+//    watcher_notify_->Notify();
 }
 
 bool TNonblockingIOThread::notify(TNonblockingServer::TConnection* conn) {
@@ -1604,11 +1611,11 @@ bool TNonblockingIOThread::notify(TNonblockingServer::TConnection* conn) {
     }
 #endif
 
-  return true;
+    return true;
 }
 
 /* static */
-// iothread收到新的connection 根据 connection的状态 进行数据收发等处理 ，该逻辑由conection的
+// iothread收到新的connection根据connection的状态 进行数据收发等处理 ，该逻辑由conection的
 // transition()函数完成, 第一部肯定是请求报文的read操作
 // iothread获得pipefd事件后调用，读取一个指针的大小，获得connection后调用transition.
 void TNonblockingIOThread::notifyHandler(evutil_socket_t fd, short which, void* v) {
@@ -1623,7 +1630,7 @@ void TNonblockingIOThread::notifyHandler(evutil_socket_t fd, short which, void* 
         // 从管道中取出connection的指针地址
         long nBytes = recv(fd, cast_sockopt(&connection), kSize, 0);
         if (nBytes == kSize) {
-            if (connection == NULL) {
+            if (connection == nullptr) {
                 // this is the command to stop our thread, exit the handler!
                 return;
             }
@@ -1704,12 +1711,11 @@ void TNonblockingIOThread::setCurrentThreadHighPriority(bool value) {
 }
 
 void TNonblockingIOThread::run() {
-    if (eventBase_ == NULL)
-        registerEvents();
+    if (eventBase_ == nullptr)
+        register_io_events();
 
 //    GlobalOutput.printf("TNonblockingServer: IO thread #%d entering loop...", number_);
 //    GlobalOutput.printf("new iothread: %d running", CurTid());
-
     if (useHighPriority_) {
         setCurrentThreadHighPriority(true);
     }

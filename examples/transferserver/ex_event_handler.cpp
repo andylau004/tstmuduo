@@ -50,6 +50,7 @@ ExServerEventHandler::createContext(boost::shared_ptr<TProtocol> input,
                                     boost::shared_ptr<TProtocol> output) {
     ServerContext *context = new ServerContext();
     printf( "                                 tid=%d  createContext context=%p\n", CurTid(), context );
+    printf( "                                 tid=%d  input=%p output=%p\n", CurTid(), input.get(), output.get() );
 
 //    TBufferedTransport *tbuf = dynamic_cast<TBufferedTransport *>(input->getTransport().get());
 //    TSocket *sock = dynamic_cast<TSocket*>(tbuf->getUnderlyingTransport().get());
@@ -100,7 +101,7 @@ ExProcessorEventHandler::~ExProcessorEventHandler()
 {}
 
 void *
-ExProcessorEventHandler::getContext(const char *, void *serverContext) {
+ExProcessorEventHandler::getContext(const char* fn_name, void *serverContext) {
     ProcessContext *process_context = new ProcessContext();
 
     if (gettimeofday(&process_context->timeval, nullptr) != 0) {
@@ -114,13 +115,13 @@ ExProcessorEventHandler::getContext(const char *, void *serverContext) {
 }
 
 void
-ExProcessorEventHandler::freeContext(void *ctx, const char *) {
+ExProcessorEventHandler::freeContext(void *ctx, const char * fn_name) {
     delete static_cast<ProcessContext *>(ctx);
     ctx = nullptr;
 }
 
 void
-ExProcessorEventHandler::postWrite(void *ctx, const char *fn_name, uint32_t) {
+ExProcessorEventHandler::postWrite(void *ctx, const char *fn_name, uint32_t bytes) {
     ::timeval timeval_current;
     ::timeval &timeval_before_ptr =
             static_cast<ProcessContext *>(ctx)->timeval;

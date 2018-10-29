@@ -41,6 +41,9 @@
 #include <event2/event_compat.h>
 #include <event2/event_struct.h>
 
+
+class PipeEventWatcher;
+
 namespace apache {
 namespace thrift {
 namespace server {
@@ -149,7 +152,7 @@ private:
     static const int RESIZE_BUFFER_EVERY_N = 512;
 
     /// # of IO threads to use by default
-    static const int DEFAULT_IO_THREADS = 1;
+    static const int DEFAULT_IO_THREADS = 2;
 
     /// # of IO threads this server will use
     size_t numIOThreads_;
@@ -180,6 +183,9 @@ private:
 
     // Vector of IOThread objects that will handle our IO
     std::vector<boost::shared_ptr<TNonblockingIOThread> > ioThreads_;
+
+    // 主侦听线程，只负责侦听客户端socket，push新连接到io thread
+    boost::shared_ptr<TNonblockingIOThread>  m_listenThread;
 
     // Index of next IO Thread to be used (for round-robin)
     uint32_t nextIOThread_;
@@ -334,11 +340,10 @@ public:
         setThreadManager(threadManager);
     }
 
-    TNonblockingServer(const boost::shared_ptr<TProcessor>& processor,
+    TNonblockingServer(/*const int& iothread_count, */const boost::shared_ptr<TProcessor>& processor,
                        const boost::shared_ptr<TProtocolFactory>& protocolFactory,
                        int port,
-                       const boost::shared_ptr<ThreadManager>& threadManager
-                       = boost::shared_ptr<ThreadManager>())
+                       const boost::shared_ptr<ThreadManager>& threadManager = boost::shared_ptr<ThreadManager>())
         : TServer(processor) {
 
         init(port);
@@ -746,10 +751,11 @@ private:
     void returnConnection(TConnection* connection);
 };
 
+typedef boost::shared_ptr<PipeEventWatcher> PipeEventWatcherPtr;
 
-// 启动Thrift时，可启动两类线程，一是TNonblockingIOThread，另一是Worker：
+// 启动Thrift时，可启动两类线程，一是TNonblockingIOThread，另一是WorkerThread
 // TNonblockingIOThread负责接受连接，和收发数据；而Worker负责回调服务端的用户函数
-// TNonblockingIOThread::registerEvents主要做了两件事：
+// TNonblockingIOThread::register_io_Events主要做了两件事：
 // 1) 注册TNonblockingIOThread::listenHandler()，这个是用来接受连接请求的；
 // 2) 注册TNonblockingIOThread::notifyHandler()，这个是用来监听管道的。
 // TNonblockingIOThread和Worker两类线程间通过队列进行通讯，队列类型为std::queue
@@ -805,7 +811,7 @@ public:
     void join();
 
     /// Registers the events for the notification & listen sockets
-    void registerEvents();
+    void register_io_events();
 
 private:
     /**
@@ -873,6 +879,9 @@ private:
 
     /// File descriptors for pipe used for task completion notification.
     evutil_socket_t notificationPipeFDs_[2];
+
+    // 封装 替代 notificationPipeFDs_
+//    PipeEventWatcherPtr watcher_notify_;
 
     /// Actual IO Thread
     boost::shared_ptr<Thread> thread_;

@@ -222,7 +222,7 @@ public:
         bool active = false;
         bool notifyManager = false;
 
-        GlobalOutput.printf( "business thread: %d is started", CurTid() );
+        GlobalOutput.printf( "taskthread: %d is started", CurTid() );
 
         /**
      * Increment worker semaphore and notify manager if worker count reached
@@ -298,7 +298,7 @@ public:
             if (task) {
                 if (task->state_ == ThreadManager::Task::EXECUTING) {
                     try {
-                        GlobalOutput.printf( "business thread: %d task running", CurTid() );
+                        GlobalOutput.printf( "taskthread: %d task running", CurTid() );
                         task->run();
                     } catch (const std::exception& e) {
                         GlobalOutput.printf("[ERROR] task->run() raised an exception: %s", e.what());

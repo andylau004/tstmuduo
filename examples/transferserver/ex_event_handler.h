@@ -68,7 +68,7 @@ public:
 public:
     /**
      * Generate inner struct to hold info about one RPC call
-     *
+     * 调用其他回调函数之前调用，期望返回一些有序的上下文对象以便传递给其他回调函数使用
      * @param fn_name Function name of RPC call
      * @param serverContext Generate by ExServerEventHandler
      */
@@ -76,7 +76,7 @@ public:
 
     /**
      * Free the struct generate above
-     *
+     * 期望释放一个上下文有关的资源
      * @param ctx Generate by #ExProcessorEventHandler::getContext
      * @param fn_name Function name of RPC call
      */

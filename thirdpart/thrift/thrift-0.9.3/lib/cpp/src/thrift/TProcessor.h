@@ -60,6 +60,7 @@ public:
 
   /**
    * Called before reading arguments.
+   * 在读参数和处理函数之间调用
    */
   virtual void preRead(void* ctx, const char* fn_name) {
     (void)ctx;
@@ -68,6 +69,7 @@ public:
 
   /**
    * Called between reading arguments and calling the handler.
+   * 在读参数和处理函数之间调用
    */
   virtual void postRead(void* ctx, const char* fn_name, uint32_t bytes) {
     (void)ctx;
@@ -77,6 +79,7 @@ public:
 
   /**
    * Called between calling the handler and writing the response.
+   * 在处理和写响应之间调用
    */
   virtual void preWrite(void* ctx, const char* fn_name) {
     (void)ctx;
@@ -85,6 +88,7 @@ public:
 
   /**
    * Called after writing the response.
+   * 在写响应之后调用
    */
   virtual void postWrite(void* ctx, const char* fn_name, uint32_t bytes) {
     (void)ctx;
@@ -94,6 +98,7 @@ public:
 
   /**
    * Called when an async function call completes successfully.
+   * 当一个异步函数成功完成调用时调用
    */
   virtual void asyncComplete(void* ctx, const char* fn_name) {
     (void)ctx;
@@ -197,6 +202,7 @@ private:
   boost::shared_ptr<HandlerFactory_> handlerFactory_;
 };
 
+// 主要作用就是记录输入输出协议类和服务器传输对象
 struct TConnectionInfo {
   // The input and output protocols
   boost::shared_ptr<protocol::TProtocol> input;

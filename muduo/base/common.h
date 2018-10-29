@@ -65,6 +65,9 @@
 #include <arpa/inet.h>
 #include <netinet/in.h>
 
+#include <functional>
+
+
 #include <boost/thread.hpp>
 #include <boost/utility.hpp>
 #include <boost/function.hpp>
@@ -138,6 +141,13 @@ enum ServerStatus {
 #define MAKE_CHUNK_ID(nodeid, diskid, seqid) (nodeid << NODE_ID_OFFSET | diskid << DISK_ID_OFFSET | seqid)
 
 // -------------------------------------------------------------------------------------------------------
+
+
+#ifdef H_OS_WINDOWS
+#define evpp_socket_t intptr_t
+#else
+#define evpp_socket_t int
+#endif
 
 
 

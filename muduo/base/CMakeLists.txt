@@ -3,6 +3,13 @@
 
 set(base_SRCS
 
+    duration.h
+    duration.inl.h
+    duration.cc
+
+    event_watcher.h
+    event_watcher.cpp
+
     libevent.h
     libevent.cc
 
@@ -40,6 +47,7 @@ set(base_SRCS
   ThreadPool.cc
   convert.cpp
   common.cpp
+  common.h
   timerutil.cpp
   )
 
