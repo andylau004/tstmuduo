@@ -67,12 +67,7 @@ using namespace apache::thrift::server;
 
 
 
-using namespace std;
-using namespace muduo;
-using namespace muduo::net;
-
 #include "transferserver.h"
-
 
 #include "../gen-cpp/transfer_types.h"
 
@@ -83,6 +78,11 @@ using namespace muduo::net;
 
 #include "ex_event_handler.h"
 
+
+
+using namespace std;
+using namespace muduo;
+using namespace muduo::net;
 
 using boost::shared_ptr;
 
@@ -325,8 +325,15 @@ void tst_transfer_server_entry() {
 //    tst_thrift_threadmanager_fun();
 //    return ;
 
-//    /*common::*/CThriftServerHelper<PhotoHandler, PhotoProcessor> thrift_server_agent((new ClientIPHandler), false);
-    /*common::*/CThriftServerHelper<PhotoHandler, PhotoProcessor> thrift_server_agent((new thriftex::server::ExServerEventHandler), false);
+//    setEventHandler
+//    CThriftServerHelper<PhotoHandler, PhotoProcessor> thrift_server_agent((new ClientIPHandler), false);
+
+    boost::shared_ptr<thriftex::server::ExProcessorEventHandler>
+            pProcessEventHandler(new thriftex::server::ExProcessorEventHandler);
+
+    CThriftServerHelper<PhotoHandler, PhotoProcessor>
+            thrift_server_agent((new thriftex::server::ExServerEventHandler), false, pProcessEventHandler);
+
     thrift_server_agent.serve(srv_port);
     return;
 

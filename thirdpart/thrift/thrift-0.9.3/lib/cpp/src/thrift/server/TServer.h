@@ -242,16 +242,16 @@ protected:
   }
 
   // Class variables
-  boost::shared_ptr<TProcessorFactory> processorFactory_;
-  boost::shared_ptr<TServerTransport> serverTransport_;
+  boost::shared_ptr<TProcessorFactory> processorFactory_;//处理层的对象生成工厂对象
+  boost::shared_ptr<TServerTransport> serverTransport_;//服务器传输对象
 
-  boost::shared_ptr<TTransportFactory> inputTransportFactory_;
-  boost::shared_ptr<TTransportFactory> outputTransportFactory_;
+  boost::shared_ptr<TTransportFactory> inputTransportFactory_;//输入传输层工厂对象
+  boost::shared_ptr<TTransportFactory> outputTransportFactory_;//输出传输层工厂对象
 
-  boost::shared_ptr<TProtocolFactory> inputProtocolFactory_;
-  boost::shared_ptr<TProtocolFactory> outputProtocolFactory_;
+  boost::shared_ptr<TProtocolFactory> inputProtocolFactory_;//输入协议层工厂对象
+  boost::shared_ptr<TProtocolFactory> outputProtocolFactory_;//输出协议层工厂对象
 
-  boost::shared_ptr<TServerEventHandler> eventHandler_;
+  boost::shared_ptr<TServerEventHandler> eventHandler_;//服务器事件处理对象类
 
 public:
   void setInputTransportFactory(boost::shared_ptr<TTransportFactory> inputTransportFactory) {

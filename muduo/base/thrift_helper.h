@@ -31,6 +31,8 @@
 
 #include <arpa/inet.h>
 #include <boost/scoped_ptr.hpp>
+
+
 #include <thrift/concurrency/PosixThreadFactory.h>
 #include <thrift/concurrency/ThreadManager.h>
 #include <thrift/protocol/TBinaryProtocol.h>
@@ -38,6 +40,11 @@
 #include <thrift/TApplicationException.h>
 #include <thrift/transport/TSocketPool.h>
 #include <thrift/transport/TTransportException.h>
+
+// new add
+#include <thrift/TProcessor.h>
+
+
 //NET_NAMESPACE_BEGIN
 
 // 用来判断thrift是否已经连接，包括两种情况：
@@ -200,7 +207,8 @@ class CThriftServerHelper
 {
 public:
     // set_log_function 是否设置写日志函数，默认设置为debug级别日志
-    CThriftServerHelper(apache::thrift::server::TServerEventHandler* server_event_handler=nullptr, bool set_log_function=true);
+    CThriftServerHelper(apache::thrift::server::TServerEventHandler* server_event_handler=nullptr,
+                        bool set_log_function=true, const boost::shared_ptr<apache::thrift::TProcessorEventHandler>& process_event_handler = nullptr);
 
     // 启动rpc服务，请注意该调用是同步阻塞的，所以需放最后调用
     // port thrift服务端的监听端口号
@@ -237,7 +245,7 @@ public:
     }
 
 private:
-    void init1(apache::thrift::server::TServerEventHandler* server_event_handler, bool set_log_function);
+    void init1(apache::thrift::server::TServerEventHandler* server_event_handler, bool set_log_function, const boost::shared_ptr<apache::thrift::TProcessorEventHandler>& process_event_handler);
     void init2(const std::string &ip, uint16_t port, uint8_t num_worker_threads, uint8_t num_io_threads);
 
 private:
@@ -395,9 +403,9 @@ uint16_t CThriftClientHelper<ThriftClient, Protocol, Transport>::get_port() cons
 
 ////////////////////////////////////////////////////////////////////////////////
 template <class ThriftHandler, class ServiceProcessor, class ProtocolFactory>
-CThriftServerHelper<ThriftHandler, ServiceProcessor, ProtocolFactory>::CThriftServerHelper(apache::thrift::server::TServerEventHandler* server_event_handler, bool set_log_function)
+CThriftServerHelper<ThriftHandler, ServiceProcessor, ProtocolFactory>::CThriftServerHelper(apache::thrift::server::TServerEventHandler* server_event_handler, bool set_log_function, const boost::shared_ptr<apache::thrift::TProcessorEventHandler>& process_event_handler)
 {
-    init1(server_event_handler, set_log_function);
+    init1(server_event_handler, set_log_function, process_event_handler);
 }
 
 template <class ThriftHandler, class ServiceProcessor, class ProtocolFactory>
@@ -455,7 +463,7 @@ void CThriftServerHelper<ThriftHandler, ServiceProcessor, ProtocolFactory>::stop
 }
 
 template <class ThriftHandler, class ServiceProcessor, class ProtocolFactory>
-void CThriftServerHelper<ThriftHandler, ServiceProcessor, ProtocolFactory>::init1(apache::thrift::server::TServerEventHandler* server_event_handler, bool set_log_function)
+void CThriftServerHelper<ThriftHandler, ServiceProcessor, ProtocolFactory>::init1(apache::thrift::server::TServerEventHandler* server_event_handler, bool set_log_function, const boost::shared_ptr<apache::thrift::TProcessorEventHandler>& process_event_handler)
 {
     if (set_log_function) {
         set_thrift_debug_log_function();
@@ -464,6 +472,8 @@ void CThriftServerHelper<ThriftHandler, ServiceProcessor, ProtocolFactory>::init
     _server_event_handler.reset(server_event_handler);
     _handler.reset(new ThriftHandler);
     _processor.reset(new ServiceProcessor(_handler));
+    // new add
+    _processor->setEventHandler(process_event_handler);
 
     // ProtocolFactory默认为apache::thrift::protocol::TBinaryProtocolFactory
     _protocol_factory.reset(new ProtocolFactory());
@@ -483,6 +493,7 @@ void CThriftServerHelper<ThriftHandler, ServiceProcessor, ProtocolFactory>::init
 
     server->setNumIOThreads(num_io_threads);
     server->setServerEventHandler(_server_event_handler);
+
     _server.reset(server);
     // 不要调用_server->run()，交给serve()来调用，
     // 因为一旦调用了run()后，调用线程或进程就被阻塞了。

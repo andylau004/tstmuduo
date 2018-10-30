@@ -110,6 +110,7 @@ ExProcessorEventHandler::getContext(const char* fn_name, void *serverContext) {
     } else {
         process_context->server_context = static_cast<ServerContext *>(serverContext);
     }
+    printf( "                                 tid=%d  getContext fn_name=%s\n", CurTid(), fn_name );
 
     return process_context;
 }
@@ -117,6 +118,7 @@ ExProcessorEventHandler::getContext(const char* fn_name, void *serverContext) {
 void
 ExProcessorEventHandler::freeContext(void *ctx, const char * fn_name) {
     delete static_cast<ProcessContext *>(ctx);
+    printf( "                                 tid=%d  freeContext fn_name=%s\n", CurTid(), fn_name );
     ctx = nullptr;
 }
 
@@ -135,16 +137,27 @@ ExProcessorEventHandler::postWrite(void *ctx, const char *fn_name, uint32_t byte
         ms += (timeval_current.tv_usec - timeval_before_ptr.tv_usec) / 1000;
 
         if (ms >= this->SLOW_TIME) {
-            std::cout << server_context->remote_host << "("
-                    << server_context->remote_address << ":" << server_context->port
-                    << ") " << fn_name << ".SLOW " << ms << "ms cost\n";
+//            std::cout << server_context->remote_host << "("
+//                      << server_context->remote_address << ":" << server_context->port
+//                      << ") " << fn_name << ".SLOW " << ms << "ms cost\n";
+            printf( "                                 tid=%d  %s(%s:%d) %s.SLOW %dms cost\n",
+                    CurTid(),
+                    server_context->remote_host.c_str(), server_context->remote_address.c_str(),
+                    server_context->port, fn_name, ms );
         } else {
-            std::cout << server_context->remote_host << "("
-                          << server_context->remote_address << ":"
-                          << server_context->port << ") " << fn_name << " "
-                          << ms << "ms cost\n";
-        }
+//            std::cout << server_context->remote_host << "("
+//                          << server_context->remote_address << ":"
+//                          << server_context->port << ") " << fn_name << " "
+//                          << ms << "ms cost\n";
+            printf( "                                 tid=%d  %s(%s:%d) %s %dms cost\n",
+                    CurTid(),
+                    server_context->remote_host.c_str(), server_context->remote_address.c_str(),
+                    server_context->port, fn_name, ms );
+       }// end else
     }
+
 }
 
-}}
+
+}
+}
