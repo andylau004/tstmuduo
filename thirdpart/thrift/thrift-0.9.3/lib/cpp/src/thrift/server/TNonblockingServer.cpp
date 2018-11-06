@@ -100,7 +100,6 @@ using boost::shared_ptr;
 // 当可读的事件发生时，则读，可写的事件发生时，则写。
 // 读和写两种操作会互相交替进行，所以我们需要用 状态值来进行不同的逻辑处理。
 // TNonblockingServer 里的状态值有以下三种：
-
 /// Three states for sockets: recv frame size, recv data, and send mode
 enum TSocketState { SOCKET_RECV_FRAMING, SOCKET_RECV, SOCKET_SEND };
 
