@@ -354,6 +354,8 @@ public:
     void forceClose() {
         appState_ = APP_CLOSE_CONNECTION;
         if (!notifyIOThread()) {
+            // new add fy
+            server_->decrementActiveProcessors();
             close();
             throw TException("TConnection::forceClose: failed write on notify pipe");
         }
@@ -409,8 +411,7 @@ public:
             exit(1);
         } catch (const std::exception& x) {
             GlobalOutput.printf("TNonblockingServer: process() exception: %s: %s",
-                                typeid(x).name(),
-                                x.what());
+                                typeid(x).name(), x.what());
         } catch (...) {
             GlobalOutput.printf("TNonblockingServer: unknown exception while processing.");
         }
@@ -424,6 +425,7 @@ public:
         // connection_的指针地址将通过管道传给工作线程
         // workpool thread 任务线程处理完成后会调用notifyIOThread通知connection对应的iothead来发送结果给客户端
         if (!connection_->notifyIOThread()) {
+            connection_->server_->decrementActiveProcessors();
             GlobalOutput.printf("TNonblockingServer: failed to notifyIOThread, closing.");
             connection_->close();
             throw TException("TNonblockingServer::Task::run: failed write on notify pipe");
@@ -666,23 +668,26 @@ void TNonblockingServer::TConnection::transition() {
 
             // The application is now waiting on the task to finish
             appState_ = APP_WAIT_TASK;
-            try {// server_为TNonblockingServer回调交给工作线程，IO线程不做这个工作
-                server_->addTask(task);
-            } catch (IllegalStateException& ise) {
-                // The ThreadManager is not ready to handle any more tasks (it's probably shutting down).
-                GlobalOutput.printf("IllegalStateException: Server::process() %s", ise.what());
-                close();
-            } catch (TimedOutException& to) {
-                GlobalOutput.printf("[ERROR] TimedOutException: Server::process() %s", to.what());
-                close();
-            }
 
             // Set this connection idle so that libevent doesn't process more
             // data on it while we're still waiting for the threadmanager to
             // finish this task
             // setIdle目的在于将该连接对应的socket事件标志位清空，
             // 也就是在Idle阶段不再关心该socket是否有数据可读或者可写。
-            setIdle();
+            setIdle();// 最新版本thrift把设置空闲调整到此处
+
+            try {// server_为TNonblockingServer回调交给工作线程，IO线程不做这个工作
+                server_->addTask(task);
+            } catch (IllegalStateException& ise) {
+                server_->decrementActiveProcessors();
+                // The ThreadManager is not ready to handle any more tasks (it's probably shutting down).
+                GlobalOutput.printf("IllegalStateException: Server::process() %s", ise.what());
+                close();
+            } catch (TimedOutException& to) {
+                server_->decrementActiveProcessors();
+                GlobalOutput.printf("[ERROR] TimedOutException: Server::process() %s", to.what());
+                close();
+            }
             return;
         } else {
             // 调用TNonblockingServer的构造函数时，
@@ -907,7 +912,8 @@ void TNonblockingServer::TConnection::setFlags(short eventFlags) {
 
     // Add the event
     if (event_add(&event_, 0) == -1) {
-        GlobalOutput("TConnection::setFlags(): could not event_add");
+        GlobalOutput.perror("TConnection::setFlags(): could not event_add", THRIFT_GET_SOCKET_ERROR);
+//        GlobalOutput("TConnection::setFlags(): could not event_add");
     }
 }
 
@@ -990,7 +996,7 @@ TNonblockingServer::TConnection* TNonblockingServer::createConnection(THRIFT_SOC
 
     // pick an IO thread to handle this connection -- currently round robin
     assert(nextIOThread_ < ioThreads_.size());
-    int selectedThreadIdx = nextIOThread_;
+    uint32_t selectedThreadIdx = nextIOThread_;
     nextIOThread_ = static_cast<uint32_t>((nextIOThread_ + 1) % ioThreads_.size());
 
     TNonblockingIOThread* ioThread = ioThreads_[selectedThreadIdx].get();
@@ -998,7 +1004,7 @@ TNonblockingServer::TConnection* TNonblockingServer::createConnection(THRIFT_SOC
                          socket, selectedThreadIdx, nextIOThread_, ioThreads_.size() );
 
     // Check the connection stack to see if we can re-use
-    TConnection* result = NULL;
+    TConnection* result = nullptr;
     if (connectionStack_.empty()) {
         result = new TConnection(socket, ioThread, addr, addrLen);
         ++numTConnections_;
@@ -1616,7 +1622,7 @@ bool TNonblockingIOThread::notify(TNonblockingServer::TConnection* conn) {
 
 /* static */
 // iothread收到新的connection根据connection的状态 进行数据收发等处理 ，该逻辑由conection的
-// transition()函数完成, 第一部肯定是请求报文的read操作
+// transition()函数完成, 第一步肯定是请求报文read操作
 // iothread获得pipefd事件后调用，读取一个指针的大小，获得connection后调用transition.
 void TNonblockingIOThread::notifyHandler(evutil_socket_t fd, short which, void* v) {
     TNonblockingIOThread* ioThread = (TNonblockingIOThread*)v;
@@ -1625,13 +1631,14 @@ void TNonblockingIOThread::notifyHandler(evutil_socket_t fd, short which, void* 
 
     GlobalOutput.printf("iothread notifyHandler exec!!!");
     while (true) {
-        TNonblockingServer::TConnection* connection = 0;
+        TNonblockingServer::TConnection* connection = nullptr;
         const int kSize = sizeof(connection);
         // 从管道中取出connection的指针地址
         long nBytes = recv(fd, cast_sockopt(&connection), kSize, 0);
         if (nBytes == kSize) {
             if (connection == nullptr) {
                 // this is the command to stop our thread, exit the handler!
+//                ioThread->breakLoop(false);
                 return;
             }
             connection->transition();// 进入状态转换函数
@@ -1642,10 +1649,12 @@ void TNonblockingIOThread::notifyHandler(evutil_socket_t fd, short which, void* 
             return;
         } else if (nBytes == 0) {
             GlobalOutput.printf("notifyHandler: Notify socket closed!");
+//            ioThread->breakLoop(false);
             // exit the loop
             break;
         } else { // nBytes < 0
-            if (THRIFT_GET_SOCKET_ERROR != THRIFT_EWOULDBLOCK && THRIFT_GET_SOCKET_ERROR != THRIFT_EAGAIN) {
+            if (THRIFT_GET_SOCKET_ERROR != THRIFT_EWOULDBLOCK &&
+                THRIFT_GET_SOCKET_ERROR != THRIFT_EAGAIN) {
                 GlobalOutput.perror("TNonblocking: notifyHandler read() failed: ", THRIFT_GET_SOCKET_ERROR);
                 ioThread->breakLoop(true);
                 return;
@@ -1666,7 +1675,8 @@ void TNonblockingIOThread::breakLoop(bool error) {
     }
 
     // sets a flag so that the loop exits on the next event
-    event_base_loopbreak(eventBase_);
+    // 需要判断是否在当前iothread内执行，跨线程不能执行base_loopbreak
+//    event_base_loopbreak(eventBase_);
 
     // event_base_loopbreak() only causes the loop to exit the next time
     // it wakes up.  We need to force it to wake up, in case there are
@@ -1677,7 +1687,10 @@ void TNonblockingIOThread::breakLoop(bool error) {
     // same thread, this means the thread can't be blocking in the event
     // loop either.
     if (!Thread::is_current(threadId_)) {
-        notify(NULL);
+        notify(nullptr);
+    } else {
+        // cause the loop to stop ASAP - even if it has things to do in it
+        event_base_loopbreak(eventBase_);
     }
 }
 
@@ -1720,15 +1733,17 @@ void TNonblockingIOThread::run() {
         setCurrentThreadHighPriority(true);
     }
 
-    // Run libevent engine, never returns, invokes calls to eventHandler
-    event_base_loop(eventBase_, 0);
+    if (eventBase_ != nullptr) {
+        // Run libevent engine, never returns, invokes calls to eventHandler
+        event_base_loop(eventBase_, 0);
 
-    if (useHighPriority_) {
-        setCurrentThreadHighPriority(false);
+        if (useHighPriority_) {
+            setCurrentThreadHighPriority(false);
+        }
+
+        // cleans up our registered events
+        cleanupEvents();
     }
-
-    // cleans up our registered events
-    cleanupEvents();
 
     GlobalOutput.printf("TNonblockingServer: IO thread #%d run() done!", number_);
 }
