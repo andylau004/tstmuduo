@@ -50,7 +50,7 @@ int main(int argc, char *argv[])
     Logger::setLogLevel(Logger::DEBUG);
     LOG_INFO << "pid = " << getpid() << ", tid = " << CurrentThread::tid();
 
-    tst_c11fun_entry();
+    tst_twfun_entry();
 
     return 1;
 }
