@@ -751,7 +751,6 @@ private:
     void returnConnection(TConnection* connection);
 };
 
-typedef boost::shared_ptr<PipeEventWatcher> PipeEventWatcherPtr;
 
 // 启动Thrift时，可启动两类线程，一是TNonblockingIOThread，另一是WorkerThread
 // TNonblockingIOThread负责接受连接，和收发数据；而Worker负责回调服务端的用户函数
