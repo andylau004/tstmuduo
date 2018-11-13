@@ -18,6 +18,18 @@ aux_source_directory(../gen-cpp O_GENCPP)
 add_executable(${PROJECT_NAME}
     ../thrift-file/transfer.thrift
     transferserver.h transferserver.cpp
+    server.hpp server.cpp
+    common_stucts.hpp common_stucts.cpp
+    iothreadmanager.hpp iothreadmanager.cpp
+    iothread.hpp iothread.cpp
+    threadex.hpp threadex.cpp
+    clientctx.hpp clientctx.cpp
+    sigslot.h sigslot.cc
+    transport.hpp transport.cpp
+    frametransport.hpp frametransport.cpp
+    processor.h processor.cpp
+    testprocessor.h testprocessor.cpp
+
     ex_event_handler.h ex_event_handler.cpp
     ${O_GENCPP} ${O_THRIFT_FILE}
     main.cpp)

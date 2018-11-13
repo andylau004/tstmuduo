@@ -114,7 +114,7 @@ int  clientAddImpl() {
     OutputDbgInfo tmpOut( /*strTid +*/ " clientAddImpl beg---------", /*strTid +*/ " clientAddImpl end---------" );
 
     uint32_t uSrvIp = ErasureUtils::str2ip("172.17.0.2");
-    boost::shared_ptr<one_sendFile_ThriftConn> newClient = g_clientPool_sendfile->get_connection( uSrvIp, 9090 );
+    boost::shared_ptr<one_sendFile_ThriftConn> newClient = g_clientPool_sendfile->get_connection( uSrvIp, 9900 );
 
     {
         OneFile oneFile;
@@ -128,9 +128,9 @@ int  clientAddImpl() {
         oneFile.__set_file_size(ulFileSize);
         oneFile.__set_file_hsh("12345");
 
-//        bool bSend = oneConn->get_client()->SendPhoto(oneFile);
-        int iSum = newClient->get_client()->Add(99, 10);
-        LOG_INFO << "sum=" << iSum;
+        bool bSend = newClient->get_client()->SendPhoto(oneFile);
+//        int iSum = newClient->get_client()->Add(99, 10);
+//        LOG_INFO << "sum=" << iSum;
     }
 
     g_pLatch->countDown();
@@ -152,29 +152,29 @@ void tst_transfer_client_entry() {
 //    return ;
 //    std::cout << __FILE__ << ":" << __LINE__ << "  main threadid=" << muduo::CurrentThread::tid() << std::endl;
 
-    const int max_thread_count = 3;
-    g_pLatch.reset( new CountDownLatch(max_thread_count) );
+//    const int max_thread_count = 3;
+//    g_pLatch.reset( new CountDownLatch(max_thread_count) );
 
-    g_clientPool_sendfile.reset(new sendFile_ThriftConnectionPool(FLAGS_conn_max,
-                                                                  FLAGS_conn_maxperhost,
-                                                                  FLAGS_conn_timeout_ms,
-                                                                  FLAGS_recv_timeout_ms,
-                                                                  FLAGS_send_timeout_ms,
-                                                                  FLAGS_idle_timeout_sec,
-                                                                  FLAGS_block_wait_ms));
-    muduo::ThreadPool  workpool;
-    workpool.start(max_thread_count);
+//    g_clientPool_sendfile.reset(new sendFile_ThriftConnectionPool(FLAGS_conn_max,
+//                                                                  FLAGS_conn_maxperhost,
+//                                                                  FLAGS_conn_timeout_ms,
+//                                                                  FLAGS_recv_timeout_ms,
+//                                                                  FLAGS_send_timeout_ms,
+//                                                                  FLAGS_idle_timeout_sec,
+//                                                                  FLAGS_block_wait_ms));
+//    muduo::ThreadPool  workpool;
+//    workpool.start(max_thread_count);
 
-//    workpool.run(clientAddImpl);
-    for (int i = 0; i < max_thread_count; ++i) {
-        workpool.run( boost::bind(clientAddImpl_2, 12) );
-    }
-    g_pLatch->wait();
-    std::cout << "all work Done!!!" << std::endl;
-    return;
+////    workpool.run(clientAddImpl);
+//    for (int i = 0; i < max_thread_count; ++i) {
+//        workpool.run( boost::bind(clientAddImpl_2, 12) );
+//    }
+//    g_pLatch->wait();
+//    std::cout << "all work Done!!!" << std::endl;
+//    return;
 
 
-    boost::shared_ptr<TSocket> clientSock(new TSocket("127.0.0.1", 9090));
+    boost::shared_ptr<TSocket> clientSock(new TSocket("172.17.0.2", 9900));
 
     //设置发送、接收、连接超时
     clientSock->setConnTimeout(2000 * 100000);
@@ -199,7 +199,7 @@ void tst_transfer_client_entry() {
     PhotoClient client(send_prot);
 
     OneFile oneFile;
-    const char* lpszFile = "./tstalgo";
+    const char* lpszFile = "./CMakeCache.txt";
 
     unsigned int ulFileSize = GetFileSize(lpszFile);
     std::cout << "ulFileSize=" << ulFileSize << std::endl;
@@ -211,8 +211,10 @@ void tst_transfer_client_entry() {
     oneFile.__set_file_hsh("12345");
 
     bool bSend = client.SendPhoto(oneFile);
-
     std::cout << "bsend=" << bSend << std::endl;
+
+    int addret = client.Add(444, 777);
+    std::cout << "addret=" << addret << std::endl;
 
     transport->close();
 

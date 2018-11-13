@@ -1,5 +1,7 @@
 //#include "evpp/inner_pre.h"
 
+#include "event_watcher.h"
+
 #include <string.h>
 
 //#include "evpp/libevent.h"
@@ -10,10 +12,10 @@
 //#include <assert.h>
 
 
+#include "muduo/base/duration.h"
 #include "muduo/base/libevent.h"
 #include "muduo/base/Logging.h"
 
-#include "event_watcher.h"
 
 
 //namespace evpp {
@@ -143,7 +145,24 @@ bool PipeEventWatcher::DoInit() {
         LOG_ERROR << "make socketpair nonblcking ERROR errno=" << err << " " << strerror(err);
         goto failed;
     }
+    for (int i = 0; i < 2; ++i) {
+  #if LIBEVENT_VERSION_NUMBER < 0x02000000
+      int flags;
+      if ((flags = FCNTL(pipe_[i], F_GETFD, 0)) < 0
+          || FCNTL(pipe_[i], F_SETFD, flags | FD_CLOEXEC) < 0) {
+  #else
+      if (evutil_make_socket_closeonexec(pipe_[i]) < 0) {
+  #endif
+        close(pipe_[0]);
+        close(pipe_[1]);
+        pipe_[0] = INVALID_SOCKET;
+        pipe_[1] = INVALID_SOCKET;
+        LOG_ERROR << "bad closeonexec";
+        return false;
+      }
+    }
 
+    LOG_INFO << "pipe[0]=" << pipe_[0] << " pipe[1]=" << pipe_[1];
     ::event_set(event_, pipe_[1], EV_READ | EV_PERSIST, &PipeEventWatcher::HandlerFn, this);
     return true;
 failed:
@@ -160,7 +179,7 @@ void PipeEventWatcher::DoClose() {
 }
 
 void PipeEventWatcher::HandlerFn(evpp_socket_t fd, short which, void* v) {
-    LOG_INFO << "PipeEventWatcher::HandlerFn fd=" << fd << " v=" << v;
+    LOG_INFO << "PipeEventWatcher::HandlerFn fd=" << fd << " which=" << which << " v=" << v;
     PipeEventWatcher* e = (PipeEventWatcher*)v;
 #ifdef H_BENCHMARK_TESTING
     // Every time we only read 1 byte for testing the IO event performance.
@@ -169,12 +188,15 @@ void PipeEventWatcher::HandlerFn(evpp_socket_t fd, short which, void* v) {
     //  1. evpp/benchmark/ioevent/fd_channel_vs_pipe_event_watcher/
     char buf[1];
 #else
-    char buf[128];
+    char buf[128] = {0};
+//    char buf[1] = {0};
 #endif
     int n = 0;
-
     if ((n = ::recv(e->pipe_[1], buf, sizeof(buf), 0)) > 0) {
-        e->handler_(fd, which, v);
+        LOG_INFO << "recv n=" << n << " buf=" << buf;
+        e->handler_(fd, which, v, buf);
+    } else {
+        LOG_ERROR << "recv failed!!!";
     }
 }
 
@@ -183,8 +205,7 @@ bool PipeEventWatcher::AsyncWait() {
 }
 
 void PipeEventWatcher::Notify() {
-    char buf[1] = {};
-
+    char buf[1] = {'c'};
     if (::send(pipe_[0], buf, sizeof(buf), 0) < 0) {
         return;
     }

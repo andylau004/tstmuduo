@@ -18,7 +18,7 @@ class EventLoop;
 class /*EVPP_EXPORT*/ EventWatcher {
 public:
 //    typedef boost::function<void(void)> Handler;
-    typedef boost::function<void(evpp_socket_t, short, void*)> Handler;
+    typedef boost::function<void(evpp_socket_t, short, void*, void*)> Handler;
 
     virtual ~EventWatcher();
 
@@ -102,4 +102,10 @@ private:
 //    int signo_;
 //};
 //}
+
+
+typedef boost::shared_ptr<PipeEventWatcher> PipeEventWatcherPtr;
+
+
+
 

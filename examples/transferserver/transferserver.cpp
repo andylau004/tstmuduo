@@ -3,22 +3,6 @@
 #include "transferserver.h"
 
 
-
-//#include <stdio.h>
-
-//#include <iostream>
-//#include <sstream>
-
-//#include <iostream>
-//#include <string>
-//#include <algorithm>
-//#include <stack>
-//#include <vector>
-//#include <queue>
-
-//#include <fstream>
-//#include <thread>
-
 #include <boost/bind.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/shared_ptr.hpp>
@@ -77,6 +61,9 @@ using namespace apache::thrift::server;
 #include "muduo/base/event_watcher.h"
 
 #include "ex_event_handler.h"
+
+
+#include "server.hpp"
 
 
 
@@ -293,40 +280,52 @@ void ReadCallback(int idx) {
 //    w->Init();
 //}
 
+void disorderfun() {
+    //    demo a;
+    //    demo* pa = &a;
+    //    typedef boost::function<void()> Handler;
+    //    int iret = 0;
+
+    //    Handler funptr = (boost::bind(&demo::Add, pa, 2, 1));
+    //    std::cout << "add1=" << boost::bind( &demo::Add, pa, 10, _2 )( 12, 23 ) << std::endl;
+
+    //    typedef boost::function<int(int, int)> HandlerEx;
+    //    HandlerEx funcEx = (boost::bind(&demo::Add, pa, 2, 1));
+    //    std::cout << "addex=" << funcEx( 12, 23 ) << std::endl;
+
+    ////    Handler testPtr = (boost::bind(&demo::Add, pa, _1, _2));
+    ////    std::cout << "add_aaa=" << testPtr(3, 5) << std::endl;
+
+    ////    std::cout << "add=" << funptr() << std::endl;
+    ////    int iret = funptr();
+    //    std::cout << "add2=" << iret << std::endl;
+    //    return;
+
+    //    tst_thrift_threadmanager_fun();
+    //    return ;
+
+    //    setEventHandler
+    //    CThriftServerHelper<PhotoHandler, PhotoProcessor> thrift_server_agent((new ClientIPHandler), false);
+}
+
+void my_thrift_srv() {
+    printf( "my_thrift_srv beg-----------------------\n" );
+    Server * s = new Server(P_TEST_PROCESS, PRO_BINARY, 9900, 2);
+    if (!s->serve()) {
+        printf("bad server\n");
+        delete_object(s);
+        return;
+    }
+    printf( "my_thrift_srv end-----------------------\n" );
+}
 void tst_transfer_server_entry() {
 //    std::cout << "sizeof (st_kv)=" << sizeof (st_kv) << std::endl;
 //    return ;
-
 //    tt1(); return ;
 
     OutputDbgInfo tmpOut( "tst_transfer_server_entry begin", "tst_transfer_server_entry end" ) ;
-    uint16_t srv_port = 9090;
-
-//    demo a;
-//    demo* pa = &a;
-//    typedef boost::function<void()> Handler;
-//    int iret = 0;
-
-//    Handler funptr = (boost::bind(&demo::Add, pa, 2, 1));
-//    std::cout << "add1=" << boost::bind( &demo::Add, pa, 10, _2 )( 12, 23 ) << std::endl;
-
-//    typedef boost::function<int(int, int)> HandlerEx;
-//    HandlerEx funcEx = (boost::bind(&demo::Add, pa, 2, 1));
-//    std::cout << "addex=" << funcEx( 12, 23 ) << std::endl;
-
-////    Handler testPtr = (boost::bind(&demo::Add, pa, _1, _2));
-////    std::cout << "add_aaa=" << testPtr(3, 5) << std::endl;
-
-////    std::cout << "add=" << funptr() << std::endl;
-////    int iret = funptr();
-//    std::cout << "add2=" << iret << std::endl;
-//    return;
-
-//    tst_thrift_threadmanager_fun();
-//    return ;
-
-//    setEventHandler
-//    CThriftServerHelper<PhotoHandler, PhotoProcessor> thrift_server_agent((new ClientIPHandler), false);
+    my_thrift_srv();
+    return;
 
     boost::shared_ptr<thriftex::server::ExProcessorEventHandler>
             pProcessEventHandler(new thriftex::server::ExProcessorEventHandler);
@@ -334,6 +333,7 @@ void tst_transfer_server_entry() {
     CThriftServerHelper<PhotoHandler, PhotoProcessor>
             thrift_server_agent((new thriftex::server::ExServerEventHandler), false, pProcessEventHandler);
 
+    uint16_t srv_port = 9090;
     thrift_server_agent.serve(srv_port);
     return;
 

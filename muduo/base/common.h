@@ -143,6 +143,9 @@ enum ServerStatus {
 // -------------------------------------------------------------------------------------------------------
 
 
+
+
+
 #ifdef H_OS_WINDOWS
 #define evpp_socket_t intptr_t
 #else
@@ -218,7 +221,22 @@ void PrintInContainer( CONTAINER& container ) {
     printf( "\n" );
 }
 
+/*!
+ * \brief The Align enum
+ */
+enum ALIGN_MEMORY {
+    __ALIGN = 8 /*!< default align */
+};
 
+/*!
+ * \brief holly_align
+ * \param bytes
+ * \param align
+ * \return aligned bytes
+ */
+inline size_t holly_align(size_t bytes, size_t align) {
+    return  (((bytes) + (align - 1)) & ~(align - 1));
+}
 
 
 
@@ -249,7 +267,9 @@ enum TypeProcess {
     P_UNKNOWN = 0,
     P_APPROCESS,
     P_BGPROCESS,      //background processor
-    P_JAVAPROCESS
+    P_JAVAPROCESS,
+    P_TEST_PROCESS
+
 };
 
 
