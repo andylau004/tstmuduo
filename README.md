@@ -1,14 +1,14 @@
 # tstmuduo
 
-1.    测试　 muduo 
-2.    测试　实验代码
-3.    测试　算法　堆排序、快排、trie树、二分查找等常用算法
-4.    测试　boost 库　常用工具类　方法
-5.    测试　各种哈希算法，一致性哈希算法
-6.    新增  protobuff 测试 序列化 反序列化
-7.    新增  测试thrift传二进制文件，同时，新增thrift server/client 封装工具类，                   
+1.    测试 muduo 
+2.    测试 实验代码
+3.    测试 算法: 堆排序、快排、trie树、二分查找等常用算法
+4.    测试 boost库 常用工具类 方法
+5.    测试 各种哈希算法，一致性哈希算法
+6.    新增 protobuff 测试 序列化/反序列化
+7.    新增 测试thrift传二进制文件，同时，新增thrift server/client 封装工具类，                   
                    
-8.    新增  boost::shared_ptr<TNonblockingIOThread>  m_listenThread;
+8.    新增 boost::shared_ptr<TNonblockingIOThread>  m_listenThread;
       此线程只负责侦听接受客户端连接
 ```
     // 主侦听线程，只负责侦听客户端socket，push新连接到io thread
@@ -19,9 +19,11 @@
     m_listenThread->register_io_events();
 ```
 
-9.    新增    class ExProcessorEventHandler: public apache::thrift::TProcessorEventHandler
+9.    新增    
+class ExProcessorEventHandler: public apache::thrift::TProcessorEventHandler
       根据 getContext  和 postWrite 之间 调用时间差，打印指定接口--函数的调用耗时
-       
+
+
 10.   不修改thrift源码获取thrift客户端IP，通过注入
 ```
 class ExServerEventHandler: public apache::thrift::server::TServerEventHandler
