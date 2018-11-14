@@ -5,6 +5,10 @@
 
 
 
+#include <cstdio>
+#include <cstdlib>
+#include <functional>
+
 #include "muduo/base/common.h"
 
 #include <boost/bind.hpp>
@@ -38,6 +42,7 @@
 #include <thrift/server/TNonblockingServer.h>
 
 
+#include "timewheel.h"
 
 
 
@@ -53,10 +58,6 @@ using namespace apache::thrift::server;
 
 
 
-#include <cstdio>
-#include <cstdlib>
-#include <functional>
-
 
 using namespace std;
 using namespace muduo;
@@ -66,9 +67,54 @@ using namespace muduo::net;
 // timewheel 实现
 
 
-void tst_twfun_entry() {
-    OutputDbgInfo tmpOut( "tst_twfun_entry begin", "tst_twfun_entry end" );
+void fun100()
+{
+    cout << "func 100" << endl;
+}
+void fun200()
+{
+    cout << "func 200" << endl;
+}
+void fun500()
+{
+    cout << "func 500" << endl;
+}
 
+void fun1500()
+{
+    cout << "func 1500" << endl;
+}
+
+void tst_twfun_entry() {
+    std::string stt = " 123";
+    OutputDbgInfo tmpOut( "tst_twfun_entry begin" +stt, "tst_twfun_entry end" +stt);
+
+    boost::function<void(void)> f100 = boost::bind(&fun100);
+    boost::function<void(void)> f200 = boost::bind(&fun200);
+    boost::function<void(void)> f500 = boost::bind(&fun500);
+    boost::function<void(void)> f1500 = boost::bind(&fun1500);
+
+    TimeWheel time_wheel;
+    time_wheel.InitTimerWheel(100, 5);
+//    int timer1 = time_wheel.AddTimer(100, f100);
+    int timer2 = time_wheel.AddTimer(200, f200);
+//    int timer3 = time_wheel.AddTimer(500, f500);
+//	time_wheel.AddTimer(1500, f1500);
+
+    bool b = true;
+    int nLoop = 0;
+    while (1)
+    {
+        nLoop++;
+        this_thread::sleep_for(chrono::milliseconds(300));
+//        if (b)
+//        {
+//            time_wheel.AddTimer(1500, f1500);
+//            b = false;
+//        }
+//        if (nLoop == 3)
+//            time_wheel.DeleteTimer(timer1);
+    }
 
 }
 

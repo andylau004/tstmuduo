@@ -111,7 +111,7 @@ TimerQueue::TimerQueue(EventLoop* loop)
       timers_(),
       callingExpiredTimers_(false)
 {
-    //    LOG_INFO << "timerfd_=" << timerfd_;
+//    LOG_INFO << "timerfd_=" << timerfd_;
     //设置timerfd可读事件回调函数为handleRead
     timerfdChannel_.setReadCallback(boost::bind(&TimerQueue::handleRead, this));
     // we are always reading the timerfd, we disarm it with timerfd_settime.

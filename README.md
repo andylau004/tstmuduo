@@ -22,6 +22,13 @@
        
 10.   不修改thrift源码获取thrift客户端IP，通过注入class ExServerEventHandler: public apache::thrift::server::TServerEventHandler
 
+11.   新增　tstc11 测试用例
+　　　　测试　ON_SCOPE_EXIT　C++11 实现 golang defer　延迟释放
+
+12.   新增　tstimewheel
+　　　　测试　时间轮　算法
+
+
 
 
 计划：
