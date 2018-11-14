@@ -9,24 +9,34 @@
 7.    新增    测试thrift传二进制文件，同时，新增thrift server/client 封装工具类，                   
                    
 8.    新增    boost::shared_ptr<TNonblockingIOThread>  m_listenThread;
-        此线程只负责侦听接受客户端连接
+      此线程只负责侦听接受客户端连接
+```
     // 主侦听线程，只负责侦听客户端socket，push新连接到io thread
     boost::shared_ptr<TNonblockingIOThread>  m_listenThread;
 
     // Register the events for the primary (listener) IO thread
 //    ioThreads_[0]->register_io_events();
     m_listenThread->register_io_events();
+```
 
 9.    新增    class ExProcessorEventHandler: public apache::thrift::TProcessorEventHandler
-       根据 getContext  和 postWrite 之间 调用时间差，打印指定接口--函数的调用耗时
+      根据 getContext  和 postWrite 之间 调用时间差，打印指定接口--函数的调用耗时
        
-10.   不修改thrift源码获取thrift客户端IP，通过注入class ExServerEventHandler: public apache::thrift::server::TServerEventHandler
+10.   不修改thrift源码获取thrift客户端IP，通过注入
+```
+class ExServerEventHandler: public apache::thrift::server::TServerEventHandler
+```
 
 11.   新增　tstc11 测试用例
 　　　　测试　ON_SCOPE_EXIT　C++11 实现 golang defer　延迟释放
 
 12.   新增　tstimewheel
 　　　　测试　时间轮　算法
+
+
+
+
+
 
 
 
