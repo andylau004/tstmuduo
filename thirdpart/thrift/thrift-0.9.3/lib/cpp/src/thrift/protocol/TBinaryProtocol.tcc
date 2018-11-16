@@ -32,6 +32,7 @@ template <class Transport_, class ByteOrder_>
 uint32_t TBinaryProtocolT<Transport_, ByteOrder_>::writeMessageBegin(const std::string& name,
                                                                      const TMessageType messageType,
                                                                      const int32_t seqid) {
+    printf ( "strict_write_=%d\n", this->strict_write_ );
     if (this->strict_write_) {
         int32_t version = (VERSION_1) | ((int32_t)messageType);
         uint32_t wsize = 0;
