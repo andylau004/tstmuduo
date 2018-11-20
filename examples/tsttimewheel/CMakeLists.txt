@@ -2,7 +2,7 @@
 
 
 
-project(tsttw)
+project(tsttimewheel)
 
 
 set(EXECUTABLE_OUTPUT_PATH ../../)

@@ -13,6 +13,15 @@
 #include <assert.h>
 #endif
 
+
+#include <string>
+using namespace std;
+
+
+
+#define MUDUO_STD_STRING 1
+
+
 ///
 /// The most common stuffs.
 ///

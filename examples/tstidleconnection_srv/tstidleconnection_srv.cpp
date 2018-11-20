@@ -3,15 +3,6 @@
 
 #include "tstidleconnection_srv.h"
 
-//#include <stdio.h>
-//#include <iostream>
-//#include <string>
-
-//#include <list>
-
-//#include <boost/bind.hpp>
-//#include <boost/function.hpp>
-//#include <boost/scoped_ptr.hpp>
 
 #include <stdio.h>
 #include <unistd.h>
@@ -28,14 +19,13 @@
 
 #include "muduo/net/Callbacks.h"
 #include "muduo/base/common.h"
+#include "muduo/base/Logging.h"
+
 #include "muduo/net/EventLoop.h"
 #include "muduo/base/Timestamp.h"
-//#include "muduo/base/ThreadPool.h"
 
 #include "muduo/base/libevent.h"
 
-#include "muduo/base/Logging.h"
-#include "muduo/net/EventLoop.h"
 #include "muduo/net/TcpServer.h"
 
 
@@ -111,9 +101,7 @@ public:
 
 private:
     void onConnection(const TcpConnectionPtr& conn);
-    void onMessage(const TcpConnectionPtr& conn,
-                   Buffer* buf,
-                   Timestamp time);
+    void onMessage(const TcpConnectionPtr& conn, Buffer* buf, Timestamp time);
     void onTimer();
     void dumpConnectionList() const;
 
@@ -131,15 +119,13 @@ private:
     WeakConnectionList connectionList_;
 };
 
-EchoServer::EchoServer(EventLoop* loop,
-                       const InetAddress& listenAddr,
-                       int idleSeconds)
+EchoServer::EchoServer(EventLoop* loop, const InetAddress& listenAddr, int idleSeconds)
     : server_(loop, listenAddr, "EchoServer"), idleSeconds_(idleSeconds)
 {
     server_.setConnectionCallback( boost::bind(&EchoServer::onConnection, this, _1) );
     server_.setMessageCallback( boost::bind(&EchoServer::onMessage, this, _1, _2, _3) );
 
-    loop->runEvery((double)1.0, boost::bind(&EchoServer::onTimer, this) );
+    loop->runEvery( (double)1.0, boost::bind(&EchoServer::onTimer, this) );
     dumpConnectionList();
 }
 void EchoServer::onConnection(const TcpConnectionPtr &conn) {
@@ -168,11 +154,15 @@ void EchoServer::onMessage(const TcpConnectionPtr &conn, Buffer *buf, Timestamp 
              << " bytes at " << time.toString();
     conn->send(recvMsg);
 
+    // refresh time wheel node
     assert(!conn->getContext().empty());
-    Node* node = boost::any_cast<Node>(conn->getMutableContext());
+
+    Node* node = boost::any_cast<Node> (conn->getMutableContext());
     node->lastReceiveTime = time;
+
     connectionList_.splice(connectionList_.end(), connectionList_, node->position);
     assert(node->position == --connectionList_.end());
+    // -----------------------
 
     dumpConnectionList();
 }
@@ -180,32 +170,80 @@ void EchoServer::onTimer() {
     dumpConnectionList();
 
     Timestamp now = Timestamp::now();
+    for ( auto it = connectionList_.begin(); it != connectionList_.end(); ) {
 
+        TcpConnectionPtr conn = it->lock();
+        if (conn) {
+
+            Node* p_n = boost::any_cast<Node> (conn->getMutableContext());
+            double age = timeDifference(now, p_n->lastReceiveTime);
+
+            if ( age > idleSeconds_ ) {
+                if (conn->connected()) {
+                    conn->shutdown();
+                    LOG_INFO << "shutting down connection: " << conn->name();
+                    conn->forceCloseWithDelay(3.5);
+                }
+            } else if ( age < 0 ) {
+                LOG_INFO << "Time Jump, age=" << age;
+                p_n->lastReceiveTime = now;
+            } else {
+                LOG_INFO << "age < idleSeconds_, age=" << age << ", idleSeconds_=" << idleSeconds_;
+                break;
+            }
+            ++it;
+
+        } else {// conn == null
+            LOG_INFO << "conn == null, Expired...";
+            it = connectionList_.erase(it);
+        }
+    }
 }
-void EchoServer::dumpConnectionList() const
-{
-    LOG_INFO << "size = " << connectionList_.size();
-
-    for (WeakConnectionList::const_iterator it = connectionList_.begin();
-         it != connectionList_.end(); ++it)
+void EchoServer::dumpConnectionList() const {
+    if ( !connectionList_.empty() )
+        LOG_INFO << "connectionList_size = " << connectionList_.size();
+    for ( auto it = connectionList_.begin(); it != connectionList_.end(); ++it )
     {
         TcpConnectionPtr conn = it->lock();
-        if (conn)
-        {
-            printf("conn %p\n", get_pointer(conn));
+        if (conn) {
+//            printf("conn %p\n", get_pointer(conn));
             const Node& n = boost::any_cast<const Node&>(conn->getContext());
-            printf("    time %s\n", n.lastReceiveTime.toString().c_str());
-        }
-        else
-        {
+//            printf("    time %s\n", n.lastReceiveTime.toString().c_str());
+        } else {
             printf("expired\n");
         }
     }
 }
 
+class CYinyongcount {
+public:
+    CYinyongcount() {
+        printf ( "yiyong cst\n" );
+    }
+    ~CYinyongcount() {
+        printf ( "yiyong dst\n" );
+    }
+};
+void tst_shared_weak_ptr() {
+    boost::shared_ptr<CYinyongcount> sp1(new CYinyongcount);// sp1.reset(new CYinyongcount);
+    boost::weak_ptr< CYinyongcount > wkPtr( sp1 );
+
+    std::cout << " wkPtr count=" << wkPtr.use_count() << std::endl;
+    std::cout << " sp1 count=" << sp1.use_count() << std::endl;
+}
 
 int tst_idleconnection_srv_entry(int argc, char *argv[]) {
+    EventLoop loop;
 
+    InetAddress listenAddr(2007);
+    int idleSeconds = 10;
+    if (argc > 1) {
+        idleSeconds = atoi(argv[1]);
+    }
+
+    EchoServer server(&loop, listenAddr, idleSeconds);
+    server.start();
+    loop.loop();
     return 0;
 }
 

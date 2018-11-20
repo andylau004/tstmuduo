@@ -23,6 +23,11 @@ add_subdirectory(tstepoll_srv)
 add_subdirectory(tstepoll_cli)
 add_subdirectory(tstc11)
 add_subdirectory(tsttimewheel)
+add_subdirectory(tstidleconnection_srv)
+add_subdirectory(tstbucketwheel)
+
+
+
 
 #add_subdirectory(${CMAKE_SOURCE_DIR}/thirdpart/rapidjson)
 

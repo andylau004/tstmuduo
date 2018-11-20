@@ -1,12 +1,12 @@
 cmake_minimum_required(VERSION 2.8)
 
-project(tstmuduo C CXX)
+project(tstfun C CXX)
 
 
 set(CXX_FLAGS
     -g
     # -DVALGRIND
-    # -DMUDUO_STD_STRING
+     -DMUDUO_STD_STRING
     -DCHECK_PTHREAD_RETURN_VALUE
     -D_FILE_OFFSET_BITS=64
     -Wall

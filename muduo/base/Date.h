@@ -9,6 +9,10 @@
 #include <muduo/base/copyable.h>
 #include <muduo/base/Types.h>
 
+#include <string>
+using namespace std;
+
+
 struct tm;
 
 namespace muduo
@@ -73,7 +77,7 @@ class Date : public muduo::copyable
   ///
   /// Converts to yyyy-mm-dd format.
   ///
-  string toIsoString() const;
+  std::string toIsoString() /*const*/;
 
   struct YearMonthDay yearMonthDay() const;
 

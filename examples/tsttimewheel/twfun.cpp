@@ -85,6 +85,8 @@ void fun1500()
     cout << "func 1500" << endl;
 }
 
+
+
 void tst_twfun_entry() {
     std::string stt = " 123";
     OutputDbgInfo tmpOut( "tst_twfun_entry begin" +stt, "tst_twfun_entry end" +stt);

@@ -81,16 +81,16 @@ int TimeWheel::InitTimerWheel(int step_ms, int max_min) {
         cout << "step is not property, should be devided by 1000" << endl;
         return -1;
     }
-    int msNeedCount = 1000 / step_ms;
-    int sNeedCount = 60;
+    int msNeedCount  = 1000 / step_ms;// 10
+    int sNeedCount   = 60;
     int minNeedCount = max_min;
 
     _pCallbackList = new std::list<EventInfo>[msNeedCount + sNeedCount + minNeedCount];
     _step_ms = step_ms;
 
-    _lowCount = msNeedCount;
-    _midCount = sNeedCount;
-    _highCount = minNeedCount;
+    _lowCount  = msNeedCount; // 10
+    _midCount  = sNeedCount;  // 60
+    _highCount = minNeedCount;// 5
 
     std::thread th([&]{
         std::cout << "loop begin" << std::endl;
@@ -157,6 +157,7 @@ int TimeWheel::DoLoop()
     while (true)
     {
         this_thread::sleep_for(chrono::milliseconds(_step_ms));
+
         std::unique_lock<std::mutex> lock(_mutex);
         cout << ".........this is " << ++nCount <<"  loop........."<< endl;
 
@@ -183,8 +184,7 @@ int TimeWheel::DoLoop()
             DealTimeWheeling(leinfo);
             leinfo.clear();
         }
-        else
-        {
+        else {
             cout << "error time not change" << endl;
             return -1;
         }
@@ -218,17 +218,16 @@ int TimeWheel::InsertTimer(int diff_ms, EventInfo &einfo)
 int TimeWheel::GetNextTrigerPos(int interval, TimePos& time_pos)
 {
     int cur_ms = GetMS(_time_pos);
+//    std::cout << "cur_ms=" << cur_ms << std::endl;
     int future_ms = cur_ms + interval;
 
     time_pos.min_pos = (future_ms / 1000 / 60) % _highCount;
-    time_pos.s_pos = (future_ms % (1000 * 60)) / 1000;
-    time_pos.ms_pos = (future_ms % 1000) / _step_ms;
-
+    time_pos.s_pos   = (future_ms % (1000 * 60)) / 1000;
+    time_pos.ms_pos  = (future_ms % 1000) / _step_ms;
     return 0;
 }
 
-int TimeWheel::GetMS(TimePos time_pos)
-{
+int TimeWheel::GetMS(TimePos time_pos) {
     return _step_ms * time_pos.ms_pos + time_pos.s_pos * 1000 + time_pos.min_pos * 60 * 1000;
 }
 
