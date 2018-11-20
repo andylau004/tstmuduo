@@ -67,17 +67,14 @@ Timestamp EPollPoller::poll(int timeoutMs, ChannelList* activeChannels)
         pPtr += strlen(pPtr);
     }
 
-    LOG_INFO << "fd total count " << channels_.size();
-    int numEvents = ::epoll_wait(epollfd_,
-                                 &*events_.begin(),
-                                 static_cast<int>(events_.size()),
-                                 timeoutMs);
+//    LOG_INFO << "fd total count " << channels_.size();
+    int numEvents = ::epoll_wait(epollfd_, &*events_.begin(), static_cast<int>(events_.size()), timeoutMs);
 //    LOG_INFO << "tmpbuffer=" << tmpbuffer << ", numEvents=" << numEvents;// << ", curtid=" << CurrentThread::tid();
 
     int savedErrno = errno;
     Timestamp now(Timestamp::now());
     if (numEvents > 0) {
-        LOG_INFO << numEvents << " events happened";
+//        LOG_INFO << numEvents << " events happened";
         fillActiveChannels(numEvents, activeChannels); //调用fillActiveChannels，传入numEvents也就是发生的事件数目
         if (implicit_cast<size_t>(numEvents) == events_.size()) {
             events_.resize(events_.size()*2); //如果返回的事件数目等于当前事件数组大小，就分配2倍空间
@@ -127,7 +124,7 @@ void EPollPoller::fillActiveChannels(int numEvents,
         assert(it->second == channel);
 #endif
 
-        LOG_INFO << "activechannelfd=" << channel->fd() << ", events_[" << i << "].events=" << events_[i].events;
+//        LOG_INFO << "activechannelfd=" << channel->fd() << ", events_[" << i << "].events=" << events_[i].events;
         channel->set_revents(events_[i].events); //把已发生的事件传给channel,写到通道当中
         activeChannels->push_back(channel);
     }

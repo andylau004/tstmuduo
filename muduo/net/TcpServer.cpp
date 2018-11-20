@@ -87,7 +87,7 @@ void TcpServer::newConnection(int sockfd, const InetAddress& peerAddr)
 
     // FIXME poll with zero timeout to double confirm the new connection
     // FIXME use make_shared if necessary
-    //TcpConnection的use_count此处为1，新建了一个Tcpconnection
+    // TcpConnection的use_count此处为1，新建了一个Tcpconnection
     TcpConnectionPtr conn(new TcpConnection(ioLoop,
                                             connName,
                                             sockfd,

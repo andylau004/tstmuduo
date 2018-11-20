@@ -90,7 +90,7 @@ void Channel::handleEvent(Timestamp receiveTime) {
     }
     else
     {
-        LOG_INFO << "no tie_ handleEvent";
+//        LOG_INFO << "no tie_ handleEvent";
         handleEventWithGuard(receiveTime);
     }
 }
@@ -126,7 +126,7 @@ void Channel::handleEventWithGuard(Timestamp receiveTime)
     {
         //当是侦听socket时，readCallback_指向Acceptor::handleRead
         //当是客户端socket时，调用TcpConnection::handleRead
-        LOG_INFO << "revents_=" << revents_ << " readCallback_";
+//        LOG_INFO << "revents_=" << revents_ << " readCallback_";
         if (readCallback_) readCallback_(receiveTime);// 产生可读事件 调用读函数
     }
     if (revents_ & POLLOUT)

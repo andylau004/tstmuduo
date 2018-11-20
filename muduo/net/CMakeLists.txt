@@ -6,26 +6,28 @@ if(NOT HAVE_ACCEPT4)
 endif()
 
 set(net_SRCS
-  Acceptor.cc
-  Buffer.cc
-  Channel.cc
-  Connector.cpp
-  EventLoop.cpp
-  EventLoopThread.cc
-  EventLoopThreadPool.cpp
-  InetAddress.cc
+  Acceptor.cc   Acceptor.h
+  Buffer.cc   Buffer.h
+  Channel.cc    Channel.h
+  Connector.cpp   Connector.h
+  EventLoop.cpp   EventLoop.h
+  EventLoopThread.cc   EventLoopThread.h
+  EventLoopThreadPool.cpp   EventLoopThreadPool.h
+  InetAddress.cc   InetAddress.h
   Poller.cc
   poller/DefaultPoller.cc
   poller/EPollPoller.cc
-  poller/PollPoller.cc
-  Socket.cc
-  SocketsOps.cc
-  TcpClient.cpp
-  TcpConnection.cpp
-  TcpServer.cpp
-  Timer.cc
-  TimerQueue.cc
-  )
+  poller/PollPoller.cc   poller/PollPoller.h
+
+  Socket.cc   Socket.h
+  SocketsOps.cc SocketsOps.h
+  TcpClient.cpp TcpClient.h
+  TcpConnection.cpp TcpConnection.h
+  TcpServer.cpp   TcpServer.h
+  Timer.cc Timer.h
+  TimerQueue.cc   TimerQueue.h
+
+)
 
 add_library(muduo_net ${net_SRCS})
 target_link_libraries(muduo_net muduo_base)

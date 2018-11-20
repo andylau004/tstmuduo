@@ -52,7 +52,7 @@ muduo选择用智能指针shared_ptr来管理TcpConnection的生命期，并且�
  *
  * */
 class TcpConnection : boost::noncopyable,
-        public boost::enable_shared_from_this<TcpConnection>
+                      public boost::enable_shared_from_this<TcpConnection>
 {
 public:
     /// Constructs a TcpConnection with a connected sockfd
