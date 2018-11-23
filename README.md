@@ -35,9 +35,12 @@ class ExServerEventHandler: public apache::thrift::server::TServerEventHandler
 12.   新增　tstimewheel
       测试　时间轮　算法
 
+13.   新增　模仿muduo内timewheel实现方式，实现时间轮
+      ./examples/tstbucketwheel/tstbucketwheel.cpp
 
-
-
+14.   新增　在修改过的thrift中实现时间轮，用来监控连接是否在指定时间内是否有数据交互，如果没有则析构连接
+      ./examples/transferserver/iothread.cpp
+      测试通过
 
 
 
