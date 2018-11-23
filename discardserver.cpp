@@ -57,7 +57,8 @@ private:
                   << (conn->connected() ? "UP" : "DOWN");
     }
 
-//    这是用户提供给TcpServer的可读时的回调函数，又由TcpServer提供给TcpConnection，当TcpConnection的读缓冲区执行完readFd返回后，会执行用户的回调函数，图片程序来自muduo的测试用例。
+// 这是用户提供给TcpServer的可读时的回调函数，
+//又由TcpServer提供给TcpConnection，当TcpConnection的读缓冲区执行完readFd返回后，会执行用户的回调函数，图片程序来自muduo的测试用例。
 /*
  * 可以看到
     buf->readableBytes()返回缓冲区中可读字节数
