@@ -67,6 +67,14 @@
 
 #include <functional>
 
+#include <unordered_set>
+#include <boost/circular_buffer.hpp>
+
+#include <boost/function.hpp>
+#include <boost/shared_ptr.hpp>
+
+#include <boost/any.hpp>
+#include <boost/unordered_map.hpp>
 
 #include <boost/thread.hpp>
 #include <boost/utility.hpp>

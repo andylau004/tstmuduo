@@ -75,8 +75,8 @@ private:
 
 //class /*EVPP_EXPORT*/ TimerEventWatcher : public EventWatcher {
 //public:
-//    TimerEventWatcher(EventLoop* loop, const Handler& handler, Duration timeout);
-//    TimerEventWatcher(EventLoop* loop, Handler&& handler, Duration timeout);
+////    TimerEventWatcher(EventLoop* loop, const Handler& handler, Duration timeout);
+////    TimerEventWatcher(EventLoop* loop, Handler&& handler, Duration timeout);
 //    TimerEventWatcher(struct event_base* loop, const Handler& handler, Duration timeout);
 //    TimerEventWatcher(struct event_base* loop, Handler&& handler, Duration timeout);
 
@@ -106,6 +106,7 @@ private:
 
 typedef boost::shared_ptr<PipeEventWatcher> PipeEventWatcherPtr;
 
+//typedef boost::shared_ptr<TimerEventWatcher> TimerEventWatcherPtr;
 
 
 

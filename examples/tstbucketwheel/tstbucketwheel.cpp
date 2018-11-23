@@ -59,24 +59,25 @@ private:
 
     void dumpConnectionBuckets() const;
 
+
     typedef boost::weak_ptr<muduo::net::TcpConnection> WeakTcpConnectionPtr;
 
     struct Entry : public muduo::copyable
     {
+        // 初始化时候获得muduo::net::TcpConnection类型对象的弱指针
         explicit Entry(const WeakTcpConnectionPtr& weakConn) : weakConn_(weakConn) {
         }
-        ~Entry() {
-            LOG_INFO << "--------------Entry Obj Destroying beg--------------";
+        ~Entry() {// 析构时候将弱指针提升为强指针,提升成功则关闭写端
+            OutputDbgInfo tmp("--------------Entry Obj Destroying beg--------------",
+                              "--------------Entry Obj Destroying beg--------------");
             muduo::net::TcpConnectionPtr conn = weakConn_.lock();
             if (conn) {
                 conn->shutdown();
                 LOG_INFO << "--------------shutdowning--------------";
             }
-            LOG_INFO << "--------------Entry Obj Destroying end--------------";
         }
         WeakTcpConnectionPtr weakConn_;
     };
-
     typedef std/*boost*/::shared_ptr<Entry> EntryPtr;
     typedef std/*boost*/::weak_ptr<Entry>   WeakEntryPtr;
 
@@ -84,7 +85,9 @@ private:
     typedef boost::circular_buffer<Bucket> WeakConnectionList;
 
     muduo::net::TcpServer server_;
-    WeakConnectionList connectionBuckets_;
+    WeakConnectionList connectionBuckets_;// 存放连接的强指针
+    // connectionBuckets是个循环队列，当往队尾插入一个元素空的Bucket时候，
+    // 队头就会被删掉，此时队头的Bucket中每个EntryPtr的引用计数均会-1的，当该EntryPtr的引用计数值为0时候就会调用Entry对象的析构函数
 };
 
 EchoServerEx::EchoServerEx(EventLoop* loop, const InetAddress& listenAddr, int idleSeconds)
@@ -106,12 +109,13 @@ void EchoServerEx::onConnection(const TcpConnectionPtr& conn)
              << (conn->connected() ? "UP" : "DOWN");
 
     if (conn->connected()) {
-        EntryPtr entry(new Entry(conn));
-        connectionBuckets_.back().insert(entry);
+        // 当客户端连接上时候，客户的conn为TcpConnectionPtr；
+        EntryPtr entry(new Entry(conn)); // 强引用计数+1
+        connectionBuckets_.back().insert(entry);// 将该强引用指针放入Bucket的末尾的set中
 
         dumpConnectionBuckets();
 
-        WeakEntryPtr weakEntry(entry);
+        WeakEntryPtr weakEntry(entry); //将弱指针保存在conn中,如果将强指针存于conn中则永远删不掉
         conn->setContext(weakEntry);
     } else {
         assert(!conn->getContext().empty());
@@ -136,9 +140,12 @@ void EchoServerEx::onMessage(const TcpConnectionPtr& conn, Buffer* buf, Timestam
 }
 void EchoServerEx::onTimer()
 {
+    // 这样会将队列的头部Bucket给弹出去的，即该Bucket中的每一个强引用计数-1，
+    // 当减为0时候即调用~Entry()，这里面可以直接conn->shutdown();或者conn->handleClose();
     connectionBuckets_.push_back(Bucket());
     dumpConnectionBuckets();
 }
+
 void EchoServerEx::dumpConnectionBuckets() const
 {
     LOG_INFO << "";

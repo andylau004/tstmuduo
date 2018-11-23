@@ -8,6 +8,11 @@
 #include <boost/circular_buffer.hpp>
 
 
+#include <iostream>       // std::cout
+#include <atomic>         // std::atomic
+#include <thread>         // std::thread, std::this_thread::yield
+
+
 #include "muduo/base/common.h"
 
 #include <boost/bind.hpp>
@@ -43,6 +48,8 @@
 
 
 
+///////////////////////////////////
+
 
 using namespace apache::thrift;
 using namespace apache::thrift::transport;
@@ -60,11 +67,13 @@ using namespace apache::thrift::server;
 #include <cstdlib>
 #include <functional>
 
+#include <atomic>
 
 using namespace std;
 using namespace muduo;
 using namespace muduo::net;
 
+using namespace boost;
 
 
 enum enum_Minganci {
@@ -162,20 +171,17 @@ public:
         printf( "out put connection info\n" );
     }
 private:
-
 };
-class TestEntry {
+class ConnectEntry {
 public:
-    TestEntry(const boost::weak_ptr<Connect>& inweakConn)
+    ConnectEntry(const boost::weak_ptr<Connect>& inweakConn)
         : weak_Conn_(inweakConn) {
-        printf( "TestEntry cst\n" );
-
+        printf( "ConnectEntry cst\n" );
     }
-    ~TestEntry() {
-        printf( "TestEntry dst\n" );
+    ~ConnectEntry() {
+        printf( "ConnectEntry dst\n" );
     }
     void output() {
-
         boost::shared_ptr<Connect> usePtr = weak_Conn_.lock();
         if (usePtr) {
             printf( "usePtr is valid ptr\n" );
@@ -183,7 +189,6 @@ public:
         } else {
             printf( "usePtr is invalid ptr\n" );
         }
-
     }
 private:
     boost::weak_ptr<Connect> weak_Conn_;
@@ -191,13 +196,10 @@ private:
 
 // weak_ptr 负责观察 后者 shared_ptr，如果后者被析构，则前者能通过lock的返回发现是否被析构
 void tst_shared_weak_ptr() {
-
-    TestEntry* tstObj;
+    ConnectEntry* tstObj;
     {
         boost::shared_ptr<Connect> newConnect(new Connect);
-
-        tstObj = new TestEntry(newConnect);
-
+        tstObj = new ConnectEntry(newConnect);
         tstObj->output();
     }
     printf ( "----------------------------------\n" );
@@ -227,13 +229,191 @@ void tst_set_fun() {
 
 //    std::cout << "size=" << onebt.size() << std::endl;
 }
+
+void tst_113( int inval ) {
+    std::cout << "inval=" << inval << std::endl;
+    inval = 1923;
+    std::cout << "new inval=" << inval << std::endl;
+}
+
+Connect GetOneConnect() {
+    Connect newConnObj;
+    return newConnObj;
+}
+void tst_Ret_cpy_construct() {
+    Connect recvConn = GetOneConnect();
+}
+
+
+class CB;
+class CA {
+public:
+    ~CA() { printf( "CA destroy\n" ); }
+public:
+    boost::shared_ptr<CB> m_ptrB;
+};
+
+class CB {
+public:
+    ~CB() { printf( "CB destroy\n" ); }
+public:
+    boost::shared_ptr<CA> m_ptrA;
+};
+
+void tst_shared_ptr_1() {
+    boost::shared_ptr<CA> a_obj(new CA);
+    boost::shared_ptr<CB> b_obj(new CB);
+
+//    a_obj->m_ptrB = b_obj;
+//    b_obj->m_ptrA = a_obj;
+//    std::cout << "all done" << std::endl;
+
+    std::cout << "a_obj->m_ptrB count=" << a_obj.use_count() << std::endl;
+    std::cout << "b_obj->m_ptrA count=" << b_obj.use_count() << std::endl;
+    a_obj = NULL;
+    b_obj = NULL;
+}
+
+typedef std::shared_ptr<Connect>            SP_ConnectPtr;
+typedef std::unordered_set<SP_ConnectPtr>   setBucket;
+
+setBucket setObjs;
+
+void InsertObj( const SP_ConnectPtr inObj ) {
+    setObjs.insert(inObj);
+}
+
+void tst_ref_count() {
+
+    SP_ConnectPtr p1(new Connect);
+
+    printf( "p1 usecount=%d\n", p1.use_count() );
+
+    InsertObj(p1);
+
+    printf( "p1 usecount=%d\n", p1.use_count() );
+
+}
+// 测试 weak_ptr 作为 shared_ptr 对象的观察者
+// weak_ptr  shared_ptr 互相引用，使用
+void tst_ref_count_1() {
+    auto sp1 = boost::make_shared<Connect>();
+    printf( "sp1 usecount=%d\n", sp1.use_count() );
+    boost::weak_ptr<Connect> wp1(sp1);
+    printf( "wp1 usecount=%d\n", wp1.use_count() );
+
+    sp1 = nullptr;
+    if (wp1.expired())
+        std::cout << "wp1 is expired" << std::endl;
+}
+class self_shared: public boost::enable_shared_from_this<self_shared>
+{
+public:
+    self_shared(int n):x(n){
+        printf( "construct self_shared obj, this=%p\n", this );
+    }
+    ~self_shared() {
+        printf( "destroy self_shared obj, this=%p\n", this );
+    }
+
+    int x;
+    void print()
+    {std::cout << " self_shared:" << x << std::endl;}
+};
+typedef boost::shared_ptr<self_shared> self_sharedLPtr;
+
+
+boost::shared_ptr<Connect> getone_ConnectObj() {
+    boost::shared_ptr<Connect> tmpPtr(new Connect());
+    std::cout << "tmpPtr count=" << tmpPtr.use_count() << std::endl;
+    return tmpPtr;
+}
+
+self_sharedLPtr getone_selstObj() {
+    self_sharedLPtr oneObjPtr(new self_shared(9527));
+    return oneObjPtr;
+}
+
+void tst_ref_count_2() {
+    boost::shared_ptr<self_shared> sp1 = boost::make_shared<self_shared>(313);
+    sp1->print();
+
+    boost::shared_ptr<self_shared> p_cpy = sp1->shared_from_this();
+    std::cout << "sp1 count=" << sp1.use_count() << std::endl;
+    std::cout << "p_cpy count=" << p_cpy.use_count() << std::endl;
+    p_cpy->print();
+}
+void tst_ref_count_3() {
+//    self_sharedLPtr returnPtr = getone_selstObj();
+//    std::cout << "returnPtr count=" << returnPtr.use_count() << std::endl;
+
+    boost::shared_ptr<Connect> oneConnPtr = getone_ConnectObj();
+    std::cout << "oneConnPtr count=" << oneConnPtr.use_count() << std::endl;
+}
+
+boost::unordered_map < uint64_t, boost::shared_ptr< Connect > > id_ctx_map_;
+
+void insert_ctx( const boost::shared_ptr<Connect>& inPtr ) {
+//    Connect* pfake = nullptr;
+//    id_ctx_map_.insert( std::make_pair(1, pfake) );
+    id_ctx_map_.insert( std::make_pair(1, inPtr) );
+//    tst_map.insert(std::make_pair(1, 1));
+}
+void tst_ref_count_4() {
+    Connect* newConnPtr = new Connect();
+
+    boost::shared_ptr<Connect> tmp_sp1(newConnPtr);
+    std::cout << "before tmp_sp1 usercount=" << tmp_sp1.use_count() << std::endl;
+    insert_ctx( tmp_sp1 );
+    std::cout << "after tmp_sp1 usercount=" << tmp_sp1.use_count() << std::endl;
+
+    getchar();
+}
+
+#include <boost/atomic.hpp>
+#include <atomic>
+
+using namespace std;
+
+atomic_uint64_t  g_tstatomic;// 此处 用的 其实是 boost 内的 原子 类型
+std::atomic<std::uint64_t> g_ucount;// 此处 用的 才是真正c11内置 atmoic 类型
+
+void impl_add() {
+    for ( auto i = 0 ; i < 100 ; i ++ )
+        g_ucount ++ ;
+}
+void tst_atomic( ) {
+    std::vector < std::thread* > v_threads;
+    for (int i = 0; i < 4; ++ i) {
+        v_threads.push_back( new std::thread(&impl_add) );
+    }
+    for (int i = 0; i < 4; ++ i) {
+        v_threads[i]->join();
+    }
+    std::cout << "all thread work done" << std::endl;
+    std::cout << "g_ucount = " << g_ucount << std::endl;
+}
+
 void tst_c11fun_entry() {
     OutputDbgInfo tmpOut( "tst_c11fun_entry begin", "tst_c11fun_entry end" );
 
+    tst_atomic(); return;
+    tst_ref_count_4(); return;
+    tst_ref_count_3(); return;
+    tst_ref_count_2(); return;
+    tst_ref_count_1(); return;
+    tst_ref_count(); return;
+
+    tst_shared_weak_ptr(); return;
+
+    tst_shared_ptr_1(); return;
+
+    tst_Ret_cpy_construct(); return;
+
+    tst_113(1023); return;
+
     tst_set_fun(); return ;
 
-    tst_shared_weak_ptr();
-    return ;
 
     tst_list_splice();
     return ;

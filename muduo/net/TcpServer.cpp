@@ -95,7 +95,8 @@ void TcpServer::newConnection(int sockfd, const InetAddress& peerAddr)
                                             peerAddr));
 //    LOG_INFO << "new one conn use_count=" << conn.use_count();
     connections_[connName] = conn;
-    //TcpConnection的use_count此处为2，因为加入到connections_中。
+    //TcpConnection的use_count此处为2，因为加入到connections_中
+    LOG_INFO << "insert into map use_count=" << conn.use_count();
 
     //实际TcpServer的connectionCallback等回调函数是对conn的回调函数的封装，所以在这里设置过去
     conn->setConnectionCallback(connectionCallback_);
@@ -105,12 +106,11 @@ void TcpServer::newConnection(int sockfd, const InetAddress& peerAddr)
     //将TcpServer的removeConnection设知道了TcpConnection的关闭回调函数中
     conn->setCloseCallback(boost::bind(&TcpServer::removeConnection, this, _1)); // FIXME: unsafe
 
-//    LOG_INFO << "before runInLoop new conn use_count=" << conn.use_count();
+    LOG_INFO << "before runInLoop new conn use_count=" << conn.use_count();
     //调用TcpConenction::connectEstablished函数内部会将use_count加一然后减一，此处仍为2
     //但是本函数介绍结束后conn对象会析构掉，所以引用计数为1，仅剩connections_列表中存活一个
     ioLoop->runInLoop(boost::bind(&TcpConnection::connectEstablished, conn));
-//    LOG_INFO << "after  runInLoop new conn use_count=" << conn.use_count();
-
+    LOG_INFO << "after  runInLoop new conn use_count=" << conn.use_count();
 }
 
 /*
@@ -120,7 +120,7 @@ A. 将conn从connctions里面移除
 
 B. 将connChannel从Loop中的监听队列中remove
 
-C. 在A，B的基础上你又要保证conn的生命周期，使得conn存活到B之后。
+C. 在A，B的基础上你又要保证conn的生命周期，使得conn存活到B之后
 */
 void TcpServer::removeConnection(const TcpConnectionPtr& conn) {
     // FIXME: unsafe
@@ -136,8 +136,7 @@ void TcpServer::removeConnection(const TcpConnectionPtr& conn) {
 // 7. connections_中移除conn，引用计数-1
 // 8. 执行TcpTcpConnection中connectDestroyed，将Channel指针从loop中移除
 // 在上述关闭过程中，为什么需要用到TcpServer中的函数，原因是connections_这个数据结构的存在
-// 为了维持TcpConnection的生存期，需要将ptr保存在connections_中，当tcp关闭时，
-// 也必须去处理这个数据结构
+// 为了维持TcpConnection的生存期，需要将ptr保存在connections_中，当tcp关闭时，也必须去处理这个数据结构
 void TcpServer::removeConnectionInLoop(const TcpConnectionPtr& conn)
 {
     loop_->assertInLoopThread();
@@ -154,6 +153,7 @@ void TcpServer::removeConnectionInLoop(const TcpConnectionPtr& conn)
     // 这里用boost::bind让TcpConnection的生命期长到调用connectDestroyed()的时刻
     // 使用boost::bind得到一个boost::function对象,会把conn传递进去，引用计数会加1
     EventLoop* ioLoop = conn->getLoop();
-    ioLoop->queueInLoop(boost::bind(&TcpConnection::connectDestroyed, conn));// bind延长了conn的生命期，connectDestroyed完成后，TcpConnection被析构。
+    ioLoop->queueInLoop(boost::bind(&TcpConnection::connectDestroyed, conn));
+    // bind延长了conn的生命期，connectDestroyed完成后，TcpConnection被析构
 }
 

@@ -127,9 +127,14 @@ void TcpConnection::send(const StringPiece& message)
 
 // FIXME efficiency!!!
 
-//如果 TcpConnection::send() 调用发生在该 TcpConnection 所属的那个 IO 线程，那么它会转而调用 TcpConnection::sendInLoop()，sendInLoop() 会在当前线程（也就是 IO 线程）操作 output buffer；如果 TcpConnection::send() 调用发生在别的线程，它不会在当前线程调用 sendInLoop() ，而是通过 EventLoop::runInLoop() 把 sendInLoop() 函数调用转移到 IO 线程（听上去颇为神奇？），这样 sendInLoop() 还是会在 IO 线程操作 output buffer，不会有线程安全问题。当然，跨线程的函数转移调用涉及函数参数的跨线程传递，一种简单的做法是把数据拷一份，绝对安全（不明白的同学请阅读代码）。
+// 如果 TcpConnection::send() 调用发生在该 TcpConnection 所属的那个 IO 线程，
+// 那么它会转而调用 TcpConnection::sendInLoop()，sendInLoop() 会在当前线程（也就是 IO 线程）操作 output buffer；
+// 如果 TcpConnection::send() 调用发生在别的线程，它不会在当前线程调用 sendInLoop() ，
+// 而是通过 EventLoop::runInLoop() 把 sendInLoop() 函数调用转移到 IO 线程（听上去颇为神奇？），
+// 这样 sendInLoop() 还是会在 IO 线程操作 output buffer，不会有线程安全问题。
+// 当然，跨线程的函数转移调用涉及函数参数的跨线程传递，一种简单的做法是把数据拷一份，绝对安全（不明白的同学请阅读代码）。
 
-//另一种更为高效做法是用 swap()。这就是为什么 TcpConnection::send() 的某个重载以 Buffer* 为参数，而不是 const Buffer&，这样可以避免拷贝，而用 Buffer::swap() 实现高效的线程间数据转移。（最后这点，仅为设想，暂未实现。目前仍然以数据拷贝方式在线程间传递，略微有些性能损失。）
+// 另一种更为高效做法是用 swap()。这就是为什么 TcpConnection::send() 的某个重载以 Buffer* 为参数，而不是 const Buffer&，这样可以避免拷贝，而用 Buffer::swap() 实现高效的线程间数据转移。（最后这点，仅为设想，暂未实现。目前仍然以数据拷贝方式在线程间传递，略微有些性能损失。）
 
 // 本函数的两种情况都是执行sendInLoop
 // 但是根据是否跨线程，一种是直接在本线程执行 （此时本线程就是loop线程）
