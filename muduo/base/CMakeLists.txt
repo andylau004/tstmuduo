@@ -49,6 +49,10 @@ set(base_SRCS
   common.cpp
   common.h
   timerutil.cpp
+
+    noncopyable.h
+    Singleton.h
+
   )
 
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -gdwarf-2 -Wno-deprecated -ffunction-sections -W -Wall -pthread -Wno-missing-braces -Wparentheses -std=c++11" )

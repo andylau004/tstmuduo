@@ -118,9 +118,11 @@ EventLoop::~EventLoop()
 
 //事件循环,该函数不能跨线程调用，只能在创建该对象的线程中调用
 /*
- * IO线程平时阻塞在事件循环EventLoop::loop()的poll调用中，为了让IO线程能立刻执行用户回调，需要唤醒它。传统的方法是使用管道pipe，IO线程始终监视此管道的readable事件，在需要唤醒的时候，其他线程往管道里写一个字节，这样IO线程就从IO多路复用阻塞调用中返回。linux中使用eventfd，可以更高效地唤醒，因为它不必管理缓冲区。
-
-eventfd 是一个比 pipe 更高效的线程间事件通知机制，一方面它比 pipe 少用一个 file descripor，节省了资源；另一方面，eventfd 的缓冲区管理也简单得多，全部“buffer” 只有定长8 bytes，不像 pipe 那样可能有不定长的真正 buffer。
+ * IO线程平时阻塞在事件循环EventLoop::loop()的poll调用中，为了让IO线程能立刻执行用户回调，需要唤醒它。
+ * 传统的方法是使用管道pipe，IO线程始终监视此管道的readable事件，在需要唤醒的时候，其他线程往管道里写一个字节，这样IO线程就从IO多路复用阻塞调用中返回。
+ * linux中使用eventfd，可以更高效地唤醒，因为它不必管理缓冲区。
+ * eventfd 是一个比 pipe 更高效的线程间事件通知机制，一方面它比 pipe 少用一个 file descripor，节省了资源；
+ * 另一方面，eventfd 的缓冲区管理也简单得多，全部“buffer” 只有定长8bytes，不像 pipe 那样可能有不定长的真正 buffer。
  * */
 void EventLoop::loop()
 {
@@ -132,11 +134,10 @@ void EventLoop::loop()
 
     while (!quit_)
     {
-        // 每次poll调用，就是一次重新填充activeChannels_的过程
-        // 所以这里需要清空
+        // 每次poll调用，就是一次重新填充activeChannels_的过程 所以这里需要清空
         activeChannels_.clear();
-        //调用poll获得当前活动事件的channel列表（其实是将有活动事件的fd对应的channel填入activechannels_），然后依次调用每个channel的handleEvent函数
-        // 这一步的实质是进行poll或者epoll_wait调用
+        // 调用poll获得当前活动事件的channel列表（其实是将有活动事件的fd对应的channel填入activechannels_），
+        // 然后依次调用每个channel的handleEvent函数 这一步的实质是进行poll或者epoll_wait调用
         // 根据fd的返回事件，填充对应的Channel，以准备后面执行回调处理事件
         pollReturnTime_ = poller_->poll(kPollTimeMs, &activeChannels_);
         ++iteration_;

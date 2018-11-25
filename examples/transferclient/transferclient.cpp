@@ -129,6 +129,7 @@ int  clientAddImpl() {
         oneFile.__set_file_hsh("12345");
 
         bool bSend = newClient->get_client()->SendPhoto(oneFile);
+        getchar();
 //        int iSum = newClient->get_client()->Add(99, 10);
 //        LOG_INFO << "sum=" << iSum;
     }
@@ -152,7 +153,7 @@ void tst_transfer_client_entry() {
 //    return ;
 //    std::cout << __FILE__ << ":" << __LINE__ << "  main threadid=" << muduo::CurrentThread::tid() << std::endl;
 
-//    const int max_thread_count = 3;
+//    const int max_thread_count = 1;
 //    g_pLatch.reset( new CountDownLatch(max_thread_count) );
 
 //    g_clientPool_sendfile.reset(new sendFile_ThriftConnectionPool(FLAGS_conn_max,
@@ -216,6 +217,7 @@ void tst_transfer_client_entry() {
     int addret = client.Add(444, 777);
     std::cout << "addret=" << addret << std::endl;
 
+    getchar();
     transport->close();
 
 }

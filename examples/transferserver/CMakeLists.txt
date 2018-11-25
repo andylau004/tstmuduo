@@ -29,6 +29,7 @@ add_executable(${PROJECT_NAME}
     frametransport.hpp frametransport.cpp
     processor.h processor.cpp
     testprocessor.h testprocessor.cpp
+    clientctxmgr.h clientctxmgr.cpp
 
     ex_event_handler.h ex_event_handler.cpp
     ${O_GENCPP} ${O_THRIFT_FILE}

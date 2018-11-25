@@ -25,6 +25,7 @@ add_subdirectory(tstc11)
 add_subdirectory(tsttimewheel)
 add_subdirectory(tstidleconnection_srv)
 add_subdirectory(tstbucketwheel)
+add_subdirectory(tsteventfd)
 
 
 

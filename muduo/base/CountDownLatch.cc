@@ -19,6 +19,8 @@ CountDownLatch::~CountDownLatch() {
 //    printf( "countdownlatch this=%p\n", this );
 }
 
+// latchdown之后然后调用wait.等待最后一个线程notifyAll,
+// 然后多个线程同时解除锁定就可以同时开始执行了
 void CountDownLatch::wait()
 {
     MutexLockGuard lock(mutex_);
@@ -27,7 +29,7 @@ void CountDownLatch::wait()
         condition_.wait();
     }
 }
-
+// 每个线程启动成功后就执行latchdown,最后一个线程会notifyAll
 void CountDownLatch::countDown()
 {
     MutexLockGuard lock(mutex_);
