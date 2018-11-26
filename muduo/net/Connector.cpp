@@ -38,7 +38,7 @@ Connector::~Connector()
     assert(!channel_);
 }
 
-// 实际的start的函数，因为每个channel 都需要在eventloop 的线程执行
+// 实际的start的函数，因为每个Channel都需要在eventloop线程执行
 // 当执行函数是在别的线程执行的时候，就将要执行的函数封装成函数对象，放到 eventloop 的待执行队列中
 // 然后唤醒 epoll 执行
 void Connector::start()
@@ -142,13 +142,11 @@ void Connector::connecting(int sockfd)
     setState(kConnecting);
     assert(!channel_);
 
-    // 新的channel ,他的fd 就是 sockfd 是在 startinloop 中创建的
+    // 新的channel,他的fd就是sockfd 是在 startinloop 中创建的
     // 这个 fd 就是后面的连接了
     channel_.reset(new Channel(loop_, sockfd));
-    channel_->setWriteCallback(
-                boost::bind(&Connector::handleWrite, this)); // FIXME: unsafe
-    channel_->setErrorCallback(
-                boost::bind(&Connector::handleError, this)); // FIXME: unsafe
+    channel_->setWriteCallback(boost::bind(&Connector::handleWrite, this)); // FIXME: unsafe
+    channel_->setErrorCallback(boost::bind(&Connector::handleError, this)); // FIXME: unsafe
 
     // channel_->tie(shared_from_this()); is not working,
     // as channel_ is not managed by shared_ptr
@@ -173,8 +171,7 @@ void Connector::resetChannel()
     channel_.reset();
 }
 
-// 当非阻塞的连接,可写的时候,表示连接创建了
-// 然后执行回调函数
+// 当非阻塞的连接,可写的时候,表示连接创建了 然后执行回调函数
 void Connector::handleWrite()
 {
     LOG_INFO << "Connector::handleWrite " << state_;

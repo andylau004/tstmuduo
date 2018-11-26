@@ -123,7 +123,7 @@ EventLoop::~EventLoop()
  * linux中使用eventfd，可以更高效地唤醒，因为它不必管理缓冲区。
  * eventfd 是一个比 pipe 更高效的线程间事件通知机制，一方面它比 pipe 少用一个 file descripor，节省了资源；
  * 另一方面，eventfd 的缓冲区管理也简单得多，全部“buffer” 只有定长8bytes，不像 pipe 那样可能有不定长的真正 buffer。
- * */
+ */
 void EventLoop::loop()
 {
     assert(!looping_);// 禁止重复开启loop
@@ -180,29 +180,36 @@ void EventLoop::quit()
 }
 
 /*
-1、不是简单地在临界区内依次调用Functor，而是把回调列表swap到functors中，这样一方面减小了临界区的长度（意味着不会阻塞其它线程的queueInLoop()），另一方面，也避免了死锁（因为Functor可能再次调用queueInLoop()）
+1、不是简单地在临界区内依次调用Functor，而是把回调列表swap到functors中，
+这样一方面减小了临界区的长度（意味着不会阻塞其它线程的queueInLoop()），
+另一方面，也避免了死锁（因为Functor可能再次调用queueInLoop()）
 
-2、由于doPendingFunctors()调用的Functor可能再次调用queueInLoop(cb)，这时，queueInLoop()就必须wakeup()，否则新增的cb可能就不能及时调用了
+2、由于doPendingFunctors()调用的Functor可能再次调用queueInLoop(cb)，
+这时，queueInLoop()就必须wakeup()，否则新增的cb可能就不能及时调用了
 
-3、muduo没有反复执行doPendingFunctors()直到pendingFunctors_为空而是每次poll 返回就执行一次，这是有意的，否则IO线程可能陷入死循环，无法处理IO事件。*/
+3、muduo没有反复执行doPendingFunctors()直到pendingFunctors_为空而是每次poll返回就执行一次，
+这是有意的，否则IO线程可能陷入死循环，无法处理IO事件。
+*/
 void EventLoop::queueInLoop(const Functor& cb)
 {
-    //这里增加业务逻辑是增加执行任务的函数指针的，增加的任务保存在成员变量pendingFunctors_中，这个变量是一个函数指针数组（vector对象），执行的时候，调用每个函数就可以了。
-    //上面的代码先利用一个栈变量将成员变量pendingFunctors_里面的函数指针换过来，接下来对这个栈变量进行操作就可以了，这样减少了锁的粒度。因为成员变量pendingFunctors_在增加任务的时候，也会被用到，设计到多个线程操作，所以要加锁，增加任务的地方是：
+    //这里增加业务逻辑是增加执行任务的函数指针的，增加的任务保存在成员变量pendingFunctors_中，
+    //这个变量是一个函数指针数组（vector对象），执行的时候，调用每个函数就可以了。
+    //上面的代码先利用一个栈变量将成员变量pendingFunctors_里面的函数指针换过来，接下来对这个栈变量进行操作就可以了，
+    //这样减少了锁的粒度。因为成员变量pendingFunctors_在增加任务的时候，也会被用到，设计到多个线程操作，所以要加锁，增加任务的地方是：
     {
         MutexLockGuard lock(mutex_);
         pendingFunctors_.push_back(cb);
     }
     /*
      * runInLoop的实现：需要使用eventfd唤醒的两种情况 (1) 调用queueInLoop的线程不是当前IO线程。(2)是当前IO线程并且正在调用pendingFunctor。
-     * */
+    */
     if (!isInLoopThread() || callingPendingFunctors_)
     {
         char tmpout[ 2048 ] = {0};
         sprintf( tmpout, "queueInLoop trig Functor& cb isInLoopThread: %d eventloopTid_: %d callingPendingFunctors_: %d",
                  isInLoopThread(), threadId_, //CurrentThread::tid(),
                  callingPendingFunctors_ );
-        LOG_INFO << tmpout;
+//        LOG_INFO << tmpout;
         wakeup();
     }
 }
@@ -230,6 +237,35 @@ TimerId EventLoop::runEvery(double interval, const TimerCallback& cb)
     return timerQueue_->addTimer(cb, time, interval);
 }
 
+/*
+ * 1.如果事件循环不属于当前这个线程，就不能直接调用回调函数，应该回到自己所在线程调用
+ * 2.此时需要先添加到自己的队列中存起来，然后唤醒自己所在线程的io复用函数（poll）
+ * 3.唤醒方法是采用eventfd，这个eventfd只有8字节的缓冲区，向eventfd中写入数据另poll返回
+ * 4.返回后会调用在队列中的函数，见EventLoop
+ *
+ * 举例说明什么时候会出现事件驱动循环不属于当前线程的情况
+ *      1.客户端close连接，服务器端某个Channel被激活，原因为EPOLLHUP
+ *      2.Channel调用回调函数，即TcpConnection的handleClose
+ *      3.handleClose调用TcpServer为它提供的回调函数removeConnection
+ *      4.此时执行的是TcpServer的removeConnection函数，
+ * 解释
+ *      1.因为TcpServer所在线程和TcpConnection所在的不是同一个线程
+ *      2.这就导致将TcpServer暴露给了TcpConnection所在线程
+ *      3.因为TcpServer需要将这个关闭的TcpConnection从tcp map中删除
+ *        就需要调用自己的另一个函数removeConnectionInLoop
+ *      4.为了实现线程安全性，也就是为了让removeConnectionInLoop在TcpServer自己所在线程执行
+ *        需要先把这个函数添加到队列中存起来，等到回到自己的线程在执行
+ *      5.runInLoop中的queueInLoop就是将这个函数存起来
+ *      6.而此时调用runInLoop的仍然是TcpConnection所在线程
+ *      7.因为自始至终，removeConnection这个函数都还没有结束
+ *
+ * 如果调用runInLoop所在线程和事件驱动循环线程是一个线程，那么直接调用回调函数就行了
+ *
+ * 在TcpServer所在线程中，EventLoop明明阻塞在poll上，这里为什么可以对它进行修改
+ *      1.线程相当于一个人可以同时做两件事情，一个EventLoop同时调用两个函数就很正常了
+ *      2.其实函数调用都是通过函数地址调用的，既然EventLoop可读，就一定直到内部函数的地址，自然可以调用
+ *      3.而更改成员函数，通过地址访问，进而修改，也是可以的
+ */
 void EventLoop::runInLoop(const Functor& cb)
 {
     if (isInLoopThread())

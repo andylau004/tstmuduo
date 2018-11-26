@@ -173,21 +173,50 @@ private:
     bool eventHandling_; /* atomic */
     bool callingPendingFunctors_; /* atomic */
     int64_t iteration_;
+
+    /* 创建时保存当前事件循环所在线程，用于之后运行时判断使用EventLoop的线程是否是EventLoop所属的线程 */
     const pid_t threadId_;
+    /* poll返回的时间，用于计算从激活到调用回调函数的延迟 */
     Timestamp pollReturnTime_;
+    /* io多路复用 */
     boost::scoped_ptr<Poller> poller_;
+    /* 定时器队列 */
     boost::scoped_ptr<TimerQueue> timerQueue_;
+    /* 唤醒当前线程的描述符 */
     int wakeupFd_;
     // unlike in TimerQueue, which is an internal class,
     // we don't expose Channel to client.
+    /*
+     * 用于唤醒当前线程，因为当前线程主要阻塞在poll函数上
+     * 所以唤醒的方法就是手动激活这个wakeupChannel_，即写入几个字节让Channel变为可读
+     * 注: 这个Channel也注册到Poller中
+    */
     boost::scoped_ptr<Channel> wakeupChannel_;//wakeupfd所对应的通道，该通道会纳入到poller来管理
     boost::any context_;
 
     // scratch variables
-    ChannelList activeChannels_; //Poller返回的活动通道，vector<channel*>类型
-    Channel* currentActiveChannel_; //当前正在处理的活动通道
+    /*
+     * vector<channel*>类型
+     * 激活队列，poll函数在返回前将所有激活的Channel添加到激活队列中
+     * 在当前事件循环中的所有Channel在Poller中
+    */
+    ChannelList activeChannels_;
+    /* 当前执行回调函数的Channel */
+    Channel* currentActiveChannel_;
 
     mutable MutexLock mutex_;
+    /*
+     * 等待在当前线程调用的回调函数，
+     * 原因是本来属于当前线程的回调函数会被其他线程调用时，应该把这个回调函数添加到它属于的线程中
+     * 等待它属于的线程被唤醒后调用，以满足线程安全性
+     *
+     * TcpServer::removeConnection是个例子
+     * 当关闭一个TcpConnection时，需要调用TcpServer::removeConnection，但是这个函数属于TcpServer，
+     * 然而TcpServer和TcpConnection不属于同一个线程，这就容易将TcpServer暴露给其他线程，
+     * 万一其他线程析构了TcpServer怎么办（线程不安全）
+     * 所以会调用EventLoop::runInLoop，如果要调用的函数属于当前线程，直接调用
+     * 否则，就添加到这个队列中，等待当前线程被唤醒
+     */
     std::vector<Functor> pendingFunctors_; // @GuardedBy mutex_
 };
 

@@ -449,7 +449,7 @@ private:
         {
             /* 通过缩小预留空间大小可以容纳len个数据，就缩小预留空间 */
             // move readable data to the front, make space inside buffer
-            assert(kCheapPrepend < readerIndex_);
+            assert(kCheapPrepend < readerIndex_);// 如果可以压缩的话那么就压缩
             /* 返回缓冲区数据个数，writerIndex - readerIndex */
             size_t readable = readableBytes();
             /* 将所有数据前移 */

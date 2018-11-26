@@ -53,7 +53,10 @@ Channel::~Channel()
 //从shared_ptr对象obj构造weak_ptr tie_，获得资源的观测权
 //防止shared_ptr出现循环引用
 /*
- * 当连接到来，创建一个TcpConnection对象，立刻用shared_ptr来管理，引用计数为1，在Channel中维护一个weak_ptr（tie_），将这个shared_ptr对象赋值给_tie，引用计数仍然为1。当连接关闭时，在handleEvent中，将tie_提升，得到一个shard_ptr对象，引用计数就变成了2。当shared_ptr的计数不为0时，TcpConnection不会被销毁。
+ * 1. 当连接到来，创建一个TcpConnection对象，立刻用shared_ptr来管理，引用计数为1，
+ * 在Channel中维护一个weak_ptr（tie_），将这个shared_ptr对象赋值给_tie，引用计数仍然为1。
+ * 2. 当连接关闭时，在handleEvent中，将tie_提升，得到一个shard_ptr对象，引用计数就变成了2。
+ * 当shared_ptr的计数不为0时，TcpConnection不会被销毁。
 */
 void Channel::tie(const boost::shared_ptr<void>& obj)
 {
@@ -84,7 +87,7 @@ void Channel::handleEvent(Timestamp receiveTime) {
         guard = tie_.lock();// 这里是对弱指针的一个提升
         if (guard)
         {
-            LOG_INFO << "tie_ handleEvent";
+//            LOG_INFO << "tie_ handleEvent";
             handleEventWithGuard(receiveTime);// 调用提前注册的回调函数处理读写事件
         }
     }
@@ -134,7 +137,7 @@ void Channel::handleEventWithGuard(Timestamp receiveTime)
     if (revents_ & POLLOUT)
     {
         //如果是连接状态服的socket，则writeCallback_指向Connector::handleWrite()
-        LOG_INFO << "revents_=" << revents_ << " writeCallback_";
+//        LOG_INFO << "revents_=" << revents_ << " writeCallback_";
         if (writeCallback_) writeCallback_();// 可写事件的产生 调用写的回调函数
     }
     eventHandling_ = false;

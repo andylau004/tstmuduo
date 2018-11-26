@@ -169,6 +169,7 @@ fail:
 
 int write_data() {
     int64_t ucount = 0;
+    char tmpbuffer[ 2048 ] = {0};
 
     ::sleep(3);
     int iwheel = 0;
@@ -177,20 +178,20 @@ int write_data() {
 
         int ret = ::write( g_efd, &ucount, sizeof(ucount) );
         if (ret < 0 ) {
-            printf( "write data failed!!! sizeof(ucount)=%d g_efd=%d errCode=%s ret=%d\n",
-                    sizeof(ucount), g_efd, strerror_tl(errno), ret );
+            sprintf( tmpbuffer, "write data failed!!! sizeof(ucount)=%d g_efd=%d errCode=%s ret=%d",
+                     sizeof(ucount), g_efd, strerror_tl(errno), ret );
+            LOG_ERROR << tmpbuffer;
             return -1;
         } else {
             struct timeval tv;
             gettimeofday(&tv, NULL);
 
-            printf( "success write to efd, write %d bytes(%llu) at %lds %ldus\n",
-                    ret, ucount, tv.tv_sec, tv.tv_usec );
+            sprintf( tmpbuffer, "success write to efd, write %d bytes(%llu) at %lds %ldus",
+                     ret, ucount, tv.tv_sec, tv.tv_usec );
+            LOG_INFO << tmpbuffer;
         }
 
-        iwheel ++;
-
-        if (iwheel>0 && (iwheel % 2) == 0) {
+        if (iwheel ++ && iwheel>0 && (iwheel % 2) == 0) {
             ::sleep(10);
         }
 
@@ -203,6 +204,7 @@ void OnReadSignal(evutil_socket_t fd, short which, void * v) {
 //        return;
     }
 //    printf( "fd=%d recv signal\n", fd );
+    char tmpbuffer[ 2048 ] = {0};
 
     int64_t recvI64 = -1;
     int ret = ::read(fd, &recvI64, sizeof(recvI64));
@@ -210,8 +212,9 @@ void OnReadSignal(evutil_socket_t fd, short which, void * v) {
         perror("OnReadSignal read fail:\n");
         return;
     } else {
-        printf("OnReadSignal success read from efd, read ret=%d count=(%llu)\n",
-               ret, recvI64);
+        sprintf(tmpbuffer, "OnReadSignal success read from efd, read ret=%d count=(%llu)",
+                ret, recvI64);
+        LOG_INFO << tmpbuffer;
     }
 
 }
@@ -259,6 +262,7 @@ int libevent_impl_eventfd() {
 // eventfd 绑定epoll事件，等待触发读
 int tst_epoll_eventfd() {
     OutputDbgInfo tmp( "tst_epoll_eventfd beg", "tst_epoll_eventfd end" );
+    char tmpbuffer[ 2048 ] = {0};
 
     uint64_t ucount = 0;
     pthread_t tid = 0;
@@ -276,18 +280,19 @@ int tst_epoll_eventfd() {
 
         ret = ::write( g_efd, &ucount, sizeof(ucount) );
         if (ret < 0 ) {
-            printf( "write data failed!!!\n" );
+            LOG_ERROR << "write data failed!!!";
             return -1;
         } else {
             struct timeval tv;
             gettimeofday(&tv, NULL);
 
-            printf("success write to efd, write %d bytes(%llu) at %lds %ldus\n",
-                   ret, ucount, tv.tv_sec, tv.tv_usec);
+            sprintf(tmpbuffer,"success write to efd, write %d bytes(%llu) at %lds %ldus\n",
+                    ret, ucount, tv.tv_sec, tv.tv_usec);
+            LOG_INFO << tmpbuffer;
         }
         ::sleep(5);
     }
-    printf( "main thread is work done!!!\n" );
+    LOG_INFO << ( "main thread is work done!!!\n" );
 
 failed:
     if (tid > 0) {
