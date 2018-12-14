@@ -27,6 +27,8 @@
 #include "muduo/base/libevent.h"
 
 #include "muduo/net/TcpServer.h"
+#include "muduo/base/CountDownLatch.h"
+
 
 
 using namespace std;
@@ -232,18 +234,53 @@ void tst_shared_weak_ptr() {
     std::cout << " sp1 count=" << sp1.use_count() << std::endl;
 }
 
-int tst_idleconnection_srv_entry(int argc, char *argv[]) {
-    EventLoop loop;
+#include <thread>         // std::thread, std::this_thread::yield
 
+boost::shared_ptr<muduo::CountDownLatch>    g_pLatch = nullptr;
+
+
+void WorkThread(boost::weak_ptr<muduo::CountDownLatch>& in_param) {
+    if (in_param.expired()) {
+        LOG_INFO << "in_param.expired return";
+        return;
+    }
+
+    EventLoop loop;
     InetAddress listenAddr(2007);
     int idleSeconds = 10;
-    if (argc > 1) {
-        idleSeconds = atoi(argv[1]);
-    }
+//    if (argc > 1) {
+//        idleSeconds = atoi(argv[1]);
+//    }
 
     EchoServer server(&loop, listenAddr, idleSeconds);
     server.start();
     loop.loop();
+
+//    in_param->countDown();
+    LOG_INFO << " work thread done";
+}
+
+int tst_idleconnection_srv_entry(int argc, char *argv[]) {
+//    g_pLatch.reset( new muduo::CountDownLatch );
+
+//    std::thread tWork(&WorkThread, g_pLatch);
+
+//    g_pLatch->wait();
+
+
+    EventLoop loop;
+    InetAddress listenAddr(2007);
+    int idleSeconds = 10;
+//    if (argc > 1) {
+//        idleSeconds = atoi(argv[1]);
+//    }
+
+    EchoServer server(&loop, listenAddr, idleSeconds);
+    server.start();
+    loop.loop();
+
+
+    LOG_INFO << "main process done";
     return 0;
 }
 

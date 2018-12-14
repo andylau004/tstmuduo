@@ -140,6 +140,7 @@ public:
         : loop_(loop),
           server_(loop, listenAddr, "testserver")
     {
+        server_.setThreadNum(2);
 
         server_.setConnectionCallback(
                     boost::bind(&CTestServer::onConnection, this, _1) );
@@ -162,7 +163,7 @@ public:
             message_ += line.substr(i, 72) + '\n';
         }
         message_ = "12345";
-        server_.setThreadNum(1);
+
 //        printf("message_=%s\n", message_.c_str());
 
 //        exit(1);
@@ -179,7 +180,6 @@ public:
     }
 private:
     void onConnection(const TcpConnectionPtr& conn) {
-
         if (conn->connected()) {
 //            printf("onConnection(): new connection [%s] from %s\n",
 //                   conn->name().c_str(),
@@ -219,8 +219,8 @@ private:
 
 };
 
+//
 void tst_Tcp_server1() {
-    LOG_INFO << "pid = " << getpid() << ", tid = " << CurrentThread::tid();
 
     InetAddress listenAddr(8888);
     EventLoop loop;
@@ -698,7 +698,7 @@ return;
 
 
     {
-        uint64_t newFileCode = 7755548965449811111222;
+        uint64_t newFileCode = 7755548965;
 
         std::string str_newCode = convert<std::string>(newFileCode+1);
         std::cout << "str_newCode=" << str_newCode <<  std::endl;
@@ -954,8 +954,8 @@ protected:
 template <class T>
 void test_size(T t)
 {
-    int a[std::tuple_size<T>::value]; // 可在编译时
-    std::cout << "test_size=" << std::tuple_size<T>::value << '\n'; // 或在运行时使用
+//    int a[std::tuple_size<T>::value]; // 可在编译时
+//    std::cout << "test_size=" << std::tuple_size<T>::value << '\n'; // 或在运行时使用
 }
 
 class CQuerySystemHelp_SqlHelper : public AbstractSqlHelper<int, std::map<std::string, std::string> > {
@@ -1149,7 +1149,11 @@ int main(int argc, char *argv[])
 {
     std::setlocale(LC_ALL, "en_US.utf8");
     Logger::setLogLevel(Logger::DEBUG);
-//    LOG_INFO << "pid = " << getpid() << ", tid = " << CurrentThread::tid();
+    LOG_INFO << "pid = " << getpid() << ", tid = " << CurrentThread::tid();
+
+    tst_Tcp_server1(); return 1;
+
+
     tst_str_2(); return 1;
 
     tst_tuple_2(); return 1;
@@ -1219,7 +1223,6 @@ int main(int argc, char *argv[])
     printf( "no define SO_REUSEPORT\n" );
 #endif
 
-    tst_Tcp_server1(); return 1;
 
 }
 

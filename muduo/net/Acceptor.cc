@@ -51,6 +51,7 @@ Acceptor::~Acceptor()
 
 void Acceptor::listen()//构造函数和listen()执行创建TCP服务端的传统步骤 socket bind listen
 {
+    LOG_INFO << "Acceptor::listen is execute";
     loop_->assertInLoopThread();
     listenning_ = true;
     acceptSocket_.listen();
@@ -70,10 +71,9 @@ void Acceptor::handleRead()//当epoll监听到listenfd时，开始执行此回�
 //        LOG_TRACE << "Accepts of " << hostport;
         //这里的回调函数 newConnectionCallback 是在 Acceptor::setNewConnectionCallback(newConnectionCallback) 指定的，
         //TcpServer构造时 new 一个 Acceptor 后，会通过这个函数指定回调函数为 TcpServer::newConnection(int sockfd, const InetAddress& peerAddr)
-        /* 接受完连接后回调 newConnectionCallback_
-         * 传回connfd，创建TcpConnection 再将连接分配给其他线程 */
+        //接受完连接后回调 newConnectionCallback_ 传回connfd，创建TcpConnection 再将连接分配给其他线程
         if (newConnectionCallback_) {
-            newConnectionCallback_(connfd, peerAddr);
+            newConnectionCallback_(connfd, peerAddr);// 这里调用TcpServer::newConnection()函数
         }
         else {
             sockets::close(connfd);

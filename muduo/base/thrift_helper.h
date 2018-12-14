@@ -45,6 +45,10 @@
 #include <thrift/TProcessor.h>
 
 
+using namespace apache::thrift;
+using namespace apache::thrift::transport;
+using namespace apache::thrift::protocol;
+
 //NET_NAMESPACE_BEGIN
 
 // 用来判断thrift是否已经连接，包括两种情况：
@@ -498,6 +502,32 @@ void CThriftServerHelper<ThriftHandler, ServiceProcessor, ProtocolFactory>::init
     // 不要调用_server->run()，交给serve()来调用，
     // 因为一旦调用了run()后，调用线程或进程就被阻塞了。
 }
+
+
+//序列化
+template<typename T>
+void object2String(const T &object, string &buf)
+{
+    boost::shared_ptr<transport::TMemoryBuffer> membuffer(new transport::TMemoryBuffer());
+    boost::shared_ptr<protocol::TProtocol> protocol(new protocol::TBinaryProtocol(membuffer));
+    object.write(protocol.get());
+    buf.clear();
+    buf = membuffer->getBufferAsString();
+}
+
+//反序列化
+template<typename T>
+void string2object(const string &buf, T &object)
+{
+    uint8_t *p = (uint8_t *)(buf.data());
+    uint32_t size = buf.size();
+    boost::shared_ptr<transport::TMemoryBuffer> membuffer(new transport::TMemoryBuffer(p,size));
+    boost::shared_ptr<protocol::TProtocol> protocol(new protocol::TBinaryProtocol(membuffer));
+    object.read(protocol.get());
+}
+
+
+
 
 //NET_NAMESPACE_END
 #endif // MOOON_NET_THRIFT_HELPER_H

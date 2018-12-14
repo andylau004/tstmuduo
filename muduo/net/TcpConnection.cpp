@@ -145,11 +145,13 @@ void TcpConnection::send(Buffer* buf)
     {
         if (loop_->isInLoopThread())
         {
+            LOG_INFO << ( "loop_->isInLoopThread()" );
             sendInLoop(buf->peek(), buf->readableBytes());
             buf->retrieveAll();
         }
         else
         {
+            LOG_INFO << ( "not loop_->isInLoopThread()" );
             loop_->runInLoop(
                         boost::bind(&TcpConnection::sendInLoop,
                                     this,     // FIXME
@@ -172,6 +174,8 @@ void TcpConnection::sendInLoop(const StringPiece& message)
  */
 void TcpConnection::sendInLoop(const void* data, size_t len)
 {
+    LOG_INFO << "sendInLoop len=" << len;
+
     loop_->assertInLoopThread();
     ssize_t nwrote = 0;
     /* 没有写入tcp缓冲区的字节数 */
@@ -385,7 +389,9 @@ void TcpConnection::stopReadInLoop()
     }
 }
 
-//TcpServer::newConnection() 创建完 TcpConnection 对象，设置好回调函数之后调用的，主要是调用 Channel::enableReading() 将 TcpConnection 对应的 sockfd 注册读事件，然后执行用户指定的 connectionCallback_() ，并将 TcpConnection 状态置为 kConnected。
+//TcpServer::newConnection() 创建完 TcpConnection 对象，设置好回调函数之后调用的，
+//主要是调用 Channel::enableReading() 将 TcpConnection 对应的 sockfd 注册读事件，
+//然后执行用户指定的 connectionCallback_() ，并将 TcpConnection 状态置为 kConnected。
 //这个函数如何被执行呢？ Acceptor 持有的 fd 有可读事件发生，
 //即有连接请求，此时Channel::handleEvent() -> Acceptor::handleRead() -> TcpServer::newConnection() -> …… ->TcpConnection::connectEstablished()
 //中间省略的部分是线程转移，转移到TcpConnection 所在的 IO 线程执行，TcpServer 和 TcpConnection 可能不在同一线程。
@@ -404,8 +410,12 @@ void TcpConnection::connectEstablished()
     //shared_from_this()之后引用计数+1，为3，但是shared_from_this()是临时对象，析构后又会减一，
     //而tie是weak_ptr并不会改变引用计数，所以该函数执行完之后引用计数不会更改
     channel_->tie(shared_from_this());
-    channel_->enableReading();//一旦连接成功就关注它的可读事件，加入到Poller中关注
+    // 对于新建连接的socket描述符，还需要设置期望监控的事件（POLLIN | POLLPRI），
+    // 并且将此socket描述符放入poll函数的监控描述符集合中，用于等待接收客户端从此连接上发送来的消息
+    // 这些工作，都是由TcpConnection::connectEstablished函数完成。
+    channel_->enableReading();
 
+    // 此函数对应TcpServer::connectionCallback_,最终指向一个用户服务器定义的回调函数
     connectionCallback_(shared_from_this());
 }
 
@@ -466,21 +476,21 @@ void TcpConnection::handleRead(Timestamp receiveTime)
     }
 }
 
-// 内核发送缓冲区有空间了，回调该函数
+//内核发送缓冲区有空间了，回调该函数
 //send 一系列函数是可以用户或者其他线程调用，用于发送信息。
 //如果不是在IO线程，它会把实际工作转移到IO线程调用。
-//首先检查 TcpConnection 对应的 Socket 是否注册了可写事件，若注册了可写事件表明输出缓冲区 outputBuffer_中已经有数据等待发送，为了保证不乱序，这次的数据只要追加到输出缓冲区中，通过 Channel::handleEvent() -> TcpConnection::handleWrite() 来发送。
-//如果Socket没有注册可写事件，输出缓冲区没有数据，那么这次的消息可以直接通过 write 发送，如果没有一次性发送完毕，那么 message 剩余的数据仍然要 append 到 outputBuffer 中，并向 Poller 注册可写事件，
-//当 socket 变得可写时，Channel 会调用 TcpConnection::handleWrite() 来发送 outputBuffer_ 中堆积的数据，发送完毕后立刻停止监听可写事件，避免 busy loop。无论是 sendInLoop() -> write() 还是 Channel::handleEvent() -> handleWrite() ，只要确定发送完 message 或者 outputBuffer_ 中的数据，那么都要调用用户指定的回调 writeCompleteCallback() 。
+//首先检查 TcpConnection 对应的 Socket 是否注册了可写事件，若注册了可写事件表明输出缓冲区 outputBuffer_中已经有数据等待发送，
+//为了保证不乱序，这次的数据只要追加到输出缓冲区中，通过 Channel::handleEvent() -> TcpConnection::handleWrite() 来发送。
+//如果Socket没有注册可写事件，输出缓冲区没有数据，那么这次的消息可以直接通过 write 发送，
+//如果没有一次性发送完毕，那么 message 剩余的数据仍然要 append 到 outputBuffer 中，并向 Poller 注册可写事件，
+//当 socket 变得可写时，Channel 会调用 TcpConnection::handleWrite() 来发送 outputBuffer_ 中堆积的数据，发送完毕后立刻停止监听可写事件，避免 busy loop。无论是 sendInLoop() -> write() 还是 Channel::handleEvent() -> handleWrite()，只要确定发送完 message 或者 outputBuffer_ 中的数据，那么都要调用用户指定的回调 writeCompleteCallback() 。
 void TcpConnection::handleWrite()
 {
     loop_->assertInLoopThread();
     if (channel_->isWriting())
     {
         /* 尝试写入写缓冲区的所有数据，返回实际写入的字节数（tcp缓冲区很有可能仍然不能容纳所有数据） */
-        ssize_t n = sockets::write(channel_->fd(),
-                                   outputBuffer_.peek(),
-                                   outputBuffer_.readableBytes());
+        ssize_t n = sockets::write(channel_->fd(), outputBuffer_.peek(), outputBuffer_.readableBytes());
 //        LOG_INFO << "handleWrite writelen=" << n;
         if (n > 0)
         {
@@ -488,8 +498,8 @@ void TcpConnection::handleWrite()
             if (outputBuffer_.readableBytes() == 0)// 应用层发送缓冲区已清空
             {
                 channel_->disableWriting();// 停止关注POLLOUT事件，以免出现busy loop
-                if (writeCompleteCallback_)
-                {// 应用层发送缓冲区被清空，就回调用writeCompleteCallback_
+                if (writeCompleteCallback_)// 应用层发送缓冲区被清空，就回调用writeCompleteCallback_
+                {
                     loop_->queueInLoop(boost::bind(writeCompleteCallback_, shared_from_this()));
                 }
                 /*

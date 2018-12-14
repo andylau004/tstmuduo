@@ -90,28 +90,9 @@ typedef  sendFile_ThriftConnectionPool::TThriftConnection  one_sendFile_ThriftCo
 extern int  clientAddImpl();
 
 
-// 传输二进制文件给服务器(transferserver) 客户端程序
-class PhotoHandler : virtual public PhotoIf {
-public:
-    PhotoHandler() {
-        // Your initialization goes here
-    }
-
-    bool SendPhoto(const OneFile& onefile) {
-        // Your implementation goes here
-        printf("SendPhoto Recv Onefile\n");
-        std::cout << "fileName=" << onefile.name << std::endl;
-        std::cout << "file_size=" << onefile.file_size << std::endl;
-
-        return true;
-    }
-
-};
-
-
 
 int  clientAddImpl() {
-    OutputDbgInfo tmpOut( /*strTid +*/ " clientAddImpl beg---------", /*strTid +*/ " clientAddImpl end---------" );
+    OutputDbgInfo tmpOut(" clientAddImpl beg---------", /*strTid +*/ " clientAddImpl end---------" );
 
     uint32_t uSrvIp = ErasureUtils::str2ip("172.17.0.2");
     boost::shared_ptr<one_sendFile_ThriftConn> newClient = g_clientPool_sendfile->get_connection( uSrvIp, 9900 );
@@ -145,8 +126,76 @@ int  clientAddImpl_2( int ival ) {
     UNUSED(ival);
     return clientAddImpl();
 }
+
+// 测试单个客户端登录功能
+void tst_single_client_fun() {
+    boost::shared_ptr<TSocket> clientSock(new TSocket("172.17.0.2", 9900));
+
+    //设置发送、接收、连接超时
+    clientSock->setConnTimeout(2000 * 100000);
+    clientSock->setRecvTimeout(2000 * 100000);
+    clientSock->setSendTimeout(2000 * 100000);
+/*
+    // 对接nonblockingServer时必须的，
+    // 对普通server端时用boost::shared_ptr<TTransport> transport(new TBufferedTransport(socket));
+//    boost::shared_ptr<TTransport> transport(new THttpClient(clientSock, "192.168.32.19", ""));
+//    boost::shared_ptr<TTransport>  t(new TBufferedTransport(clientSock, 10240, 10240));
+    boost::shared_ptr<TTransport>  transport(new TFramedTransport(clientSock, 10240, 10240));
+//    boost::shared_ptr<TTransport>  transport(new TBufferedTransport(clientSock, 10240, 10240));
+    boost::shared_ptr<THttpClient> http(new THttpClient(transport, "www.zzzyyy.com", "/"));
+    //
+    boost::shared_ptr<TProtocol>   send_prot(new TBinaryProtocol(http));
+*/
+    boost::shared_ptr<TTransport>  transport(new TFramedTransport(clientSock, 10240, 10240));
+    boost::shared_ptr<TProtocol>   send_prot(new TBinaryProtocol(transport));
+    transport->open();
+
+    PhotoClient client(send_prot);
+
+    OneFile oneFile;
+    const char* lpszFile = "./CMakeCache.txt";
+
+    unsigned int ulFileSize = GetFileSize(lpszFile);
+    LOG_INFO << "ulFileSize=" << ulFileSize;
+//    std::cout << "GetFileContent_string=" << GetFileContent_string(lpszFile) << std::endl;
+
+    oneFile.__set_name(lpszFile);
+    oneFile.__set_file_buffer(GetFileContent_string(lpszFile));
+    oneFile.__set_file_size(ulFileSize);
+    oneFile.__set_file_hsh("12345");
+
+    bool bSend = client.SendPhoto(oneFile);
+    LOG_INFO << "bsend=" << bSend;
+
+    int addret = client.Add(444, 777);
+    LOG_INFO << "addret=" << addret;
+
+    for ( int i = 0 ; i < 3; ++i ) {
+        LoginParam inparam_login;
+        LoginResult ret_login;
+
+        client.login_im(ret_login, inparam_login);
+        LOG_INFO << "logcount=" << i+1 << ", ret_login sessionID=" << ret_login.sessionID;
+    }
+//    client.send_SendEmptyRequest();
+
+    SendEmptyRequestReq reqEmptyRequest;
+    reqEmptyRequest.__set_sessionID( 3 );
+
+    LOG_INFO << "before SendEmptyRequest";
+    client.SendEmptyRequest(reqEmptyRequest);
+    printXto_console("send kEmptyRequest args=", reqEmptyRequest);
+    LOG_INFO << "after SendEmptyRequest";
+
+//    getchar();
+    transport->close();
+}
+
 void tst_transfer_client_entry() {
     OutputDbgInfo tmpOut( "tst_transfer_client_entry begin", "tst_transfer_client_entry end" );
+
+    tst_single_client_fun();
+
 
 //    std::cout << std::endl;
 //    std::cout << __FILE__ << ":" << __LINE__ << "  createContext" << std::endl;
@@ -173,52 +222,6 @@ void tst_transfer_client_entry() {
 //    g_pLatch->wait();
 //    std::cout << "all work Done!!!" << std::endl;
 //    return;
-
-
-    boost::shared_ptr<TSocket> clientSock(new TSocket("172.17.0.2", 9900));
-
-    //设置发送、接收、连接超时
-    clientSock->setConnTimeout(2000 * 100000);
-    clientSock->setRecvTimeout(2000 * 100000);
-    clientSock->setSendTimeout(2000 * 100000);
-
-/*
-    // 对接nonblockingServer时必须的，
-    // 对普通server端时用boost::shared_ptr<TTransport> transport(new TBufferedTransport(socket));
-//    boost::shared_ptr<TTransport> transport(new THttpClient(clientSock, "192.168.32.19", ""));
-//    boost::shared_ptr<TTransport>  t(new TBufferedTransport(clientSock, 10240, 10240));
-    boost::shared_ptr<TTransport>  transport(new TFramedTransport(clientSock, 10240, 10240));
-//    boost::shared_ptr<TTransport>  transport(new TBufferedTransport(clientSock, 10240, 10240));
-    boost::shared_ptr<THttpClient> http(new THttpClient(transport, "www.zzzyyy.com", "/"));
-    //
-    boost::shared_ptr<TProtocol>   send_prot(new TBinaryProtocol(http));
-*/
-    boost::shared_ptr<TTransport>  transport(new TFramedTransport(clientSock, 10240, 10240));
-    boost::shared_ptr<TProtocol>   send_prot(new TBinaryProtocol(transport));
-    transport->open();
-
-    PhotoClient client(send_prot);
-
-    OneFile oneFile;
-    const char* lpszFile = "./CMakeCache.txt";
-
-    unsigned int ulFileSize = GetFileSize(lpszFile);
-    std::cout << "ulFileSize=" << ulFileSize << std::endl;
-//    std::cout << "GetFileContent_string=" << GetFileContent_string(lpszFile) << std::endl;
-
-    oneFile.__set_name(lpszFile);
-    oneFile.__set_file_buffer(GetFileContent_string(lpszFile));
-    oneFile.__set_file_size(ulFileSize);
-    oneFile.__set_file_hsh("12345");
-
-    bool bSend = client.SendPhoto(oneFile);
-    std::cout << "bsend=" << bSend << std::endl;
-
-    int addret = client.Add(444, 777);
-    std::cout << "addret=" << addret << std::endl;
-
-    getchar();
-    transport->close();
 
 }
 

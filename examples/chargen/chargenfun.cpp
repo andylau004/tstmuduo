@@ -128,7 +128,7 @@ ChargenServer::ChargenServer(EventLoop* loop,
     server_.setWriteCompleteCallback(
                 boost::bind(&ChargenServer::onWriteComplete, this, _1) );
     if (print) {
-        loop->runEvery(3.0, boost::bind(&ChargenServer::printThroughput, this) );
+        loop->runEvery( 3.0, boost::bind(&ChargenServer::printThroughput, this) );
     }
 
     string line;
@@ -137,15 +137,20 @@ ChargenServer::ChargenServer(EventLoop* loop,
         line.push_back(char(i));
     }
     line += line;
+    LOG_INFO << "size=" << line.size() << ", line=" << line;
+
     for (size_t i = 0; i < 127-33; ++i)
     {
+//        LOG_INFO << "line.substr(i, 72)=" << line.substr(i, 72);
         message_ += line.substr(i, 72) + '\n';
     }
+    LOG_INFO << "message_.size()=" << message_.size();
 }
+
 void ChargenServer::start() { server_.start(); }
 
 void ChargenServer::onConnection(const TcpConnectionPtr& conn) {
-    LOG_INFO << "ChargenServer - " << conn->peerAddress().toIpPort() << " -> "
+    LOG_INFO << "ChargenServer - client_ip: " << conn->peerAddress().toIpPort() << " -> listen: "
              << conn->localAddress().toIpPort() << " is "
              << (conn->connected() ? "UP" : "DOWN");
     if (conn->connected())
@@ -165,16 +170,18 @@ void ChargenServer::onMessage(const TcpConnectionPtr& conn,
 void ChargenServer::onWriteComplete(const TcpConnectionPtr& conn)
 {
     transferred_ += message_.size();
-    conn->send(message_);
+//    conn->send(message_);
 }
 
 void ChargenServer::printThroughput()
 {
     char tmpbuffer[2048] = {0};
     Timestamp endTime = Timestamp::now();
+
     double time = timeDifference(endTime, startTime_);
     sprintf(tmpbuffer, "%4.3f MiB/s", static_cast<double>(transferred_)/time/1024/1024);
     LOG_INFO << tmpbuffer;
+
     transferred_ = 0;
     startTime_ = endTime;
 }

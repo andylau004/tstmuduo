@@ -72,7 +72,7 @@ void TcpServer::newConnection(int sockfd, const InetAddress& peerAddr)
     loop_->assertInLoopThread();
 
     EventLoop* ioLoop = threadPool_->getNextLoop();
-    LOG_INFO << "ioLoop->threadId_=" << ioLoop->IoEventLoopTid();// << ", CurTid=" << CurrentThread::tid();
+    LOG_INFO << "post ioLoop->threadId_=" << ioLoop->IoEventLoopTid();// << ", CurTid=" << CurrentThread::tid();
 
     char buf[64];
     snprintf(buf, sizeof buf, "-%s#%d", ipPort_.c_str(), nextConnId_); //端口+连接id

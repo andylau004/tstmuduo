@@ -584,6 +584,22 @@ static inline void ext_executeCleanupBlock(__strong ext_cleanupBlock_t *block) {
 
 
 
+#define UNIQUE_LOCK_EX(oneMtx)  boost::unique_lock<boost::mutex> tmpMtx(oneMtx);
+
+
+
+#include "muduo/base/Logging.h"
+
+template <class T>
+void printXto_console(const char* lpszPrefix, T& x) {
+    std::ostringstream stream;
+    x.printTo(stream);
+//    printf( "tostrings=%s\n", stream.str().c_str() );
+    LOG_INFO << lpszPrefix << " tostrings=" << stream.str().c_str();
+}
+
+
+
 
 
 

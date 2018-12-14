@@ -49,15 +49,17 @@ void EventLoopThreadPool::start(const ThreadInitCallback& cb)
     // 禁止跨线程，必须在baseLoop所在线程内开启线程池
     baseLoop_->assertInLoopThread();
 
-    printf("cb=%p\n", &cb);
+//    printf("cb=%p\n", &cb);
     started_ = true;
 
     for (int i = 0; i < numThreads_; ++i)
     {
         char buf[name_.size() + 32];
         snprintf(buf, sizeof buf, "%s%d", name_.c_str(), i);
+
         EventLoopThread* t = new EventLoopThread(cb, buf);
         threads_.push_back(t);
+
         // 开启线程，开启EventLoop
         loops_.push_back(t->startLoop());
     }

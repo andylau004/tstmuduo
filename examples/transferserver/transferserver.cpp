@@ -84,6 +84,9 @@ public:
         // Your initialization goes here
     }
 
+    virtual void login_im(LoginResult& _return, const LoginParam& param) {
+
+    }
     virtual bool SendPhoto(const OneFile& onefile) {
         // Your implementation goes here
         printf("SendPhoto Recv Onefile\n");
@@ -97,6 +100,9 @@ public:
     virtual int32_t Add(const int32_t add1, const int32_t add2) {
         return (add1 + add2);
 //        return 1;
+    }
+    void SendEmptyRequest(const SendEmptyRequestReq& req) {
+
     }
 };
 

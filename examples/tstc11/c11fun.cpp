@@ -394,8 +394,136 @@ void tst_atomic( ) {
     std::cout << "g_ucount = " << g_ucount << std::endl;
 }
 
+// --------------------------------------------------------
+// 测试左值 右值
+void process_val(int& in_val) {
+    std::cout << "leftVal Process=" << in_val << std::endl;
+}
+void process_val(int&& in_val) {
+    std::cout << "rightVal Process=" << in_val << std::endl;
+}
+void tst_rval_lval() {
+    int a = 0;
+    process_val(a);
+    process_val(1);
+}
+// --------------------------------------------------------
+
+// --------------------------------------------------------
+// 测试移动语义
+const int max_arry_size = 500;
+class CTestMove {
+public:
+    CTestMove& operator=(const CTestMove& other) {
+        LOG_INFO << "assign constructor";
+        if (i_array==nullptr) {
+            i_array = new int[max_arry_size];
+        }
+//        LOG_INFO << "this.i_array=" << this->i_array << ", other.i_array=" << other.i_array;
+        memset(i_array, 0, max_arry_size*sizeof(int));
+        memcpy(i_array, other.i_array, max_arry_size*sizeof(int));
+        return *this;
+    }
+public:
+    int* i_array = nullptr;
+public:
+    CTestMove() : i_array( new int[max_arry_size] {1, 2, 3, 4} ) {
+        LOG_INFO << "default constructor, this=" << this << ", i_array=" << i_array;
+    }
+    CTestMove(const CTestMove& other) {
+        LOG_INFO << "copy constructor, this=" << this << ", other=" << &other;
+        if (i_array==nullptr) {
+            i_array = new int[max_arry_size];
+        }
+//        LOG_INFO << "this.i_array=" << this->i_array << ", other.i_array=" << other.i_array;
+        memset(i_array, 0, max_arry_size*sizeof(int));
+        memcpy(i_array, other.i_array, max_arry_size*sizeof(int));
+    }
+    CTestMove(CTestMove&& t) : i_array(t.i_array) {
+        this->i_array = t.i_array;
+        LOG_INFO << "move    constructor, this=" << this << ", i_array=" << this->i_array;
+        t.i_array = nullptr;
+    }
+    ~CTestMove() {
+        LOG_INFO << "~destructor, this=" << this;
+        if (i_array) {
+            LOG_INFO << "delete i_arrry=" << this->i_array;
+            delete []i_array;
+        }
+    }
+    void PrintInfo() {
+    }
+};
+void tst_mov_yuyi() {
+//    CTestMove t1;
+//    CTestMove t2 = t1;
+
+    CTestMove t1;
+    CTestMove duplicated( std::move(t1) );
+    LOG_INFO << "t1.i_array=" << t1.i_array;
+    LOG_INFO << "duplicated.i_array=" << duplicated.i_array;
+}
+
+CTestMove CreateNewTest() {
+    OutputDbgInfo tmpout( "----------------CreateNewTest beg----------------", "----------------CreateNewTest end----------------" );
+    CTestMove onetm;
+    return onetm;
+}
+
+// --------------------------------------------------------
+
+class A
+{
+public:
+    A() : array(new int[3]{1, 2, 3})
+    {
+    }
+    ~A()
+    {
+        if(nullptr != array)
+        {
+            delete [] array;
+        }
+    }
+    A(const A& a)
+    {
+        std::cout << "Copy Construct" << endl;
+    }
+public:
+    int *array{nullptr};
+};
+
+void tst_move_1() {
+    std::string str = "hello";
+    std::vector < std::string > v;
+    v.push_back(str);
+    std::cout << "After copy, str is \"" << str << "\"\n";
+
+    v.push_back(std::move(str));
+    std::cout << "After copy, str is \"" << str << "\"\n";
+    std::cout << "The contents of the vector are \"" << v[0] << "\", \"" << v[1] << "\"\n";
+}
+
+void recvCall(const char* pfnName) {
+    std::cout << "fname=" << pfnName << std::endl;
+}
+
+#define NOTIFY_PROCESS(fname, customParam) \
+    recvCall(#fname);
+
 void tst_c11fun_entry() {
     OutputDbgInfo tmpOut( "tst_c11fun_entry begin", "tst_c11fun_entry end" );
+
+    NOTIFY_PROCESS(tstrecvfname__call, 123);
+    return;
+
+    tst_mov_yuyi();  return ;
+
+    tst_move_1();
+    return;
+
+
+    tst_rval_lval(); return ;
 
     tst_atomic(); return;
     tst_ref_count_4(); return;

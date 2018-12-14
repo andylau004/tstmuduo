@@ -37,8 +37,8 @@ project(tstsrv)
 #    )
 set(EXECUTABLE_OUTPUT_PATH ../../)
 
-add_executable(tstsrv main.cpp parent.cpp child.cpp pubhead.h pubhead.cpp stockfactory.cpp booststockfactory.cpp)
-target_link_libraries(tstsrv muduo_base muduo_net rt boost_thread boost_system  boost_filesystem)
+add_executable( ${PROJECT_NAME}  main.cpp parent.cpp child.cpp pubhead.h pubhead.cpp stockfactory.cpp booststockfactory.cpp)
+target_link_libraries( ${PROJECT_NAME}  muduo_base muduo_net rt boost_thread boost_system  boost_filesystem)
 
 
 
