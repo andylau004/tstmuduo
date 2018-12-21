@@ -28,7 +28,10 @@ add_subdirectory(tstbucketwheel)
 add_subdirectory(tsteventfd)
 add_subdirectory(chargen)
 
+add_subdirectory(tst_libeventsrv)
 
+add_subdirectory(tst_et)
+add_subdirectory(tst_lt)
 
 
 #add_subdirectory(${CMAKE_SOURCE_DIR}/thirdpart/rapidjson)

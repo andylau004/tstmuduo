@@ -17,6 +17,8 @@ aux_source_directory(../gen-cpp O_GENCPP)
 
 add_executable(${PROJECT_NAME}
     ../thrift-file/transfer.thrift
+#    ../thrift-file/dervie.thrift
+
     transferserver.h transferserver.cpp
     server.hpp server.cpp
     common_stucts.hpp common_stucts.cpp

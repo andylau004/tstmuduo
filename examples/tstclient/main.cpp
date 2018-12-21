@@ -91,10 +91,10 @@ private:
             std::string strMsg = "abcdefg";
             conn->send( strMsg.c_str(), strMsg.size() );
 
-            exit(-1);
-            return;
+//            exit(-1);
+//            return;
 
-            conn->shutdown();
+//            conn->shutdown();
         }
         else
         {
@@ -129,7 +129,8 @@ int main(int argc, char *argv[])
     Logger::setLogLevel(Logger::DEBUG);
     LOG_INFO << "pid = " << getpid() << ", tid = " << CurrentThread::tid();
     EventLoop loop;
-    InetAddress serverAddr("127.0.0.1", 8888);
+//    InetAddress serverAddr("127.0.0.1", 8888);
+    InetAddress serverAddr("127.0.0.1", 80);
     TestClient client(&loop, serverAddr);
     client.connect();
     loop.loop();

@@ -511,8 +511,37 @@ void recvCall(const char* pfnName) {
 #define NOTIFY_PROCESS(fname, customParam) \
     recvCall(#fname);
 
+
+
+// 设计一个不能被继承的类
+class Base_NoInherit {
+private:
+
+public:
+    ~Base_NoInherit() {
+        printf( "Base_NoInherit deconstruct\n" );
+    }
+};
+
+Base_NoInherit objfactory() {
+    return Base_NoInherit();
+}
+
+void tst_youzhi() {
+    std::cout << "before copy constructor..." << std::endl;
+    Base_NoInherit oneObj = objfactory();
+    std::cout << "after copy constructor..." << std::endl << std::endl;
+
+    Base_NoInherit&& obj2 = objfactory();
+    std::cout << "life time ends!" << std::endl << std::endl;
+
+}
+
 void tst_c11fun_entry() {
     OutputDbgInfo tmpOut( "tst_c11fun_entry begin", "tst_c11fun_entry end" );
+
+    tst_youzhi();
+    return;
 
     NOTIFY_PROCESS(tstrecvfname__call, 123);
     return;

@@ -58,6 +58,17 @@ struct OneFile {
 	5: string file_hsh,
 }
 
+
+
+struct OneFileDeriveEx {
+        1: OneFile one_file_obj;
+        2: string str_extent_1,
+        3: i32 int_extent_1,
+}
+
+
+
+
 service Photo {
 
       /// 登陆接口
