@@ -32,6 +32,8 @@ add_subdirectory(tst_libeventsrv)
 
 add_subdirectory(tst_et)
 add_subdirectory(tst_lt)
+add_subdirectory(tst_memleak)
+
 
 
 #add_subdirectory(${CMAKE_SOURCE_DIR}/thirdpart/rapidjson)
