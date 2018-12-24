@@ -34,6 +34,7 @@ add_subdirectory(tst_et)
 add_subdirectory(tst_lt)
 add_subdirectory(tst_memleak)
 
+add_subdirectory(tst-tw-timer)
 
 
 #add_subdirectory(${CMAKE_SOURCE_DIR}/thirdpart/rapidjson)

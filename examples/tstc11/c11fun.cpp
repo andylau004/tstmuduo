@@ -287,20 +287,20 @@ void tst_ref_count() {
 
     SP_ConnectPtr p1(new Connect);
 
-    printf( "p1 usecount=%d\n", p1.use_count() );
+    printf( "p1 usecount=%lu\n", p1.use_count() );
 
     InsertObj(p1);
 
-    printf( "p1 usecount=%d\n", p1.use_count() );
+    printf( "p1 usecount=%lu\n", p1.use_count() );
 
 }
 // 测试 weak_ptr 作为 shared_ptr 对象的观察者
 // weak_ptr  shared_ptr 互相引用，使用
 void tst_ref_count_1() {
     auto sp1 = boost::make_shared<Connect>();
-    printf( "sp1 usecount=%d\n", sp1.use_count() );
+    printf( "sp1 usecount=%lu\n", sp1.use_count() );
     boost::weak_ptr<Connect> wp1(sp1);
-    printf( "wp1 usecount=%d\n", wp1.use_count() );
+    printf( "wp1 usecount=%lu\n", wp1.use_count() );
 
     sp1 = nullptr;
     if (wp1.expired())
@@ -514,27 +514,54 @@ void recvCall(const char* pfnName) {
 
 
 // 设计一个不能被继承的类
-class Base_NoInherit {
+class Base_Uninherit {
 private:
+    // 简单构造函数
+    Base_Uninherit() {
+    }
+    // 拷贝构造函数
+    Base_Uninherit(const Base_Uninherit& rhs) {
+
+    }
+    Base_Uninherit& operator=(const Base_Uninherit& rhs) {
+        return *this;
+    }
 
 public:
-    ~Base_NoInherit() {
-        printf( "Base_NoInherit deconstruct\n" );
+    ~Base_Uninherit() {
+        printf( "~Base_Uninherit dst\n" );
+    }
+    static Base_Uninherit* constructObj() {
+        Base_Uninherit* newObj = new Base_Uninherit();
+        return newObj;
     }
 };
 
-Base_NoInherit objfactory() {
-    return Base_NoInherit();
-}
+//class DeriveA : public Base_Uninherit {
+//public:
+//    DeriveA() {
+//        printf( "DeriveA cst\n" );
+//    }
+//    ~DeriveA() {
+//        printf( "~DeriveA dst\n" );
+//    }
+//};
+
+//Base_Uninherit objfactory() {
+//    return Base_Uninherit();
+//}
 
 void tst_youzhi() {
-    std::cout << "before copy constructor..." << std::endl;
-    Base_NoInherit oneObj = objfactory();
-    std::cout << "after copy constructor..." << std::endl << std::endl;
+//    std::cout << "before copy constructor..." << std::endl;
+//    Base_Uninherit oneObj = objfactory();
+//    std::cout << "after copy constructor..." << std::endl << std::endl;
 
-    Base_NoInherit&& obj2 = objfactory();
-    std::cout << "life time ends!" << std::endl << std::endl;
+//    Base_Uninherit&& obj2 = objfactory();
+//    std::cout << "life time ends!" << std::endl << std::endl;
 
+    {
+        Base_Uninherit* pObj = Base_Uninherit::constructObj();
+    }
 }
 
 void tst_c11fun_entry() {
@@ -590,7 +617,7 @@ return;
     buf->getWritePtr(4);
     buf->wroteBytes(4);
 
-    uint32_t    cur_body_len  = 1;
+//    uint32_t    cur_body_len  = 1;
     uint8_t*    pData     = NULL;
     uint32_t    tmpsize   = 0 ;
     buf->getBuffer( &pData, &tmpsize );
