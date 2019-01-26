@@ -137,7 +137,7 @@ void tst_NoR_merge_1() {
     std::cout << std::endl;
     std::cout << "-----------------sorted beg" << std::endl;
     for (int i = 0; i < 20; ++i)
-        std::cout << result[i] << "  ";
+        std::cout << result1[i] << "  ";
     std::cout << std::endl;
     std::cout << "-----------------sorted beg" << std::endl;
 
@@ -299,26 +299,26 @@ int tst_example_1()
 
 
 
-void Merge(int sourceArr[],int tempArr[], int startIndex, int midIndex, int endIndex) {
-    int i = startIndex, j=midIndex+1, k = startIndex;
-    while(i!=midIndex+1 && j!=endIndex+1)
+void Merge(int sourceArr[], int tempArr[], int startIndex, int midIndex, int endIndex) {
+    int i = startIndex, j = midIndex+1, k = startIndex;
+    while ( i != midIndex+1 && j != endIndex+1 )
     {
-        if(sourceArr[i] > sourceArr[j])
+        if (sourceArr[i] > sourceArr[j])
             tempArr[k++] = sourceArr[j++];
         else
             tempArr[k++] = sourceArr[i++];
     }
-    while(i != midIndex+1)
+    while ( i != midIndex+1 )
         tempArr[k++] = sourceArr[i++];
-    while(j != endIndex+1)
+    while ( j != endIndex+1 )
         tempArr[k++] = sourceArr[j++];
-    for(i=startIndex; i<=endIndex; i++)
+    for ( i = startIndex; i <= endIndex; i++ )
         sourceArr[i] = tempArr[i];
 }
-//内部使用递归
+// 内部使用递归
 void MergeSort(int sourceArr[], int tempArr[], int startIndex, int endIndex) {
     int midIndex;
-    if(startIndex < endIndex)
+    if (startIndex < endIndex)
     {
         midIndex = (startIndex + endIndex) / 2;
         MergeSort(sourceArr, tempArr, startIndex, midIndex);
@@ -326,15 +326,15 @@ void MergeSort(int sourceArr[], int tempArr[], int startIndex, int endIndex) {
         Merge(sourceArr, tempArr, startIndex, midIndex, endIndex);
     }
 }
-//归并排序和堆排序、快速排序的比较
-//若从空间复杂度来考虑：首选堆排序，其次是快速排序，最后是归并排序。
-//若从稳定性来考虑，应选取归并排序，因为堆排序和快速排序都是不稳定的。
-//若从平均情况下的排序速度考虑，应该选择快速排序。
+// 归并排序和堆排序、快速排序的比较
+// 若从空间复杂度来考虑：首选堆排序，其次是快速排序，最后是归并排序。
+// 若从稳定性来考虑，应选取归并排序，因为堆排序和快速排序都是不稳定的。
+// 若从平均情况下的排序速度考虑，应该选择快速排序。
 void tst_merge_sort_1() {
     int a[8] = {50, 10, 20, 30, 70, 40, 80, 60};
-    int i, b[8];
-    MergeSort(a, b, 0, 7);
-    for(i=0; i<8; i++)
+    int i, tmp[8];
+    MergeSort(a, tmp, 0, 7);
+    for (i=0; i<8; i++)
         printf("%d ", a[i]);
     printf("\n");
 }
@@ -395,13 +395,14 @@ void tst_c11_merge() {
 }
 
 int tst_MergeSortEntry_() {
+    tst_NoR_merge_1(); return 0;
+
     tst_c11_merge(); return 1;
 
     tst_merge_sort_1(); return 1;
 
     tst_example_1(); return 0;
 
-    tst_NoR_merge_1(); return 0;
 
     return 0;
 }

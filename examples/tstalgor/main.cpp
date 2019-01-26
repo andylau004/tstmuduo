@@ -968,6 +968,9 @@ int main(int argc, char *argv[])
     Logger::setLogLevel(Logger::DEBUG);
     LOG_INFO << "pid = " << getpid() << ", tid = " << CurrentThread::tid();
 
+    tst_MergeSortEntry_(); return 1;
+    tst_ListEntry_(); return 1;
+
 #ifdef __cplusplus//C++编译器定义了-cplusplus
 std::cout << "c++" << std::endl;
 #else
@@ -1009,7 +1012,6 @@ std::cout << "argc=" << argc << std::endl;
 
 
     tst_ComplexDataEntry_(); return 1;
-    tst_ListEntry_(); return 1;
 
 tst_print_time(); return 1;
 tst_qs_111(); return 1;

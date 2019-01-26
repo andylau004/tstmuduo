@@ -4,7 +4,10 @@
 
 #include "tstList.h"
 
+#include <stack>
 
+
+using namespace std;
 
 
 
@@ -53,18 +56,18 @@ ListNodeEx* NoRecrusive_ReverseList(ListNodeEx* head) {
     head->next = NULL;// while结束后，将翻转后的最后一个节点（即翻转前的第一个结点head）的链域置为NULL
     return pre;
 }
-//插入一个新节点到链表中(放在链表头部)
-void CreateList(ListNodeEx*& pHead, int newData) {
-    ListNodeEx* p = new ListNodeEx;
-    p->val  = newData;
-    p->next = NULL;
+// 插入一个新节点到链表中(放在链表头部)
+void CreateList(ListNodeEx*& pIn, int newVal) {
+    ListNodeEx* pNewNode = new ListNodeEx;
+    pNewNode->val  = newVal;
+    pNewNode->next = NULL;
 
-    if (pHead == NULL) {
-        pHead = p;
+    if (pIn == NULL) {
+        pIn = pNewNode;
         return;
     }
-    p->next = pHead;
-    pHead = p;
+    pNewNode->next = pIn;
+    pIn = pNewNode;
 }
 void tst_reverse_list_1() {
     ListNodeEx* phead = NULL;
@@ -263,8 +266,105 @@ void tst_printfilecontent() {
 
 }
 
+
+// 如何判断一个字符串是否是回文字符串的问题
+/*
+ * １．用快慢两个指针遍历，同时用栈copy慢指针指向的data。
+ * ２．完成后，慢指针指向中间节点，耗时为N/2.
+ * ３．最后用pop栈中的data和慢指针指向的data比较，耗时也是N/2.
+ * 所以时间复杂度为：Ｏ(N)，空间复杂度因栈额外存储了一半的data，故为O(N/2)
+*/
+void fast_slow_ptr() {
+//    int arr[10] = { 9, 12, 3, 889, 71, 889, 3, 12, 9 };
+
+    std::stack<int> stackInts;
+
+    ListNodeEx* pHead = nullptr;
+    CreateList(pHead, 9); CreateList(pHead, 12); CreateList(pHead, 3); CreateList(pHead, 889);
+    CreateList(pHead, 71);
+    CreateList(pHead, 889);CreateList(pHead, 3); CreateList(pHead, 12); CreateList(pHead, 9);
+
+    ListNodeEx* pshow = pHead;
+
+    std::ostringstream otmp;
+    while (pshow) {
+        otmp << pshow->val << " ";
+        pshow = pshow->next;
+    }
+    LOG_DEBUG << "array=" << otmp.str();
+
+    ListNodeEx* pFast = pHead;
+    ListNodeEx* pslow = pHead;
+
+    while (pFast) {
+        LOG_DEBUG << "val=" << pFast->val;
+
+        if (pFast->next) {
+            pFast = pFast->next->next;
+
+            stackInts.push(pslow->val);
+        } else {// pslow 坐标是数组中位,也就是刚好正中间
+            pFast = nullptr;
+            LOG_DEBUG << " middle val= " << pslow->val;
+
+            if (pslow->next) {
+
+                ListNodeEx* pcompare = pslow->next;
+                while (pcompare) {
+                    int icurVal = stackInts.top();
+                    stackInts.pop();
+                    if (pcompare->val != icurVal) {
+                        LOG_ERROR << "compare failed!!! pcompare->val:" << pcompare->val << " != icurVal:" << icurVal;
+                    } else {
+                        LOG_INFO << "compare successedd!!!val=" << icurVal;
+                    }
+                    pcompare = pcompare->next;
+                }
+
+            }
+        }
+
+        pslow = pslow->next;
+    }
+
+}
+
+// 插入排序实现_1
+void insert_sort_1( ) {
+    int arrInts[] = { 67, 1, 210, 37, 24, 76, 9, 7, 10 };
+    int length = array_size(arrInts);
+    LOG_INFO << "array_size(arrInts)=" << length;
+
+    for ( int i = 1; i < length; ++i ) {
+        int value = arrInts[i];
+        int j = i - 1;
+
+        for ( ; j >= 0; -- j ) {
+            if ( arrInts[j] > value ) {
+                arrInts[j + 1] = arrInts[j];
+            } else {
+                break;
+            }
+        }// for 2 end
+
+        arrInts[j + 1] = value;
+
+    }// for 1 end
+
+    std::ostringstream otmp;
+    for (int i = 0; i < length; ++i ) {
+        otmp << " " << arrInts[i] ;
+    }
+    LOG_INFO << " print all = " << otmp.str();
+}
+
+
 // 测试list操作算法总入口
 int tst_ListEntry_() {
+    insert_sort_1(); return 1;
+
+    fast_slow_ptr(); return 1;
+
     tst_printfilecontent(); return 1;
 
     tst_max_array(); return 1;
