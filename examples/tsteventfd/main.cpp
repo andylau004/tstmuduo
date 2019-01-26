@@ -59,9 +59,11 @@ using namespace muduo::net;
 
 int main(int argc, char *argv[])
 {
+    Logger::setLogLevel(Logger::DEBUG);
     LOG_INFO << "pid = " << getpid() << ", tid = " << CurrentThread::tid();
 
     tst_event_fd_entry(argc, argv);
+
 //    Logger::setLogLevel(Logger::DEBUG);
 //    LOG_INFO << "pid = " << getpid() << ", tid = " << CurrentThread::tid();
 //    EventLoop loop;
@@ -70,23 +72,6 @@ int main(int argc, char *argv[])
 //    client.connect();
 //    loop.loop();
 }
-
-//int main()
-//{
-//    //    Logger::setLogLevel(Logger::DEBUG);
-//    //    std::setlocale(LC_ALL, "en_US.utf8");
-
-//    return 1;
-//}
-
-
-
-
-
-
-
-
-
 
 
 

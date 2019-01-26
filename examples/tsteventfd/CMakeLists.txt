@@ -7,6 +7,7 @@ set(EXECUTABLE_OUTPUT_PATH ../../)
 
 add_executable(${PROJECT_NAME}
     tsteventfd.h tsteventfd.cpp
+    getchunkedclient.h getchunkedclient.cpp
     ${O_GENCPP}
     main.cpp)
 

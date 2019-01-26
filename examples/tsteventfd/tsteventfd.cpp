@@ -57,6 +57,7 @@
 #include <thrift/server/TNonblockingServer.h>
 
 
+#include "getchunkedclient.h"
 
 
 
@@ -306,8 +307,132 @@ failed:
     return 0;
 }
 
+const char* STR_CRLF = "\r\n";
+
+// evbuffer 测试使用示例
+void tst_evbuffer_use() {
+    LOG_DEBUG << " tst_evbuffer_use ------------------";
+    printf( " tst_evbuffer_use ------------------\n" );
+
+    struct evbuffer* requestBuffer = evbuffer_new();
+
+    int len1 = 0;
+    const char* lpszUserData = "12345678";
+    len1 = strlen(lpszUserData);
+    uint32_t nw_len = ::htonl(len1);
+
+    evbuffer_add( requestBuffer, &nw_len, sizeof(nw_len) );// 4 bytes
+    evbuffer_add( requestBuffer, STR_CRLF, strlen(STR_CRLF) );// 2 bytes
+
+    evbuffer_add( requestBuffer, lpszUserData, strlen(lpszUserData) );// 8 bytes
+    evbuffer_add( requestBuffer, STR_CRLF, strlen(STR_CRLF) );// 2 bytes
+
+    {
+        size_t requestLen = evbuffer_get_length(requestBuffer);
+        LOG_INFO << "allsize=" << requestLen;
+
+        char* copy_out_buf = new char[requestLen + 1];
+        memset( copy_out_buf, 0, requestLen + 1 );
+
+        ev_ssize_t copy_out_n = evbuffer_copyout( requestBuffer, copy_out_buf, requestLen );
+//        printf("data[%s] len[%d]\n" , copy_out_buf, copy_out_n);
+        printf_buffer( "copy_out_buf---------------", (unsigned char*)copy_out_buf, copy_out_n );
+/*
+ * 20190126 05:05:21.834069Z 10044 INFO  allsize=16 - tsteventfd.cpp:331
+    ==========================================================
+    copy_out_buf---------------: length:16
+    08 00 00 00 0d 0a 31 32 33 34 35 36 37 38 0d 0a
+    ==========================================================
+    20190126 05:05:21.834087Z 10044 DEBUG tst_evbuffer_use  111 ptrFind.pos=4 - tsteventfd.cpp:349
+    20190126 05:05:21.834094Z 10044 DEBUG tst_evbuffer_use  222 ptrFind.pos=5 - tsteventfd.cpp:355
+    20190126 05:05:21.834099Z 10044 DEBUG tst_evbuffer_use  333 ptrFind.pos=14 - tsteventfd.cpp:359
+*/
+    }
+
+    {
+        size_t buffer_len = evbuffer_get_length(requestBuffer);
+        LOG_INFO << "---- buffer_len=" << buffer_len;
+
+        ev_uint32_t record_len = 0;
+        char* record = nullptr;
+
+        struct evbuffer_ptr ptrFind = evbuffer_search( requestBuffer, STR_CRLF, strlen(STR_CRLF), nullptr );
+        if ( (int)(ptrFind.pos) == -1 ) {
+            LOG_ERROR << " no found length str_crlf" ;
+            return ;
+        } else {
+            // copy 4 bytes head.
+            evbuffer_copyout( requestBuffer, &record_len, sizeof(ev_uint32_t) );
+
+            record_len = ::ntohl(record_len); // Convert len_buf into host order.
+            if (buffer_len < record_len + 4) {
+                LOG_ERROR << " want more data, buffer_len: " << buffer_len << " < record_len + 4: " << record_len + 4;
+                return; /* The record hasn't arrived */
+            }
+            LOG_DEBUG << " record_len=" << record_len;
+
+            LOG_DEBUG << " 111 ptrFind.pos=" << ptrFind.pos;
+            evbuffer_ptr_set( requestBuffer, &ptrFind, 1, EVBUFFER_PTR_ADD );
+            LOG_DEBUG << " 222 ptrFind.pos=" << ptrFind.pos;
+
+            // 检查 "chunk\r\n"
+            ptrFind = evbuffer_search( requestBuffer, STR_CRLF, strlen(STR_CRLF), &ptrFind );
+            LOG_DEBUG << " 333 ptrFind.pos=" << ptrFind.pos;
+
+            if ( (int)(ptrFind.pos) == -1 ) {
+                LOG_ERROR << " no found chunked str_crlf";
+                return;
+            }
+
+            record = NewAllocMem(record_len);
+            if (record == NULL) {
+                LOG_ERROR << " alloc new memory failed!!!";
+                return;
+            }
+
+            evbuffer_drain( requestBuffer, sizeof(ev_uint32_t) );
+            evbuffer_drain( requestBuffer, strlen(STR_CRLF) );
+
+            evbuffer_remove( requestBuffer, record, record_len );
+            evbuffer_drain( requestBuffer, strlen(STR_CRLF) );
+
+            LOG_INFO << "record.size()=" << record.size() << ", record=" << record;
+
+            int iiit = 123;
+    //        printf("===evbuffer_search() : print buffer from search result point===\n");
+    //        print_buf( requestBuffer, &ptrFind );
+        }
+    }
+
+    //evbuffer_add , evbuffer_add_printf
+//    evbuffer_add( buf , "merry christmas\n" , strlen("merry christmas\n") );
+//    evbuffer_add_printf( buf , "hello %s\n" , "world" );
+
+    //evbuffer_get_length
+//    size_t len = evbuffer_get_length(buf);
+//    printf("===evbuffer_get_length() : [%d]===\n" , len);
+
+//    //evbuffer_get_contiguous_space
+//    len = evbuffer_get_contiguous_space(buf);
+//    printf("===evbuffer_get_contiguous_space() : [%d]===\n" , len);
+
+//    //evbuffer_readln
+//    char * line = evbuffer_readln( buf , &len , EVBUFFER_EOL_ANY );
+//    if ( line != NULL) {
+//        printf("===evbuffer_readln(): line[%s] len[%d]===\n" , line , len);
+//        free(line);
+//    }
+
+}
+
 // 测试 eventfd 事件通知机制
 int tst_event_fd_entry(int argc, char *argv[]) {
+
+    tst_evbuffer_use(); return 1;
+
+
+    tst_getchunked_url(); return 1;
+
 
     // event style
     libevent_impl_eventfd(); return 1;
