@@ -9,13 +9,13 @@
 #target_link_libraries(cdns muduo_cdns)
 
 
-project(tstsomefun)
+project(tstcli)
 
 
 set(EXECUTABLE_OUTPUT_PATH ../../)
 
-add_executable(tstcli main.cpp)
-target_link_libraries(tstcli muduo_net)
+add_executable(${PROJECT_NAME} main.cpp)
+target_link_libraries(${PROJECT_NAME} muduo_net)
 
 
 

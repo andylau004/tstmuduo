@@ -34,6 +34,8 @@
 #include "muduo/base/Logging.h"
 
 #include "muduo/net/TcpClient.h"
+#include "muduo/net/SocketsOps.h"
+
 
 #include "discardserver.h"
 
@@ -89,11 +91,17 @@ private:
 //                   conn->peerAddress().toIpPort().c_str());
             LOG_INFO << "TestClient onConnection(): new connection [" << conn->name() << "] from " << conn->peerAddress().toIpPort();
             std::string strMsg = "abcdefg";
-            conn->send( strMsg.c_str(), strMsg.size() );
+
+            std::string strall;
+
+            Buffer sendBuffer;
+            sendBuffer.appendInt32( strMsg.size() );
+            sendBuffer.append(strMsg);
+
+            conn->send( &sendBuffer );
 
 //            exit(-1);
 //            return;
-
 //            conn->shutdown();
         }
         else
@@ -105,9 +113,17 @@ private:
 
     void onMessage(const TcpConnectionPtr &conn, Buffer *buf, Timestamp time)
     {
-        muduo::string msg(buf->retrieveAllAsString());
-        printf("onMessage(): recv a message [%s]\n", msg.c_str());
-        LOG_INFO << conn->name() << " recv " << msg.size() << " bytes at " << time.toFormattedString();
+        muduo::string strMsg(buf->retrieveAllAsString());
+//        printf("recv msg [%s]\n", strMsg.c_str());
+        LOG_INFO << conn->name() << " recv " << strMsg.size() << " bytes, msg=" << strMsg;
+
+        {
+            Buffer sendBuffer;
+            sendBuffer.appendInt32( strMsg.size() );
+            sendBuffer.append(strMsg);
+
+            conn->send( &sendBuffer );
+        }
     }
 
     // 标准输入缓冲区中有数据的时候，回调该函数
@@ -130,7 +146,7 @@ int main(int argc, char *argv[])
     LOG_INFO << "pid = " << getpid() << ", tid = " << CurrentThread::tid();
     EventLoop loop;
 //    InetAddress serverAddr("127.0.0.1", 8888);
-    InetAddress serverAddr("127.0.0.1", 80);
+    InetAddress serverAddr("172.17.0.2", 10091);
     TestClient client(&loop, serverAddr);
     client.connect();
     loop.loop();

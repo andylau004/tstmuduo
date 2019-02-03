@@ -37,6 +37,8 @@ include_directories("${CMAKE_SOURCE_DIR}")
 include_directories(${CMAKE_SOURCE_DIR}/thirdpart/rapidjson)
 include_directories(${CMAKE_SOURCE_DIR}/thirdpart/thrift/thrift-0.9.3)
 include_directories(${CMAKE_SOURCE_DIR}/thirdpart/thrift/thrift-0.9.3/lib/cpp/src)
+#include_directories(${PROJECT_SOURCE_DIR}/thirdpart/concurrentqueue)
+#include_directories(${PROJECT_SOURCE_DIR}/thirdpart/concurrentqueue/concurrentqueue-src)
 
 
 aux_source_directory(. SRC_LIST)
@@ -55,6 +57,8 @@ link_directories(/opt/openssl/lib/)
 
 
 add_subdirectory(thirdpart/thrift)
+#add_subdirectory(thirdpart/concurrentqueue)
+#add_subdirectory(thirdpart/concurrentqueue-src)
 add_subdirectory(muduo/base)
 add_subdirectory(muduo/net)
 
