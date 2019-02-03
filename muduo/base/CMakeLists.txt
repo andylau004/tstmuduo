@@ -3,6 +3,9 @@
 
 set(base_SRCS
 
+    timeinterval.h
+    timeinterval.cpp
+
     duration.h
     duration.inl.h
     duration.cc

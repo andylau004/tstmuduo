@@ -47,6 +47,14 @@
 #include "muduo/base/ThreadPool.h"
 
 
+#include <event2/http.h>
+#include <event2/rpc.h>
+#include <event2/http_compat.h>
+#include <event2/http_struct.h>
+
+
+
+
 #include <thrift/concurrency/ThreadManager.h>
 #include <thrift/concurrency/PlatformThreadFactory.h>
 
@@ -396,7 +404,7 @@ void tst_evbuffer_use() {
             evbuffer_remove( requestBuffer, record, record_len );
             evbuffer_drain( requestBuffer, strlen(STR_CRLF) );
 
-            LOG_INFO << "record.size()=" << record.size() << ", record=" << record;
+            LOG_INFO << "record.size()=" << record_len << ", record=" << record;
 
             int iiit = 123;
     //        printf("===evbuffer_search() : print buffer from search result point===\n");
@@ -425,8 +433,178 @@ void tst_evbuffer_use() {
 
 }
 
+
+static char const* const CHUNKS[] = {
+    "This is funny",
+    "but not hilarious.",
+    "bwv 1052"
+};
+
+struct chunk_req_state {
+    struct event_base *base;
+    struct evhttp_request *req;
+    int i;
+};
+static void
+http_chunked_trickle_cb(evutil_socket_t fd, short events, void *arg)
+{
+    struct evbuffer *evb = evbuffer_new();
+    struct chunk_req_state *state = (struct chunk_req_state *)arg;
+    struct timeval when = { 0, 0 };
+
+    evbuffer_add_printf(evb, "%s", CHUNKS[state->i]);
+    evhttp_send_reply_chunk(state->req, evb);
+    evbuffer_free(evb);
+
+    if (++state->i < (int) (sizeof(CHUNKS)/sizeof(CHUNKS[0]))) {
+        event_base_once(state->base, -1, EV_TIMEOUT, http_chunked_trickle_cb, state, &when);
+    } else {
+        evhttp_send_reply_end(state->req);
+        free(state);
+    }
+}
+static void
+http_chunked_cb(struct evhttp_request *req, void *arg)
+{
+    struct timeval when = { 0, 0 };
+    struct chunk_req_state *state = (struct chunk_req_state *)malloc(sizeof(struct chunk_req_state));
+    printf(("%s: called\n", __func__));
+
+    memset(state, 0, sizeof(struct chunk_req_state));
+    state->req  = req;
+    state->base = (struct event_base *)arg;
+
+    if (strcmp(evhttp_request_get_uri(req), "/streamed") == 0) {
+        evhttp_add_header(evhttp_request_get_output_headers(req), "Content-Length", "39");
+    }
+    evhttp_send_reply_start(req, HTTP_OK, "Everything is fine");// generate a chunked/streamed reply
+
+    /* but trickle it across several iterations to ensure we're not assuming it comes all at once */
+    event_base_once((struct event_base *)arg, -1, EV_TIMEOUT, http_chunked_trickle_cb, state, (struct timeval *)&when);
+}
+void tst_some_http_server() {
+    struct evhttp_bound_socket *handle = NULL;
+    evutil_socket_t server_fd = -1;
+
+    struct event_base * m_pEventBase = event_base_new();
+    if (!m_pEventBase) {
+        printf("event_base_new failed: %s\n", strerror(errno));
+        return;
+//        goto ErrP;
+    }
+    struct evhttp* m_pHttpHandler = evhttp_new(m_pEventBase);
+    if (!m_pHttpHandler) {
+        printf("evhttp_new failed: %s\n", strerror(errno));
+        return;
+//        goto ErrP;
+    }
+
+    handle = evhttp_bind_socket_with_handle(m_pHttpHandler, "0.0.0.0", 10086);
+    if (!handle) {
+        printf("evhttp_bind_socket_with_handle failed: %s\n", strerror(errno));
+        return;
+//        goto ErrP;
+    }
+    server_fd = evhttp_bound_socket_get_fd(handle);
+    printf("evhttp_bind_socket_with_handle succeed: %d\n", server_fd);
+
+    evhttp_set_timeout(m_pHttpHandler, 120);
+//    evhttp_set_cb(m_pHttpHandler, "/platform/api2/file2text", default_request_cb, &m_pEventBase);
+//    evhttp_set_cb(m_pHttpHandler, "/platform/api2/stream2text", stream_request_cb, &m_pEventBase);
+
+    evhttp_set_cb(m_pHttpHandler, "/chunked",  http_chunked_cb, &m_pEventBase);
+    evhttp_set_cb(m_pHttpHandler, "/streamed", http_chunked_cb, &m_pEventBase);
+
+    event_base_dispatch(m_pEventBase);
+
+//ErrP:
+//    LOG_ERROR << " fatal error bind http socket";
+//    if(m_pHttpHandler) evhttp_free(m_pHttpHandler);
+//    if(m_pEventBase) event_base_free(m_pEventBase);
+//    m_pHttpHandler = NULL;
+//    m_pEventBase = NULL;
+}
+
+typedef  struct _tag_Test {
+    unsigned int chunked:1,		/* a chunked request */
+        userdone:1;			/* the user has sent all data */
+    int xxx;
+}Test;
+
+
+void demo_asr(const std::string &file0, const std::string &file1, int agent_dn) {
+    LOG_INFO << "BEG...";
+//    LOG_INFO << " workthread, file0" << file0 << ", file1" << file1;
+    LOG_INFO << "agent_dn=" << agent_dn;
+    LOG_INFO << "END...";
+//    LOG_INFO << " ";
+    printf( "\n" );
+}
+
+void tst_threads_() {
+    std::string file0 = "file____0";
+    std::string file1 = "file____1";
+    auto concurrency  = 2;
+
+    std::vector<std::thread> threads;
+    for ( int j = 0 ; j < 3; ++ j ) {
+
+//        for (int i = 0; i < concurrency; ++i) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(21));
+            threads.emplace_back(demo_asr, file0, file1, j * 100/* + i*/);
+//        }
+
+    }
+    std::for_each( threads.begin(), threads.end(), [](std::thread& t){ t.join();} );
+
+    LOG_INFO << "work all done";
+}
+
+extern int newchukclient();
+
+class Testcccc {
+public:
+    Testcccc(int i) {
+        m_indx = i;
+        LOG_INFO << "Testcccc cst----------------idx=" << m_indx;
+    }
+    ~Testcccc() { LOG_INFO << "Testcccc dst----------------idx=" << m_indx; }
+
+    void PrintVal() {
+        LOG_INFO << "val=" << m_indx;
+    }
+private:
+    int m_indx;
+};
+
+void tst_122xxxxx2( ) {
+    boost::ptr_vector<Testcccc> arr_objs;
+
+    for (int i = 0; i < 3; ++i ) {
+        arr_objs.push_back( new Testcccc(i) );
+    }
+    for (int i = 0; i < 3; ++i ) {
+        arr_objs[i].PrintVal();
+    }
+
+//    for_each( arr_objs.begin(), arr_objs.end(), boost::bind(&Testcccc::PrintVal, _1) );
+}
+
 // 测试 eventfd 事件通知机制
 int tst_event_fd_entry(int argc, char *argv[]) {
+
+    tst_122xxxxx2(); return 1;
+
+    newchukclient(); return 1;
+
+//    Test c11;
+//    LOG_INFO << " c11.chunked=" << c11.chunked
+//             << " c11.userdone=" << c11.userdone
+//             << " c11.xxx=" << c11.xxx;
+//    return 1;
+    tst_threads_(); return 1;
+
+    tst_some_http_server(); return 1;
 
     tst_evbuffer_use(); return 1;
 

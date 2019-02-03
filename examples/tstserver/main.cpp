@@ -140,7 +140,7 @@ public:
         : loop_(loop),
           server_(loop, listenAddr, "testserver")
     {
-        server_.setThreadNum(2);
+        server_.setThreadNum(24);
 
         server_.setConnectionCallback(
                     boost::bind(&CTestServer::onConnection, this, _1) );
@@ -185,7 +185,7 @@ private:
 //                   conn->name().c_str(),
 //                   conn->peerAddress().toIpPort().c_str());
 
-            LOG_INFO << "onConnection(): new connection [" << conn->name() << "] from " << conn->peerAddress().toIpPort();
+//            LOG_INFO << "onConnection(): new connection [" << conn->name() << "] from " << conn->peerAddress().toIpPort();
             conn->setTcpNoDelay(true);
 //            conn->send(message_);
 //            conn->shutdown();
@@ -199,14 +199,14 @@ private:
                    Timestamp receiveTime)
     {
         muduo::string msg(buf->retrieveAllAsString());
-        printf("onMessage(): received %zd bytes msg=%s from connection [%s] at %s\n",
-               msg.size(), msg.c_str(),
-               conn->name().c_str(),
-               receiveTime.toFormattedString().c_str());
+//        printf("onMessage(): received %zd bytes msg=%s from connection [%s] at %s\n",
+//               msg.size(), msg.c_str(),
+//               conn->name().c_str(),
+//               receiveTime.toFormattedString().c_str());
         conn->send(msg);
     }
     void onWriteComplete(const TcpConnectionPtr& conn) {
-        conn->send(message_);
+//        conn->send(message_);
     }
 
 private:
@@ -222,7 +222,7 @@ private:
 //
 void tst_Tcp_server1() {
 
-    InetAddress listenAddr(8888);
+    InetAddress listenAddr(9091);
     EventLoop loop;
 
     CTestServer server(&loop, listenAddr);
