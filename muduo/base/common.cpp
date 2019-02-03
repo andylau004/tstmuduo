@@ -27,6 +27,30 @@ using namespace muduo;
 //using namespace muduo::net;
 
 
+
+void printf_buffer(const char* title, unsigned char* buffer, int size)
+{
+    int i;
+    printf("==========================================================\n");
+    printf("%s: length:%d\n", title, size);
+    for(i=0;i<size;i++)
+    {
+        if (((i%16)==0) && (i!=0)) printf("\n");
+        printf("%02x ", (unsigned char)buffer[i]);
+    }
+    printf("\n");
+    printf("==========================================================\n");
+}
+
+char* NewAllocMem(int isize) {
+    char* ret = new char[ isize + 1 ];
+    memset( ret, 0, isize + 1 );
+    return ret;
+}
+
+
+
+
 _tag_OutputDbgInfo::_tag_OutputDbgInfo( const std::string& str_in, const std::string& str_out ) {
     m_str_out = str_out;
     printf( "\n" );
