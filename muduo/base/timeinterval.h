@@ -4,18 +4,20 @@
 
 #include <stdio.h>
 
-#include <iostream>
-#include <sstream>
+//#include <iostream>
+//#include <sstream>
 
-#include <iostream>
-#include <string>
-#include <algorithm>
-#include <stack>
-#include <vector>
-#include <queue>
+//#include <iostream>
+//#include <string>
+//#include <algorithm>
+//#include <stack>
+//#include <vector>
+//#include <queue>
 
-#include <fstream>
-#include <thread>
+//#include <fstream>
+//#include <thread>
+
+#include <sys/time.h>
 
 #include <memory>
 
@@ -39,24 +41,12 @@ public:
         init();
     }
 
-    ~TimeInterval()
-    {
-#ifdef GCC
-        gettimeofday(&end, NULL);
-        std::cout << detail
-            << 1000 * (end.tv_sec - start.tv_sec) + (end.tv_usec - start.tv_usec) / 1000
-            << " ms" << endl;
-#else
-        end = clock();
-        std::cout << detail
-            << (double)(end - start) << " ms" << std::endl;
-#endif // GCC
-    }
+    ~TimeInterval();
 
 protected:
     void init() {
 #ifdef GCC
-        printf( "gettimeofday logic\n" );
+//        printf( "gettimeofday logic\n" );
         gettimeofday(&start, NULL);
 #else
         printf( "clock logic\n" );

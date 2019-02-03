@@ -189,7 +189,7 @@ public:
     int64_t getExpireTime() const { return expireTime_; }
 
 private:
-    // 这里的Runnable实际为TNonblockingServer::TConnection::Task
+    // 这里的Runnable实际为 TNonblockingServer::TConnection::Task
     // 在TNonblockingServer::TConnection::transition()中被push进来
     shared_ptr<Runnable> runnable_;
     friend class ThreadManager::Worker;

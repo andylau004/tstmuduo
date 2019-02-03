@@ -32,10 +32,10 @@ class EventLoop;
 /// The file descriptor could be a socket,
 /// an eventfd, a timerfd, or a signalfd
 /*
- *class Channel：事件分发器，其记录了描述符fd的注册事件和就绪事件，及就绪事件回调比如可读回调readCallback。其和文件描述符fd是一一对应的关系，但其不拥有fd。当一个fd想要注册事件并在事件就绪时执行相应的就绪事件回调时，首先通过Channel::update(this)->EventLoop::updateChannel(Channel*)->Poller::updateChannel(Channel*)调用链向poll系统调用的侦听事件表注册或者修改注册事件。
- * Channel作为是事件分发器其核心结构是Channel::handleEvent()该函数执行fd上就绪事件相应的事件回调，比如fd可读事件执行readCallback()。
- * Channel应该还具有一个功能是：Channel::~Channel()->EventLoop::removeChannel(Channel*)->Poller::removeChannel(Channel*)将Poller中的Channel*移除防止空悬指针。这是因为Channel的生命周期和Poller/EventLoop不一样长。
- * 其关键数据成员：fd_文件描述符，int events_文件描述符的注册事件，int revents_文件描述符的就绪事件，及事件回调readCallback_,writeCallback...
+    * class Channel：事件分发器，其记录了描述符fd的注册事件和就绪事件，及就绪事件回调比如可读回调readCallback。其和文件描述符fd是一一对应的关系，但其不拥有fd。当一个fd想要注册事件并在事件就绪时执行相应的就绪事件回调时，首先通过Channel::update(this)->EventLoop::updateChannel(Channel*)->Poller::updateChannel(Channel*)调用链向poll系统调用的侦听事件表注册或者修改注册事件。
+    * Channel作为是事件分发器其核心结构是Channel::handleEvent()该函数执行fd上就绪事件相应的事件回调，比如fd可读事件执行readCallback()。
+    * Channel应该还具有一个功能是：Channel::~Channel()->EventLoop::removeChannel(Channel*)->Poller::removeChannel(Channel*)将Poller中的Channel*移除防止空悬指针。这是因为Channel的生命周期和Poller/EventLoop不一样长。
+    * 其关键数据成员：fd_文件描述符，int events_文件描述符的注册事件，int revents_文件描述符的就绪事件，及事件回调readCallback_,writeCallback...
  * */
 class Channel : boost::noncopyable
 {
