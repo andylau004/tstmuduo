@@ -5,24 +5,19 @@
 
 
 #include <stdio.h>
-
+#include <iostream>
+#include <unordered_map>
 
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
 #include <boost/scoped_ptr.hpp>
-//#include <Windows.h>
 
 #include "muduo/base/Timestamp.h"
-//#include <muduo/base/Timestamp.h>
 
 
 using namespace std;
 using namespace muduo;
-//using namespace muduo::net;
 
-#include <iostream>
-#include <unordered_map>
-using namespace std;
 
 // 双向链表的节点结构
 struct LRUCacheNode {
@@ -45,7 +40,7 @@ private:
 public:
     LRUCache(int capacity);       // 构造函数
     ~LRUCache();                  // 析构函数
-    int get(int key);             // 查询数据项
+    int  get(int key);             // 查询数据项
     void set(int key, int value); // 未满时插入,已满时替换
 private:
     void removeLRUNode();                 // 删除尾结点（最久未使用）

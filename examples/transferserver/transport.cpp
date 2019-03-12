@@ -24,7 +24,7 @@ Transport::Transport(uint32_t readBufferSize, uint32_t writeBufferSize) :
     m_readBufferPos(0),
     m_writeBufferPos(0),
     m_socket(INVALID_SOCKET) {
-    m_outputTransport.reset(new transport::TMemoryBuffer(writeBufferSize));
+    m_outMemBuffer.reset(new transport::TMemoryBuffer(writeBufferSize));
 }
 
 Transport::Transport(uint32_t size) :
@@ -35,7 +35,7 @@ Transport::Transport(uint32_t size) :
     m_readBufferPos(0),
     m_writeBufferPos(0),
     m_socket(INVALID_SOCKET) {
-    m_outputTransport.reset(new transport::TMemoryBuffer(size));
+    m_outMemBuffer.reset(new transport::TMemoryBuffer(size));
 }
 
 Transport::~Transport() {
@@ -50,7 +50,7 @@ bool Transport::init() {
         if (m_readBuffer == NULL) {
             return false;
         }
-        m_inputTransport.reset(new transport::TMemoryBuffer(m_readBuffer, sizeof(uint8_t) * m_readBufferSize));
+        m_inMemBuffer.reset(new transport::TMemoryBuffer(m_readBuffer, sizeof(uint8_t) * m_readBufferSize));
     }
 
     m_writeBuffer = NULL;

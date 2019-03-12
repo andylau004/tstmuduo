@@ -150,20 +150,20 @@ void tst_NoR_merge_1() {
 
 
 /**
-给定K个有序数组，每个数组有n个元素，想把这些数组合并成一个有序数组。
+    给定K个有序数组，每个数组有n个元素，想把这些数组合并成一个有序数组。
 
-算法原理及实现
-一. 最简单的方法是创建一个n*k大小的数组，然后把所有数字拷贝进去，然后再进行时间复杂度为O(nlogn)排序算法，这样总体时间复杂度为O(nklognk)
+    算法原理及实现
+    一. 最简单的方法是创建一个n*k大小的数组，然后把所有数字拷贝进去，然后再进行时间复杂度为O(nlogn)排序算法，这样总体时间复杂度为O(nklognk)
 
-二. 可以利用最小堆完成，时间复杂度是O(nklogk)，具体过程如下：
+    二. 可以利用最小堆完成，时间复杂度是O(nklogk)，具体过程如下：
 
-创建一个大小为n*k的数组保存最后的结果
-创建一个大小为k的最小堆，堆中元素为k个数组中的每个数组的第一个元素
-重复下列步骤n*k次：
-每次从堆中取出最小元素（堆顶元素），并将其存入输出数组中
-用堆顶元素所在数组的下一元素将堆顶元素替换掉，
-如果数组中元素被取光了，将堆顶元素替换为无穷大。每次替换堆顶元素后，重新调整堆
-下面给出相关算法的C++实现代码
+    创建一个大小为n*k的数组保存最后的结果
+    创建一个大小为k的最小堆，堆中元素为k个数组中的每个数组的第一个元素
+    重复下列步骤n*k次：
+    每次从堆中取出最小元素（堆顶元素），并将其存入输出数组中
+    用堆顶元素所在数组的下一元素将堆顶元素替换掉，
+    如果数组中元素被取光了，将堆顶元素替换为无穷大。每次替换堆顶元素后，重新调整堆
+    下面给出相关算法的C++实现代码
  **/
 #define n 4
 
@@ -321,6 +321,8 @@ void MergeSort(int sourceArr[], int tempArr[], int startIndex, int endIndex) {
     if (startIndex < endIndex)
     {
         midIndex = (startIndex + endIndex) / 2;
+        printf( "startIdx=%d endIdx=%d midIdx=%d\n", startIndex, endIndex, midIndex );
+
         MergeSort(sourceArr, tempArr, startIndex, midIndex);
         MergeSort(sourceArr, tempArr, midIndex+1, endIndex);
         Merge(sourceArr, tempArr, startIndex, midIndex, endIndex);
@@ -331,10 +333,13 @@ void MergeSort(int sourceArr[], int tempArr[], int startIndex, int endIndex) {
 // 若从稳定性来考虑，应选取归并排序，因为堆排序和快速排序都是不稳定的。
 // 若从平均情况下的排序速度考虑，应该选择快速排序。
 void tst_merge_sort_1() {
-    int a[8] = {50, 10, 20, 30, 70, 40, 80, 60};
-    int i, tmp[8];
-    MergeSort(a, tmp, 0, 7);
-    for (i=0; i<8; i++)
+    int a[ ] = {50, 10, 34, 29, 17, 61, 20, 30, 70, 40, 80, 60};
+    int lenArr = array_size(a);
+    int i, tmp[ lenArr ];
+    printf("lenArr=%d\n", lenArr);
+
+    MergeSort(a, tmp, 0, lenArr - 1);
+    for (i=0; i < lenArr; i++)
         printf("%d ", a[i]);
     printf("\n");
 }
@@ -395,11 +400,13 @@ void tst_c11_merge() {
 }
 
 int tst_MergeSortEntry_() {
+
+    tst_merge_sort_1(); return 1;
+
     tst_NoR_merge_1(); return 0;
 
     tst_c11_merge(); return 1;
 
-    tst_merge_sort_1(); return 1;
 
     tst_example_1(); return 0;
 

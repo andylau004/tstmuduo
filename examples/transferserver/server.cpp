@@ -110,7 +110,7 @@ bool ServerImpl::init(TypeProcess tp, TypeProtocol pro, int port, int nthread) {
     }
 
     bool ret = m_tmanager->start(tp, pro);
-    if (ret == false) {
+    if (!ret) {
         return false;
     }
 

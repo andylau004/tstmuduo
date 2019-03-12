@@ -3,6 +3,8 @@
 
 #include <stdio.h>
 
+#include <boost/scoped_ptr.hpp>
+
 #include "transport.hpp"
 
 enum SocketState {
@@ -55,7 +57,8 @@ private:
     void transition();
 
 private:
-    Framing     *   m_framing;
+    boost::scoped_ptr<Framing> m_framing;
+//    Framing     *   m_framing;
     SocketState     m_socketState;
     AppState        m_appState;
     ServerState     m_serverState;

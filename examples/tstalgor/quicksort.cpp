@@ -31,6 +31,12 @@ using namespace std;
 const int MAX_LENGTH_INSERT_SORT = 7;
 
 
+void justPrint(int arr[], int length) {
+    for ( size_t idx = 0; idx < length; ++idx ) {
+        std::cout << arr[idx] << " ";
+    }
+    std::cout << std::endl;
+}
 
 // 选取左中右三个元素，求出中位数，放入数组最左边的a[low]中
 int selectMiddleOfThree(int arr[], int low, int high) {
@@ -222,7 +228,152 @@ void tst_qs_111() {
     cout << std::endl;
 }
 
+int p_new(int a[], int l, int r, int length) {
+    int i = l, j = r + 1;
 
+    int key = a[l];
+    while (true) {
+        while (a[--j] > key) {}
+        if ( i == j )
+            break;
+        if ( i < j )
+            std::swap(a[i], a[j]);
+
+        while (a[++i] < key) {
+            if (i == j) break;
+        }
+        if (i >= j) {
+            break;
+        } else {
+            std::swap(a[i], a[j]);
+        }
+    }
+    std::swap(a[l], a[j]);
+}
+void qs_new(int arr[], int left, int rigth, int length) {
+    int pivocLoc;
+    if (left < rigth) {
+        pivocLoc = p_new(arr, left, rigth, length);
+        qs_new(arr, left, pivocLoc, length);
+        qs_new(arr, pivocLoc + 1, rigth, length);
+    }
+}
+class SolutionQS {
+    int partition(int arr[], int l, int r) {
+        int index = l, pivot = arr[r];
+
+        for (int i=l; i<r; ++i)
+            if (arr[i] <= pivot) std::swap(arr[i], arr[index++]);
+
+        std::swap(arr[index], arr[r]);
+        return index;
+    }
+public:
+    void quickSort(int arr[], int l, int r) {
+        if (l < r) {
+            int pivot = partition(arr, l, r);
+            quickSort(arr, l, pivot-1);
+            quickSort(arr, pivot+1, r);
+        }
+    }
+};
+
+
+
+// 简洁靠谱 快排实现
+/*
+ * 功能：对数组升序快排，递归实现
+ * 参数：lst：带排序数组，head：数组首元素下标，tail：数组末元素下标
+ * 返回值：无
+ */
+template<typename T>
+void t_qsort(T lst[], int head, int tail) {
+    if (head >= tail) return;
+
+    int i = head, j = tail;
+
+    T pivot = lst[head];  // 通常取第一个数为基准
+    while (i < j) { // i,j 相遇即退出循环
+        while (i < j && lst[j] >= pivot) j--;
+        lst[i] = lst[j];    // 从右向左扫描，将比基准小的数填到左边
+        while (i < j && lst[i] <= pivot) i++;
+        lst[j] = lst[i];    //  从左向右扫描，将比基准大的数填到右边
+    }
+    lst[i] = pivot; // 将 基准数 填回
+
+    t_qsort(lst, head, i - 1);    // 以基准数为界左右分治
+    t_qsort(lst, j + 1, tail);
+}
+// 简洁靠谱 快排实现
+void my_qs(int arr[], int head, int tail) {
+    if (head >= tail) return;
+
+    int i = head, j = tail;
+    int piv = arr[i];
+    while (i < j) {
+        while (i < j && arr[j] > piv) j --;
+        if (i < j)
+            arr[i++] = arr[j];
+//            std::swap( arr[i++], arr[j] );
+
+        while (i < j && arr[i] <= piv) i ++;
+        if (i < j)
+            arr[j--] = arr[i];
+//            std::swap( arr[j--], arr[i] );
+    }
+    arr[ i ] = piv;
+
+    my_qs( arr, head, i - 1 );
+    my_qs( arr, j + 1, tail );
+}
+void f_1(int arr[], int head, int tail) {
+    if (head >= tail) return;
+
+    int i = head, j = tail;
+    int piv = arr[i];
+    while (i < j) {
+        while (j < j && arr[j] > piv) j--;
+        if (i < j) arr[i++] = arr[j];
+
+        while (i < j && arr[i] <= piv) i++;
+        if (i < j) arr[j--] = arr[i];
+    }
+    arr[i] = piv;
+
+    f_1( arr, head, i - 1 );
+    f_1( arr, j + 1, tail );
+}
+void f_2(int arr[], int head, int tail) {
+    if (head >= tail) return;
+
+    int i = head, j = tail;
+    int piv = arr[i];
+
+    while (i < j) {
+        while (i < j && arr[j] > piv) j --;
+        if (i < j) arr[i++] = arr[j];
+
+        while (i < j && arr[i] <= piv) i++;
+        if (i < j) arr[j--] = arr[i];
+    }
+    arr[i] = piv;
+    f_2( arr, head, i - 1 );
+    f_2( arr, j + 1, tail );
+}
+
+void tst_qs_new() {
+    int arr[] = {12, 45, 748, 3986, 15, 56, 3, 89, 4, 48, 2, 0, -1, 1024, };
+    int length = sizeof(arr) / sizeof(int);
+    justPrint( arr, length );
+
+    f_2(arr, 0, length - 1);
+//    my_qs( arr, 0, length - 1 );
+//    t_qsort<int>( arr, 0, length - 1 );
+//    SolutionQS cqs;
+//    cqs.quickSort( arr, 0, length - 1 );
+
+    justPrint( arr, length );
+}
 
 
 

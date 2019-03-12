@@ -310,8 +310,58 @@ void tst_lowbounder() {
     std::cout << "it=" << *it << std::endl;
 }
 
+class CZhongweishu {
+public:
+    priority_queue<int, vector<int>, less<int> > p;
+    priority_queue<int, vector<int>, greater<int> > q;
+
+public:
+    void Insert(int num){
+        if(p.empty() || num <= p.top()) p.push(num);
+        else q.push(num);
+        if(p.size() == q.size() + 2) q.push(p.top()), p.pop();
+        if(p.size() + 1 == q.size()) p.push(q.top()), q.pop();
+    }
+    double GetMedian(){
+      return p.size() == q.size() ? (p.top() + q.top()) / 2.0 : p.top();
+    }
+};
+//链接：https://ac.nowcoder.com/questionTerminal/440f16e490a0404786865e99c6ad91c9?toCommentId=127471
+//来源：牛客网
+#include <bits/stdc++.h>
+using namespace std;
+
+int getonecount() {
+    int n;
+    while(cin>>n){
+        int c = 0;
+        while ( n ) {
+            n &= (n-1);
+            c ++;
+        }
+        printf( "c=%d\n", c );
+    }
+    return 0;
+}
+
+
+void tst_zhongweishu() {
+
+    CZhongweishu  czws;
+
+    czws.Insert( 16 );czws.Insert( 3 );
+    czws.Insert( 156 );czws.Insert( 322 );
+    czws.Insert( 99 );czws.Insert( 7 );
+    czws.Insert( 27 );
+
+    LOG_INFO << "czws.GetMedian=" << czws.GetMedian();
+}
 
 int tst_HeapSortEntry_() {
+    getonecount(); return 1;
+
+    tst_zhongweishu(); return 1;
+
     tst_lowbounder();
     return 1;
 

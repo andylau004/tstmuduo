@@ -36,24 +36,27 @@ FrameTransport::FrameTransport(uint32_t size) :
 }
 
 FrameTransport::~FrameTransport() {
-    delete_object(m_framing);
+//    delete_object(m_framing);
 }
 
 bool FrameTransport::init() {
     if (!Transport::init()) {
         return false;
     }
-    if (m_framing == nullptr) {
-        m_framing = new (std::nothrow) Framing;
-        if (m_framing == nullptr) {
-            LOG_ERROR << " new m_framing error ";
-            return false;
-        }
+//    if (m_framing == nullptr) {
+//        m_framing = new (std::nothrow) Framing;
+//        if (m_framing == nullptr) {
+//            LOG_ERROR << " new m_framing error ";
+//            return false;
+//        }
+//    }
+    if (!m_framing) {
+        m_framing.reset(new Framing);
     }
     m_socketState = SOCKET_RECV_FRAMING;
-    m_appState = APP_INIT;
+    m_appState    = APP_INIT;
     m_serverState = SERVER_READ;
-    m_readWant = 0;
+    m_readWant    = 0;
     return true;
 }
 
@@ -146,7 +149,7 @@ bool FrameTransport::read_framing() {
     m_appState = APP_READ_FRAME_SIZE;
 
     // 触发时间轮 -- 该连接收到数据
-    SingalRecvSomeData();
+//    SingalRecvSomeData();
     return true;
 }
 
@@ -171,7 +174,7 @@ void FrameTransport::transition() {
                     SignalCloseSocket();
                     return;
                 }
-                m_readBuffer = newbuffer;
+                m_readBuffer     = newbuffer;
                 m_readBufferSize = newSize;
             } else {
                 // tcmalloc will hold the performance
@@ -188,26 +191,26 @@ void FrameTransport::transition() {
                 }
             }
             m_readBufferPos = 0;
-            m_socketState = SOCKET_RECV;
-            m_appState = APP_READ_REQUEST;
+            m_socketState   = SOCKET_RECV;
+            m_appState      = APP_READ_REQUEST;
             return;
 
         case APP_READ_REQUEST: // 解析body
             LOG_INFO << ", READ_REQUEST read done";
-            m_inputTransport->resetBuffer(m_readBuffer, m_readWant);
-            m_outputTransport->resetBuffer();
-            m_outputTransport->getWritePtr(4);
-            m_outputTransport->wroteBytes(4);
-            m_appState = APP_WAIT_TASK;
+            m_inMemBuffer->resetBuffer(m_readBuffer, m_readWant);
+            m_outMemBuffer->resetBuffer();
+            m_outMemBuffer->getWritePtr(4);
+            m_outMemBuffer->wroteBytes(4);
+            m_appState    = APP_WAIT_TASK;
             m_serverState = SERVER_WRITE;
             SignalReadSocketDone();
             break;
 
         case APP_WAIT_TASK:
-            m_outputTransport->getBuffer(&m_writeBuffer, &m_writeBufferSize);
+            m_outMemBuffer->getBuffer(&m_writeBuffer, &m_writeBufferSize);
             if (m_writeBufferSize > 4) {
                 m_writeBufferPos = 0;
-                m_socketState = SOCKET_SEND;
+                m_socketState    = SOCKET_SEND;
 
                 uint32_t frameSize = (uint32_t)::htonl(m_writeBufferSize - 4);
                 memcpy(m_writeBuffer, &frameSize, 4);
@@ -221,13 +224,14 @@ void FrameTransport::transition() {
         LABEL_APP_INIT:
         case APP_INIT:
                 LOG_INFO << ", INIT, set read";
-                m_writeBuffer = NULL;
-                m_writeBufferPos = 0;
+                m_writeBuffer     = NULL;
+                m_writeBufferPos  = 0;
                 m_writeBufferSize = 0;
-                m_socketState = SOCKET_RECV_FRAMING;
-                m_appState = APP_READ_FRAME_SIZE;
-                m_serverState = SERVER_READ;
-                m_readBufferPos = 0;
+
+                m_socketState     = SOCKET_RECV_FRAMING;
+                m_appState        = APP_READ_FRAME_SIZE;
+                m_serverState     = SERVER_READ;
+                m_readBufferPos   = 0;
 
                 //SignalSetWriteState();
                 SignalSetReadState();
@@ -258,7 +262,7 @@ bool FrameTransport::read_data() {
         return false;
     }
     // whenever we got here, it means something has wrong
-    LOG_ERROR << ", m_readWant:" << m_readWant << ",m_readBufferPos:" << m_readBufferPos;
+    LOG_ERROR << ", m_readWant:" << m_readWant << ", m_readBufferPos:" << m_readBufferPos;
     SignalCloseSocket();
     return false;
 }

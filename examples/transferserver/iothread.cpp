@@ -301,24 +301,24 @@ void IOThreadImpl::return_clientctx(ClientCtx * ctx) {
         uint64_t tmpId = ctx->GetIdx();
         LOG_INFO << "return_clientctx shoudao close connection Idx=" << tmpId ;
 
-        MutexLockGuard lock(mtx_id_ctx);
-        boost::unordered_map< uint64_t, ClientCtxPtr >::iterator itfind
-                = id_ctx_map_.find(tmpId);
-        if ( itfind == id_ctx_map_.end() ) {
-            LOG_ERROR << "no found IdxId=" << tmpId << ", id_ctx_map size=" << id_ctx_map_.size();
-//            for (auto iter = id_ctx_map_.begin(); iter != id_ctx_map_.end(); ++iter) {
-//                LOG_INFO << "mapId=" << iter->first /*<< " mapval=" << iter->second*/;
+//        MutexLockGuard lock(mtx_id_ctx);
+//        boost::unordered_map< uint64_t, ClientCtxPtr >::iterator itfind
+//                = id_ctx_map_.find(tmpId);
+//        if ( itfind == id_ctx_map_.end() ) {
+//            LOG_ERROR << "no found IdxId=" << tmpId << ", id_ctx_map size=" << id_ctx_map_.size();
+////            for (auto iter = id_ctx_map_.begin(); iter != id_ctx_map_.end(); ++iter) {
+////                LOG_INFO << "mapId=" << iter->first /*<< " mapval=" << iter->second*/;
+////            }
+//        } else {
+//            WeakClientCtxPtr tmpSecond(itfind->second);
+//            if (tmpSecond.expired()) {
+//                LOG_INFO << "tmpId=" << tmpId << " connection is destroy!!!";
+//            } else {
+//                LOG_INFO << "before tmpSecond not expired" << " usecount=" << tmpSecond.use_count();
 //            }
-        } else {
-            WeakClientCtxPtr tmpSecond(itfind->second);
-            if (tmpSecond.expired()) {
-                LOG_INFO << "tmpId=" << tmpId << " connection is destroy!!!";
-            } else {
-                LOG_INFO << "before tmpSecond not expired" << " usecount=" << tmpSecond.use_count();
-            }
-            id_ctx_map_.erase( tmpId );
-            LOG_INFO << "after tmpSecond not expired" << " usecount=" << tmpSecond.use_count();
-        }
+//            id_ctx_map_.erase( tmpId );
+//            LOG_INFO << "after tmpSecond not expired" << " usecount=" << tmpSecond.use_count();
+//        }
         ctx->SetIdx(0);
     }
 
@@ -568,21 +568,22 @@ bool IOThreadImpl::create_connection(Item_t * item) {
     if (!ctx->init(item)) {
         ret = false;
         activeCtxnum_--;
-        delete ctx;
-        LOG_ERROR << " init ctx error, ctx=" << ctx << ",ctx activeNum=" << activeCtxnum_;
-    } else {// ret == true
-        boost::shared_ptr<ClientCtx> sp_ctx(ctx);
-        SaveNewCtx(sp_ctx);
+        LOG_ERROR << " init ctx error, ctx=" << ctx << ", activeNum=" << activeCtxnum_;
+        delete_object(ctx);
+    } else {
+        ret == true;
+//        boost::shared_ptr<ClientCtx> sp_ctx(ctx);
+//        SaveNewCtx(sp_ctx);
 
-        EntryCtxPtr new_entry(new EntryCtx(sp_ctx));
-        connectionBuckets_.back().insert(new_entry);
+//        EntryCtxPtr new_entry(new EntryCtx(sp_ctx));
+//        connectionBuckets_.back().insert(new_entry);
 
-        dumpConnectionBuckets();
+//        dumpConnectionBuckets();
 
-        WeakEntryCtxPtr weak_new_entry(new_entry);
-        ctx->setContext(weak_new_entry);
+//        WeakEntryCtxPtr weak_new_entry(new_entry);
+//        ctx->setContext(weak_new_entry);
 
-        printf( "after SaveNewCtx sp_ctx.use_count=%d\n", sp_ctx.use_count() );
+//        printf( "after SaveNewCtx sp_ctx.use_count=%d\n", sp_ctx.use_count() );
     }
     return ret;
 }

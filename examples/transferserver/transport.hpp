@@ -40,8 +40,8 @@ public:
     // 通知收到客户端数据
     sigslot::signal0<> SingalRecvSomeData;
 
-    TMemoryBufferPtr getInputTransport()    { return m_inputTransport; }
-    TMemoryBufferPtr getOutputTransport()   { return m_outputTransport; }
+    TMemoryBufferPtr getInputTransport()    { return m_inMemBuffer; }
+    TMemoryBufferPtr getOutputTransport()   { return m_outMemBuffer; }
 protected:
     int32_t read(uint8_t * buf, uint32_t len);
     int32_t write(const uint8_t * buf, uint32_t len);
@@ -56,7 +56,7 @@ protected:
 
     SOCKET   m_socket;
 
-    TMemoryBufferPtr m_inputTransport;
-    TMemoryBufferPtr m_outputTransport;
+    TMemoryBufferPtr m_inMemBuffer;
+    TMemoryBufferPtr m_outMemBuffer;
 };
 

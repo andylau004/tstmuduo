@@ -140,12 +140,10 @@ public:
         : loop_(loop),
           server_(loop, listenAddr, "testserver")
     {
-        server_.setThreadNum(24);
+        server_.setThreadNum(2);
 
-        server_.setConnectionCallback(
-                    boost::bind(&CTestServer::onConnection, this, _1) );
-        server_.setMessageCallback(
-                    boost::bind(&CTestServer::onMessage, this, _1, _2, _3) );
+        server_.setConnectionCallback(boost::bind(&CTestServer::onConnection, this, _1) );
+        server_.setMessageCallback(boost::bind(&CTestServer::onMessage, this, _1, _2, _3) );
 //        server_.setWriteCompleteCallback(
 //                    boost::bind(&CTestServer::onWriteComplete, this, _1));
 
@@ -180,6 +178,7 @@ public:
     }
 private:
     void onConnection(const TcpConnectionPtr& conn) {
+        LOG_DEBUG << "On use_count=" << conn.use_count();
         if (conn->connected()) {
 //            printf("onConnection(): new connection [%s] from %s\n",
 //                   conn->name().c_str(),
@@ -220,6 +219,34 @@ private:
 };
 
 //
+
+class CTestObj {
+public:
+    CTestObj() { printf( "CTestObj cst\n" ); }
+    ~CTestObj() { printf( "CTestObj dst\n" ); }
+};
+
+
+void useIt2(const boost::shared_ptr< CTestObj >& oneObj) {
+
+    LOG_INFO << "useIt2 find usecount=" << oneObj.use_count();
+}
+
+void useIt1(const boost::shared_ptr< CTestObj >& oneObj) {
+
+    LOG_INFO << "useIt1 find usecount=" << oneObj.use_count();
+
+    useIt2( oneObj );
+}
+
+void use_sp_usecount() {
+    boost::shared_ptr< CTestObj > spObj( new CTestObj );
+    LOG_INFO << "before usecount=" << spObj.use_count();
+    useIt1( spObj );
+    LOG_INFO << "after usecount=" << spObj.use_count();
+    return;
+}
+
 void tst_Tcp_server1() {
 
     InetAddress listenAddr(9091);

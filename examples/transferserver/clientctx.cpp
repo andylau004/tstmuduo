@@ -83,7 +83,7 @@ bool ClientCtx::init(Item_t * item) {
         m_transport->SignalSetWriteState.connect(this, &ClientCtx::on_setwritestate);
         m_transport->SignalSetReadState.connect(this, &ClientCtx::on_setreadstate);
 
-        m_transport->SingalRecvSomeData.connect(this, &ClientCtx::on_recvsomedata);
+//        m_transport->SingalRecvSomeData.connect(this, &ClientCtx::on_recvsomedata);
     }
     if (!m_transport->init()) {
         LOG_ERROR << " bad transport init " << m_ctx->m_sfd;
