@@ -2,8 +2,39 @@
 #include "mergesort.h"
 
 
+#define ECCref_MAX_BITS			512
+
+#define ECCref_MAX_LEN			((ECCref_MAX_BITS+7) / 8)
+
+extern void call_FindNumsAppearOnce();
 
 
+// 求两个有序数组的中位数或者第k小元素
+int findMedian_merg(std::vector<int>& vec1, std::vector<int>& vec2) {
+
+//    printf( "ECCref_MAX_LEN=%d\n", ECCref_MAX_LEN );
+//    return 1;
+
+    std::vector< int > vectt;
+    vectt.push_back(981);
+    vectt.push_back(12);
+    vectt.push_back(45);
+
+    int * pstart = &(vectt[0]);
+    int count = vectt.size();
+    while( count ) {
+        printf( "val=%d\n", *pstart );
+        pstart++;
+        count --;
+    }
+    return 1;
+
+    int N1 = vec1.size();
+    int N2 = vec2.size();
+    int median = (N1 + N2 + 1)/2;
+
+    return 1;
+}
 
 
 //low为本次二路归并排序的第1有序区的第1个元素，i指向第1个元素, mid为第1有序区的最后1个元素
@@ -321,11 +352,11 @@ void MergeSort(int sourceArr[], int tempArr[], int startIndex, int endIndex) {
     if (startIndex < endIndex)
     {
         midIndex = (startIndex + endIndex) / 2;
-        printf( "startIdx=%d endIdx=%d midIdx=%d\n", startIndex, endIndex, midIndex );
+//        printf( "startIdx=%d endIdx=%d midIdx=%d\n", startIndex, endIndex, midIndex );
 
-        MergeSort(sourceArr, tempArr, startIndex, midIndex);
-        MergeSort(sourceArr, tempArr, midIndex+1, endIndex);
-        Merge(sourceArr, tempArr, startIndex, midIndex, endIndex);
+        MergeSort( sourceArr, tempArr, startIndex, midIndex );
+        MergeSort( sourceArr, tempArr, midIndex + 1, endIndex );
+        Merge( sourceArr, tempArr, startIndex, midIndex, endIndex );
     }
 }
 // 归并排序和堆排序、快速排序的比较
@@ -339,8 +370,9 @@ void tst_merge_sort_1() {
     printf("lenArr=%d\n", lenArr);
 
     MergeSort(a, tmp, 0, lenArr - 1);
+
     for (i=0; i < lenArr; i++)
-        printf("%d ", a[i]);
+        printf("%d ", tmp[i]);
     printf("\n");
 }
 
@@ -398,8 +430,57 @@ void tst_c11_merge() {
         cout << nums[i] << " ";
     cout << endl;
 }
+extern void FindNumsAppearOnce(int data[], int length, int &num1, int &num2);
 
+// int类型有32位，假如二进制位不进位的话，
+// 对数组中除了single数以外的所有数做累加，32位每一位上的值都是3。
+// 假如我对每一位是做模3加法的话，把数组所有数加起来，
+// 32位每一位的值应该有1有0，因为三个相同数加起来都会模3变为0，
+// 所以剩下的1都是属于single数的，所以这个累加和就等于single数。
+// 这个方法时间是O(32*N)，但要分别计算每一位的累加，分别作32次累加。空间是O(1)。
+// 数组中每个数会出现3次，只有1个例外的数仅出现1次。
+void singleNumber(int arr[], int length, int &result) {
+    result = 0;
+    int sum[32] = {0};
+    int i = 0; int j = 0;
+
+    for (i = 0; i < length; ++i) {
+        for (j = 0; j < 32; ++j) {
+            sum[j] += ( (arr[i] >> j) & 1 );// 每轮只对固定某一位做累加
+        }
+    }
+    for(j = 0; j < 32; ++j) {
+        if (sum[j] % 3 != 0)
+            result += (1 << j);
+    }
+    std::cout << "result=" << result << std::endl;
+}
+void call_singleNumber() {
+    int arr[] = { 888, 888, 987, 13, 888, 987, 987};
+    int sizearr = sizeof(arr)/sizeof(arr[0]);
+    int v1 = 0;
+    singleNumber(arr, sizearr, v1);
+    std::cout << "v1=" << v1 << std::endl;
+}
 int tst_MergeSortEntry_() {
+    std::vector<int> vec1,  vec2;
+//    findMedian_merg(vec1, vec2); return 1;
+
+    call_singleNumber(); return 1;
+
+    call_FindNumsAppearOnce(); return 1;
+
+    priority_queue<int> p;
+    p.push(1);
+    p.push(2);
+    p.push(8);
+    p.push(5);
+    p.push(43);
+    for(int i=0;i<5;i++){
+        cout<<p.top()<<endl;
+        p.pop();
+    }
+    return 1;
 
     tst_merge_sort_1(); return 1;
 
@@ -407,9 +488,102 @@ int tst_MergeSortEntry_() {
 
     tst_c11_merge(); return 1;
 
-
     tst_example_1(); return 0;
-
 
     return 0;
 }
+
+bool IsBit(int val, int idxBit) {
+    val = val >> idxBit;
+    return val & 1;
+}
+
+
+class Solution {
+public:
+    void FindNumsAppearOnce(vector<int> data,int* num1,int *num2)  // 返回值的大小顺序没作要求，输入的数组也不一定是有序的
+    {
+        if(data.size()<2) return ;  // 返回值为void类型，出口应该这样写
+        int partFlag=0x1;  // partFlag为两类数的划分标志，是可变的
+        int xorRes=0;
+        for(int i=0; i<data.size();i++)
+            xorRes ^= data[i];
+        *num1 = xorRes;
+        *num2 = xorRes;
+        printf( "xorRes=%d\n", xorRes );
+        while((xorRes & partFlag)==0)
+            partFlag <<= 1;  // a & 0x1 等价于a%2，在这用来判断最后一位是0还是1，
+                             // 找到xorRes中的1个位置时，partFlag的最高位(倒数第k位)是1，其他位全0
+        for(int i=0; i<data.size();i++)
+        {
+            if((data[i] & partFlag)==0) *num1 ^= data[i]; // 判断data数组中所有数的倒数第k位是0还是1，*num1是两单次出现的数中的较大者
+            else *num2 ^=data[i]; // *num1是两单次出现的数中的较大者, *num2是较小者
+        }
+    }
+};
+
+
+void call_FindNumsAppearOnce() {
+    ////    vector<int> data1 = {3,1,10,1,3,6,2,6};
+    int arr[] = { 888, 32, 987, 15, 888, 987};
+    int sizearr = sizeof(arr)/sizeof(arr[0]);
+    int v1 = -1; int v2 = -1;
+    FindNumsAppearOnce( arr, sizearr, v1, v2 );
+    printf( "v1=%d v2=%d\n", v1, v2 );
+}
+///// 查找数组中两个单次出现，其他都是两个重复出现数字
+void FindNumsAppearOnce(int data[], int length, int &num1, int &num2)
+{
+    if (length < 2) return;
+    {
+        int xorVal = 0;
+        int partFlag = 0x01;
+        for (int i = 0; i < length; ++i)
+            xorVal ^= data[i];
+        if (xorVal == 0) return;
+        while ((xorVal & partFlag) == 0) {
+            partFlag <<= 1;
+        }
+        num1 = 0;num2 = 0;
+        for (int i = 0; i < length; ++i) {
+            if (data[i] & partFlag) {
+                num1 ^= data[i];
+            } else {
+                num2 ^= data[i];
+            }
+        }
+    }
+    return;
+
+    {
+        int xorVal   = 0;
+        int partFlag = 0x1;  // partFlag为两类数的划分标志，是可变的
+        for (int i = 0 ; i < length; ++i )
+           xorVal ^= data[i];
+        printf( "xorVal=%d\n", xorVal );
+        if (xorVal == 0) return;
+
+        num1 = xorVal;
+        num2 = xorVal;
+        // partFlag & 0x1 等价于partFlag%2，在这用来判断最后一位是0还是1，
+        // 找到xorRes中的1个位置时，partFlag的最高位(倒数第k位)是1，其他位全0
+        while ((xorVal & partFlag) == 0)
+            partFlag <<= 1;
+
+        for ( int i = 0; i < length; ++i ) {
+            if ( (data[i] & partFlag) == 0/*IsBit( data[i], idxBit )*/ ) {
+                num1 ^= data[i];
+            } else {
+                num2 ^= data[i];
+            }
+        }
+
+    }
+
+}
+
+
+
+
+
+

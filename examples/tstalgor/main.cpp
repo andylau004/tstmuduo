@@ -74,6 +74,10 @@
 
 #include "bitmapfun.h"
 
+#include "bst.h"
+#include "List.h"
+
+
 
 using namespace std;
 using namespace muduo;
@@ -98,6 +102,7 @@ using namespace muduo::net;
 
 
 
+extern void tst_link_1();
 
 /*
 
@@ -249,9 +254,8 @@ HTTP 协议的 get 和 post 方法的区别，问得比较深的会让你画出 
 
 因为个人经验能力有限，而且限于篇幅，很多地方也不便详细展开，读者如果有什么想法或者指教，欢迎交流探讨。
 
-
-
 */
+
 
 class TestClient
 {
@@ -624,91 +628,91 @@ void tst_host_net_shunxu() {
 
 
 
-struct ListNode {
-    int val;
-    ListNode *next;
-    ListNode(int x) : val(x), next(NULL) {}
-};
+//struct ListNode {
+//    int val;
+//    ListNode *next;
+//    ListNode(int x) : val(x), next(NULL) {}
+//};
 
-class Solution {
-public:
-    ListNode* getPartation(ListNode *start, ListNode *end)
-    {
-        if (start == end) return start ;
+//class Solution {
+//public:
+//    ListNode* getPartation(ListNode *start, ListNode *end)
+//    {
+//        if (start == end) return start ;
 
-        ListNode *p1 = start ;
-        ListNode *p2 = p1->next ;
-        int key = start->val ;
+//        ListNode *p1 = start ;
+//        ListNode *p2 = p1->next ;
+//        int key = start->val ;
 
-        while(p2 != end)
-        {
-            if (p2->val < key)
-            {
-                p1 = p1->next ;
-                if ( p1 != p2 )
-                    swap(p1->val, p2->val) ; //找到一个比key小的数字，与p1到p2间的数交换，
-            }										//这之间的数都大于等于key
-            p2 = p2->next ;
-        }
-        swap(start->val, p1->val) ; //找到划分位置
-        return p1 ;
-    }
+//        while(p2 != end)
+//        {
+//            if (p2->val < key)
+//            {
+//                p1 = p1->next ;
+//                if ( p1 != p2 )
+//                    swap(p1->val, p2->val) ; //找到一个比key小的数字，与p1到p2间的数交换，
+//            }										//这之间的数都大于等于key
+//            p2 = p2->next ;
+//        }
+//        swap(start->val, p1->val) ; //找到划分位置
+//        return p1 ;
+//    }
 
-    void QuickSort(ListNode* start, ListNode *end)
-    {
-        if (start != end)
-        {
-            ListNode *pt = getPartation(start, end) ;
-            QuickSort(start, pt) ;
-            QuickSort(pt->next, end) ;
-        }
-    }
+//    void QuickSort(ListNode* start, ListNode *end)
+//    {
+//        if (start != end)
+//        {
+//            ListNode *pt = getPartation(start, end) ;
+//            QuickSort(start, pt) ;
+//            QuickSort(pt->next, end) ;
+//        }
+//    }
 
-    ListNode *sortList(ListNode *head) {
-        QuickSort(head, NULL) ;
-        return head ;
-    }
-};
+//    ListNode *sortList(ListNode *head) {
+//        QuickSort(head, NULL) ;
+//        return head ;
+//    }
+//};
 
-void insertBack(ListNode** head, ListNode** tail,  ListNode* n) //从尾部插入
-{
-    if (n)
-    {
-        if (*head == NULL)
-        {
-            *head = n ;
-            *tail = n ;
-        }
-        else
-        {
-            (*tail)->next = n ;
-            *tail = n ;
-        }
-    }
-}
+//void insertBack(ListNode** head, ListNode** tail,  ListNode* n) //从尾部插入
+//{
+//    if (n)
+//    {
+//        if (*head == NULL)
+//        {
+//            *head = n ;
+//            *tail = n ;
+//        }
+//        else
+//        {
+//            (*tail)->next = n ;
+//            *tail = n ;
+//        }
+//    }
+//}
 
-int tst_list_qs()
-{
-    ifstream in("data.txt") ;
-    ListNode* head = NULL ;
-    ListNode* tail = NULL ;
-    int val ;
+//int tst_list_qs()
+//{
+//    ifstream in("data.txt") ;
+//    ListNode* head = NULL ;
+//    ListNode* tail = NULL ;
+//    int val ;
 
-    Solution s ;
-    while(in >> val)
-    {
-        ListNode*tmp = new ListNode(val) ;
-        insertBack(&head, &tail, tmp) ;
-    }
-    head = s.sortList(head) ;
-    while(head)
-    {
-        cout << head->val << " " ;
-        head = head->next ;
-    }
-    cout << endl ;
-    return 0 ;
-}
+//    Solution s ;
+//    while(in >> val)
+//    {
+//        ListNode*tmp = new ListNode(val) ;
+//        insertBack(&head, &tail, tmp) ;
+//    }
+//    head = s.sortList(head) ;
+//    while(head)
+//    {
+//        cout << head->val << " " ;
+//        head = head->next ;
+//    }
+//    cout << endl ;
+//    return 0 ;
+//}
 
 
 void use_cpu() {
@@ -1173,14 +1177,271 @@ void tst_ptr_vec () {
 
         LOG_INFO << "pTmp addr=" << pTmp;
     }
-
-
 }
 
+double g_iBenJin = 1000 * 10000;
+
+void tst_lixi() {
+    double yinhang = 0.04;
+    double yuebao  = 0.028;
+
+    double year_yinhang = g_iBenJin * 0.04;
+    std::cout << "year_yinhang=" << year_yinhang << std::endl;
+
+    double lixi = 0;
+    double tmpBenjin = g_iBenJin;
+    double sum = 0;
+    for ( int i = 1; i < 365; ++ i ) {
+        lixi += (tmpBenjin * yuebao) / 365;
+        tmpBenjin = tmpBenjin + lixi;
+    }
+    std::cout << "year_yuebao=" << lixi << std::endl;
+}
+
+
+//把一个数组最开始的若干个元素搬到数组的末尾，我们称之为数组的旋转。
+//输入一个非减排序的数组的一个旋转，输出旋转数组的最小元素。
+//例如数组{3,4,5,1,2}为{1,2,3,4,5}的一个旋转，该数组的最小值为1。
+//NOTE：给出的所有元素都大于0，若数组大小为0，请返回0。
+int findmin_inrotatearrry( std::vector<int> v ) {
+    int left = 0;
+    int right = v.size() - 1;
+    int mid = left;
+
+    while (v[left] >= v[right]) {
+        if (right - left == 1) {
+            mid = right;
+            break;
+        }
+
+        mid = left + (right - left) / 2;
+        std::cout << "while mid=" << mid << std::endl;
+
+        if (v[mid] >= v[left]) {
+            left = mid;
+        } else if (v[mid <= v[right]]) {
+            right= mid;
+        }
+    }
+    std::cout << "mid=" << mid << std::endl;
+    return v[mid];
+}
+void tst_findmin_inrotatearrry() {
+    std::vector< int > v;
+    v.push_back(3);v.push_back(4);v.push_back(5);
+    v.push_back(1);v.push_back(2);
+    std::cout << "findmin_inrotatearrry=" << findmin_inrotatearrry(v) << std::endl;
+}
+
+// 面试题15之链表中倒数第K个结点_KthNodeFromEnd.cpp
+ListNode* FindKthToTail(ListNode* pListHead, unsigned int k) {
+    ListNode* pFront = pListHead;
+    for ( unsigned int i = 0; i < k - 1; i ++ ) {
+        if (pFront->m_pNext)
+            pFront = pFront->m_pNext;
+        else
+            return NULL;
+    }
+    ListNode* pBehind = pListHead;
+    while (pFront->m_pNext) {
+        pFront = pFront->m_pNext;
+        pBehind = pBehind->m_pNext;
+    }
+    return pBehind;
+}
+// 寻找单链表的中间节点
+// 当链表中有偶数个元素时，最中间的两个节点都可以算作中间节点；
+// 但通过该方法查找到的是前面那个节点；如｛1，2，3，4，5｝，通过该方法查找到的中间节点是3。
+// 查找中间节点，如果是奇数个队列元素，返回中间
+ListNode* FindMidNode(ListNode* pHead) {
+    ListNode* pMid  = NULL;
+    ListNode* ptemp = pHead;
+
+    while (pHead && pHead->m_pNext && pHead->m_pNext->m_pNext) {
+        pHead = pHead->m_pNext->m_pNext;
+        ptemp = ptemp->m_pNext;
+        pMid = ptemp;
+    }
+    return pMid;
+}
+void call_rever_KthNode() {
+    printf("=====Test1 starts:=====\n");
+    ListNode* pNode1 = CreateListNode(1);
+    ListNode* pNode2 = CreateListNode(2);
+    ListNode* pNode3 = CreateListNode(3);
+    ListNode* pNode4 = CreateListNode(4);
+    ListNode* pNode5 = CreateListNode(5);
+
+    ConnectListNodes(pNode1, pNode2);
+    ConnectListNodes(pNode2, pNode3);
+    ConnectListNodes(pNode3, pNode4);
+    ConnectListNodes(pNode4, pNode5);
+
+    printf("expected result: 4.\n");
+    ListNode* pNode = FindKthToTail(pNode1, 2);
+
+    PrintListNode(pNode);
+    pNode = FindMidNode(pNode1);
+    PrintListNode(pNode);
+
+    DestroyList(pNode1);
+}
+
+ListNode* IsCycle(ListNode *pHead) {
+    if (NULL == pHead || NULL == pHead->m_pNext)
+        return NULL;
+
+    std::set<ListNode*> setNodes;
+    ListNode* pnode = pHead;
+    while (pnode) {
+        int iPos = setNodes.insert(pnode).second;
+        if ( iPos ) {
+            pnode = pnode->m_pNext;
+            std::cout << "" << iPos << " insert success! nodeval=" << pnode->m_nValue << std::endl;
+        }
+        else {
+            std::cout << "" << iPos << " insert duplicate! nodeval=" << pnode->m_nValue << std::endl;
+            return pnode;
+        }
+    }
+    return NULL;
+
+//    if (!pHead)
+//        return NULL;
+
+//    ListNode* pFast = pHead;
+//    ListNode* pSlow = pHead;
+
+//    while (pFast && pFast->m_pNext) {
+//        pFast = pFast->m_pNext->m_pNext;
+//        pSlow = pSlow->m_pNext;
+//        if (pFast == pSlow) {
+//            return pFast;
+//        }
+//    }
+//    return NULL;
+}
+void call_cycle() {
+    ListNode* pNode1 = CreateListNode(1);
+    ListNode* pNode2 = CreateListNode(2);
+    ListNode* pNode3 = CreateListNode(3);
+    ListNode* pNode4 = CreateListNode(4);
+    ListNode* pNode5 = CreateListNode(5);
+    ListNode* pNode6 = CreateListNode(6);
+    ListNode* pNode7 = CreateListNode(7);
+
+    ConnectListNodes(pNode1, pNode2);
+    ConnectListNodes(pNode2, pNode3);
+    ConnectListNodes(pNode3, pNode4);
+    ConnectListNodes(pNode4, pNode5);
+    ConnectListNodes(pNode5, pNode6);
+    ConnectListNodes(pNode6, pNode7);
+    ConnectListNodes(pNode7, pNode4);
+
+    ListNode* pNode = IsCycle(pNode1);
+    if (!pNode) {
+        std::cout << "pNode is null" << std::endl;
+    } else {
+        std::cout << "val=" << pNode->m_nValue << std::endl;
+    }
+}
+
+//
+int Max_array_Sum(int* arr, int length) {
+    int max = arr[0];
+    int sum = arr[0];
+    for (int i = 1; i < length; i++) {
+        if (sum < 0) {
+            sum = arr[i];
+        } else {
+            sum += arr[i];
+        }
+        if (max < sum) {
+            max = sum;
+        }
+    }
+    return max;
+}
+// 求连续子数组的最大和
+void call_Max_array_Sum() {
+    int arr[]  = {6, -3, -2, 7, -15, 1, 2, 2};
+    int length = array_size(arr);
+    // last result value=8
+    // set: "6, -3, -2, 7"
+    std::cout << "sum=" << Max_array_Sum(arr, length) << std::endl;
+}
+
+// 给定数组a, 里面的元素先严格递增后严格递减, 求最大值元素的下标
+int find_max_in_array(const std::vector<int>& v) {
+//    if (nums.length == 1) {
+//        return 0;
+//    }
+//    if (nums[0] > nums[1]) {//数组单调递减
+//        return 0;
+//    }
+//    int index = nums.length-1;
+//    if (nums[index] > nums[index-1]) {//数组单调递增
+//        return index;
+//    }
+    int left = 0;
+    int right = v.size() - 1;
+    int mid = 0;
+    while ( left < right ) {
+        mid = (left + right) >> 1;
+        std::cout << "mid=" << mid << ", v[mid]=" << v[mid]
+                  << ", v[mid + 1]=" << v[mid + 1]
+                  << ", v[mid - 1]=" << v[mid - 1] << std::endl;
+
+        if (v[mid] > v[mid - 1] && v[mid] > v[mid + 1]) {
+            return mid;
+        }
+        else if (v[mid] > v[mid + 1]) {// 处于下坡段, 即递减段
+            right = mid - 1;
+        } else if (v[mid] > v[mid - 1]) {//处于上坡段, 即递增段
+            left = mid + 1;
+        }
+    }
+    return -1;
+}
+void call_find_max_in_array() {
+    std::vector<int> v;
+    for (int i = 0; i < 10; i+=2) {
+        v.push_back(i);
+    }
+    for (int j = 15; j > 0; j-=3) {
+        v.push_back(j);
+    }
+    std::cout << "orignal array: ";
+    for (size_t k = 0; k < v.size(); k++) {
+        std::cout << v[k] << " ";
+    }
+    std::cout << std::endl;
+
+    int idx = find_max_in_array(v);
+    if (idx != -1) {
+        std::cout << "find maxVal Idx=" << idx << ", value=" << v[idx] << std::endl;
+    } else {
+        std::cout << "no found max val" << std::endl;
+    }
+}
 int main(int argc, char *argv[])
 {
     Logger::setLogLevel(Logger::DEBUG);
     LOG_INFO << "pid = " << getpid() << ", tid = " << CurrentThread::tid();
+
+    call_find_max_in_array(); return 1;
+    call_Max_array_Sum(); return 1;
+
+    call_cycle(); return 1;
+
+    call_rever_KthNode(); return 1;
+
+    tst_findmin_inrotatearrry();return 1;
+    tst_bst_tree(); return 1;
+
+    tst_link_1(); return 1;
+
+    tst_lixi(); return 1;
 
 //    tst_ptr_vec(); return 1;
     tst_MergeSortEntry_(); return 1;
@@ -1234,10 +1495,9 @@ std::cout << "argc=" << argc << std::endl;
 //    std::cout << std::endl;
     std::cout << std::endl;
 
-
     tst_ComplexDataEntry_(); return 1;
 
-tst_print_time(); return 1;
+    tst_print_time(); return 1;
 
     tst_struct_fun(); return 1;
 
@@ -1284,11 +1544,11 @@ tst_print_time(); return 1;
 //    } else
 //        std::cout << "bbb tmpPath=" << tmpPath << std::endl;
 
-print_time ();
+    print_time();
 
     return 1;
 
-    tst_list_qs(); return 1;
+//    tst_list_qs(); return 1;
 
 
 //    trie_tree_1(); return 1;

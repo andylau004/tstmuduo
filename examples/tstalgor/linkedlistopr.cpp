@@ -51,14 +51,29 @@ int vec_partition( std::vector< int >& vec_data, int left, int right ) {
     return j;
 }
 // vector形式 快排
-void vec_qsort( std::vector< int >& vec_data, int left, int right ) {
-    int pivotLoc ;
-    if (left < right) {
-        pivotLoc = vec_partition( vec_data, left, right );
+void vec_qsort( std::vector< int >& v, int head, int tail ) {
+//    int pivotLoc ;
+//    if (left < right) {
+//        pivotLoc = vec_partition( v, head, tail );
 
-        vec_qsort( vec_data, left, pivotLoc - 1 );
-        vec_qsort( vec_data, pivotLoc + 1, right );
+//        vec_qsort( v, head, pivotLoc - 1 );
+//        vec_qsort( v, pivotLoc + 1, tail );
+//    }
+    if (head >= tail) return;
+    int i = head;
+    int j = tail;
+    int piv = v[i];
+
+    while (i < j) {
+        while (i < j && v[j] > piv) j --;
+        if (i < j) v[ i ++ ] = v[ j ];
+
+        while (i < j && v[i] <= piv) i ++;
+        if (i < j) v[ j -- ] = v[i];
     }
+    v[i] = piv;
+    vec_qsort( v, head, i - 1 );
+    vec_qsort( v, j + 1, tail );
 }
 
 struct ListNode {
@@ -151,25 +166,45 @@ struct TreeNode{
 //也是一个递归的过程，每次都把数组分为两个部分，
 //作为左子树和右子树。
 TreeNode* BST(std::vector<int>& nums, int s, int e) {
-    if (s > e) return NULL;
+    {
+        if (s > e) return NULL;
+        int midPos = (s+e) / 2;
+        TreeNode* newNode = new TreeNode( nums[midPos] );
 
-    int mid = (s + e) / 2;
-    TreeNode* pNewNode = new TreeNode(nums[mid]);
-    pNewNode->left = BST(nums, s, mid - 1);
-    pNewNode->right= BST(nums, mid + 1, e);
-    return pNewNode;
+        newNode->left = BST(nums, s, midPos - 1);
+        newNode->right= BST(nums, midPos + 1, e);
+        return newNode;
+    }
+    {
+        if (s > e) return NULL;
+
+        int mid = (s + e) / 2;
+        TreeNode* pNewNode = new TreeNode(nums[mid]);
+        pNewNode->left = BST(nums, s, mid - 1);
+        pNewNode->right= BST(nums, mid + 1, e);
+        return pNewNode;
+    }
 }
 TreeNode* sortedArray2BST(vector<int>& nums) {
     return BST(nums, 0, nums.size() - 1);
 }
 
-void inOrderTree( TreeNode* pRoot ) {
-    if ( pRoot ) {
-        if ( pRoot->left )
-            inOrderTree( pRoot->left );
+void qianxu_traverse( TreeNode* pRoot ) {
+    if (pRoot) {
         std::cout << pRoot->val << std::endl;
-        if ( pRoot->right )
-            inOrderTree( pRoot->right );
+        if (pRoot->left)
+            qianxu_traverse(pRoot->left);
+        if (pRoot->right)
+            qianxu_traverse(pRoot->right);
+    }
+}
+void zhongxu_traverse( TreeNode* pRoot ) {
+    if (pRoot) {
+        if (pRoot->left)
+            zhongxu_traverse(pRoot->left);
+        std::cout << pRoot->val << std::endl;
+        if (pRoot->right)
+            zhongxu_traverse(pRoot->right);
     }
 }
 
@@ -182,7 +217,6 @@ void reverseOrderTree( TreeNode* pRoot ) {
             reverseOrderTree( pRoot->left );
     }
 }
-//TreeNode*
 
 
 
@@ -288,9 +322,28 @@ void PrintDoubleLinkedList(TreeNode* pHeadOfList)
 
     printf("\n");
 }
+
+void insert_treenode( TreeNode* pTree, int iVal ) {
+    TreeNode* pNew = new TreeNode(iVal);
+
+    TreeNode* parent = NULL;
+    TreeNode* temp   = pTree;
+
+    while (temp) {
+        parent = temp;
+        if (pNew->val > temp->val) {
+            temp = temp->right;
+        } else {
+            temp = temp->left;
+        }
+    }
+
+
+}
 void tst_link_1() {
+
     // 先对数组容器排序，把数组转换为二叉树，二叉树转换为双向链表
-    std::vector< int > vec_data = { 7654, 7890, 7, 21, 1986, 1, 2, 4, 654, 543 };
+    std::vector< int > vec_data = { 10922, 33, 79, 7654, 7890, 7, 21, 1986, 1, 2, 4, 654, 543 };
     vec_qsort( vec_data, 0, vec_data.size() - 1 );
 
     std::cout << "-----------------vec qsort beg" << std::endl;
@@ -299,24 +352,29 @@ void tst_link_1() {
 
     // 排序的数组转换为二进制查找树
     TreeNode* pBst = sortedArray2BST( vec_data );
-    if (!pBst) { std::cout << "sortarray2bst failed!!!" << std::endl; return ;}
+    if (!pBst) { std::cout << "sortarray2bst failed!!!" << std::endl; return;}
+
+    // 前序: 根左右; 中序: 左根右; 后序: 左右根;
+    std::cout << "-----------------qianxu_traverse beg" << std::endl;
+    qianxu_traverse( pBst );
+    std::cout << "-----------------qianxu_traverse end" << std::endl;
 
     // 中序　左根右　遍历二叉树 升序
-    std::cout << "-----------------inOrderTree beg" << std::endl;
-    inOrderTree( pBst );
-    std::cout << "-----------------inOrderTree end" << std::endl;
+    std::cout << "-----------------zhongxu_traverse beg" << std::endl;
+    zhongxu_traverse( pBst );
+    std::cout << "-----------------zhongxu_traverse end" << std::endl;
 
     // 右根左　遍历二叉树 降序
     std::cout << "-----------------reverseOrderTree beg" << std::endl;
     reverseOrderTree( pBst );
     std::cout << "-----------------reverseOrderTree end" << std::endl;
-
+    return;
 
     TreeNode* pNode10 = CreateBinaryTreeNode_1(10);
-    TreeNode* pNode6 = CreateBinaryTreeNode_1(6);
+    TreeNode* pNode6  = CreateBinaryTreeNode_1(6);
     TreeNode* pNode14 = CreateBinaryTreeNode_1(14);
-    TreeNode* pNode4 = CreateBinaryTreeNode_1(4);
-    TreeNode* pNode8 = CreateBinaryTreeNode_1(8);
+    TreeNode* pNode4  = CreateBinaryTreeNode_1(4);
+    TreeNode* pNode8  = CreateBinaryTreeNode_1(8);
     TreeNode* pNode12 = CreateBinaryTreeNode_1(12);
     TreeNode* pNode16 = CreateBinaryTreeNode_1(16);
 
@@ -329,8 +387,7 @@ void tst_link_1() {
 
 void tst_linkedlist_entry() {
     tst_link_1();
-
-    return ;
+    return;
 
     reverse_linjin_node();
 }

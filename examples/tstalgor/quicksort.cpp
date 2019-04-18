@@ -360,7 +360,21 @@ void f_2(int arr[], int head, int tail) {
     f_2( arr, head, i - 1 );
     f_2( arr, j + 1, tail );
 }
+void f_3(int a[], int head, int tail) {
+//    if (head < tail) return;
 
+//    int i = head, j = tail;
+//    int piv = arr[i];
+//    while (i < j) {
+//        while (i<j && a[j] > piv) j --;
+//        if (i<j) a[i++] = a[j];
+//        while (i<j && a[i] < piv) i ++;
+//        if (i<j) a[j--]
+//    }
+//    a[i] = piv;
+//    f_3(a, head, j - 1);
+//    f_3(a, i + 1, tail);
+}
 void tst_qs_new() {
     int arr[] = {12, 45, 748, 3986, 15, 56, 3, 89, 4, 48, 2, 0, -1, 1024, };
     int length = sizeof(arr) / sizeof(int);

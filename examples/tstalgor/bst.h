@@ -8,6 +8,10 @@
 #include <deque>
 #include <queue>
 
+// 《剑指 Offer》题目的 Modern C++ 实现
+// https://github.com/ZhiruiLi/CodingInterviewsWithModernCpp
+
+
 template < typename T >
 class BSTNode {
 public:
