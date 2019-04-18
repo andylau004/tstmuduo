@@ -410,12 +410,14 @@ void TcpConnection::connectEstablished()
     //shared_from_this()之后引用计数+1，为3，但是shared_from_this()是临时对象，析构后又会减一，
     //而tie是weak_ptr并不会改变引用计数，所以该函数执行完之后引用计数不会更改
     channel_->tie(shared_from_this());
+
     // 对于新建连接的socket描述符，还需要设置期望监控的事件（POLLIN | POLLPRI），
     // 并且将此socket描述符放入poll函数的监控描述符集合中，用于等待接收客户端从此连接上发送来的消息
     // 这些工作，都是由TcpConnection::connectEstablished函数完成。
     channel_->enableReading();
 
     // 此函数对应TcpServer::connectionCallback_,最终指向一个用户服务器定义的回调函数
+    LOG_INFO << "shared_from_this use_count=" << shared_from_this().use_count();
     connectionCallback_(shared_from_this());
 }
 

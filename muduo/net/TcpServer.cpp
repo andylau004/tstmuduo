@@ -106,9 +106,12 @@ void TcpServer::newConnection(int sockfd, const InetAddress& peerAddr)
     //将TcpServer的removeConnection设知道了TcpConnection的关闭回调函数中
     conn->setCloseCallback(boost::bind(&TcpServer::removeConnection, this, _1)); // FIXME: unsafe
 
-    LOG_INFO << "before runInLoop new conn use_count=" << conn.use_count();
     //调用TcpConenction::connectEstablished函数内部会将use_count加一然后减一，此处仍为2
     //但是本函数介绍结束后conn对象会析构掉，所以引用计数为1，仅剩connections_列表中存活一个
+    LOG_INFO << "before runInLoop new conn use_count=" << conn.use_count();
+    // !!!--------------重要--------------!!!
+    // 下面 connectEstablished 会在 eventloop 工作线程中执行
+    // 当前线程应该是主线程,也就是,侦听+接受套接字线程
     ioLoop->runInLoop(boost::bind(&TcpConnection::connectEstablished, conn));
     LOG_INFO << "after  runInLoop new conn use_count=" << conn.use_count();
 }
@@ -140,8 +143,7 @@ void TcpServer::removeConnection(const TcpConnectionPtr& conn) {
 void TcpServer::removeConnectionInLoop(const TcpConnectionPtr& conn)
 {
     loop_->assertInLoopThread();
-    LOG_INFO << "TcpServer::removeConnectionInLoop [" << name_
-             << "] - connection " << conn->name();
+    LOG_INFO << "TcpServer::removeConnectionInLoop [" << name_ << "] - connection " << conn->name();
 
     // 根据conn的name，从map容器中删除，此时引用计数会减1。
     // erase之前引用计数为2（由前面的shared_from_this()保证），所以执行完erase，引用计数变为1

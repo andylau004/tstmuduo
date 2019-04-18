@@ -3,6 +3,9 @@
 
 set(base_SRCS
 
+    Error.h
+    shared_mem.h
+
     timeinterval.h
     timeinterval.cpp
 

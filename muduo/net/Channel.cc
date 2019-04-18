@@ -50,8 +50,7 @@ Channel::~Channel()
     }
 }
 
-//从shared_ptr对象obj构造weak_ptr tie_，获得资源的观测权
-//防止shared_ptr出现循环引用
+//从shared_ptr对象obj构造weak_ptr tie_，获得资源的观测权 防止shared_ptr出现循环引用
 /*
  * 1. 当连接到来，创建一个TcpConnection对象，立刻用shared_ptr来管理，引用计数为1，
  * 在Channel中维护一个weak_ptr（tie_），将这个shared_ptr对象赋值给_tie，引用计数仍然为1。
@@ -60,6 +59,7 @@ Channel::~Channel()
 */
 void Channel::tie(const boost::shared_ptr<void>& obj)
 {
+    LOG_INFO << " in tie function usecount=" << obj.use_count();
     tie_  = obj;
     tied_ = true;
 }

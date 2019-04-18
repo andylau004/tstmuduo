@@ -223,8 +223,9 @@ void PrintInContainer( CONTAINER& container ) {
     if ( container.empty() ) {
         return;
     }
-    for( /*CONTAINER::iterator*/ auto itElem = container.begin(); itElem != container.end(); ++ itElem ) {
-        std::cout << " " << *itElem ;
+    for( auto itElem : container ) {
+//    for( /*CONTAINER::iterator*/ auto itElem = container.begin(); itElem != container.end(); ++ itElem ) {
+        std::cout << " " << itElem ;
     }
     printf( "\n" );
 }
@@ -603,7 +604,17 @@ void printXto_console(const char* lpszPrefix, T& x) {
 
 
 
+#define TEXT_SZ 2048
 
+struct shared_use_st
+{
+    int  written; // 作为一个标志，非0：表示可读，0：表示可写
+    char text[TEXT_SZ]; // 记录写入 和 读取 的文本
+};
+
+
+#define SHM_KEY  0x082157ff
+#define SHM_SIZE 2048
 
 
 
