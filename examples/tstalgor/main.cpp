@@ -1388,9 +1388,9 @@ int find_max_in_array(const std::vector<int>& v) {
     int mid = 0;
     while ( left < right ) {
         mid = (left + right) >> 1;
-        std::cout << "mid=" << mid << ", v[mid]=" << v[mid]
-                  << ", v[mid + 1]=" << v[mid + 1]
-                  << ", v[mid - 1]=" << v[mid - 1] << std::endl;
+//        std::cout << "mid=" << mid << ", v[mid]=" << v[mid]
+//                  << ", v[mid + 1]=" << v[mid + 1]
+//                  << ", v[mid - 1]=" << v[mid - 1] << std::endl;
 
         if (v[mid] > v[mid - 1] && v[mid] > v[mid + 1]) {
             return mid;
@@ -1429,6 +1429,8 @@ int main(int argc, char *argv[])
     Logger::setLogLevel(Logger::DEBUG);
     LOG_INFO << "pid = " << getpid() << ", tid = " << CurrentThread::tid();
 
+    tst_bst_tree(); return 1;
+
     call_find_max_in_array(); return 1;
     call_Max_array_Sum(); return 1;
 
@@ -1437,7 +1439,6 @@ int main(int argc, char *argv[])
     call_rever_KthNode(); return 1;
 
     tst_findmin_inrotatearrry();return 1;
-    tst_bst_tree(); return 1;
 
     tst_link_1(); return 1;
 

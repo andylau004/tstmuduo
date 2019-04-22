@@ -2,13 +2,16 @@
 
 #include "bst.h"
 
-
-
+#include <stdio.h>
 #include <iostream>
+
+#include <string>
+#include <string.h>
+
 #include <vector>
 
-
 using namespace std;
+
 
 #define N 63
 
@@ -160,8 +163,71 @@ void tst_bst_2() {
 
 }
 
+void tst_bst_3() {
+    BSTree<int> s;
+    std::vector< int > vec_data = { 5, 3, 7, 2, 4, 6, 8 };
+    for (int i = 0; i < vec_data.size(); ++i)
+        s.insert(vec_data[i]);
+
+    std::cout << "in order traverse:" << std::endl;
+    s.inOrder();
+    std::cout << std::endl;
+}
+
+// 专门进行翻转的函数
+void reverse_string(std::string& str) {
+    if (str.size() <= 1)return;
+    int low = 0, high= str.size() - 1;
+
+    while (low < high) {
+        char tmpval = str[low];
+        str[low]  = str[high];
+        str[high] = tmpval;
+        low ++; high --;
+    }
+
+    {
+        //    printf( "pBeg=%s\n", pBeg);
+        //    printf( "pEnd=%s\n", pEnd);
+
+        //    if (!pBeg || !pEnd) return;
+
+        //    while (pBeg < pEnd) {
+        //        char tmpChar = *pBeg;
+        //        *pBeg = *pEnd;
+        //        *pEnd = tmpChar;
+        //        pBeg ++; pEnd --;
+        //    }
+    }
+}
+std::string reverse_line(std::string& strline) {
+    reverse_string(strline);
+    std::cout << "strline=" << strline.c_str() << std::endl;
+
+    int left = 0;
+    for (int i = 0; i < strline.size(); ++i) {
+        if (str[i] == ' ') {
+            std::string tmp1 = strline.substr(i, i-left);
+
+            left = i + 1;
+        }
+    }
+}
+void tst_reverse_line() {
+    char  tmpString[1024] = { "I am a student." };
+    char* pbeg = tmpString;
+    char* pend = tmpString + strlen(tmpString) - 1;
+
+    std::string tmpstr = tmpString;
+    reverse_line(tmpstr);
+    std::cout << "test string=" << tmpstr.c_str() << std::endl;
+}
 
 void tst_bst_tree() {
+    tst_reverse_line(); return;
+
+    tst_bst_3();
+    return;
 //    tst_bst_2();
 //    return;
 //    tst_bst_1();
