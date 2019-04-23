@@ -13,6 +13,8 @@
 using namespace std;
 
 
+#include "muduo/base/common.h"
+
 #define N 63
 
 typedef struct node
@@ -201,20 +203,31 @@ void reverse_string(std::string& str) {
     }
 }
 std::string reverse_line(std::string& strline) {
+    std::string ret;
+
+    // 首先进行整句的翻转
     reverse_string(strline);
     std::cout << "strline=" << strline.c_str() << std::endl;
 
+    // 进行单词的翻转，每找到一个空格说明找到了一个单词，此时取出该单词进行翻转，并将结果添加到resu的后面
     int left = 0;
-    for (int i = 0; i < strline.size(); ++i) {
-        if (str[i] == ' ') {
-            std::string tmp1 = strline.substr(i, i-left);
-
+    int i    = 0;
+    for (; i < strline.size(); ++i) {
+        if (strline[i] == ' ') {
+            std::string tmp = strline.substr(left, i-left);
+            reverse_string(tmp);
+            ret += (tmp + " ");
             left = i + 1;
         }
     }
+    std::string tmp = strline.substr(left, i-left);
+    reverse_string(tmp);
+    ret += (tmp);
+    strline = ret;
+    return ret;
 }
 void tst_reverse_line() {
-    char  tmpString[1024] = { "I am a student." };
+    char  tmpString[1024] = { "It's am a student." };
     char* pbeg = tmpString;
     char* pend = tmpString + strlen(tmpString) - 1;
 
@@ -223,7 +236,32 @@ void tst_reverse_line() {
     std::cout << "test string=" << tmpstr.c_str() << std::endl;
 }
 
+int max_stock_value(int* arr, int length) {
+    int min = arr[0];
+    int maxIncome = arr[1] - min;
+
+    for (int i = 2; i < length; ++i) {
+        //检查前一天的值是不是最小值，是就更新最小值
+        if (arr[i-1] < min)
+            min = arr[i-1];
+        if ((arr[i] - min) > maxIncome) {
+            maxIncome = (arr[i] - min);
+        }
+    }
+    return maxIncome;
+}
+// 1.可以转换成为求最大子数组问题，
+// 数组相邻的数后一个减去前一个减得到股票的变化数组{2，-3，-3,2，5,4，-2}。
+// 这样问题转换成了求数组的最大子数组问题。
+// 2.也可以在遍历数组时记录下遍历到某个节点能够买入的最低价格，
+// 在当前价格确定的情况下，在最低价格买入能够赚最多。这样遍历一次数组就能得到结果，时间复杂度为O（n）。
+void tst_max_stock_value () {
+    int numbers[] = { 4, 1, 3, 2, 5 };
+    std::cout << "max=" << max_stock_value(numbers, array_size(numbers)) << std::endl;
+}
+
 void tst_bst_tree() {
+//    tst_max_stock_value(); return;
     tst_reverse_line(); return;
 
     tst_bst_3();
