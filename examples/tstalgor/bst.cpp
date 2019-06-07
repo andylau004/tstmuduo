@@ -260,26 +260,38 @@ void tst_max_stock_value () {
     std::cout << "max=" << max_stock_value(numbers, array_size(numbers)) << std::endl;
 }
 
+void tst_KthNode() {
+    BSTree<int> s;
+    std::vector< int > vec_data = { 5, 3, 7, 2, 4, 6, 8 };
+    for (int i = 0; i < vec_data.size(); ++i)
+        s.insert(vec_data[i]);
+
+    std::cout << "s.GetKthNode=" << s.GetKthNode(7) << std::endl;
+    std::cout << std::endl;
+}
 void tst_bst_tree() {
 //    tst_max_stock_value(); return;
-    tst_reverse_line(); return;
+//    tst_KthNode(); return ;
+//    tst_reverse_line(); return;
 
-    tst_bst_3();
-    return;
+//    tst_bst_3();
+//    return;
 //    tst_bst_2();
 //    return;
 //    tst_bst_1();
 //    return;
 
     BSTree<int> s;
-
-//    int a ;
-//    std::cout << "请输入二叉树结点以构造二叉查找树：" << std::endl;
-    std::vector< int > vec_data = { 10922, 33, 79, 7890,
-                                    7, 1, 4, 2 };
+//    std::vector< int > vec_data = { 10922, 33, 79, 7890, 7, 1, 4, 2 };
+    std::vector< int > vec_data = { 5, 3, 7, 2, 4, 6, 8 };
     for (int i = 0; i < vec_data.size(); ++i) {
         s.insert(vec_data[i]);
     }
+    {
+        s.PrintTree_ByLine_1();
+        s.PrintTree_ByLine();
+    }
+return ;
 //    while(std::cin>>a )
 //        s.insert(a);
 //    std::cin.clear();
@@ -336,10 +348,6 @@ void tst_bst_tree() {
         std::cout << "closet value2=" << s.closestValue(1) << std::endl;
     }
 
-    {
-        s.PrintTree_ByLine_1();
-//        s.PrintTree_ByLine();
-    }
 }
 
 

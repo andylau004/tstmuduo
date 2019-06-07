@@ -431,6 +431,7 @@ void BInsertSort(int* a, int size) {
         temp = a[i];
         while ( low <= high ) {
             mid = (low + high) >> 1;
+            
         }
     }
 }

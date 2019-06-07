@@ -16,6 +16,7 @@
 #include <stack>
 #include <vector>
 #include <queue>
+#include <stack>
 
 #include <fstream>
 #include <thread>
@@ -76,7 +77,7 @@
 
 #include "bst.h"
 #include "List.h"
-
+#include "tstdp.h"
 
 
 using namespace std;
@@ -1233,10 +1234,11 @@ void tst_findmin_inrotatearrry() {
     std::cout << "findmin_inrotatearrry=" << findmin_inrotatearrry(v) << std::endl;
 }
 
-// 面试题15之链表中倒数第K个结点_KthNodeFromEnd.cpp
+// 面试题15之链表中倒数第K个结点
 ListNode* FindKthToTail(ListNode* pListHead, unsigned int k) {
     ListNode* pFront = pListHead;
-    for ( unsigned int i = 0; i < k - 1; i ++ ) {
+    // 倒数第k个结点与倒数第一个结点相隔k-1个位置
+    for (unsigned int i = 0; i < k - 1; i ++) {
         if (pFront->m_pNext)
             pFront = pFront->m_pNext;
         else
@@ -1424,12 +1426,87 @@ void call_find_max_in_array() {
         std::cout << "no found max val" << std::endl;
     }
 }
+
+// 翻转list链表
+ListNode* reverse_list(ListNode* pHead) {
+    if (!pHead) return NULL;
+
+    ListNode* pReverseHead = NULL;
+    ListNode* pCur = pHead, *pPrev = NULL, *pNext;
+    while (pCur) {
+        //做循环，如果当前节点不为空的话，始终执行此循环，此循环的目的就是让当前节点从指向next到指向pre
+        //如此就可以做到反转链表的效果
+        //先用next保存head的下一个节点的信息，保证单链表不会因为失去head节点的原next节点而就此断裂
+        pNext = pCur->m_pNext;
+        if (pNext == NULL)
+            pReverseHead = pCur;
+
+        //保存完next，就可以让head从指向next变成指向pre了，代码如下
+        pCur->m_pNext = pPrev;
+
+        pPrev = pCur;
+        pCur  = pNext;
+    }
+    return pReverseHead;
+}
+void call_reverse_list() {
+    ListNode* pNode1 = CreateListNode(1);
+    ListNode* pNode2 = CreateListNode(2);
+    ListNode* pNode3 = CreateListNode(3);
+    ListNode* pNode4 = CreateListNode(4);
+    ListNode* pNode5 = CreateListNode(5);
+    ConnectListNodes(pNode1, pNode2);
+    ConnectListNodes(pNode2, pNode3);
+    ConnectListNodes(pNode3, pNode4);
+    ConnectListNodes(pNode4, pNode5);
+
+    PrintList(pNode1);
+    ListNode* pRHead = reverse_list(pNode1);
+    PrintList(pRHead);
+}
+
+void swap2node_list(ListNode* listHead) {
+    std::stack<ListNode*> stackNodes;
+
+    ListNode* cur = listHead;
+    while (cur) {
+        while (stackNodes.size() == 2) {
+
+        }
+        stackNodes.push(cur);
+        cur = cur->m_pNext;
+    }
+
+}
+// 给定一个链表，两两交换其中相邻的节点，并返回交换后的链表。
+void tst_swap2Node_list() {
+    ListNode* pNode1 = CreateListNode(1);
+    ListNode* pNode2 = CreateListNode(2);
+    ListNode* pNode3 = CreateListNode(3);
+    ListNode* pNode4 = CreateListNode(4);
+//    ListNode* pNode5 = CreateListNode(5);
+    ConnectListNodes(pNode1, pNode2);
+    ConnectListNodes(pNode2, pNode3);
+    ConnectListNodes(pNode3, pNode4);
+//    ConnectListNodes(pNode4, pNode5);
+
+//    PrintList(pNode1);
+//    ListNode* pRetHead = swap2node_list(pNode1);
+//    PrintList(pRetHead);
+}
+
 int main(int argc, char *argv[])
 {
     Logger::setLogLevel(Logger::DEBUG);
     LOG_INFO << "pid = " << getpid() << ", tid = " << CurrentThread::tid();
 
+    tst_HeapSortEntry_(); return 1;
+    tst_dpfun_entry(); return 1;
+
     tst_bst_tree(); return 1;
+
+    call_reverse_list(); return 1;
+
 
     call_find_max_in_array(); return 1;
     call_Max_array_Sum(); return 1;
@@ -1449,7 +1526,6 @@ int main(int argc, char *argv[])
 
     tst_qs_new(); return 1;
 
-    tst_HeapSortEntry_(); return 1;
 
     tst_GetInout(); return 1;
 

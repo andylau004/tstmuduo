@@ -18,6 +18,7 @@ set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -gdwarf-2 -Wno-deprecated -ffunction-se
 
 
 add_executable(${PROJECT_NAME}
+    tstdp.h tstdp.cpp
     List.h List.cpp
     bst.h bst.cpp
     main.cpp boost_use_1.h boost_use_1.cpp

@@ -75,8 +75,11 @@ public:
     // 按行打印二进制查找树
     void PrintTree_ByLine_1();
 
+    T GetKthNode(int k);
+
     // 内部使用函数，供外部接口调用
 private:
+    BSTNode<T>*    KthNodeImpl(BSTNode<T>*& root, int& k);
     T    closestValue(BSTNode<T>*& root, T key);
 
     int  calc_tree_layers(BSTNode<T>*& root);
@@ -96,7 +99,35 @@ private:
 };
 
 
+// 二叉搜索树的第K大节点
+template<typename T>
+T BSTree<T>::GetKthNode(int k) {
+    if (_Root == NULL) return -1;
 
+    BSTNode<T>* pNode = KthNodeImpl(_Root, k);
+    if (pNode) {
+        return pNode->_key;
+    }
+    printf( "GetKthNode failed!!!\n" );
+    return -1;
+}
+template<typename T>
+BSTNode<T>* BSTree<T>::KthNodeImpl(BSTNode<T>*& root, int& k) {
+    if (root == NULL) return NULL;
+
+    BSTNode<T>* res = NULL;
+    res = KthNodeImpl( root->_lchild, k );
+    std::cout << "node val=" << root->_key << std::endl;
+    if (k == 1) {
+        return root;
+    }
+    k --;
+    if ( k > 0 ) {
+        res = KthNodeImpl( root->_rchild, k );
+        std::cout << "node val=" << root->_key << std::endl;
+    }
+    return res;
+}
 /*
 *插入操作
 *非递归实现
@@ -108,6 +139,9 @@ void BSTree<T>::insert(BSTNode<T>* &tree, BSTNode<T>* z)
     BSTNode< T > * parent = NULL;
     BSTNode< T > * temp = tree;
 
+    if (tree == NULL) {
+        std::cout << "first tree root" << std::endl;
+    }
     while (temp) {
         parent = temp;
         if (z->_key > temp->_key) {
@@ -363,7 +397,6 @@ void BSTree<T>::PrintTree_ByLine_1() {
     qNodes.push(_Root);
 
     int curline = 1;
-
     while (!qNodes.empty()) {
         int nexline = 0;
 
@@ -381,13 +414,10 @@ void BSTree<T>::PrintTree_ByLine_1() {
                 nexline ++;
             }
         }
-
         curline = nexline;
         std::cout << "\n";
     }
-
 }
-
 template<typename T>
 void BSTree<T>::PrintTree_ByLine() {
     if (!_Root) return;
