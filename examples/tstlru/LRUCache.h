@@ -8,7 +8,8 @@
 
 using namespace std;
 
-#define MAXSIZE 1<<20 //1048576
+
+#define MAXSIZE     (1<<20) //1048576
 
 
 
@@ -18,7 +19,7 @@ class LRUCache
 public:
     LRUCache(const unsigned capacity);
     ~LRUCache();
-    int get(const std::string key, Type &value);
+    int  get(const std::string key, Type &value);
     void put(const std::string key, const Type &value);
 
 private:
@@ -30,7 +31,7 @@ private:
     };
 
     std::list<CacheNode> cacheList;
-    std::unordered_map< std::string, typename std::list<CacheNode>::iterator > cacheMap;//need add typename
+    std::unordered_map< std::string, typename std::list<CacheNode>::iterator > cacheMap;
     unsigned int size;
 };
 
@@ -50,17 +51,17 @@ LRUCache<Type>::~LRUCache()
 }
 
 template <typename Type>
-int LRUCache<Type>::get(const std::string key, Type &value)
-{
+int LRUCache<Type>::get(const std::string key, Type &value) {
     if (cacheMap.find(key) == cacheMap.end()) {//没有命中
         return -1;
     }
+
     //命中
-    typename std::list<CacheNode>::iterator it = cacheMap[key];
-    cacheList.erase(it);
+    typename std::list<LRUCache::CacheNode>::iterator itfind = cacheMap[key];
+    cacheList.erase(itfind);
 
     //将命中的节点放到链表头部
-    cacheList.push_front(CacheNode(key, it->value));
+    cacheList.push_front(CacheNode(key, itfind->value));
     cacheMap[key] = cacheList.begin();
 
     value = cacheMap[key]->value;
@@ -70,21 +71,18 @@ int LRUCache<Type>::get(const std::string key, Type &value)
 template <typename Type>
 void LRUCache<Type>::put(const std::string key, const Type &value)
 {
-    if(cacheMap.find(key) == cacheMap.end())//没有命中
-    {
-        if(cacheList.size() == size)
-        {
+    if (cacheMap.find(key) == cacheMap.end()) {// 没有命中, no hit cache
+        if (cacheList.size() == size) {
             cacheMap.erase(cacheList.back().key);
             cacheList.pop_back();
         }
         cacheList.push_front(CacheNode(key,value));
         cacheMap[key] = cacheList.begin();
-    }
-    else //命中
-    {
+    } else {// 命中
         typename std::list<CacheNode>::iterator it = cacheMap[key];
         cacheList.erase(it);
-        cacheList.push_front(CacheNode(key,value));
+
+        cacheList.push_front(CacheNode(key, value));
         cacheMap[key] = cacheList.begin();
     }
 }

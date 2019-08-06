@@ -103,6 +103,27 @@ void tst_lru_11() {
 
 void tst_lru_entry() {
 
+//    std::list< std::pair < int, int > > listNode;
+
+    std::list < int > listInts;
+    int i = 0;
+    for ( i ; i < 10; i ++ ) {
+        listInts.push_back(i);
+    }
+
+    std::list<int>::iterator itfind;
+    for ( itfind = listInts.begin(); itfind != listInts.end(); itfind ++ ) {
+        if ( *itfind == 3 ) {
+            listInts.erase(itfind);
+            break;
+        }
+    }
+    std::cout << "*itfind=" << *itfind << std::endl;
+    return;
+
+//    for ( auto it&)
+    return;
+
     tst_lru_11();
     return ;
 
