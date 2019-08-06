@@ -165,7 +165,7 @@ enum ServerStatus {
 #define UNUSED(x) ((void)x)
 
 #define array_size(arr)    (sizeof(arr)/sizeof(arr[0]))
-#define ARRAY+SiZE(arr)    (sizeof(arr)/sizeof(arr[0]))
+#define ARRAY_SiZE(arr)    (sizeof(arr)/sizeof(arr[0]))
 
 
 #define VRV_ERR -1

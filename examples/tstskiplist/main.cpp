@@ -20,9 +20,6 @@
 #include <boost/date_time/posix_time/posix_time.hpp>
 
 
-//#include "poco/Bugcheck.h"
-//#include "poco/Foundation.h"
-//#include "poco/Alignment.h"
 
 #include "muduo/base/common.h"
 
@@ -36,7 +33,7 @@
 #include "muduo/net/TcpClient.h"
 
 
-#include "c11fun.h"
+#include "tstskiplist.h"
 
 using namespace std;
 using namespace muduo;
@@ -47,10 +44,10 @@ using namespace muduo::net;
 
 int main(int argc, char *argv[])
 {
-//    Logger::setLogLevel(Logger::DEBUG);
-//    LOG_INFO << "pid = " << getpid() << ", tid = " << CurrentThread::tid();
+    Logger::setLogLevel(Logger::DEBUG);
+    LOG_INFO << "pid = " << getpid() << ", tid = " << CurrentThread::tid();
 
-    tst_c11fun_entry();
+//    tst_c11fun_entry();
 
     return 1;
 }

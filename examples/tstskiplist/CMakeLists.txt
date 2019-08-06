@@ -2,7 +2,7 @@
 
 
 
-project(tstc11)
+project(tstskiplist)
 
 
 set(EXECUTABLE_OUTPUT_PATH ../../)
@@ -11,21 +11,20 @@ set(EXECUTABLE_OUTPUT_PATH ../../)
 
 include_directories(../gen-cpp)
 
-#aux_source_directory(../gen-cpp O_GENCPP)
+aux_source_directory(../gen-cpp O_GENCPP)
 
 
 add_executable(${PROJECT_NAME}
-    c11fun.h c11fun.cpp
-    tstbacktrace.h tstbacktrace.cpp
-#${O_GENCPP}
+    SkipList.h SkipList.cpp
+    tstskiplist.h tstskiplist.cpp
+${O_GENCPP}
     main.cpp)
 
 #add_executable(${PROJECT_NAME} ${CODE_LIST})
 
 #target_link_libraries(${PROJECT_NAME} muduo_base muduo_net rt thriftnb thrift event ssl crypto)
-target_link_libraries(${PROJECT_NAME} pthread boost_filesystem boost_system boost_thread muduo_base muduo_net rt thriftnb thrift event ssl crypto   )
+target_link_libraries(${PROJECT_NAME} pthread boost_system boost_thread muduo_base muduo_net rt thriftnb thrift event ssl crypto   )
 
-#asan
 
 
 

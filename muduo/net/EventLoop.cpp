@@ -282,48 +282,48 @@ void EventLoop::runInLoop(const Functor& cb)
 
 #ifdef __GXX_EXPERIMENTAL_CXX0X__
 // FIXME: remove duplication
-//void EventLoop::runInLoop(Functor&& cb)
-//{
-//    if (isInLoopThread()) {
-//        LOG_INFO << ( "new aaaaaaaaaaaaaaaaaaaaaaaaaa" );
-//        cb();
-//    }
-//    else {
-//        LOG_INFO << ( "new bbbbbbbbbbbbbbbbbbbbbbbbbb" );
-//        queueInLoop(std::move(cb));
-//    }
-//}
-//void EventLoop::queueInLoop(Functor&& cb)
-//{
-//    {
-//        MutexLockGuard lock(mutex_);
-//        pendingFunctors_.push_back(std::move(cb));  // emplace_back
-//    }
-//    if (!isInLoopThread() || callingPendingFunctors_) {
-//        char tmpout[ 2048 ] = {0};
-//        sprintf( tmpout, "queueInLoop trig Functor&& cb isInLoopThread: %d eventloopTid_: %d  callingPendingFunctors_: %d",
-//                 isInLoopThread(), threadId_, /*CurrentThread::tid(),*/ callingPendingFunctors_ );
-//        LOG_INFO << tmpout;
-//        wakeup();
-//    }
-//}
+void EventLoop::runInLoop(Functor&& cb)
+{
+    if (isInLoopThread()) {
+        LOG_INFO << ( "new aaaaaaaaaaaaaaaaaaaaaaaaaa" );
+        cb();
+    }
+    else {
+        LOG_INFO << ( "new bbbbbbbbbbbbbbbbbbbbbbbbbb" );
+        queueInLoop(std::move(cb));
+    }
+}
+void EventLoop::queueInLoop(Functor&& cb)
+{
+    {
+        MutexLockGuard lock(mutex_);
+        pendingFunctors_.push_back(std::move(cb));  // emplace_back
+    }
+    if (!isInLoopThread() || callingPendingFunctors_) {
+        char tmpout[ 2048 ] = {0};
+        sprintf( tmpout, "queueInLoop trig Functor&& cb isInLoopThread: %d eventloopTid_: %d  callingPendingFunctors_: %d",
+                 isInLoopThread(), threadId_, /*CurrentThread::tid(),*/ callingPendingFunctors_ );
+        LOG_INFO << tmpout;
+        wakeup();
+    }
+}
 
-//TimerId EventLoop::runAt(const Timestamp& time, TimerCallback&& cb)
-//{
-//    return timerQueue_->addTimer(std::move(cb), time, 0.0);
-//}
+TimerId EventLoop::runAt(const Timestamp& time, TimerCallback&& cb)
+{
+    return timerQueue_->addTimer(std::move(cb), time, 0.0);
+}
 
-//TimerId EventLoop::runAfter(double delay, TimerCallback&& cb)
-//{
-//    Timestamp time(addTime(Timestamp::now(), delay));
-//    return runAt(time, std::move(cb));
-//}
+TimerId EventLoop::runAfter(double delay, TimerCallback&& cb)
+{
+    Timestamp time(addTime(Timestamp::now(), delay));
+    return runAt(time, std::move(cb));
+}
 
-//TimerId EventLoop::runEvery(double interval, TimerCallback&& cb)
-//{
-//    Timestamp time(addTime(Timestamp::now(), interval));
-//    return timerQueue_->addTimer(std::move(cb), time, interval);
-//}
+TimerId EventLoop::runEvery(double interval, TimerCallback&& cb)
+{
+    Timestamp time(addTime(Timestamp::now(), interval));
+    return timerQueue_->addTimer(std::move(cb), time, interval);
+}
 #endif
 
 void EventLoop::cancel(TimerId timerId)

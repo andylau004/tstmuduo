@@ -5,13 +5,20 @@
 
 
 #include <unordered_set>
-#include <boost/circular_buffer.hpp>
 
 
 #include <iostream>       // std::cout
 #include <atomic>         // std::atomic
 #include <thread>         // std::thread, std::this_thread::yield
 
+
+#include <cstdio>
+#include <cstdlib>
+#include <functional>
+
+#include <atomic>
+
+#include <boost/circular_buffer.hpp>
 
 #include "muduo/base/common.h"
 
@@ -47,6 +54,7 @@
 
 
 
+#include "tstbacktrace.h"
 
 ///////////////////////////////////
 
@@ -61,13 +69,6 @@ using namespace apache::thrift::transport;
 using namespace apache::thrift::server;
 //using namespace apache::thrift::async;
 
-
-
-#include <cstdio>
-#include <cstdlib>
-#include <functional>
-
-#include <atomic>
 
 using namespace std;
 using namespace muduo;
@@ -272,6 +273,19 @@ void tst_shared_ptr_1() {
     std::cout << "b_obj->m_ptrA count=" << b_obj.use_count() << std::endl;
     a_obj = NULL;
     b_obj = NULL;
+}
+
+
+std::shared_ptr<CA> getItem() {
+    std::shared_ptr<CA> item(new CA);
+    return item;
+}
+
+void tst_shared_ptr_2() {
+
+    std::shared_ptr<CA> item = getItem();
+    std::cout << "item usecount=" << item.use_count() << std::endl;
+
 }
 
 typedef std::shared_ptr<Connect>            SP_ConnectPtr;
@@ -564,8 +578,107 @@ void tst_youzhi() {
     }
 }
 
+
+class TestThread {
+public:
+    TestThread() : m_val(2024)/*, cThrdObj()*/ {
+//    TestThread() : m_val(1024), cThrdObj(print, this) {
+
+        m_pfnCb = std::bind(&TestThread::print, this);
+    }
+    void start() {
+        std::thread cThrdObj(m_pfnCb);
+        cThrdObj.join();
+//        ::sleep(3);
+    }
+    ~TestThread() {
+        printf( "xigou testthread\n" );
+    }
+    static void print(void* arg) {
+        TestThread* pThis = (TestThread*)arg;
+
+        printf( "111 hello everybody!!m_val=%d\n", pThis->m_val );
+    }
+private:
+    typedef std::function<void()> ThreadCb;
+    ThreadCb    m_pfnCb;
+
+//    std::thread cThrdObj;
+    int m_val;
+};
+void tstThrdWork() {
+    TestThread ct;
+    ct.start();
+    sleep( 2 );
+}
+
+void GetFileNameFromDir(const char* rootPath)
+{
+    boost::filesystem::path dir(rootPath);
+    if (boost::filesystem::exists(dir)) // 判断路径是否存在
+    {
+        boost::filesystem::directory_iterator itEnd;
+        boost::filesystem::directory_iterator itDir(dir);
+        std::string fileName("");
+        for (; itDir != itEnd; itDir++) // 遍历路径下所有文件
+        {
+            fileName = itDir->path().string();
+            if (boost::filesystem::is_directory(fileName.c_str()))
+                std::cout << "is dir, val=" << fileName.c_str() << std::endl;
+            else {
+                std::cout << "is file, val=" << fileName.c_str() << std::endl;
+            }
+        }
+    }
+}
+
+
+void GetCurSecond() {
+    {
+        struct timeval tv;
+        gettimeofday(&tv,NULL);
+        printf("second:%ld\n",tv.tv_sec);  //秒
+        printf("millisecond:%ld\n",tv.tv_sec*1000 + tv.tv_usec/1000);  //毫秒
+        printf("microsecond:%ld\n",tv.tv_sec*1000000 + tv.tv_usec);  //微秒
+
+        sleep(3); // 为方便观看，让程序睡三秒后对比
+        std::cout << "3s later:" << std::endl;
+
+        gettimeofday(&tv,NULL);
+        printf("second:%ld\n",tv.tv_sec);  //秒
+        printf("millisecond:%ld\n",tv.tv_sec*1000 + tv.tv_usec/1000);  //毫秒
+        printf("microsecond:%ld\n",tv.tv_sec*1000000 + tv.tv_usec);  //微秒
+
+    }
+    struct timeval tv;
+    char buf[1024] = {0};
+
+    gettimeofday(&tv, NULL);
+    strftime(buf, sizeof(buf)-1, "%Y-%m-%d %H:%M:%S", localtime(&tv.tv_sec));
+//    printf( "buf=%s\n", buf );
+    fprintf(stderr, "%s.%03d\n", buf, (int)(tv.tv_usec / 1000));
+}
+
 void tst_c11fun_entry() {
-    OutputDbgInfo tmpOut( "tst_c11fun_entry begin", "tst_c11fun_entry end" );
+//    OutputDbgInfo tmpOut( "tst_c11fun_entry begin", "tst_c11fun_entry end" );
+
+    GetCurSecond();
+    return ;
+
+    int &&rval1 = 1;    // 正确，1是右值，可以赋值给右值引用
+    GetFileNameFromDir("include");
+    GetFileNameFromDir("CMakeFiles");
+    GetFileNameFromDir("compile_commands.json");
+    return ;
+
+    tstThrdWork();
+    return;
+
+    tst_shared_ptr_2();
+    return;
+
+    tst_die();
+    return ;
 
     tst_youzhi();
     return;
