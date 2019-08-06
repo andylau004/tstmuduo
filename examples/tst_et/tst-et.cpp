@@ -298,9 +298,129 @@ void start_et_srv() {
     }
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#define MAX_EVENT_NUMBER 1024
+#define BUFFER_SIZE 10
+int SUM = 0;
+
+int setnonblocking(int fd) {
+    int old_option = fcntl(fd, F_GETFL);
+    int new_option = old_option | O_NONBLOCK;
+    fcntl( fd, F_SETFL, new_option );
+    return old_option;
+}
+//添加fd到epoll内核事件表并选择是否开启ET模式
+void addfd(int epoll_fd, int fd, bool enable_et) {
+    epoll_event event;
+    event.data.fd = fd;
+    event.events = EPOLLIN | EPOLLERR;
+    if (enable_et) {
+        event.events |= EPOLLET;
+    }
+    epoll_ctl(epoll_fd, EPOLL_CTL_ADD, fd, &event);
+    setnonblocking(fd);
+}
+void et(epoll_event *events,int number,int epollfd,int listenfd)
+{
+    char buf[BUFFER_SIZE] = {0};
+
+    for(int i=0;i<number;i++)
+    {
+        int sockfd = events[i].data.fd;
+        if (sockfd == listenfd) {
+            struct sockaddr_in client_addr;
+            socklen_t addrlen = sizeof(client_addr);
+            int connfd = ::accept(listenfd, (struct sockaddr*)&client_addr, &addrlen);
+
+            int on = 500;
+            //设置接收缓冲区大小为500
+            setsockopt(connfd,SOL_SOCKET,SO_RCVBUF,(void *)&on,sizeof(int));
+            addfd(epollfd,connfd,true);
+        } else if (events[i].events & EPOLLIN) {
+
+            SUM++;
+            while (1) {
+                bzero(buf, BUFFER_SIZE);
+                int ret = recv( sockfd, buf, BUFFER_SIZE - 1, 0 );
+
+                if (ret < 0) {
+                    printf( "ret < 0, ret=%d", ret );
+                    if (errno == EAGAIN || errno == EWOULDBLOCK) {
+                        printf( "read later " );
+                        break;
+                    }
+                } else if (ret == 0) {
+                    close(sockfd);
+                    printf ( " close sockfd=%d\n", sockfd );
+                } else {
+                    std::cout<<"get "<<ret<<" bytes of content "<<buf<<std::endl;
+                }
+            }
+
+            std::cout<<"times:"<<SUM<<std::endl;
+        } else {
+            std::cout<<"something else happened\n";
+        }
+
+    }
+}
+int tst_et_1() {
+    const char* ip = "172.17.0.2";
+    int port = 9011;
+
+    int ret = 0;
+    struct sockaddr_in address;
+    bzero(&address,sizeof(address));
+    address.sin_family = AF_INET;
+    inet_pton(AF_INET, ip, &address.sin_addr);
+    address.sin_port = htons(port);
+
+    int listenfd = socket(PF_INET,SOCK_STREAM,0);
+    assert(listenfd >= 0);
+
+    ret = ::bind(listenfd, (struct sockaddr *)&address, static_cast<int>(sizeof(address)));
+    assert(ret != -1);
+    ret = listen(listenfd,5);
+    assert(ret != -1);
+
+    epoll_event events[MAX_EVENT_NUMBER];
+    int epollfd = epoll_create(5);
+    assert(epollfd != -1);
+    addfd(epollfd,listenfd,true);
+
+    while (1) {
+        int ret = epoll_wait(epollfd, events, MAX_EVENT_NUMBER, -1);
+        if (ret < 0) {
+            printf(" epooll wait failed err=%d\n", errno);
+            return -1;
+        }
+        et(events,ret,epollfd,listenfd);
+    }
+    close(listenfd);
+    return 0;
+}
 int tst_et_entry(int argc, char *argv[]) {
     int tmp_array[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
     LOG_INFO << "array_size(tmp_array)=" << array_size(tmp_array) * sizeof(int);
+
+    tst_et_1();
+    return 1;
 
     start_et_srv();
     return 1;

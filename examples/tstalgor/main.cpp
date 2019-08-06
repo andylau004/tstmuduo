@@ -1500,6 +1500,9 @@ int main(int argc, char *argv[])
     Logger::setLogLevel(Logger::DEBUG);
     LOG_INFO << "pid = " << getpid() << ", tid = " << CurrentThread::tid();
 
+
+    tst_hash_fun_entry(); return 1;
+
     tst_HeapSortEntry_(); return 1;
     tst_dpfun_entry(); return 1;
 
@@ -1561,7 +1564,6 @@ std::cout << "argc=" << argc << std::endl;
     tst_linkedlist_entry();
     return 1;
 
-    tst_hash_fun_entry();
 //    return 1;
     tst_Extern_MergeSortEntry_();
     return 1;

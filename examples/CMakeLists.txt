@@ -40,6 +40,7 @@ add_subdirectory(tst_emplaceback)
 
 add_subdirectory(tst_rdshamem)
 add_subdirectory(tst_wrshamem)
+add_subdirectory(tstskiplist)
 
 
 #add_subdirectory(${CMAKE_SOURCE_DIR}/thirdpart/rapidjson)

@@ -196,7 +196,7 @@ void tst_NoR_merge_1() {
     如果数组中元素被取光了，将堆顶元素替换为无穷大。每次替换堆顶元素后，重新调整堆
     下面给出相关算法的C++实现代码
  **/
-#define n 4
+#define CNST_NUM 4
 
 // 定义最小堆节点
 struct MinHeapNode
@@ -232,9 +232,9 @@ public:
     // 替换根节点（堆顶元素），重新调整堆
     void replaceMin(MinHeapNode x) { harr[0] = x;  MinHeapify(0); }
 };
-int *mergeKArrays(int arr[][n], int k)
+int *mergeKArrays(int arr[][CNST_NUM], int k)
 {
-    int *output = new int[n*k];  // 最后输出的数组，保存排序结果
+    int *output = new int[CNST_NUM*k];  // 最后输出的数组，保存排序结果
 
     // 创建一个大小为k的最小堆，堆中元素为k个数组中的每个数组的第一个元素
     MinHeapNode *harr = new MinHeapNode[k];
@@ -247,14 +247,14 @@ int *mergeKArrays(int arr[][n], int k)
     MinHeap hp(harr, k); // 对上述大小为k的数组建堆
 
     // 逐次取出堆顶元素，存入输出数组中，并将其替换为所在数组的下一元素
-    for (int count = 0; count < n*k; count++)
+    for (int count = 0; count < CNST_NUM*k; count++)
     {
         // 取堆顶，存结果
         MinHeapNode root = hp.getMin();
         output[count] = root.element;
 
         // 替换堆顶
-        if (root.j < n)
+        if (root.j < CNST_NUM)
         {
             root.element = arr[root.i][root.j];
             root.j += 1;
@@ -312,7 +312,7 @@ void printArray(int arr[], int size)
 
 int tst_example_1()
 {
-    int arr[][n] =  {{2, 6, 12, 34},
+    int arr[][CNST_NUM] =  {{2, 6, 12, 34},
                      {1, 9, 20, 1000},
                      {23, 34, 90, 2000}};
     int k = sizeof(arr)/sizeof(arr[0]);
@@ -321,7 +321,7 @@ int tst_example_1()
     int *output = mergeKArrays(arr, k);
 
     cout << "Merged array is " << endl;
-    printArray(output, n*k);
+    printArray(output, CNST_NUM*k);
     cout << endl;
 
     return 0;
