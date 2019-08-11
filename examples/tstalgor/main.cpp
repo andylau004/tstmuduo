@@ -25,10 +25,6 @@
 #include <boost/date_time/posix_time/posix_time.hpp>
 
 
-//#include "poco/Bugcheck.h"
-//#include "poco/Foundation.h"
-//#include "poco/Alignment.h"
-
 #include "muduo/base/common.h"
 
 #include "muduo/net/InetAddress.h"
@@ -1495,11 +1491,96 @@ void tst_swap2Node_list() {
 //    PrintList(pRetHead);
 }
 
+void MakeX7() {
+    int iVal = 8;
+    int iLst = (iVal << 3)/* - 8*/;
+    std::cout << "iLst= " << iLst <<std::endl;
+}
+
+char* reverse_string(char* s) {
+    char* p = s;
+    char* q = s;
+    while (*q) {
+        q ++ ;
+    }
+    q --;
+
+    while (q > p) {
+        char tmp = *p;
+        *p++ = *q;
+        *q-- = tmp;
+    }
+    return s;
+}
+void my_itoa( int iVal ) {
+
+    bool bIsNegtaive = false;
+
+    int  i          = 0;
+    char all[ 256 ] = {0};
+
+    if ( iVal < 0 ) {
+        iVal = -iVal;
+        bIsNegtaive = true;
+    }
+
+    do {
+        all[ i++ ] = iVal % 10 + '0';
+        iVal = iVal / 10;
+    } while(iVal > 0);
+
+    if (bIsNegtaive) {
+
+        all [ i++ ] = '-';
+    }
+    reverse_string(all);
+    std::cout << "last=" << all << std::endl;
+}
+
+char* returnstr()
+{
+    char p[] = "hello";
+    printf("111=%d\n",sizeof(p));
+    printf("222=%d\n",strlen(p));
+}
+void tst_some_one_1()
+{
+    class Base1
+    {
+    public:
+        int base1_1;
+        int base1_2;
+    };
+    std::cout << "sizeof(Base1)=" << sizeof(Base1) << std::endl;
+    return;
+
+    char* s = returnstr();
+    printf("%s\n",s);
+}
+
+
+
 int main(int argc, char *argv[])
 {
     Logger::setLogLevel(Logger::DEBUG);
     LOG_INFO << "pid = " << getpid() << ", tid = " << CurrentThread::tid();
 
+
+    tst_qs_new(); return 1;
+
+    tst_some_one_1(); return 1;
+
+    my_itoa(10089);
+    my_itoa(-32652300); return 1;
+
+
+    MakeX7(); return 1;
+
+
+    tst_GetInout(); return 1;
+
+
+    tst_reverse_list_1(); return 1;
 
     tst_hash_fun_entry(); return 1;
 
@@ -1527,10 +1608,7 @@ int main(int argc, char *argv[])
 //    tst_ptr_vec(); return 1;
     tst_MergeSortEntry_(); return 1;
 
-    tst_qs_new(); return 1;
 
-
-    tst_GetInout(); return 1;
 
     tst_qs_111(); return 1;
 

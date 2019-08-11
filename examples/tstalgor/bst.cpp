@@ -349,16 +349,3 @@ return ;
     }
 
 }
-
-
-
-/*
-    *
-    *前序遍历算法
-    *BSTree类内部调用函数
-    *
-*/
-//template < typename T >
-//void BSTree< T >::preOrder() {
-
-//}

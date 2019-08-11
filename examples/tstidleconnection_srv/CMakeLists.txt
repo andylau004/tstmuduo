@@ -12,7 +12,7 @@ add_executable(tstidleconnection_srv
     main.cpp)
 
 
-target_link_libraries( ${PROJECT_NAME}  event muduo_net muduo_base)
+target_link_libraries( ${PROJECT_NAME}  event muduo_net_cpp11 muduo_base )
 
 
 

@@ -282,6 +282,14 @@ std::shared_ptr<CA> getItem() {
 }
 
 void tst_shared_ptr_2() {
+    int ival = 10;
+
+    std::shared_ptr< int > pobj = std::make_shared< int > (ival);
+    std::shared_ptr< int > p2 = pobj;
+    std::cout << "pobj usecount=" << pobj.use_count() << std::endl;
+
+    return;
+
 
     std::shared_ptr<CA> item = getItem();
     std::cout << "item usecount=" << item.use_count() << std::endl;
@@ -662,8 +670,11 @@ void GetCurSecond() {
 void tst_c11fun_entry() {
 //    OutputDbgInfo tmpOut( "tst_c11fun_entry begin", "tst_c11fun_entry end" );
 
-    GetCurSecond();
-    return ;
+
+    tst_shared_ptr_2();  return;
+
+
+    GetCurSecond();  return;
 
     int &&rval1 = 1;    // 正确，1是右值，可以赋值给右值引用
     GetFileNameFromDir("include");
@@ -671,26 +682,17 @@ void tst_c11fun_entry() {
     GetFileNameFromDir("compile_commands.json");
     return ;
 
-    tstThrdWork();
-    return;
+    tstThrdWork(); return;
 
-    tst_shared_ptr_2();
-    return;
+    tst_die(); return;
 
-    tst_die();
-    return ;
+    tst_youzhi(); return;
 
-    tst_youzhi();
-    return;
-
-    NOTIFY_PROCESS(tstrecvfname__call, 123);
-    return;
+    NOTIFY_PROCESS(tstrecvfname__call, 123); return;
 
     tst_mov_yuyi();  return ;
 
-    tst_move_1();
-    return;
-
+    tst_move_1(); return;
 
     tst_rval_lval(); return ;
 

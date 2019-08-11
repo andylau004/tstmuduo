@@ -56,12 +56,12 @@ ListNodeEx* NoRecrusive_ReverseList(ListNodeEx* head) {
     head->next = NULL;// while结束后，将翻转后的最后一个节点（即翻转前的第一个结点head）的链域置为NULL
     return pre;
 }
+
 // 插入一个新节点到链表中(放在链表头部)
 void CreateList(ListNodeEx*& pIn, int newVal) {
     ListNodeEx* pNewNode = new ListNodeEx;
     pNewNode->val  = newVal;
     pNewNode->next = NULL;
-
     if (pIn == NULL) {
         pIn = pNewNode;
         return;
@@ -77,7 +77,8 @@ void tst_reverse_list_1() {
     }
 
     PrintList(phead);
-    phead = Recrusive_ReverseList(phead);
+//    phead = Recrusive_ReverseList(phead);
+    phead = NoRecrusive_ReverseList(phead);
     PrintList(phead);
 }
 

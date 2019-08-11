@@ -156,12 +156,14 @@ void tst_hashmap_2() {
     hshmapobj.put( 555, 567 );
     hshmapobj.put( 111, 999 );
     hshmapobj.remove( 111 );
-hshmapobj.show();
-
+    hshmapobj.show();
 }
+
 void tst_hash_fun_entry() {
+
     tst_hashmap_2(); return;
+
     tst_my_hashmap_1(); return;
 
-    tst_murmurhash_1();
+    tst_murmurhash_1(); return;
 }
