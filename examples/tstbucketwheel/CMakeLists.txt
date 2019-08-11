@@ -12,7 +12,7 @@ add_executable(tstbucketwheel
     main.cpp)
 
 
-target_link_libraries(tstbucketwheel event muduo_net muduo_base)
+target_link_libraries(tstbucketwheel event muduo_net_cpp11 muduo_base)
 
 
 

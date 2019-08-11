@@ -1,65 +1,67 @@
 
 
 
-set(base_SRCS
 
-    Error.h
-    shared_mem.h
+#set(base_SRCS
 
-    timeinterval.h
-    timeinterval.cpp
+#    Error.h
+#    shared_mem.h
 
-    duration.h
-    duration.inl.h
-    duration.cc
+#    timeinterval.h
+#    timeinterval.cpp
 
-    event_watcher.h
-    event_watcher.cpp
+#    duration.h
+#    duration.inl.h
+#    duration.cc
 
-    libevent.h
-    libevent.cc
+#    event_watcher.h
+#    event_watcher.cpp
 
-    errcode.h
-    exception.h
-    thrift_connection_pool.h
-    thrift_connection_pool.cpp
-    utils.h
-    utils.cpp
+#    libevent.h
+#    libevent.cc
 
-    thrift_helper.h
-    thrift_helper.cpp
+#    errcode.h
+#    exception.h
+#    thrift_connection_pool.h
+#    thrift_connection_pool.cpp
+#    utils.h
+#    utils.cpp
 
-    color.h
-    color.cpp
-    murmurhash.h
-    murmurhash.cpp
+#    thrift_helper.h
+#    thrift_helper.cpp
 
-    BinaryTree.cpp
+#    color.h
+#    color.cpp
+#    murmurhash.h
+#    murmurhash.cpp
 
-    Basic.cpp
-#  AsyncLogging.cc
-  Condition.cc
-  CountDownLatch.cc
-  Date.cc
-  Exception.cc
-#  FileUtil.cc
-#  LogFile.cc
-  Logging.cc
-  LogStream.cc
-#  ProcessInfo.cc
-  Timestamp.cc
-  TimeZone.cc
-  Thread.cc
-  ThreadPool.cc
-  convert.cpp
-  common.cpp
-  common.h
-  timerutil.cpp
+#    BinaryTree.cpp
 
-    noncopyable.h
-    Singleton.h
+#    Basic.cpp
+##  AsyncLogging.cc
+#  Condition.cc
+#  CountDownLatch.cc
+#  Date.cc
+#  Exception.cc
+##  FileUtil.cc
+##  LogFile.cc
+#  Logging.cc
+#  LogStream.cc
+##  ProcessInfo.cc
+#  Timestamp.cc
+#  TimeZone.cc
+#  Thread.cc
+#  ThreadPool.cc
+#  convert.cpp
+#  common.cpp
+#  common.h
+#  timerutil.cpp
 
-  )
+#    noncopyable.h
+#    Singleton.h
+
+#  )
+file(GLOB base_SRCS *.cpp *.c *.cc */*.cc *.h */*.h)
 
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -gdwarf-2 -Wno-deprecated -ffunction-sections -W -Wall -pthread -Wno-missing-braces -Wparentheses -std=c++11" )
 #set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -gdwarf-2 -Wno-deprecated -ffunction-sections -W -Wall -pthread -Wno-missing-braces -Wparentheses" )
