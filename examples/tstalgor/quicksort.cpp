@@ -350,11 +350,11 @@ void f_2(int arr[], int head, int tail) {
     int piv = arr[i];
 
     while (i < j) {
-        while (i < j && arr[j] > piv) j --;
+        while (i < j && arr[j] > piv) j --; // 从右向左找第一个小于x的数
         if (i < j) arr[i++] = arr[j];
 
         while (i < j && arr[i] <= piv) i++;
-        if (i < j) arr[j--] = arr[i];
+        if (i < j) arr[j--] = arr[i];// 从左向右找第一个大于x的数
     }
     arr[i] = piv;
     f_2( arr, head, i - 1 );
@@ -375,12 +375,37 @@ void f_3(int a[], int head, int tail) {
 //    f_3(a, head, j - 1);
 //    f_3(a, i + 1, tail);
 }
+
+void newfun(int* a, int head, int tail) {
+    if (!a || head >= tail) return;
+
+    int i = head;
+    int j = tail;
+    int x = a[i];
+
+    while ( i < j ) {
+
+        while ( i < j && a[ j ] > x ) j --;
+        if ( i < j ) a[ i ++ ] = a[ j ];
+
+        while ( i < j && a[ i ] < x ) i ++;
+        if ( i < j ) a[ j -- ] = a[ i ];
+
+    }
+    a [ i ] = x;
+
+    newfun( a, head, i - 1 );
+    newfun( a, i + 1, tail );
+
+}
 void tst_qs_new() {
     int arr[] = {12, 45, 748, 3986, 15, 56, 3, 89, 4, 48, 2, 0, -1, 1024, };
     int length = sizeof(arr) / sizeof(int);
+
     justPrint( arr, length );
 
-    f_2(arr, 0, length - 1);
+    newfun( arr, 0, length - 1 );
+//    f_2(arr, 0, length - 1);
 //    my_qs( arr, 0, length - 1 );
 //    t_qsort<int>( arr, 0, length - 1 );
 //    SolutionQS cqs;

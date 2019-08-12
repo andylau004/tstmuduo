@@ -1558,12 +1558,46 @@ void tst_some_one_1()
     printf("%s\n",s);
 }
 
+#define f(a,b) a##b
+
+#define g(a) #a
+#define h(a) g(a)
 
 
+#define A(x) T_##x
+#define B(x) #@x
+#define C(x) #x
+
+
+#define WARN_IF(EXP) if(EXP) cerr << #EXP << endl;
+#define paster( n ) cout << "token" << #n << " = " << n << endl;
+#define _CONS(a, b) int(a##+##b)
+#define _STRI(s) #s
+
+void tst_111() {
+//    std::cout << "a###b=" << f(1, 2) << std::endl;
+    printf( "a###b=%d\n", f(1,2) );
+
+    printf("%s\n", h(f(1, 2))); //输出:12
+    printf("%s\n", g(f(1, 2))); //输出:f(1,2)
+    printf("%s\n", h(A(1)));    // A(1)------〉T_1
+    printf("%d\n", B(1));       // B(1)------〉'1'
+    printf("%s\n", C(1));       // C(1)------〉"1"
+
+    int div = 0;
+    WARN_IF(div == 0);              //输出: div == 0
+    paster(9);                      //输出: token9 = 9
+    std::cout << _CONS(1+2, 2) << std::endl;  //输出: 3
+    std::cout << _STRI(INT_MAX) << std::endl; //输出: INT_MAX
+    std::cout << STRI(INT_MAX) << std::endl; // prints : 2147483647
+
+}
 int main(int argc, char *argv[])
 {
     Logger::setLogLevel(Logger::DEBUG);
     LOG_INFO << "pid = " << getpid() << ", tid = " << CurrentThread::tid();
+
+    tst_111(); return 1;
 
 
     tst_qs_new(); return 1;
