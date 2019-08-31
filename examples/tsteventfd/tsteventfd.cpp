@@ -91,6 +91,13 @@ using namespace muduo::net;
 #include "muduo/base/thrift_connection_pool.h"
 
 
+
+extern int tst_some_event_fd_1(int argc, char *argv[]);
+
+extern void  start_work();
+
+
+
 int g_efd = -1;
 
 event_base* mainbase_ = nullptr;
@@ -117,7 +124,7 @@ void* read_thread(void* dummy) {
 
     {
         struct epoll_event read_event;
-        read_event.events = EPOLLHUP | EPOLLERR | EPOLLIN;
+        read_event.events = EPOLLHUP | EPOLLERR | EPOLLIN | EPOLLET;
         read_event.data.fd = g_efd;
         ret = epoll_ctl( ep_fd, EPOLL_CTL_ADD, g_efd, &read_event );
         if (ret < 0) {
@@ -128,6 +135,7 @@ void* read_thread(void* dummy) {
 
     while (1) {
         ret = ::epoll_wait(ep_fd, &events[0], 10, -1/*2000*/);
+        printf( "epoll wati ret=%d\n", ret );
         if (ret > 0) {
             int i = 0;
 
@@ -295,7 +303,7 @@ int tst_epoll_eventfd() {
             struct timeval tv;
             gettimeofday(&tv, NULL);
 
-            sprintf(tmpbuffer,"success write to efd, write %d bytes(%llu) at %lds %ldus\n",
+            sprintf(tmpbuffer,"success write to efd, write %d bytes(%llu) at %lds %ldus",
                     ret, ucount, tv.tv_sec, tv.tv_usec);
             LOG_INFO << tmpbuffer;
         }
@@ -593,6 +601,14 @@ void tst_122xxxxx2( ) {
 // 测试 eventfd 事件通知机制
 int tst_event_fd_entry(int argc, char *argv[]) {
 
+    start_work(); return 1;
+
+    tst_some_event_fd_1(argc, argv); return 1;
+
+
+    tst_epoll_eventfd(); return 1;
+
+
     tst_122xxxxx2(); return 1;
 
     newchukclient(); return 1;
@@ -616,7 +632,6 @@ int tst_event_fd_entry(int argc, char *argv[]) {
     libevent_impl_eventfd(); return 1;
 
     // epoll style
-    tst_epoll_eventfd(); return 1;
 }
 
 
