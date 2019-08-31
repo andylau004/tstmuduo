@@ -97,7 +97,6 @@ using namespace muduo::net;
 using namespace muduo::net::detail;
 
 //几个C++方面的知识点
-
 //std::lower_bound，找到第一个大于等于给定值的位置，返回迭代器
 //std::back_inserter，获取末尾位置的迭代器
 //std::move，移动语义，避免拷贝，可以和右值引用一起使用
@@ -139,7 +138,7 @@ TimerId TimerQueue::addTimer(const TimerCallback& cb,
     // 新建一个Timer
     Timer* timer = new Timer(cb, when, interval);
     //在当前TimerQuene所属的loop中调用addTimerLoop
-    // 在loop中执行真正的add操作
+    //在loop中执行真正的add操作
     loop_->runInLoop(boost::bind(&TimerQueue::addTimerInLoop, this, timer));
     // 返回一个定时任务的标示
     return TimerId(timer, timer->sequence());
@@ -210,7 +209,7 @@ void TimerQueue::handleRead()
 
     //获取在这个时间点到时的所有定时器，并把他们存储在expired数组中
     //同时这个函数也会把这些定时器从timers_中删除掉
-    // 取出所有的到期任务
+    //取出所有的到期任务
     std::vector<Entry> expired = getExpired(now);
 
     callingExpiredTimers_ = true;
@@ -230,16 +229,17 @@ void TimerQueue::handleRead()
 
 /*
  * 重新整理时间set中的任务，将所有超时的任务都拿出，然后调用其回调函数
+ * 取出已经到期的任务
 */
-// 取出已经到期的任务
 std::vector<TimerQueue::Entry> TimerQueue::getExpired(Timestamp now)
 {
     assert(timers_.size() == activeTimers_.size());
+
     std::vector<Entry> expired;// 过期的任务集合
     // 生成一个entry，用于比较，提供过期的界限
     Entry sentry(now, reinterpret_cast<Timer*>(UINTPTR_MAX));
 
-    /* lower_bound：找到第一个大于等于参数的位置，返回迭代器(此处如果超时时间恰好是now，应该不算作超时) */
+    // lower_bound：找到第一个大于等于参数的位置，返回迭代器(此处如果超时时间恰好是now，应该不算作超时)
     // 以sentry为上界，取出所有时间戳小于now的entry 此时begin和end之间，就是已经过期的任务
     // set中的任务是按照时间戳从小到大排列
     TimerList::iterator end = timers_.lower_bound(sentry);

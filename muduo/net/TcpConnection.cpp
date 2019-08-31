@@ -416,7 +416,7 @@ void TcpConnection::connectEstablished()
     // 这些工作，都是由TcpConnection::connectEstablished函数完成。
     channel_->enableReading();
 
-    // 此函数对应TcpServer::connectionCallback_,最终指向一个用户服务器定义的回调函数
+    // 此函数对应 TcpServer::connectionCallback_ ,最终指向一个用户服务器定义的回调函数
     LOG_INFO << "shared_from_this use_count=" << shared_from_this().use_count();
     connectionCallback_(shared_from_this());
 }
@@ -427,7 +427,8 @@ void TcpConnection::connectEstablished()
 //停止监听所有事件；
 //调用 connectionCallback_() 执行用户指定的回调；
 //从 epoll 监听的 fd 中移除 TcpConnection 对应的 sockfd。
-//那什么时候调用到这个函数呢？一个是 TcpServer 析构时，一般情况下是经由 TcpConnection::handleClose() -> TcpConnection::closeCallback_() -> TcpServer::removeConnection() -> ……->TcpConnection::connectDestroyed()
+//那什么时候调用到这个函数呢？一个是 TcpServer 析构时，
+//一般情况下是经由 TcpConnection::handleClose() -> TcpConnection::closeCallback_() -> TcpServer::removeConnection() -> ……->TcpConnection::connectDestroyed()
 //TcpConnection::connectDestroyed是该对象析构前调用的最后一个成员函数，它会通知用户连接已经断开。
 void TcpConnection::connectDestroyed()
 {

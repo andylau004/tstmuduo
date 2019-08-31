@@ -101,7 +101,7 @@ void Channel::handleEvent(Timestamp receiveTime) {
 // 根据revents_的值(目前活动的事件)分别调用不同的用户回调，也就是说channel对象处理fd上各种类型的事件，与events_无关(?)
 // 这里利用了Channel对象的“多态性”，
 // 如果是普通socket，可读事件就会调用预先设置的回调函数；
-// 如果是侦听socket，则调用Aceptor对象的handleRead()
+// 如果是侦听socket，则调用Acceptor对象的handleRead()
 void Channel::handleEventWithGuard(Timestamp receiveTime)
 {
     eventHandling_ = true;

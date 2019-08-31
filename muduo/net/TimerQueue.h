@@ -64,7 +64,8 @@ private:
     // FIXME: use unique_ptr<Timer> instead of raw pointers.
     // This requires heterogeneous comparison lookup (N3465) from C++14
     // so that we can find an T* in a set<unique_ptr<T>>.
-    // set < pair<TimeStamp,Timer*> >，采用 pair 为 key 的原因是可能在一个时刻有多个相同的 Timestamp 时间戳超时，而查找只返回一个，这样即使两个 Timer 的超时时间相同，它们的地址也必须不同。
+    // set < pair<TimeStamp,Timer*> >，采用 pair 为 key 的原因是可能在一个时刻有多个相同的 Timestamp 时间戳超时，
+    // 而查找只返回一个，这样即使两个 Timer 的超时时间相同，它们的地址也必须不同。
     typedef std::pair<Timestamp, Timer*> Entry; //对应一个定时任务
     typedef std::set<Entry> TimerList;          //定时任务集合，采用set,有key无value，且有序
     typedef std::pair<Timer*, int64_t> ActiveTimer;
@@ -83,7 +84,13 @@ private:
     bool insert(Timer* timer);
 
     EventLoop* loop_;
-    // 通过给 timerfd 一个超时时间实现超时计时，它内部有 Channel，通过 Channel 管理 timerfd，然后向EventLoop和 Poller 注册 timerfd 的可读事件，当 timerfd 的可读事件就绪时表明一个超时时间点到了，然后调用 timerfdChannel_ 的可读事件回调 handleRead()，通过 getExpired() 找出所有的超时事件，然后执行相应的超时回调函数 Timer::run()。为了复用定时器，每次处理完之后，会检查这些超时定时器是否需要重复定时，如果需要重复，就再次添加到定时器集合中
+    // 通过给 timerfd 一个超时时间实现超时计时，
+    // 它内部有 Channel，通过 Channel 管理 timerfd，
+    // 然后向EventLoop和Poller注册 timerfd 的可读事件，
+    // 当 timerfd 的可读事件就绪时表明一个超时时间点到了，
+    // 然后调用 timerfdChannel_ 的可读事件回调 handleRead()，
+    // 通过 getExpired() 找出所有的超时事件，然后执行相应的超时回调函数 Timer::run()。
+    // 为了复用定时器，每次处理完之后，会检查这些超时定时器是否需要重复定时，如果需要重复，就再次添加到定时器集合中
     const int timerfd_;
     Channel timerfdChannel_; //timerfd 对应的Channel，借此来观察timerfd_ 上的readable事件
     // Timer list sorted by expiration
