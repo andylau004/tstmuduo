@@ -115,6 +115,16 @@ Memory not freed:
 */
 
 void tst_mem_leak_() {
+
+    while (1 ) {
+
+        char* pMem = new char[ 8 * 1024 ];
+
+        sleep( 1 );
+    }
+
+    return ;
+
     setenv("MALLOC_TRACE", "mtrace.log", 1);
 
     char *hello;

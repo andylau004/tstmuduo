@@ -1,6 +1,6 @@
 
 
-project(tst_meml)
+project(tstmemleak)
 
 
 set(EXECUTABLE_OUTPUT_PATH ../../)

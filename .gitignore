@@ -4,3 +4,18 @@ obj/
 *.a
 
 
+CMakeLists.txt.user
+
+
+CMakeLists.txt.user.*
+
+examples/tstalgor/heapsort.cpp.autosave
+
+thirdpart/thrift/thrift-0.9.3/lib/cpp/.libs/
+thirdpart/thrift/thrift-0.9.3/lib/cpp/test/.libs/
+thirdpart/thrift/thrift-0.9.3/test/cpp/.libs/
+thirdpart/thrift/thrift-0.9.3/tutorial/cpp/.libs/
+thirdpart/thrift/thrift-0.9.3/tutorial/cpp/TutorialClient
+thirdpart/thrift/thrift-0.9.3/tutorial/cpp/TutorialServer
+
+

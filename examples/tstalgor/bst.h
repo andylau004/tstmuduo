@@ -163,7 +163,7 @@ template <typename T>
 void BSTree<T>::insert(T key)
 {
     //创建一个新的节点，使用构造函数初始化
-    BSTNode<T>* z= new BSTNode<T>(key, nullptr, nullptr, nullptr);
+    BSTNode<T>* z = new BSTNode<T>(key, nullptr, nullptr, nullptr);
     if(!z) //如果创建失败则返回
         return;
     //调用内部函数进行插入
