@@ -65,7 +65,7 @@ void mergeImpl(int *data, int start, int mid, int end, int *result) {
 }
 void Recrusive_merge_sort(int *data, int start, int end, int *result) {
     if (start < end) {
-        int mid = start + (end-start) / 2;//避免溢出int
+        int mid = start + ((end-start) / 2);//避免溢出int
         Recrusive_merge_sort(data, start, mid, result);                    //对左边进行排序
         Recrusive_merge_sort(data, mid + 1, end, result);                  //对右边进行排序
         mergeImpl(data, start, mid, end, result);                          //把排序好的数据合并

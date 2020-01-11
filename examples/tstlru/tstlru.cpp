@@ -121,9 +121,6 @@ void tst_lru_entry() {
     std::cout << "*itfind=" << *itfind << std::endl;
     return;
 
-//    for ( auto it&)
-    return;
-
     tst_lru_11();
     return ;
 

@@ -161,6 +161,7 @@ void tst_list_splice() {
 }
 
 class Connect {
+//    class Connect : public std::enable_shared_from_this<Connect> {
 public:
     Connect() {
         printf( "connect cst\n" );
@@ -170,6 +171,14 @@ public:
     }
     void outputConnectInfo() {
         printf( "out put connection info\n" );
+    }
+    std::shared_ptr < Connect > GetPtr() {
+        return std::shared_ptr < Connect > ( this );
+//        return shared_from_this();
+    }
+    std::shared_ptr < Connect > BadGetPtr() {
+        return std::shared_ptr < Connect > ( this );
+//        return shared_from_this();
     }
 private:
 };
@@ -281,7 +290,41 @@ std::shared_ptr<CA> getItem() {
     return item;
 }
 
+
+class Bad : public std::enable_shared_from_this < Bad > {
+public:
+    Bad() { std::cout << "Bad()" << std::endl; }
+    ~Bad() { std::cout << "~Bad()" << std::endl; }
+    std::shared_ptr<Bad> getPtr() {
+//        return std::shared_ptr<Bad>(this);
+        return shared_from_this();
+    }
+};
+
+int xx1() {
+    std::shared_ptr<Bad> bp1(new Bad);
+    std::shared_ptr<Bad> bp2 = bp1->getPtr();
+    std::cout << "bp2.use_count: " << bp2.use_count() << std::endl;
+    return 0;
+}
+
 void tst_shared_ptr_2() {
+
+    xx1();return ;
+    {
+        std::shared_ptr < Connect >  objC( new Connect );
+        std::shared_ptr < Connect >  objD = objC->GetPtr();
+        std::cout << "objD usecount=" << objD.use_count() << std::endl;
+
+    }
+
+
+//    std::shared_ptr < Connect > objC( new Connect );
+//    std::shared_ptr < Connect > p23 = objC;
+//    std::cout << "objC usecount=" << objC.use_count() << std::endl;
+
+    return;
+
     int ival = 10;
 
     std::shared_ptr< int > pobj = std::make_shared< int > (ival);
@@ -666,6 +709,9 @@ void GetCurSecond() {
 //    printf( "buf=%s\n", buf );
     fprintf(stderr, "%s.%03d\n", buf, (int)(tv.tv_usec / 1000));
 }
+
+
+
 
 void tst_c11fun_entry() {
 //    OutputDbgInfo tmpOut( "tst_c11fun_entry begin", "tst_c11fun_entry end" );

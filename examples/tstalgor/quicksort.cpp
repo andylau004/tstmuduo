@@ -186,6 +186,34 @@ void insertSort( int arr[], int left, int right, int length ) {// 对子序列ar
         }
     }
 }
+void InsertionSort(int *a, int len)
+{
+    for ( int j = 1; j < len; ++j ) {
+        int key = a[ j ];
+        int i = j - 1;
+
+        while ( i >= 0 && a[i] > key ) {
+            a[ i + 1 ] = a[ i ];
+            i --;
+        }
+        a[ i + 1 ] = key;
+    }
+    return ;
+
+    for (int j = 1; j < len; j++)
+    {
+        int key = a[j];
+        int i   = j - 1;
+        while (i >= 0 && a[i] > key)
+        {
+            a[i + 1] = a[i];
+            i--;
+        }
+        a[i + 1] = key;
+    }
+}
+
+
 void quickSort( int a[], int left, int right, int length ) {
     if (length > MAX_LENGTH_INSERT_SORT) {// 待排序数组长度大于临界值，则进行快速排序
         int pivotLoc; // 记录枢轴(pivot)所在位置
@@ -201,6 +229,14 @@ void quickSort( int a[], int left, int right, int length ) {
 //        insertSort(a, left, right, length);
     }
 }
+void printf_array( int* arr, int length ) {
+    for (size_t i = 0; i != length; ++i) {
+        std::cout << arr[i] << " ";
+    }
+    std::cout << std::endl;
+}
+
+
 
 void tst_qs_111() {
     int arr[10] = {12, 45, 748, 15, 56, 3, 89, 4, 48, 2};
@@ -211,11 +247,17 @@ void tst_qs_111() {
     std::cout << std::endl;
 
     std::cout << "before sort----" << std::endl;
-    for (size_t i = 0; i != length; ++i) {
-        std::cout << arr[i] << " ";
-    }
-    std::cout << std::endl;
+    printf_array( arr, length );
 
+    InsertionSort( arr, length );
+
+    std::cout << std::endl << "after sort----" << std::endl;
+    printf_array( arr, length );
+    cout << std::endl;
+    return ;
+
+    std::cout << "before sort----" << std::endl;
+    printf_array( arr, length );
     quickSort_new_2( arr, 0, length - 1, length );
 //    quickSort(arr, 0, length - 1, length);
 
@@ -376,8 +418,67 @@ void f_3(int a[], int head, int tail) {
 //    f_3(a, i + 1, tail);
 }
 
+
+int SelectPivotMedianOfThree(int arr[],int low, int high)
+{
+    {
+        int mid = low + ( (high - low) >> 1 );
+        if (arr[mid] > arr[high])
+            swap(arr[mid], arr[high]);
+        if (arr[low] > arr[high])
+            swap(arr[low], arr[high]);
+        if (arr[mid] > arr[low])
+            swap(arr[mid], arr[low]);
+        return arr[low];
+    }
+
+    int mid = low + ((high - low) >> 1);//计算数组中间的元素的下标
+
+    //使用三数取中法选择枢轴
+    if (arr[mid] > arr[high])//目标: arr[mid] <= arr[high]
+    {
+        swap(arr[mid],arr[high]);
+    }
+    if (arr[low] > arr[high])//目标: arr[low] <= arr[high]
+    {
+        swap(arr[low],arr[high]);
+    }
+    if (arr[mid] > arr[low]) //目标: arr[low] >= arr[mid]
+    {
+        swap(arr[mid],arr[low]);
+    }
+    //此时，arr[mid] <= arr[low] <= arr[high]
+    return arr[low];
+    //low的位置上保存这三个位置中间的值
+    //分割时可以直接使用low位置的元素作为枢轴，而不用改变分割函数了
+}
+
 void newfun(int* a, int head, int tail) {
     if (!a || head >= tail) return;
+
+    {
+        int i = head;
+        int j = tail;
+        int x = a[i];
+//        int x = SelectPivotMedianOfThree(a, head, tail);
+//        std::cout << "x=" << x << std::endl;
+
+        while ( i < j ) {
+
+            while ( i < j && a[ j ] > x ) j --;
+            if ( i < j ) a[ i ++ ] = a [ j ];
+
+            while ( i < j && a[ i ] <= x ) i ++;
+            if ( i < j ) a[ j -- ] = a [ i ];
+
+        }
+        std::cout << "i=" << i << " j=" << j << std::endl;
+        a [ i ] = x;
+
+        newfun ( a, head, i - 1 );
+        newfun ( a, i + 1, tail );
+        return;
+    }
 
     int i = head;
     int j = tail;
@@ -399,8 +500,12 @@ void newfun(int* a, int head, int tail) {
 
 }
 void tst_qs_new() {
-    int arr[] = {12, 45, 748, 3986, 15, 56, 3, 89, 4, 48, 2, 0, -1, 1024, };
+//    int arr[] = {12, 45, 748, 3986, 15, 56, 3, 89, 4, 48, 2, 0, -1, 1024, };
+//    int arr[] = { 10, 9, 8, 7, 6, 5, 4, 3, 2, 1 };
+//    int arr[] = { 1, 2, 3, 4, 5, 6 };
+    int arr[]  = { 6, 5, 4, 3, 2, 1 };
     int length = sizeof(arr) / sizeof(int);
+    std::cout << "length=" << length << std::endl;
 
     justPrint( arr, length );
 
@@ -414,14 +519,6 @@ void tst_qs_new() {
     justPrint( arr, length );
 }
 
-
-
-
-
-
-void tst_qs_222() {
-
-}
 
 
 

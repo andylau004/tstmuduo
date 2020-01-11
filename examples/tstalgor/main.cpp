@@ -25,6 +25,12 @@
 #include <boost/date_time/posix_time/posix_time.hpp>
 
 
+
+//#include <numeric_limits.hpp>
+#include <limits>
+#include <iostream>
+
+
 #include "muduo/base/common.h"
 
 #include "muduo/net/InetAddress.h"
@@ -563,6 +569,13 @@ void tst_int64_1() {
 }
 
 // 最大连续子数组
+
+/*
+    常规方法,时间复杂度O（n*n）
+    先从第一个元素开始向后累加，
+    每次累加后与之前的和比较，保留最大值，
+    再从第二个元素开始向后累加，以此类推。
+*/
 int tst_MaxSubArray(int* array, int length) {
     int maxSum = 0;
     int curSum = 0;
@@ -583,6 +596,28 @@ int tst_MaxSubArray(int* array, int length) {
 
     }
     return maxSum;
+}
+
+// 联机算法：联机算法是在任意时刻算法对要操作的数据只读入(扫描)一次，
+// 一旦被读入并处理，它就不需要在被记忆了。而在此处理过程中算法能对它已经读入的数据立即给出相应子序列问题的正确答案。
+int max_subarray( const std::vector<int>& v, int left, int right ) {
+    int tmp    = 0;
+    int maxSum = 0;
+    for (int i = left; i < right; i ++) {
+        tmp += v[i];
+        if (tmp > maxSum)
+            maxSum = tmp;
+        if (tmp < 0) {
+            tmp = 0;
+        }
+    }
+    return maxSum;
+}
+// 给定一个整数数组 nums ，找到一个具有最大和的连续子数组（子数组最少包含一个元素），返回其最大和。
+void wrap_max_subarray() {
+    std::vector < int > v {-2, 1, -3, 4, -1, 2, 1, -5, 4};
+    auto maxsum = max_subarray( v, 0, v.size() - 1);
+    std::cout << "maxsum=" << maxsum << std::endl;
 }
 
 
@@ -1558,61 +1593,1713 @@ void tst_some_one_1()
     printf("%s\n",s);
 }
 
-#define f(a,b) a##b
+//#define f(a,b) a##b
 
-#define g(a) #a
-#define h(a) g(a)
-
-
-#define A(x) T_##x
-#define B(x) #@x
-#define C(x) #x
+//#define g(a) #a
+//#define h(a) g(a)
 
 
-#define WARN_IF(EXP) if(EXP) cerr << #EXP << endl;
-#define paster( n ) cout << "token" << #n << " = " << n << endl;
-#define _CONS(a, b) int(a##+##b)
-#define _STRI(s) #s
+//#define A(x) T_##x
+//#define B(x) #@x
+//#define C(x) #x
+
+
+//#define WARN_IF(EXP) if(EXP) cerr << #EXP << endl;
+//#define paster( n ) cout << "token" << #n << " = " << n << endl;
+//#define _CONS(a, b) int(a##+##b)
+//#define _STRI(s) #s
 
 void tst_111() {
 //    std::cout << "a###b=" << f(1, 2) << std::endl;
-    printf( "a###b=%d\n", f(1,2) );
+//    printf( "a###b=%d\n", f(1,2) );
 
-    printf("%s\n", h(f(1, 2))); //输出:12
-    printf("%s\n", g(f(1, 2))); //输出:f(1,2)
-    printf("%s\n", h(A(1)));    // A(1)------〉T_1
-    printf("%d\n", B(1));       // B(1)------〉'1'
-    printf("%s\n", C(1));       // C(1)------〉"1"
+//    printf("%s\n", h(f(1, 2))); //输出:12
+//    printf("%s\n", g(f(1, 2))); //输出:f(1,2)
+//    printf("%s\n", h(A(1)));    // A(1)------〉T_1
+//    printf("%d\n", B(1));       // B(1)------〉'1'
+//    printf("%s\n", C(1));       // C(1)------〉"1"
 
-    int div = 0;
-    WARN_IF(div == 0);              //输出: div == 0
-    paster(9);                      //输出: token9 = 9
-    std::cout << _CONS(1+2, 2) << std::endl;  //输出: 3
-    std::cout << _STRI(INT_MAX) << std::endl; //输出: INT_MAX
-    std::cout << STRI(INT_MAX) << std::endl; // prints : 2147483647
+//    int div = 0;
+//    WARN_IF(div == 0);              //输出: div == 0
+//    paster(9);                      //输出: token9 = 9
+//    std::cout << _CONS(1+2, 2) << std::endl;  //输出: 3
+//    std::cout << _STRI(INT_MAX) << std::endl; //输出: INT_MAX
+//    std::cout << STRI(INT_MAX) << std::endl; // prints : 2147483647
 
 }
+
+class CSomeStatic {
+public:
+    CSomeStatic() {}
+    ~CSomeStatic() {}
+
+    static void PrintVal() {
+        std::cout << "val=" << m_val << std::endl;
+    }
+public:
+    static int m_val;
+};
+int CSomeStatic::m_val = 1123;
+
+
+void StackHeapObj() {
+
+    CSomeStatic::PrintVal();
+return;
+    char* pbuffer = new char[ 1024 ] ;
+    memset(pbuffer, 0, 1024);
+    free(pbuffer);
+    return;
+
+//    class CA {// only create in Heap
+//    public:
+//        CA() {
+//            printf( "CA construct\n" );
+//        }
+//    private:
+//        ~CA() {
+//            printf( "CA destruct\n" );
+//        }
+//    };
+
+//    class CB {// only create in stack
+//    public:
+//        CB() {
+//            printf( "CB construct\n" );
+//        }
+//        ~CB() {
+//            printf( "CB destruct\n" );
+//        }
+//    private:
+//        void* operator new(size_t size) {}
+//        void operator delete(void* pObj) {}
+//    };
+
+////    CA objA;
+//    CA* pA = new CA;
+
+//    CB objB;
+//    CB* pB = new CB;
+
+}
+
+
+char* strReverse(char* str) {
+    if (str == NULL || str == '\0')
+        return str;
+
+    char* beg = str;
+    char* end = str;
+
+    while (*end != '\0') {
+        end ++;
+    }
+    end --;
+
+    char tmp;
+    while ( beg != end ) {
+        tmp = *beg;
+
+        *beg = *end;
+        *end = tmp;
+
+        beg ++;
+        end --;
+    }
+    return str;
+}
+
+
+std::string strReverseEx(std::string str) {
+    {
+        std::string ret;
+        std::reverse(str.begin(), str.end());
+
+        size_t start = 0;
+        size_t pos = str.find(' ', start);
+        string word;
+
+        while (pos != string::npos) {
+            word = str.substr(start, pos - start);
+            std::reverse(word.begin(), word.end());
+            word.push_back(' ');
+
+            ret.insert(ret.size(), word);
+            start = pos + 1;
+
+            pos = str.find( ' ', start );
+        }
+        word = str.substr(start);
+        std::reverse(word.begin(), word.end());
+
+        ret.insert(ret.size(), word);
+        return ret;
+    }
+
+}
+
+void tst_reverse_str() {
+    char tmpBuffer[ 512 ] = {0};
+    strcpy(tmpBuffer, "test one instance");
+
+    std::string ret = strReverseEx((char*)tmpBuffer);
+    std::cout << "plst=" << ret << std::endl;
+}
+
+typedef BSTNode < int > BstNodeInt;
+
+class MyBst {
+private:
+    BstNodeInt* _Root;
+
+public:
+    MyBst() : _Root (nullptr) {
+    }
+    ~MyBst() {
+    }
+
+    void insert( int key )  {
+        BstNodeInt* z = new BstNodeInt(key, nullptr, nullptr, nullptr);
+        insert( z );
+    }
+    void insert( BstNodeInt*& z ) {
+        BstNodeInt* parent = nullptr;
+        BstNodeInt* temp = _Root;
+
+        if (temp == nullptr) {
+            std::cout << "first tree root" << std::endl;
+        }
+
+        while (temp) {
+            parent = temp;
+            if ( z->_key > temp->_key )
+                temp = temp->_rchild;
+            else
+                temp = temp->_lchild;
+        }
+        z->_parent = parent;
+
+        if ( z->_parent == nullptr ) {//如果树本来就是空树，则直接把z节点插入根节点
+            _Root = z;
+        } else if ( z->_key > parent->_key ) {//如果z的值大于其双亲，则z为其双亲的右孩
+            parent->_rchild = z;
+        } else {
+            parent->_lchild = z;
+        }
+
+    }
+
+    void preOder(BstNodeInt*& tree) {
+        if (tree) {
+            std::cout << "node=" << tree->_key << std::endl;
+            preOder( tree->_lchild );
+            preOder( tree->_rchild );
+        }
+    }
+    void inOder(BstNodeInt*& tree) {
+        if (tree) {
+            inOder( tree->_lchild );
+            std::cout << "node=" << tree->_key << std::endl;
+            inOder( tree->_rchild );
+        }
+    }
+
+    void preOder() {
+        preOder(_Root);
+    }
+    void inOder() {
+        inOder(_Root);
+    }
+};
+
+
+void Opr_Bst() {
+    MyBst oneBst;
+    oneBst.insert(321); oneBst.insert(12);
+    oneBst.insert(978); oneBst.insert(77);
+    oneBst.insert(65535); oneBst.insert(1023);
+
+//    oneBst.preOder();
+    oneBst.inOder();
+}
+
+
+void showArr(int ages[], size_t length) {
+
+    for(int i=0;i<length;i++)
+        std::cout << "i=" << ages[i]<<" "<<std::endl;
+
+}
+void SortAges(int ages[], size_t length) {
+
+    const int OldAges = 99;
+    int tempArr[ OldAges + 1 ] = {0};
+
+    for (int i = 0; i < length; ++i ) {
+        std::cout << "i=" << ages[i] << " " << std::endl;
+        tempArr[ ages[i] ] ++;
+    }
+
+    for(int i=0;i<=OldAges;i++) {
+        if (tempArr[i])
+            std::cout << "i=" << i << ", val=" << tempArr[i]<<" " << std::endl;
+    }
+//    return;
+
+    int i = 0, j = 0;
+    while ( j <= OldAges )
+    {
+        if ( tempArr[j] != 0 )
+        {
+            ages[i] = j;
+            tempArr[j]--;
+            i++;
+        } else {
+            j++;
+        }
+    }
+
+}
+// 时间复杂度为O(n)的排序算法
+void tst_O1_age() {
+
+    int ages[ ] = {23,26,28,32,34,23,23,28,34,41, 21, 63,};
+//    std::cout << "length=" << sizeof(ages) / sizeof(ages[0]) << std::endl;
+
+    size_t length = sizeof(ages) / sizeof(ages[0]);
+
+    SortAges(ages, length);
+//    return ;
+    showArr(ages, length);
+
+}
+void tst_lower_upper() {
+    int num[6] = { 130, 130, 256, 130, 130, 130 };
+    int ret = -1;
+    for ( int i = 0; i < 6; ++ i ) {
+        ret ^= num[i];
+    }
+    std::cout << "ret=" << ret << std::endl;
+    return;
+
+//    int num[6] = { 130, 69 , 256, 7128, 98, 67};
+//    std::sort( num, num + 6 );
+
+//    int pos1 = std::lower_bound( num , num + 6, 99 ) - num;
+//    std::cout << "pos1=" << pos1 << " val=" << num[pos1] << std::endl;
+}
+
+
+void tst_class_x() {
+    class CA {
+    public:
+        virtual void foo() {
+            printf( "ca foo\n" );
+        }
+    };
+    class CB : public CA {
+    public:
+//        virtual void foo() {
+        void foo() {
+            printf ( "cb foo\n" );
+        }
+    };
+
+    CA* pObj = new CB;
+    pObj->foo();
+}
+
+// 常规二分法查找
+int binary_search( std::vector<int>& v, int target ) {
+    int left = 0;
+    int right= v.size() - 1;
+
+    while (left <= right) {
+        int mid = left + ((right - left) >> 1);
+
+        std::cout << "mid=" << mid << std::endl;
+        if ( v[mid] == target ) {
+            return mid;
+        }
+
+        if ( v[mid] > target ) {
+            right = mid - 1;
+        }
+        if ( v[mid] < target ) {
+            left = mid + 1;
+        }
+    }
+    return -1;
+}
+
+// 发现第一个等于待查找值，如果数组中存在多个等于待查找值的场景；
+int bs_first( std::vector < int >& v, int target ) {
+    int size = v.size();
+    int left = 0;
+    int right= size - 1;
+    while ( left <= right ) {
+        int mid = left + ((right - left) >> 1);
+
+        std::cout << "mid=" << mid << std::endl;
+        if ( v[mid] > target ) {
+            right = mid - 1;
+        }
+        else if ( v[mid] < target ) {
+            left = mid + 1;
+        } else {
+            if (mid == 0 || v[mid - 1] != target) {
+                std::cout << "v[mid-1]=" << v[mid-1] << std::endl;
+                return mid;
+            }
+            else {
+                right = mid - 1;
+            }
+        }
+
+    }
+    return -1;
+}
+
+// 发现最后一个等于待查找值，如果数组中存在多个等于待查找值的场景；
+int bs_last( std::vector < int >& v, int target ) {
+    int size = v.size();
+    int left = 0;
+    int right= size - 1;
+    while ( left <= right ) {
+        int mid = left + ((right - left) >> 1);
+
+        std::cout << "mid=" << mid << std::endl;
+        if ( v[mid] > target ) {
+            right = mid - 1;
+        }
+        else if ( v[mid] < target ) {
+            left = mid + 1;
+        } else {
+            if (mid == size - 1 || v[mid + 1] != target) {
+                std::cout << "v[mid + 1]=" << v[mid + 1] << std::endl;
+                return mid;
+            }
+            else {
+                left = mid + 1;
+            }
+        }
+    }
+    return -1;
+}
+
+// 查找第一个大于等于给定值的元素
+int bs_first_greater_equal( std::vector < int >& v, int target ) {
+    int size = v.size();
+    int left = 0;
+    int right= size - 1;
+
+    while ( left <= right ) {
+        int mid = left + ((right - left) >> 1);
+//        std::cout << mid << std::endl;
+
+        if ( v[ mid ] >= target ) {
+            if (mid == 0 || v[ mid - 1 ] < target) return mid;
+            else {
+                right = mid - 1;
+            }
+        } else {
+            left = mid + 1;
+        }
+    }
+    return -1;
+}
+
+// 查找最后一个小于等于给定值的元素
+int bs_last_lesser_equal( std::vector < int >& v, int target ) {
+    int size = v.size();
+    int left = 0;
+    int right= size - 1;
+
+    while ( left <= right ) {
+        int mid = left + ((right - left) >> 1);
+//        std::cout << mid << std::endl;
+
+        if ( v[ mid ] <= target ) {
+            if (mid == (size - 1) || v[ mid + 1 ] > target) return mid;
+            else {
+                left = mid + 1;
+            }
+        } else {
+            right = mid - 1;
+        }
+    }
+    return -1;
+}
+
+// 二分算法封装
+void binary_search_wrap() {
+
+    // chang gui binary search
+    {
+//        std::vector <int> v;
+//        {
+//            v.push_back( 10 );v.push_back( 30 );v.push_back( 980 );
+//            v.push_back( 1108 );v.push_back( 1187 );
+//            v.push_back( 119900 );
+//        }
+//        std::cout << binary_search( v, 1187 ) << std::endl;
+    }
+
+    // find first == val
+    {
+//        std::vector <int> v;
+//        {
+//            v.push_back( 10 ); v.push_back( 30 ); v.push_back( 980 );
+//            v.push_back( 1108 ); v.push_back( 1109 );
+//            v.push_back( 1187 ); v.push_back( 1187 ); v.push_back( 1187 );
+//            v.push_back( 119900 );
+//        }
+//        std::cout << bs_first( v, 1187 ) << std::endl;
+    }
+
+    // find last == val
+    {
+//        std::vector <int> v;
+//        {
+//            v.push_back( 10 ); v.push_back( 30 ); v.push_back( 980 );
+//            v.push_back( 1108 ); v.push_back( 1109 );
+//            v.push_back( 1187 ); v.push_back( 1187 ); v.push_back( 1187 );
+//            v.push_back( 119900 );
+//        }
+//        std::cout << bs_last( v, 1187 ) << std::endl;
+    }
+
+    // find first >= val
+    {
+//        std::vector <int> v;
+//        {
+//            v.push_back( 10 ); v.push_back( 30 ); v.push_back( 980 );
+//            v.push_back( 1108 ); v.push_back( 1109 );
+//            v.push_back( 1187 ); v.push_back( 1187 ); v.push_back( 1187 );
+//            v.push_back( 119900 );
+//        }
+//        std::cout << bs_first_greater_equal( v, 1187 ) << std::endl;
+    }
+    // find last <= val
+    {
+        std::vector <int> v;
+        {
+            v.push_back( 10 ); v.push_back( 30 ); v.push_back( 980 );
+            v.push_back( 1108 ); v.push_back( 1109 );
+            v.push_back( 1187 ); v.push_back( 1187 ); v.push_back( 1187 );
+            v.push_back( 119900 );
+        }
+        std::cout << bs_last_lesser_equal( v, 1187 ) << std::endl;
+    }
+}
+
+// create my bst tree
+class BstNode {
+public:
+    int key_;
+    BstNode* lchild_;
+    BstNode* rchild_;
+    BstNode* parent_;
+public:
+    BstNode(int key, BstNode* lchild, BstNode* rchild, BstNode* parent) :
+        key_( key ),
+        lchild_(lchild),
+        rchild_(rchild),
+        parent_(parent)
+    {}
+};
+
+BstNode* g_pBstTree = nullptr;
+
+void AddNewNode(BstNode*& root, BstNode* pNewNode) {
+    {
+        BstNode* parent = nullptr;
+        BstNode* temp = root;
+        while (temp) {
+            parent = temp;
+            if (pNewNode->key_ > temp->key_)
+                temp = temp->rchild_;
+            else
+                temp = temp->lchild_;
+        }
+        pNewNode->parent_ = parent;
+        if (!parent)
+            root = pNewNode;
+        else if (pNewNode->key_ > parent->key_)
+            parent->rchild_ = pNewNode;
+        else
+            parent->lchild_ = pNewNode;
+        return;
+    }
+
+    BstNode* parent = nullptr;
+    BstNode* ptemp  = root;
+    if (!ptemp) {
+        std::cout << " fisrt root node " << std::endl;
+    }
+    while (ptemp) {
+        parent = ptemp;
+        if (pNewNode->key_ > ptemp->key_)
+            ptemp = ptemp->rchild_;
+        else
+            ptemp = ptemp->lchild_;
+    }
+    pNewNode->parent_ = parent;
+
+    if (parent == nullptr)
+        root = pNewNode;
+    else if (pNewNode->key_ > parent->key_)
+        parent->rchild_ = pNewNode;
+    else
+        parent->lchild_ = pNewNode;
+
+}
+// 递归中序遍历二叉树；
+void inOrder(BstNode* root) {
+    if (root->lchild_) {
+        inOrder(root->lchild_);
+    }
+    std::cout << " " << root->key_;
+    if (root->rchild_) {
+        inOrder(root->rchild_);
+    }
+}
+void preOrder(BstNode* root) {
+    std::cout << " " << root->key_;
+    if (root->lchild_) {
+        preOrder(root->lchild_);
+    }
+    if (root->rchild_) {
+        preOrder(root->rchild_);
+    }
+}
+// 非递归中序遍历二叉树；
+void inOrderNonRecru(BstNode* root) {
+
+    BstNode* tmp = root;
+    std::stack < BstNode* > stackNodes;
+
+    while ( tmp || !stackNodes.empty() ) {
+
+        if (tmp) {
+            stackNodes.push(tmp);
+            tmp = tmp->lchild_;
+        } else {
+           tmp = stackNodes.top();
+           std::cout << " " << tmp->key_;
+           stackNodes.pop();
+           tmp = tmp->rchild_;
+        }
+
+    }
+
+}
+
+// 中序遍历获取第K大节点；
+BstNode* GetKthNode(BstNode* root, int& K) {
+    BstNode* target = nullptr;
+
+    if (root->lchild_) {
+        target = GetKthNode(root->lchild_, K);
+    }
+
+    if (target == nullptr) {
+        if (K == 1)
+            target = root;
+        K --;
+    }
+
+    if (target == nullptr && root->rchild_) {
+        target = GetKthNode(root->rchild_, K);
+    }
+
+    return target;
+}
+
+// 二叉搜索树 最接近值 查找
+int ClosestValueInBst( BstNode* root, const int& target ) {
+    int ret = root->key_;
+
+    if (target < root->key_ && root->lchild_) {
+
+        int lVal = ClosestValueInBst(root->lchild_, target);
+        if (abs(ret - target) >= abs(lVal - target))
+            ret = lVal;
+
+    }
+    if (target > root->key_ && root->rchild_) {
+
+        int rVal = ClosestValueInBst( root->rchild_, target );
+        if (abs(ret - target) >= abs(rVal - target))
+            ret = rVal;
+
+    }
+    return ret;
+}
+
+// FYTODO: 剑指offer（C++）——二叉树的下一个结点
+/*思路：分两种情况考虑：
+（1）当前结点有右子树时：只要从当前结点的右子结点开始，沿着左指针一直寻找下去，最终结点就是当前结点的下一个结点
+（2）当前结点没有右子树：
+    a、如果当前结点是其父节点的左子结点，则下一个结点就是其父节点；
+    b、如果当前结点是其父节点的右子结点，就沿着指向父节点的指针一直向上遍历，
+       直到找到一个结点是其父节点的左子结点为止，这个父节点就是下一个结点
+*/
+BstNode* GetNextBstNode(BstNode* pNode) {
+    if ( !pNode ) return nullptr;
+
+    BstNode* pNext = nullptr;
+
+    // 如果当前结点有右子树，那么当前结点的下一个结点为其右子树中最左结点
+    if ( pNode->rchild_ ) {
+        BstNode* pRight = pNode->rchild_;
+        while (pRight->lchild_) { //沿右结点的指向左子结点指针一直找下去
+            pRight = pRight->lchild_;
+        }
+        pNext = pRight;
+    } else if ( pNode->parent_ ) {//节点没有右子树
+
+        BstNode* pCurrent = pNode;                       //始终指向当前遍历的结点
+        BstNode* pParent  = pNode->parent_;              //始终指向父节点
+
+        while ( pParent && pParent->rchild_ == pCurrent )//沿着父指针一直向上遍历
+        {
+            pCurrent = pParent;
+            pParent = pParent->parent_;
+        }
+
+        pNext = pParent;//父节点就是下一个结点（或者父节点为空，说明没有下一个结点）
+    }
+    return pNext;
+}
+
+// 剑指Offer——面试题47：不用加减乘除做加法
+// 题目：写一个函数，求两个整数之和，要求在函数体内不得使用+、-、×、÷四则运算符号
+// 思路：我们分解一下两个数字相加，1、各个位数上的数字相加，但不考虑进位；2、考虑进位；3、将前面两步的结果相加。
+// 对于不能使用四则运算，我们能用的就是位运算，而位运算是针对二进制的。所以，我们根据十进制数的相加方式来考虑二进制。
+// 对于二进制
+// 1、各个位数数字相加，不考虑进位，那么0与1、1与0相加都是1，而0与0、1与1相加都是0，看到这个方式，想到的是“异或”运算。
+// 2、而考虑进位，0与0、0与1、1与0都是不会发生进位的，而1与1是会发生进位。那么可以考虑“位与”运算，“位与”运算后，然后将位与后的结果进行左移一位即可。
+// 3、将前面两步结果相加，可以把1产生的结果看成一个数字，2产生的结果看成另一个数字，然后继续计算即可。直到不产生进位即可。
+int tst_add_two_num() {
+    int num1 = 12;
+    int num2 = 24;
+    int temp;
+    do {
+        temp = (num1 ^ num2);
+        num2 = (num1 & num2) << 1;
+        num1 = temp;
+    } while (num2 != 0);
+    return num1;
+}
+
+
+
+// 构建二叉树；
+void CreateBstTree() {
+//    std::cout << "-------------------------------" << std::endl;
+//    std::cout << std::boolalpha;
+//    std::cout << "Minimum value for int: " << std::numeric_limits<int>::min() << std::endl;
+//    std::cout << "Maximum value for int: " << std::numeric_limits<int>::max() << std::endl;
+
+    std::cout << "-------------------------------" << std::endl;
+    BstNode* p1 = new BstNode(1277, nullptr, nullptr, nullptr);
+    AddNewNode(g_pBstTree, p1);
+
+    BstNode* p2 = new BstNode(119, nullptr, nullptr, nullptr);
+    AddNewNode(g_pBstTree, p2);
+
+    BstNode* p3 = new BstNode(6684, nullptr, nullptr, nullptr);
+    AddNewNode(g_pBstTree, p3);
+
+    BstNode* p4 = new BstNode(217, nullptr, nullptr, nullptr);
+    AddNewNode(g_pBstTree, p4);
+
+    BstNode* p5 = new BstNode(16, nullptr, nullptr, nullptr);
+    AddNewNode(g_pBstTree, p5);
+
+    BstNode* p6 = new BstNode(31, nullptr, nullptr, nullptr);
+    AddNewNode(g_pBstTree, p6);
+}
+
+void tst_my_bst_tree() {
+
+    {
+        std::cout << "order 2----" << std::endl;
+        inOrderNonRecru(g_pBstTree);
+        std::cout << std::endl;
+        std::cout << "order 2----" << std::endl;
+    }
+
+    std::cout << "find k=120 closest value= " << ClosestValueInBst(g_pBstTree, 120) << std::endl;
+
+    // 查找第K大节点；
+    int kVal = 3;
+    BstNode* retNode = GetKthNode(g_pBstTree, kVal);
+    if (retNode)
+        std::cout << "ret val = " << retNode->key_ << std::endl;
+}
+
+void tst_my_bst_1() {
+//5，3，7，2，4，6，8
+    int tmpInts[ ] = {5, 3, 7, 2, 4, 6, 8};
+    int size = sizeof(tmpInts)/sizeof(tmpInts[0]);
+    std::cout << "size=" << size << std::endl;
+}
+
+void sortArrayOddEvenImpl( std::vector < int >& vecInts ) {
+
+    std::cout << " before sort -------------" << std::endl;
+    for (auto& it : vecInts) {
+        std::cout << " " << it /*<< std::endl*/;
+    }
+    std::cout << " " << std::endl;
+    std::cout << " " << std::endl;
+
+    int i = 0;
+    int j = vecInts.size() - 1;
+
+    while (i < j) {
+
+        bool a = (vecInts[i] % 2 == 1);
+        bool b = (vecInts[j] % 2 == 1);
+
+        if ( a && !b ) { // i: ji; j: ou;
+            ::swap( vecInts[i++], vecInts[j--] );
+        }  else if ( !a && !b ) { // both ou
+            i ++;
+        } else if ( a && b ) { // both jishu
+            j --;
+        } else if ( !a && b ) { // i: ou; j: ji;
+            i ++; j --;
+        }
+
+    }
+
+    std::cout << " " << std::endl;
+    std::cout << " after sort -------------" << std::endl;
+    for (auto& it : vecInts) {
+        std::cout << " " << it /*<< std::endl*/;
+    }
+    std::cout << " " << std::endl;
+
+}
+
+// 奇偶排序数组
+// 前半段，偶数；后半段， 奇数；
+void sortArrayOddEven() {
+    std::vector < int > vecInts;
+    vecInts.push_back( 119 ); vecInts.push_back( 24 );
+    vecInts.push_back( 13 ); vecInts.push_back( 7171 );
+    vecInts.push_back( 256 ); vecInts.push_back( 1024 );
+
+    sortArrayOddEvenImpl( vecInts );
+}
+
+
+
+
+// 二叉树叶子节点个数
+/*
+（1）如果二叉树为空，返回0
+（2）如果二叉树不为空且左右子树为空，返回1
+（3）如果二叉树不为空，且左右子树不同时为空，返回左子树中叶子节点个数加上右子树中叶子节点个数
+*/
+int GetLeafNodeCountImpl(BstNode* root) {
+    if (root == nullptr)
+        return 0;
+    if (nullptr == root->lchild_ && nullptr == root->rchild_)
+        return 1;
+
+    int leftCount  = GetLeafNodeCountImpl(root->lchild_);
+    int rightCount = GetLeafNodeCountImpl(root->rchild_);
+
+    int ret = leftCount + rightCount;
+    return ret;
+}
+// 二叉树节点个数
+int GetBstTreeNodeCount(BstNode* root/*, int* pCount*/) {
+    if (root == nullptr)
+        return 0;
+    int count = 1 + GetBstTreeNodeCount(root->lchild_/*, pCount*/) + GetBstTreeNodeCount(root->rchild_/*, pCount*/);
+    return count;
+}
+/*
+    求二叉树的深度
+    递归解法：
+    1：如果二叉树为空，则二叉树的深度为0
+    2：如果二叉树不为空，二叉树的深度 = MAX(左子数深度，右子树深度)+1；
+*/
+int GetBstTreeDepth(BstNode* root) {
+    if (!root) return 0;
+    int leftDepth = GetBstTreeDepth(root->lchild_);
+    int rightDepth = GetBstTreeDepth(root->rchild_);
+    return (1 + std::max(leftDepth, rightDepth));
+}
+void LevelTraverseBstTree(BstNode* root) {
+    if (!root) return;
+
+    std::queue<BstNode*> q;
+    q.push(root);
+
+    while (!q.empty()) {
+        BstNode* pNode = q.front();
+        q.pop();
+        std::cout << " " << pNode->key_ << std::endl;
+
+        if (pNode->lchild_) {
+            LevelTraverseBstTree(pNode->lchild_);
+        }
+        if (pNode->rchild_)
+            LevelTraverseBstTree(pNode->rchild_);
+    }
+    std::cout << " " << std::endl;
+}
+
+vector<vector<int>> levelOrder(BstNode* root)
+{
+    vector<vector<int>> result;
+    if (!root)
+        return result;
+
+    queue<BstNode*> Q;
+    Q.push(root);
+    while (!Q.empty())
+    {
+        vector<int> tmp_v;
+        int s = Q.size();
+        for (int i = 0; i < s; i++)
+        {
+            BstNode* tmp_node = Q.front();
+            Q.pop();
+            tmp_v.push_back(tmp_node->key_);
+            if (tmp_node->lchild_)
+            {
+                Q.push(tmp_node->lchild_);
+            }
+            if (tmp_node->rchild_)
+            {
+                Q.push(tmp_node->rchild_);
+            }
+        }
+//        for (auto it : tmp_v) {
+//            std::cout << " " << it;
+//        }
+//        std::cout << " " << std::endl;
+        result.push_back(tmp_v);
+    }
+    return result;
+}
+std::vector < std::vector <int> > levelPrintBst(BstNode* root) {
+
+    std::vector < std::vector <int> > vvInt;
+    if (!root) return vvInt;
+
+    {
+        std::queue < BstNode* > q;
+        q.push(root);
+
+        while (!q.empty()) {
+            int curSize = q.size();
+
+            std::vector < int > v_level;
+            for (int i = 0; i < curSize; i++) {
+                BstNode* tmp = q.front(); q.pop();
+                v_level.push_back(tmp->key_);
+
+                if (tmp->lchild_) q.push(tmp->lchild_);
+                if (tmp->rchild_) q.push(tmp->rchild_);
+            }
+            vvInt.push_back(v_level);
+            return vvInt;
+        }
+    }
+
+    std::queue < BstNode* > q;
+    q.push(root);
+    while (!q.empty()) {
+        int cur = q.size();   //当前层数的节点数量
+
+        std::vector < int > v_level;
+        for (int i = 0; i < cur; i ++) {
+            BstNode* tmp = q.front();
+            q.pop();
+
+            // 若当前层节点有孩子，则孩子进队
+            if (tmp->lchild_) q.push(tmp->lchild_);
+            if (tmp->rchild_) q.push(tmp->rchild_);
+
+            v_level.push_back(tmp->key_);
+        }
+
+        vvInt.push_back(v_level);
+    }
+
+    return vvInt;
+}
+
+void mirrorBst(BstNode* root) {
+    if (!root) return;
+    if (!root->lchild_ && !root->rchild_) return;
+
+    BstNode* tmp;
+    tmp = root->lchild_;
+    root->lchild_ = root->rchild_;
+    root->rchild_ = tmp;
+
+    mirrorBst(root->lchild_);
+    mirrorBst(root->rchild_);
+}
+
+// 题目：从扑克牌中随机抽5张牌，判断是不是一个顺子，即这5张牌是不是连续的。
+// 2~10为数字本身，A为1，J为11，Q为12，K为13，而 大小王可以看成 任意数字
+bool IsContinuous( std::vector<int>& vPoker ) {
+    std::sort( vPoker.begin(), vPoker.end() );
+
+    // 统计有多少0
+    int numZero = 0;
+    for ( const auto& it : vPoker ) {
+        if ( 0 == it ) {
+            numZero ++;
+        }
+    }
+
+    int gap = 0;
+    int n   = vPoker.size();
+    for ( int i = numZero, j = numZero + 1; j < n; i ++, j ++ ) {
+        if (vPoker[i] == vPoker[j]) return false;
+        gap += vPoker[j] - vPoker[i] - 1;
+    }
+    std::cout << " numZero=" << numZero << " gap=" << gap << std::endl;
+    return (numZero >= gap) ? true : false;
+}
+void wrap_IsContinuous() {
+    std::vector<int> vecPokers { 0, 3, 7, 9, 0, 10 };
+    IsContinuous( vecPokers );
+}
+
+
+//给定一个字符串，找出不含有重复字符的最长子串的长度。
+
+//示例：
+
+//给定 "abcabcbb" ，没有重复字符的最长子串是 "abc" ，那么长度就是3。
+
+//给定 "bbbbb" ，最长的子串就是 "b" ，长度是1。
+
+//给定 "pwwkew" ，最长子串是 "wke" ，长度是3。请注意答案必须是一个子串，"pwke" 是 子序列  而不是子串。
+int lengthOfLongestSubstring(string s) {
+    int n=0,left=0;
+    map<char,int> m;
+    for(int i=0;i<s.length();i++)  //每次遍历都会判断左边界限，当有重复时，更新left
+    {
+        left=max(left,m[s[i]]);    //更新左边界限
+        m[s[i]]=i+1;               //更新哈希表的值
+        n=max(n,i-left+1);         //更新n的值
+    }
+
+    for ( map<char,int>::iterator it = m.begin(); it != m.end(); it ++ ) {
+        std::cout << " " << it->first ;
+    }
+    std::cout << std::endl;
+    return n;
+}
+void wrap_longestsubstring() {
+    std::string st1 = "pwwkew";
+    int retlen = lengthOfLongestSubstring(st1);
+    std::cout << "retlen= " << retlen << std::endl;
+}
+
+void tst_copy_backward() {
+    std::vector<int> myvector;
+    std::vector<int>::iterator iter;
+
+    //为容器myvector赋初始值:10 20 30 40 50
+    for ( int i = 1; i <= 5; ++i )
+        myvector.push_back( i*10 );
+
+    //将myvector容器的大小增加3个单元
+    myvector.resize( myvector.size()+3 );
+
+    //将容器元素20、10拷贝到第八、第七个单元中：10 20 30 40 50 0 10 20
+    //注意copy_backward是反向复制，先将20拷贝到第八个单元，再将10拷贝到第七个单元
+    std::copy_backward( myvector.begin(), myvector.begin()+2, myvector.end() );
+
+    for ( iter = myvector.begin(); iter != myvector.end(); ++iter ) {
+        std::cout << " " << *iter;
+    }
+
+    std::cout << std::endl;
+}
+
+
+typedef list<int> IList;
+
+void print(const IList& list) {
+    IList::const_iterator ite = list.begin();
+    for (; ite != list.end(); ++ite)
+        cout << *ite << "  ";
+    cout << endl;
+}
+
+int tst_list_1() {
+    IList s;
+    s.push_back(7);
+    s.push_back(6);
+    s.push_back(5);
+    s.push_back(4);
+    s.push_back(3);
+    s.push_back(2);
+    s.push_back(1);
+    s.push_back(0);
+
+    IList carry;
+    IList counter[64];
+    int fill = 0;
+    int num = 0;
+    while (!s.empty())
+    {
+        std::cout << "取第" << num << "个数据: fill = " << fill << std::endl;
+        carry.splice(carry.begin(), s, s.begin());
+//        for ( auto it : carry ) {
+//            std::cout << "carry it=" << it << std::endl;
+//        }
+//        std::cout << std::endl;
+//        for ( auto it : s ) {
+//            std::cout << "s it=" << it << std::endl;
+//        }
+//        return 1;
+
+        int i = 0;
+        std::cout << " couter[" << i <<  "] size=" << counter[i].size() << std::endl;
+        while (i < fill && !counter[i].empty())
+        {
+            counter[i].merge(carry);
+            carry.swap(counter[i++]);
+        }
+        carry.swap(counter[i]);
+        if (i == fill)
+            ++fill;
+        //我自己加的计数
+        num++;
+        //打印每次完的结果
+        for (int i = 0; i < fill; ++i) {
+            std::cout << i << "==";
+            print(counter[i]);
+        }
+    }
+
+    for (int i = 1; i < fill; ++i)
+        counter[i].merge(counter[i - 1]);
+    s.swap(counter[fill - 1]);
+
+    getchar();
+    return 0;
+}
+
+int SubMax(vector<int> num, int length) {
+    if (num.empty() || length <= 0)
+        return -1;
+
+    int curMax = 0;
+    int nextMax = 0;
+    for (int i = 0; i < length; ++i) {
+        nextMax += num[i];
+        if (nextMax > curMax) {
+            curMax = nextMax;
+        } else if (nextMax < 0) {
+            curMax = 0;
+            nextMax = 0;
+        }
+    }
+    return curMax;
+}
+
+// 剑指offer 面试题：连续子数组最大和
+int FindGreatestSumOfSubArray(vector<int> array) {
+    if (array.empty()) return 0;
+
+    {
+        return SubMax( array, array.size() );
+//        int res = array[ 0 ];
+//        int mx = array[ 0 ];
+//        for ( int i = 1; i < array.size(); ++ i ) {
+//            mx = std::max( array[ i ], mx + array[i] );
+//            res = max ( res, mx );
+//        }
+//        return res;
+    }
+
+    int res = array[0], mx = array[0];
+    for (int i=1; i < array.size(); ++i)
+    {
+        mx = max(array[i],mx + array[i]);
+        res = max(res, mx);
+    }
+    return res;
+}
+void tst_FindGreatestSumOfSubArray() {
+    std::vector < int > vints = { -1, 100, -200, 201, -20, 61, -104, 103, 1 };
+//    vector<int>  a5 = { -1, 100, -200, 201, -20, -20, -20, 61, -104, 103, 1};
+    std::cout << "res=" << FindGreatestSumOfSubArray(vints) << std::endl;
+}
+
+void tst_multiset() {
+    std::multiset < int, std::greater<int> > setInts;
+    setInts.insert( 117 );setInts.insert( 117 );
+    setInts.insert( 37 );setInts.insert( 2098 );
+    for (auto it : setInts) {
+        std::cout << " " << it;
+    }
+    std::cout << std::endl;
+}
+
+void tst_heap_fun( ) {
+    std::vector<int> v1{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 0};
+    for (auto x : v1) {
+        std::cout << x << " ";
+    }
+    std::cout << std::endl;
+
+    v1.push_back(4);
+    make_heap(v1.begin(), v1.end());//将某区间内的元素转化为heap
+
+    std::cout << "after push_heap(): ";
+    for (auto x : v1)
+        std::cout << x << " ";
+    std::cout << std::endl;
+
+    pop_heap(v1.begin(), v1.end());           //对heap减少一个元素
+    cout << "after pop_heap() : ";
+    for (auto x : v1)
+        cout << x << " ";
+    cout << endl;
+
+    sort_heap(v1.begin(), v1.end()-1);       //对[beg,end-1)区间内的元素进行排序，之后就不再是heap
+    cout << "after sort_heap(): ";
+    for (auto x : v1)
+           cout << x << " ";
+    cout << endl;
+}
+
+
+void serializeImpl(BstNode *root, std::string& str) {
+    if (!root) {
+        str += "$,";
+        return;
+    }
+    str += to_string(root->key_);
+    str += ",";
+    serializeImpl(root->lchild_, str);
+    serializeImpl(root->rchild_, str);
+}
+/*=========================二叉树序列化==============================*/
+char* Serialize(BstNode *root) {
+    if (root == nullptr) return nullptr;
+
+    string str;
+    serializeImpl(root, str);
+
+    char* buffer = new char[str.size() + 1];
+    strcpy(buffer, str.c_str());                     //将string类型的字符串转换成C_style类型并复制到一个char类型数组
+    return buffer;
+}
+
+// 输入某二叉树的前序遍历和中序遍历的结果，请重建出该二叉树。
+// 假设输入的前序遍历和中序遍历的结果中都不含重复的数字。
+// 例如输入前序遍历序列{1,2,4,7,3,5,6,8}和中序遍历序列{4,7,2,1,5,3,8,6}，则重建二叉树并返回。
+BstNode* reConstructBinaryTree(vector<int> pre, vector<int> vin) {
+    /*
+解题思路：
+1.  前序遍历的第一个数字总是树的根节点的值。
+    但在中序遍历中，根节点的值在序列的中间，其中左子树的节点的值位于根节点的值的左边，
+    右子树的节点的值位于根节点的值的右边。要扫描中序遍历序列，才能找到根节点的值。
+2.  又因为前序遍历总是在根节点后先遍历完左子树，才会遍历右子树，
+    所以由后续遍历推断出左子树中节点的数目之后，前序遍历中根节点之后的相同数目的值都是左子树的节点的值。剩下的就是右子树的值。这样就分别找到了左右子树序列。
+3.  分别确定了根节点和左右子树的前序、中序遍历，我们可以用同样的方法构建左右子树，剩下的可以用递归来完成。
+    */
+    int vinlen = vin.size();
+
+    vector<int> leftpre, rightpre, leftvin, rightvin;
+    BstNode* newNode = new BstNode(pre[0], nullptr, nullptr, nullptr);
+
+    int root = pre[0];
+    auto posi = std::find(vin.begin(), vin.end(), root);
+    if (posi == vin.end()) {
+        printf("cant't found root=%d\n", root);
+        return nullptr;
+    }
+    int leftSize = posi - vin.begin();
+    int rightSize= vin.end() - posi - 1;
+
+    //递归求解
+    //这里取前序和后序遍历的左右子树可能有点绕，可以好好思考一下
+    newNode->lchild_ = reConstructBinaryTree(vector<int>(pre.begin() + 1, pre.begin() + 1 + leftSize),
+                                             vector<int>(vin.begin(), vin.begin() + leftSize));
+    newNode->rchild_ = reConstructBinaryTree(vector<int>(pre.begin() + 1 + leftSize, pre.end()),
+                                             vector<int>(vin.begin() + 1 + leftSize, vin.end()));
+    return nullptr;
+}
+
+
+template <typename ...Args>
+inline std::string format_string(const char* format, Args... args) {
+    std::cout << "BUFSIZE=" << BUFSIZ << std::endl;
+    constexpr size_t oldlen = BUFSIZ;
+    char buffer[oldlen];  // 默认栈上的缓冲区
+
+    size_t newlen = snprintf(&buffer[0], oldlen, format, args...);
+    newlen++;  // 算上终止符'\0'
+
+    if (newlen > oldlen) {  // 默认缓冲区不够大，从堆上分配
+        std::vector<char> newbuffer(newlen);
+        snprintf(newbuffer.data(), newlen, format, args...);
+        return std::string(newbuffer.data());
+    }
+
+    return buffer;
+}
+template <typename ...Args>
+void errExit(const char* format, Args... args) {
+    auto errmsg = format_string(format, std::forward<Args>(args)...);
+    errmsg = errmsg + ": " + strerror(errno) + "\n";
+    fputs(errmsg.c_str(), stderr);
+//    exit(1);
+}
+
+void tst_format_str() {
+    const char* s = "hello world!";
+    int fd = -1;
+    if (write(fd, s, strlen(s)) == -1)
+        errExit("write \"%s\" to file descriptor(%d) failed", s, fd);
+}
+
+void tst_bit_opr() {
+    int readTag  = 0X01;
+    int writeTag = 0X02;
+    std::cout << "readTag=" << readTag << std::endl;
+    std::cout << "writeTag=" << writeTag << std::endl;
+    std::cout << "rwTag=" << (readTag|writeTag) << std::endl;
+}
+
+//【C++】字符串中的括号是否匹配
+void tst_kuohao_pipei() {
+    // “()” and “()[]{}” are all valid but “(]” and “([)]”
+    std::string str = "{}[]()";
+    str = "{)";
+
+    std::map < char, char > map_s { {'(', ')'}, {'{', '}'}, {'[',']'} };
+    std::stack < char > temp;
+
+    for (int i = 0; i < str.size(); i++) {
+
+        if ( map_s.find(str[i]) != map_s.end() ) {
+            temp.push( map_s[str[i]] );//将s[i]在map中的值，放到栈中
+        } else {
+            if (temp.empty()) {
+                std::cout << "no found anything-------" << std::endl;
+                return;
+            }
+
+            if (str[i] == temp.top()) {
+                temp.pop();
+            } else {
+                std::cout << "no -------str[" << i << "]=" << str[i] << ", pop=" << temp.top() << std::endl;
+                return;
+            }
+
+        }
+
+    }// for str traverse
+
+    std::cout << " complete check match" << std::endl;
+}
+
+// 剑指offer——滑动窗口的最大值（c++）
+/*
+     * 给定数组，和滑动窗口的大小，请找出所有滑动窗口内的最大值。
+     * 例如，数组{2,3,4,2,6,2,5,1}，滑窗大小为3，那么结果为{4,4,6,6,6,5}。
+     * 思路:
+     * 1. 使用双向队列，用来保存有可能是滑动窗口最大值的数组的下标。
+     * 2. 在存入一个数字的下标之前，首先要判断队列里已有数字是否小于待存入的数字。
+     *    如果已有的数字小于待存入的数字，那么这些数字已经不可能是滑动窗口的最大值，因此需要在队列尾部删除（pop_back）。
+     * 3. 同时，如果队列头部的数字已经从窗口里滑出，那么滑出的数字也需要从队列的头部删除（pop_front）。
+     * 数组{2,3,4,2,6,2,5,1}的长度为3的滑动窗口最大值求解步骤如下
+*/
+std::vector<int> maxInWindow(std::vector<int>& nums, unsigned int size) {
+    std::vector<int> vret;
+    std::deque<int> dq;
+
+//    for (int i = 0; i < size; i ++) {
+
+//        while (!dq.empty() && nums[i] >= dq) {
+//            dq.pop_back();
+//        }
+
+//        dq.push_back(i);
+//    }
+
+    return vret;
+}
+void tst_maxinwindows() {
+    std::vector<int> vNums{2,3,4,2,6,2,5,1};
+    auto retV = maxInWindow(vNums, 3);
+    for (int i = 0; i < retV.size(); i ++) {
+        std::cout << " " << retV[i] ;
+    }
+    std::cout << std::endl;
+}
+
+void tst_multimap( ) {
+    {
+        multimap<string,int> m_map;
+        string s("中国"), s1("美国");
+        m_map.insert(make_pair(s,50));
+        m_map.insert(make_pair(s,55));
+        m_map.insert(make_pair(s,60));
+        m_map.insert(make_pair(s1,30));
+        m_map.insert(make_pair(s1,20));
+        m_map.insert(make_pair(s1,10));
+        m_map.insert(make_pair(s1,40));
+        m_map.insert(make_pair(s1,50));
+
+        //方式1
+        int k = 0;
+        multimap<string,int>::iterator m, beg, end;
+//        m = m_map.find(s1);
+
+        int  findVal = 30;
+        bool bfind = false;
+//        for(k = 0; k != m_map.count(s1); k++, m++) {
+//            if (m->second == findVal) bfind = true;
+//        }
+//        if (bfind) {
+//            std::cout << "find it " << findVal << std::endl;
+//        } else {
+//            std::cout << "no find it " << findVal << std::endl;
+//        }
+
+        {
+            beg = m_map.lower_bound(s1);
+            end = m_map.upper_bound(s1);
+            for(m = beg; m != end; m++) {
+                if (m->second == findVal) bfind = true;
+                cout<<m->first<<"--"<<m->second<<endl;
+            }
+            if (bfind) {
+                std::cout << "find it " << findVal << std::endl;
+            } else {
+                std::cout << "no find it " << findVal << std::endl;
+            }
+            return;
+        }
+
+        //方式2
+        {
+//            std::string findKey = "美国";
+//            multimap<string,int>::iterator beg,end;
+//            beg = m_map.lower_bound(s1);
+//            end = m_map.upper_bound(s1);
+//            if (beg == end) {
+//                std::cout << " beg == end " << std::endl;
+//            }
+//            for(m = beg; m != end; m++) {
+////                cout<<m->first<<"--"<<m->second<<endl;
+//                if (m->second == findVal) bfind = true;
+//            }
+//            if (bfind) {
+//                std::cout << "find it " << findVal << std::endl;
+//            } else {
+//                std::cout << "no find it " << findVal << std::endl;
+//            }
+        }
+
+//        beg = m_map.lower_bound(s1);
+//        end = m_map.upper_bound(s1);
+//        for(m = beg; m != end; m++)
+//            cout<<m->first<<"--"<<m->second<<endl;
+        //方式3
+//        beg = m_map.equal_range(s).first;
+//        end = m_map.equal_range(s).second;
+//        for(m = beg; m != end; m++)
+//            cout<<m->first<<"--"<<m->second<<endl;
+        return;
+    }
+    {
+        multimap<int,int> a;
+        a.insert(pair<int,int>(1,11));
+        a.insert(pair<int,int>(1,12));
+        a.insert(pair<int,int>(1,13));
+        a.insert(pair<int,int>(2,21));
+        a.insert(pair<int,int>(2,22));
+        a.insert(pair<int,int>(3,31));
+        a.insert(pair<int,int>(3,32));
+
+//        if (a.find(pair<int,int>(3,32)) != a.end()) {
+//            std::cout << "find pair(3, 32) exist" << std::endl;
+//        }
+        {
+            auto pr = a.equal_range(1);
+            if (pr.first != std::end(a))
+            {
+                for (auto iter = pr.first; iter != pr.second; ++iter)
+                    std::cout << iter->first << " is " << iter->second << std::endl;
+            }
+            return;
+        }
+
+        multimap<int,int>::iterator p_map;
+        std::pair<multimap<int,int>::iterator, multimap<int,int>::iterator> ret;
+
+        for(p_map = a.begin(); p_map != a.end();)
+        {
+            std::cout<<p_map->first<<" =>";
+
+            ret = a.equal_range(p_map->first);
+            for(p_map = ret.first; p_map != ret.second; ++p_map)
+                std::cout << " " << (*p_map).second;
+
+            std::cout << std::endl;
+        }
+
+        return;
+    }
+    std::multimap < int, int > mltIds;
+
+    mltIds.insert( std::make_pair(2099, 1024) );
+
+    mltIds.insert( std::make_pair(3018, 1024) );
+    mltIds.insert( std::make_pair(3018, 998) );
+    mltIds.insert( std::make_pair(3018, 998) );
+    mltIds.insert( std::make_pair(3018, 998) );
+
+
+    for (auto it = mltIds.begin(); it != mltIds.end(); ++it){
+        std::cout << "it->first=" << it->first << " second=" << it->second << std::endl;
+    }
+
+    auto find = mltIds.find ( 3018 );
+}
+
+class Base1 {
+public:
+    Base1() {
+        std::cout << "construct Base1" << std::endl;
+    }
+    /*virtual */~Base1() {
+        std::cout << "destroy   Base1" << std::endl;
+    }
+    virtual void release() {
+        std::cout << "release   Base1" << std::endl;
+    }
+};
+class BaseA : public Base1{
+public:
+    BaseA() {
+        std::cout << "construct BaseA" << std::endl;
+    }
+    ~BaseA() {
+        std::cout << "destroy   BaseA" << std::endl;
+    }
+    virtual void release() {
+        std::cout << "release   BaseA" << std::endl;
+        delete this;
+    }
+};
+class BaseB : public Base1{
+public:
+    BaseB() {
+        std::cout << "construct BaseB" << std::endl;
+    }
+    ~BaseB() {
+        std::cout << "destroy   BaseB" << std::endl;
+    }
+    virtual void release() {
+        std::cout << "release   BaseB" << std::endl;
+        delete this;
+    }
+};
+void tst_base_derive() {
+    BaseA* aobj = new BaseA;
+    BaseB* bobj = new BaseB;
+    void* v_aaa = aobj;
+    void* v_bbb = bobj;
+
+    Base1* pBase = aobj;
+    aobj->release();
+
+    pBase = bobj;
+    bobj->release();
+//    delete v_aaa;
+//    delete v_bbb;
+}
+
+void tst_tuple_1() {
+
+    { // std::tuple::swap: Exchanges the content of the tuple object by the content of tpl,
+      // which is another tuple of the same type (containing objects of the same types in the same order)
+        std::tuple<int, char> a(10, 'x');
+        std::tuple<int, char> b(20, 'y');
+
+//        a.swap(b);
+        std::cout << "a contains: " << std::get<0>(a);
+        std::cout << " and " << std::get<1>(a) << '\n';
+
+//        std::swap(a, b);
+//        std::cout << "a contains: " << std::get<0>(a);
+//        std::cout << " and " << std::get<1>(a) << '\n';
+    }
+
+}
+
+std::vector<int> GenerateDiffNumber(int min,int max,int num)
+{
+    int rnd;
+    std::vector<int> diff;
+    std::vector<int> tmp;//存储剩余的数
+    //初始化
+    for ( int i = min;i < max+1; i++ ) {
+        tmp.push_back(i);
+    }
+    srand((unsigned int)time(0));//初始化随机数种子
+    for(int i = 0; i < num; i++)
+    {
+        do{
+            rnd = min+rand()%(max-min+1);
+        } while(tmp.at(rnd-min)==-1);
+        diff.push_back(rnd);
+        tmp.at(rnd-min) = -1;
+        printf("rnd-min=%d\n", rnd-min);
+    }
+    return diff;
+}
+
+void tstDiffNumber() {
+    std::vector <int> retVec = GenerateDiffNumber(1, 10, 10);
+    std::cout << "size(ret)=" << retVec.size() << std::endl;
+    for (auto i : retVec) {
+        printf("i=%d\n", i);
+    }
+}
+
+
+void tstCmpare() {
+#define ngx_str7_cmp(m, c0, c1, c2, c3, c4, c5, c6, c7)                       \
+    *(uint32_t *) m == ((c3 << 24) | (c2 << 16) | (c1 << 8) | c0)             \
+        && ((uint32_t *) m)[1] == ((c7 << 24) | (c6 << 16) | (c5 << 8) | c4)
+
+    const char* lpszConn = "CONNECT ";
+    char* ptr = (char*)lpszConn;
+
+    if (ngx_str7_cmp(ptr, 'C', 'O', 'N', 'N', 'E', 'C', 'T', ' ')) {
+//        r->method = NGX_HTTP_CONNECT;
+        std::cout << " ngx http connect method " << std::endl;
+    }
+
+}
+
 int main(int argc, char *argv[])
 {
     Logger::setLogLevel(Logger::DEBUG);
-    LOG_INFO << "pid = " << getpid() << ", tid = " << CurrentThread::tid();
+    LOG_INFO << "pid = " << getpid() << ", tid levelOrder= " << CurrentThread::tid();
 
-    tst_111(); return 1;
+    tstCmpare(); return 1;
 
+    tstDiffNumber(); return 1;
+    tst_tuple_1(); return 1;
+
+    tst_base_derive();  return 1;
+    tst_multimap();     return 1;
+
+    tst_maxinwindows(); return 1;
+
+    tst_kuohao_pipei(); return 1;
+
+    tst_bit_opr();      return 1;
+
+    tst_format_str();   return 1;
+
+    CreateBstTree();
+    std::cout << "serial ret=" << Serialize(g_pBstTree) << std::endl;
+//    return 1;
+
+//    vector<vector<int>> asd = levelPrintBst/*levelOrder*/(g_pBstTree);
+//    for ( std::vector<vector<int>>::iterator itV = asd.begin(); itV != asd.end(); itV ++ ) {
+//        for ( auto it : *itV ) {
+//            std::cout << " " << it;
+//        }
+//        std::cout << std::endl;
+//    }
+
+    // 遍历二叉树；
+    std::cout << "inorder print bst 1----" << std::endl;
+    inOrder(g_pBstTree);
+    std::cout << std::endl;
+    std::cout << "inorder print bst 1----" << std::endl;
+
+    std::cout << "preorder print bst 1----" << std::endl;
+    preOrder(g_pBstTree);
+    std::cout << std::endl;
+    std::cout << "preorder print bst 1----" << std::endl;
+    return 1;
+    LevelTraverseBstTree(g_pBstTree);
+    return 1;
+
+    std::cout << " tree depth = " << GetBstTreeDepth(g_pBstTree) << std::endl; // return 1;
+    std::cout << " tree count = " << GetBstTreeNodeCount(g_pBstTree) << std::endl;// return 1;
+    std::cout << " leaft count = " << GetLeafNodeCountImpl(g_pBstTree) << std::endl; return 1;
+
+    tst_heap_fun(); return 1;
+
+    tst_multiset(); return 1;
+
+    tst_FindGreatestSumOfSubArray(); return 1;
+
+    tst_qs_111(); return 1;
+
+    tst_list_1(); return 1;
+
+    tst_copy_backward(); return 1;
+
+//    wrap_longestsubstring(); return 1;
+
+//    wrap_IsContinuous(); return 1;
+
+//    wrap_max_subarray(); return 1;
+
+//    tst_bst_tree(); return 1;
+//    sortArrayOddEven(); return 1;
+
+//    tst_my_bst_1(); return 1;
+
+    tst_my_bst_tree(); return 1;
+
+    binary_search_wrap(); return 1;
 
     tst_qs_new(); return 1;
+
+    tst_class_x(); return 1;
+
+    tst_lower_upper(); return 1;
+
+    tst_O1_age(); return 1;
+
+    Opr_Bst(); return 1;
+
+    tst_reverse_str(); return 1;
+
+    StackHeapObj(); return 1;
+
+    tst_111(); return 1;
 
     tst_some_one_1(); return 1;
 
     my_itoa(10089);
     my_itoa(-32652300); return 1;
 
-
     MakeX7(); return 1;
 
-
     tst_GetInout(); return 1;
-
 
     tst_reverse_list_1(); return 1;
 
@@ -1621,7 +3308,6 @@ int main(int argc, char *argv[])
     tst_HeapSortEntry_(); return 1;
     tst_dpfun_entry(); return 1;
 
-    tst_bst_tree(); return 1;
 
     call_reverse_list(); return 1;
 
@@ -1643,8 +3329,6 @@ int main(int argc, char *argv[])
     tst_MergeSortEntry_(); return 1;
 
 
-
-    tst_qs_111(); return 1;
 
     tst_ListEntry_(); return 1;
 
@@ -1701,7 +3385,7 @@ std::cout << "argc=" << argc << std::endl;
 
     tst_maxheap_sort(); return 1;
 
-    tst_qs_111();  return 1;
+    tst_qs_111(); return 1;
 
     ts_PrintLines(); return 1;
 

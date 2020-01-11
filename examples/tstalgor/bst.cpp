@@ -250,14 +250,28 @@ int max_stock_value(int* arr, int length) {
     }
     return maxIncome;
 }
+int max_my_stock(int* arr, int length) {
+    int min = arr[0];
+    int maxMoney = arr[1] - min;
+
+    for (int i = 2; i < length; i ++ ) {
+        if (arr[i - 1] < min) {
+            min = arr[i - 1];
+        }
+        if ( (arr[i] - min) > maxMoney )
+            maxMoney = arr[i] - min;
+    }
+
+    return maxMoney;
+}
 // 1.可以转换成为求最大子数组问题，
 // 数组相邻的数后一个减去前一个减得到股票的变化数组{2，-3，-3,2，5,4，-2}。
 // 这样问题转换成了求数组的最大子数组问题。
 // 2.也可以在遍历数组时记录下遍历到某个节点能够买入的最低价格，
 // 在当前价格确定的情况下，在最低价格买入能够赚最多。这样遍历一次数组就能得到结果，时间复杂度为O（n）。
-void tst_max_stock_value () {
+void tst_max_stock_value() {
     int numbers[] = { 4, 1, 3, 2, 5 };
-    std::cout << "max=" << max_stock_value(numbers, array_size(numbers)) << std::endl;
+    std::cout << "max=" << max_my_stock(numbers, array_size(numbers)) << std::endl;
 }
 
 void tst_KthNode() {
@@ -269,8 +283,11 @@ void tst_KthNode() {
     std::cout << "s.GetKthNode=" << s.GetKthNode(7) << std::endl;
     std::cout << std::endl;
 }
+
+
+
 void tst_bst_tree() {
-//    tst_max_stock_value(); return;
+    tst_max_stock_value(); return;
 //    tst_KthNode(); return ;
 //    tst_reverse_line(); return;
 
