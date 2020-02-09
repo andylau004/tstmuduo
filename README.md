@@ -42,7 +42,9 @@ class ExServerEventHandler: public apache::thrift::server::TServerEventHandler
       ./examples/transferserver/iothread.cpp
       测试通过
 
+15.   NewAdd kthSmallest ClosestValueInBst GetKthNode
 
+16.   NewAdd kthSmallest ClosestValueInBst GetKthNode
 
 
 
