@@ -2323,12 +2323,13 @@ void CreateBstTree() {
 }
 
 void tst_my_bst_tree() {
-
     {
-        std::cout << "order 2----" << std::endl;
+        std::cout << std::endl;
+        std::cout << "-------------------------------inOrder beg----" << std::endl;
         inOrderNonRecru(g_pBstTree);
         std::cout << std::endl;
-        std::cout << "order 2----" << std::endl;
+        std::cout << "-------------------------------inOrder end----" << std::endl;
+        std::cout << std::endl;
     }
 
     std::cout << "find k=120 closest value= " << ClosestValueInBst(g_pBstTree, 120) << std::endl;
@@ -2337,7 +2338,7 @@ void tst_my_bst_tree() {
     int kVal = 3;
     BstNode* retNode = GetKthNode(g_pBstTree, kVal);
     if (retNode)
-        std::cout << "ret val = " << retNode->key_ << std::endl;
+        std::cout << "GetKthNode ret val = " << retNode->key_ << std::endl;
 }
 
 void tst_my_bst_1() {
@@ -3198,10 +3199,85 @@ void tstCmpare() {
 
 }
 
+// instance = (uintptr_t)c & 1;
+
+typedef struct MyConn_st {
+    int ival;
+}MyConn;
+
+typedef struct Bit_st {
+    unsigned         instance:9981;
+}Bit_ST;
+
+
+// 给定一个二叉搜索树，kthSmallest 查找其中第 k 个最小的元素。
+int kthSmallest(BstNode* root, int k) {
+    int cnt = 0;
+
+    stack<BstNode*> s;
+    BstNode *p = root;
+
+    while ( p || !s.empty() ) {
+        while (p) {
+            s.push(p);
+            p = p->lchild_;
+        }
+        p = s.top();
+        s.pop();
+        ++ cnt;
+        if (cnt == k) return p->key_;
+        p = p->rchild_;
+    }
+    return 1;
+}
+
 int main(int argc, char *argv[])
 {
     Logger::setLogLevel(Logger::DEBUG);
     LOG_INFO << "pid = " << getpid() << ", tid levelOrder= " << CurrentThread::tid();
+
+    CreateBstTree();
+    std::cout << "serial ret=" << Serialize(g_pBstTree) << std::endl;
+
+    tst_my_bst_tree();
+    std::cout << "res=" << kthSmallest(g_pBstTree, 3) << std::endl;
+    return 1;
+
+    uint tmpval = 0x10;
+    LOG_INFO << "tmpval=" << tmpval;
+    LOG_INFO << "!tmpval=" << (!tmpval);
+    LOG_INFO << "!!tmpval=" << (!!tmpval);
+//    LOG_INFO << "tmpval&1=" << (tmpval&1);
+
+    tmpval = 17;
+    uint newval = ((uint) tmpval & (uint) ~1);
+    LOG_INFO << "newval=" << newval;
+    return 1;
+
+    Bit_ST obj1;
+    LOG_INFO << "obj1.instanceq=" << obj1.instance;
+    LOG_INFO << "sizeof(Bit_ST)=" << sizeof(obj1);
+    return 1;
+
+    std::vector< MyConn* > vObjs;
+    for ( int i = 0; i < 10; i ++ ) {
+        MyConn* tmpobj = new(MyConn);
+
+//        void *ptr = (void*)((uintptr_t)c | ev->instance);
+//        LOG_INFO << "a=" << ((uintptr_t)tmpobj & 1) << " obj=" << tmpobj;
+
+        int* tmpIdx = new int(123);
+        LOG_INFO << " tmpIdx=" << tmpIdx;
+
+        void* changPtr = (void *) ((uintptr_t) tmpIdx | 1);
+        LOG_INFO << " newPtr=" << changPtr;
+
+        void* recoverPtr = (void *) ((uintptr_t) tmpIdx & (uintptr_t) ~1);
+        LOG_INFO << " oldPtr=" << recoverPtr;
+
+        vObjs.push_back(tmpobj);
+    }
+    return 1;
 
     tstCmpare(); return 1;
 
@@ -3219,8 +3295,6 @@ int main(int argc, char *argv[])
 
     tst_format_str();   return 1;
 
-    CreateBstTree();
-    std::cout << "serial ret=" << Serialize(g_pBstTree) << std::endl;
 //    return 1;
 
 //    vector<vector<int>> asd = levelPrintBst/*levelOrder*/(g_pBstTree);
@@ -3272,7 +3346,6 @@ int main(int argc, char *argv[])
 
 //    tst_my_bst_1(); return 1;
 
-    tst_my_bst_tree(); return 1;
 
     binary_search_wrap(); return 1;
 
