@@ -36,19 +36,23 @@
 #include "muduo/net/TcpClient.h"
 
 
-
 using namespace std;
 using namespace muduo;
 using namespace muduo::net;
 
 
 #include "twfun.h"
+#include "heapopr.h"
+
 
 
 int main(int argc, char *argv[])
 {
     Logger::setLogLevel(Logger::DEBUG);
     LOG_INFO << "pid = " << getpid() << ", tid = " << CurrentThread::tid();
+
+    tst_heapopr_entry();
+    return 1;
 
     tst_tw_entry();
 

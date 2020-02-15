@@ -3236,6 +3236,10 @@ int main(int argc, char *argv[])
     Logger::setLogLevel(Logger::DEBUG);
     LOG_INFO << "pid = " << getpid() << ", tid levelOrder= " << CurrentThread::tid();
 
+    int data[16] = {1,0,0,1,0,0,0,1,1,1,1,1,0,0,0,0}; //明文
+    std::cout << "sizeof(data)=" << sizeof(data) << std::endl;
+    return 1;
+
     CreateBstTree();
     std::cout << "serial ret=" << Serialize(g_pBstTree) << std::endl;
 

@@ -711,12 +711,33 @@ void GetCurSecond() {
 }
 
 
+void tst_getline() {
+
+    FILE* fp = nullptr;
+    char* line = nullptr;
+    ssize_t read = 0;
+    size_t len = 0;
+
+    fp = fopen("tstc11", "r");
+    if (!fp) {
+        return;
+    }
+
+    while ( (read = getline(&line, &len, fp)) != -1 ) {
+//        printf("read=%d line=%s\n", len, line);
+//        free(line);
+    }
+
+    free(line);
+    fclose(fp);
+}
+
 
 
 void tst_c11fun_entry() {
 //    OutputDbgInfo tmpOut( "tst_c11fun_entry begin", "tst_c11fun_entry end" );
 
-
+    tst_getline(); return;
     tst_shared_ptr_2();  return;
 
 

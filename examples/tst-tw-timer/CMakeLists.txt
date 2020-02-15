@@ -17,6 +17,7 @@ aux_source_directory(../gen-cpp O_GENCPP)
 add_executable(${PROJECT_NAME}
     twfun.h twfun.cpp
     timewheel.h timewheel.cpp
+    heapopr.h heapopr.cpp
     ${O_GENCPP}
     main.cpp)
 
