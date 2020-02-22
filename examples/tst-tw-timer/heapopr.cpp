@@ -10,11 +10,171 @@
 #include <queue>
 
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <string.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <sys/epoll.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <assert.h>
+#include <signal.h>
+#include <pthread.h>
+
+
 #include "muduo/base/common.h"
+
 
 
 using namespace std;
 
+
+#define FD_LIMIT 65535
+#define MAX_EVENT_NUMBER 1024
+#define TIMESLOT 10
+
+
+
+static int pipefd[2];
+static timer_heap client_time_heap(1024);
+static int epollfd = 0;
+
+static int is_sig_alarm = 0;
+
+int do_error(int fd, int *error);       //处理错误
+
+int setnonblocking(int fd);             //设置非阻塞
+int addfd(int epollfd, int fd);         //添加描述符事件
+
+void sig_handler(int sig);              //信号处理函数
+void addsig(int sig);                   //添加信号处理函数
+
+void timer_handler();                   //定时器任务
+void cb_func(client_data *user_data);   //定时器回调函数
+
+
+
+
+int addfd(int epollfd, int fd) {
+    epoll_event event;
+    event.data.fd = fd;
+    event.events  = EPOLLIN | EPOLLET;
+
+    epoll_ctl(epollfd, EPOLL_CTL_ADD, fd, &event);
+
+    setnonblocking(fd);
+}
+
+int setnonblocking(int fd) {
+   int old_option = fcntl(fd, F_GETFL);
+   int new_option = old_option | O_NONBLOCK;
+   fcntl(fd, F_SETFL, new_option);
+   return old_option;
+}
+
+
+void sig_handler(int sig)
+{
+    int save_error = errno;
+    int msg = sig;
+    send(pipefd[1], (char*)&msg, 1, 0);
+    errno = save_error;
+}
+void addsig(int sig)
+{
+    struct sigaction sa;
+    memset(&sa, '\0', sizeof(sa));
+
+    sa.sa_handler = sig_handler;
+    sa.sa_flags |= SA_RESTART;
+
+    sigfillset(&sa.sa_mask);
+
+    assert(sigaction(sig, &sa, NULL) != -1);
+}
+
+
+int start_heap_server() {
+    int ret = 0;
+    int error;
+
+    struct sockaddr_in address;
+    bzero(&address, sizeof(address));
+    address.sin_family = AF_INET;
+    address.sin_port = htons(9981);
+    address.sin_addr.s_addr = htonl(INADDR_ANY);
+
+    int sockfd = socket(PF_INET, SOCK_STREAM, 0);
+    int reuse = 1;
+    ret = setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(reuse));
+
+    if ( (bind(sockfd, (struct sockaddr*)&address, sizeof(address)) == -1) || (listen(sockfd, 5) == -1) ) {
+        return -1;
+//        return do_error(sockfd, &error);
+    }
+
+    epollfd = epoll_create(1024);
+
+    ret = socketpair(PF_UNIX, SOCK_STREAM, 0, pipefd);
+
+    setnonblocking(pipefd[1]);
+    addfd(epollfd, pipefd[0]);
+    addfd(epollfd, sockfd);
+
+    addsig(SIGALRM);
+    addsig(SIGTERM);
+    addsig(SIGPIPE);
+
+    bool stop_server = false;
+    bool timeout = false;
+
+    epoll_event events[MAX_EVENT_NUMBER];
+    client_data* users = new client_data[FD_LIMIT];
+
+    printf("server start...\n");
+
+    while (!stop_server) {
+        int number = epoll_wait(epollfd, events, MAX_EVENT_NUMBER, -1);
+        if (number < 0) {
+            printf(" number < 0, errno=%d\n", errno);
+        }
+        if (number < 0 && errno != EINTR) {
+            fprintf(stderr, "epoll wait failed.\n");
+            break;
+        }
+
+        for (int i = 0; i < number; i ++) {
+            int listenfd = events[i].data.fd;
+
+            if (listenfd == sockfd) {
+                struct sockaddr_in client_address;
+                socklen_t client_addrlength = sizeof(client_address);
+
+                int connfd;
+                while ( ((connfd = accept(listenfd, (struct sockaddr*)&client_address, &client_addrlength)) == -1) && (errno == EINTR) );
+
+                addfd(epollfd, connfd);
+
+                users[connfd].address = client_address;
+                users[connfd].sockfd = connfd;
+
+//                heap_timer *timer = new heap_timer(TIMESLOT);
+//                if (timer) {
+
+//                }
+
+            }
+
+
+        }
+
+    }
+
+}
 
 
 
@@ -155,7 +315,37 @@ void printPriority(T& container) {
     cout << endl;
 }
 
+
+
+
 void tst_heapopr_entry() {
+
+    {
+        heap_timer_node *node1 = new heap_timer_node(6);
+        heap_timer_node *node2 = new heap_timer_node(2);
+        heap_timer_node *node3 = new heap_timer_node(4);
+        heap_timer_node *node4 = new heap_timer_node(11);
+        heap_timer_node *node5 = new heap_timer_node(5);
+
+        timer_heap heaps(10);
+        heaps.add_timer(node1);
+        heaps.add_timer(node2);
+        heaps.add_timer(node3);
+        heaps.add_timer(node4);
+        heaps.add_timer(node5);
+        heaps.disPlay();
+
+        heaps.get_top();
+
+        heaps.disPlay();
+        heaps.del_timer(node1);
+
+        heaps.del_timer(node2);
+
+        heaps.del_timer(node3);
+        heaps.disPlay();
+        return;
+    }
 
     {
         int myints[] = { 10, 20, 30, 6, 16 };

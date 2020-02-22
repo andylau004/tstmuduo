@@ -127,16 +127,6 @@ void setNonBlock(int fd);
 
 
 
-int createTimerfd()
-{
-    int timerfd = ::timerfd_create(CLOCK_MONOTONIC,
-                                   TFD_NONBLOCK | TFD_CLOEXEC);
-    if (timerfd < 0)
-    {
-        LOG_SYSFATAL << "Failed in timerfd_create";
-    }
-    return timerfd;
-}
 
 
 
@@ -150,24 +140,26 @@ int addfd(int fd) {
     setNonBlock(fd);
 }
 
-void sig_handler(int sig)
-{
-    int save_error = errno;
-    int msg = sig;
-    send(pipefd[1], (char*)&msg, 1, 0);
-    errno = save_error;
-}
-void addsig(int sig)
-{
-    struct sigaction sa;
-    memset(&sa, '\0', sizeof(sa));
-    sa.sa_handler = sig_handler;
-    sa.sa_flags |= SA_RESTART;
+extern void sig_handler(int sig);
+extern void addsig(int);
+//void sig_handler(int sig)
+//{
+//    int save_error = errno;
+//    int msg = sig;
+//    send(pipefd[1], (char*)&msg, 1, 0);
+//    errno = save_error;
+//}
+//void addsig(int sig)
+//{
+//    struct sigaction sa;
+//    memset(&sa, '\0', sizeof(sa));
+//    sa.sa_handler = sig_handler;
+//    sa.sa_flags |= SA_RESTART;
 
-    sigfillset(&sa.sa_mask);
+//    sigfillset(&sa.sa_mask);
 
-    assert(sigaction(sig, &sa, NULL) != -1);
-}
+//    assert(sigaction(sig, &sa, NULL) != -1);
+//}
 
 void timer_handler() {
     client_conn_time_wheel.tick();
