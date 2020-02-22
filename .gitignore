@@ -3,6 +3,9 @@ obj/
 
 *.a
 
+*.lo
+*.o
+
 
 CMakeLists.txt.user
 
