@@ -1761,7 +1761,7 @@ public:
     }
 
     void insert( int key )  {
-        BstNodeInt* z = new BstNodeInt(key, nullptr, nullptr, nullptr);
+        BstNodeInt* z = new BstNodeInt(key);
         insert( z );
     }
     void insert( BstNodeInt*& z ) {
@@ -2109,6 +2109,12 @@ public:
         rchild_(rchild),
         parent_(parent)
     {}
+    BstNode(int key) :
+        key_( key ),
+        lchild_(nullptr),
+        rchild_(nullptr),
+        parent_(nullptr)
+    {}
 };
 
 BstNode* g_pBstTree = nullptr;
@@ -2116,31 +2122,32 @@ BstNode* g_pBstTree = nullptr;
 void AddNewNode(BstNode*& root, BstNode* pNewNode) {
 
     {
-//        BstNode* parent = nullptr;
-//        BstNode* tmp = root;
+        BstNode* parent = nullptr;
+        BstNode* tmp = root;
 
-//        while (tmp) {
-//            parent = tmp;
-//            if (pNewNode->key_ > tmp->key_)
-//                tmp = tmp->rchild_;
-//            else
-//                tmp = tmp->lchild_;
-//        }
-//        tmp->parent_ = parent;
+        while (tmp) {
+            parent = tmp;
+            if (pNewNode->key_ > tmp->key_)
+                tmp = tmp->rchild_;
+            else
+                tmp = tmp->lchild_;
+        }
+        pNewNode->parent_ = parent;
 
-//        if (!parent) {
-//            root = pNewNode;
-//        } else if (pNewNode->key_ > parent->key_) {
-//            parent->rchild_ = pNewNode;
-//        } else {
-//            parent->lchild_ = pNewNode;
-//        }
-//        return;
+        if (!parent) {
+            root = pNewNode;
+        } else if (pNewNode->key_ > parent->key_) {
+            parent->rchild_ = pNewNode;
+        } else {
+            parent->lchild_ = pNewNode;
+        }
+        return;
     }
 
     {
         BstNode* parent = nullptr;
         BstNode* temp = root;
+
         while (temp) {
             parent = temp;
             if (pNewNode->key_ > temp->key_)
@@ -2149,6 +2156,7 @@ void AddNewNode(BstNode*& root, BstNode* pNewNode) {
                 temp = temp->lchild_;
         }
         pNewNode->parent_ = parent;
+
         if (!parent)
             root = pNewNode;
         else if (pNewNode->key_ > parent->key_)
@@ -2343,38 +2351,38 @@ void CreateBstTree() {
 //        std::cout << "  " << r;
 //    }
     std::cout << "  " << std::endl;
-//    return ;
 
-    std::cout << "-------------------------------beg val-------------------------------" << std::endl;
+    std::cout << "-------------------------------beg random val-------------------------------" << std::endl;
     for (int i = 0; i < count; ++i) {
         int randVal = rand() % (300);
-        std::cout << "  " << randVal;
+        std::cout << randVal << "  ";
 
-        BstNode* pNewNode = new BstNode(randVal, nullptr, nullptr, nullptr);
+        BstNode* pNewNode = new BstNode(randVal);
         AddNewNode(g_pBstTree, pNewNode);
     }
-    std::cout << "-------------------------------beg val-------------------------------" << std::endl;
-    return ;
+    std::cout << std::endl;
+    std::cout << "-------------------------------end random val-------------------------------" << std::endl;
+    return;
 
-    BstNode* p1 = new BstNode(1277, nullptr, nullptr, nullptr);
+    BstNode* p1 = new BstNode(127);
     AddNewNode(g_pBstTree, p1);
 
-    BstNode* p2 = new BstNode(119, nullptr, nullptr, nullptr);
+    BstNode* p2 = new BstNode(119);
     AddNewNode(g_pBstTree, p2);
 
-    BstNode* p3 = new BstNode(6684, nullptr, nullptr, nullptr);
+    BstNode* p3 = new BstNode(6684);
     AddNewNode(g_pBstTree, p3);
 
-    BstNode* p4 = new BstNode(217, nullptr, nullptr, nullptr);
+    BstNode* p4 = new BstNode(217);
     AddNewNode(g_pBstTree, p4);
 
-    BstNode* p5 = new BstNode(16, nullptr, nullptr, nullptr);
+    BstNode* p5 = new BstNode(16);
     AddNewNode(g_pBstTree, p5);
 
-    BstNode* p6 = new BstNode(31, nullptr, nullptr, nullptr);
+    BstNode* p6 = new BstNode(31);
     AddNewNode(g_pBstTree, p6);
 
-    BstNode* p7 = new BstNode(1997, nullptr, nullptr, nullptr);
+    BstNode* p7 = new BstNode(1997);
     AddNewNode(g_pBstTree, p7);
 }
 
@@ -2388,7 +2396,8 @@ void tst_my_bst_tree() {
         std::cout << std::endl;
     }
 
-    std::cout << "find k=120 closest value= " << ClosestValueInBst(g_pBstTree, 120) << std::endl;
+    std::cout << "find k=120 closest value= "
+              << ClosestValueInBst(g_pBstTree, 120) << std::endl;
 
     // 查找第K大节点；
     int kVal = 3;
