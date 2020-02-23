@@ -2,8 +2,15 @@
 
 #include "leetcode.h"
 
+#include "List.h"
 
 
+
+/* --------------------------------------------------------------------------
+ 1. Convert Sorted Array to Binary Search Tree
+ 2. Convert Sorted List to Binary Search Tree
+
+ * --------------------------------------------------------------------------*/
 
 
 // Convert Sorted Array to Binary Search Tree
@@ -19,6 +26,10 @@ struct TreeNode {
     }
 };
 
+void someInOrder(TreeNode* root);
+void InOrtderPtrint(TreeNode* root);
+
+
 //class Solution {
 //public:
     TreeNode* generateBST(int left, int right, std::vector<int>& vec) {
@@ -30,9 +41,6 @@ struct TreeNode {
             int mid1 = (left + right) >> 1;
             printf("mid1=%d\n", mid1);
 
-//            int mid2 = left + (right - left) >> 1;
-//            printf("mid2=%d\n", mid2);
-
             TreeNode* newnode = new TreeNode(vec[mid1]);
             newnode->left  = generateBST(0, mid1 - 1, vec);
             newnode->right = generateBST(mid1 + 1, right, vec);
@@ -42,6 +50,11 @@ struct TreeNode {
     TreeNode* sortedArrayToBst(std::vector<int>& vec) {
         generateBST(0, vec.size() - 1, vec);
     }
+    void InOrtderPtrint(TreeNode* root) {
+        std::cout << std::endl;
+        someInOrder(root);
+        std::cout << std::endl;
+    }
     void someInOrder(TreeNode* root) {
         if (!root) {
             printf("root is null\n");
@@ -49,7 +62,7 @@ struct TreeNode {
         }
         if (root->left)
             someInOrder(root->left);
-        std::cout << root->val << " ";
+        std::cout << root->val << '\t';
         if (root->right)
             someInOrder(root->right);
     }
@@ -58,6 +71,65 @@ struct TreeNode {
 
 // Convert Sorted List to Binary Search Tree -- LeetCode 将有序链表转为二叉搜索树
 
+class CSortedListToBst {
+public:
+    void TstEntry() {
+        ListNode* pNode1 = CreateListNode(11);
+        ListNode* pNode2 = CreateListNode(23);
+        ListNode* pNode3 = CreateListNode(35);
+        ListNode* pNode4 = CreateListNode(47);
+        ListNode* pNode5 = CreateListNode(51);
+        ListNode* pNode6 = CreateListNode(53);
+        ListNode* pNode7 = CreateListNode(198);
+        ListNode* pNode8 = CreateListNode(2739);
+        ListNode* pNode9 = CreateListNode(31798);
+
+        ConnectListNodes(pNode1, pNode2);
+        ConnectListNodes(pNode2, pNode3);
+        ConnectListNodes(pNode3, pNode4);
+        ConnectListNodes(pNode4, pNode5);
+        ConnectListNodes(pNode5, pNode6);
+        ConnectListNodes(pNode6, pNode7);
+        ConnectListNodes(pNode7, pNode8);
+        ConnectListNodes(pNode8, pNode9);
+
+        TreeNode* root = SortedListToBst(pNode1);
+        PrintList(pNode1);
+
+        std::cout << std::endl << std::endl
+                  << " in order print tree beg---------" << std::endl;
+        someInOrder(root);
+        std::cout << std::endl
+                  << " in order print tree end---------" << std::endl;
+
+    }
+    TreeNode* SortedListToBst(ListNode* head) {
+        if (!head) return nullptr;
+        helper(head, nullptr);
+    }
+    TreeNode* helper(ListNode* head, ListNode* tail) {
+        if (head == tail) return nullptr;
+
+        ListNode* slow = head, *fast = head;
+//        std::cout << "slow=" << slow <<std::endl;
+//        std::cout << "fast=" << fast <<std::endl;
+
+        while (fast != tail && fast->m_pNext != tail) {
+            slow = slow->m_pNext;
+            fast = fast->m_pNext->m_pNext;
+        }
+
+//        std::cout << "slow->val=" << slow->m_nValue << std::endl;
+//        std::cout << "fast->val=" << fast->m_nValue << std::endl;
+//        return nullptr;
+
+        TreeNode* root = new TreeNode(slow->m_nValue);
+        root->left = helper(head, slow);
+        root->right = helper(slow->m_pNext, tail);
+        return root;
+    }
+
+};
 
 
 
@@ -75,6 +147,70 @@ struct TreeNode {
 
 
 
+
+
+
+
+// Given preorder and inorder traversal of a tree, construct the binary tree.
+// Note:
+// You may assume that duplicates do not exist in the tree.
+
+// For example, given
+// preorder = [3,9,20,15,7]
+// inorder  = [9,3,15,20,7]
+
+// Return the following binary tree:
+
+//    3
+//   / \
+//  9  20
+//    /  \
+//   15   7
+
+/*
+ *
+ *  首先要知道一个结论，前序/后序+中序序列可以唯一确定一棵二叉树，所以自然而然可以用来建树。
+ *  看一下前序和中序有什么特点，前序1,2,4,7,3,5,6,8 ，中序4,7,2,1,5,3,8,6；
+ *
+ *  有如下特征：
+ *
+ *  1. 前序中左起第一位1肯定是根结点，我们可以据此找到中序中根结点的位置rootin；
+ *  2. 中序中根结点左边就是左子树结点，右边就是右子树结点，即[左子树结点，根结点，右子树结点]，
+ *     我们就可以得出左子树结点个数为int left = rootin - leftin;；
+ *  3. 前序中结点分布应该是：[根结点，左子树结点，右子树结点]；
+ *  4. 根据前一步确定的左子树个数，可以确定前序中左子树结点和右子树结点的范围；
+ *  5. 如果我们要前序遍历生成二叉树的话，下一层递归应该是：
+ *      左子树：root->left = pre_order(前序左子树范围，中序左子树范围，前序序列，中序序列);；
+ *      右子树：root->right = pre_order(前序右子树范围，中序右子树范围，前序序列，中序序列);。
+ *  6. 每一层递归都要返回当前根结点root；
+ */
+
+class CBuildBstByPreInorder {
+public:
+    TreeNode* buildTree(vector<int>& preorder, vector<int>& inorder) {
+        int pos = 0;
+        return buildTree(preorder, pos, inorder, 0, preorder.size() - 1);
+    }
+
+    TreeNode* buildTree(vector<int>& preorder, int& pos, vector<int>& inorder, int left, int right) {
+        if (pos >= preorder.size()) return 0;
+        int i = left;
+        for (; i <= right; ++i) {
+            if (inorder[i] == preorder[pos]) break;
+        }
+        TreeNode* newNode = new TreeNode(preorder[pos]);
+        if (left <= i-1)  newNode->left  = buildTree(preorder, ++pos, inorder, left, i-1);  // 左子树
+        if (i+1 <= right) newNode->right = buildTree(preorder, ++pos, inorder, i + 1, right);  // 右子树
+        return newNode;
+    }
+
+    void WorkEntry() {
+        std::vector < int > preOrder = {3,9,20,15,7};
+        std::vector < int > inOrder  = {9,3,15,20,7};
+        TreeNode* root = buildTree(preOrder, inOrder);
+        InOrtderPtrint(root);
+    }
+};
 
 
 
@@ -89,9 +225,195 @@ struct TreeNode {
 
 
 
+// LeetCode 215. Kth Largest Element in an Array--数字第K大的元素--最大堆或优先队列--C++,Python解法
+
+    int findKthLargest(vector<int>& nums, int k) {
+
+        std::priority_queue < int, vector< int > > p;
+
+        for (int i = 0; i < nums.size(); ++ i) {
+
+            if (p.size() < k) p.push(nums[i]);
+            else if (p.top() < nums[i]) {
+                p.pop();
+                p.push(nums[i]);
+            }
+        }
+
+        return p.top();
+    }
+    void tst_KthBig() {
+        std::vector < int > vRandom = { 9, 1, 123, 6613, 31, 25 };
+        std::cout << "Kth=" << findKthLargest( vRandom, 1 ) << std::endl;
+    }
+
+
+
+/*
+    给定两个二叉树，想象当你将它们中的一个覆盖到另一个上时，两个二叉树的一些节点便会重叠。
+
+    你需要将他们合并为一个新的二叉树。合并的规则是如果两个节点重叠，那么将他们的值相加作为节点合并后的新值，否则不为 NULL 的节点将直接作为新二叉树的节点。
+
+    示例 1:
+
+    输入:
+        Tree 1                     Tree 2
+              1                         2
+             / \                       / \
+            3   2                     1   3
+           /                           \   \
+          5                             4   7
+    输出:
+    合并后的树:
+             3
+            / \
+           4   5
+          / \   \
+         5   4   7
+    注意: 合并必须从两个树的根节点开始。
+*/
+
+    struct TreeNode* mergeTrees(struct TreeNode* t1, struct TreeNode* t2){
+        if (!t1 && !t2) {
+            return nullptr;
+        }
+        if (!t1 && t2) {
+            return t2;
+        }
+        if (t1 && !t2) {
+            return t1;
+        }
+        if (t1 && t2) {
+            t1->val = t1->val + t2->val;
+        }
+        t1->left=mergeTrees(t1->left,t2->left);
+        t1->right=mergeTrees(t1->right,t2->right);
+        return t1;
+    }
+
+
+
+/*
+ * 根据每日 气温 列表，请重新生成一个列表，对应位置的输入是你需要再等待多久温度才会升高超过该日的天数。如果之后都不会升高，请在该位置用 0 来代替。
+ * 例如，给定一个列表 temperatures = [73, 74, 75, 71, 69, 72, 76, 73]，你的输出应该是 [1, 1, 4, 2, 1, 1, 0, 0]。
+ * 提示：气温 列表长度的范围是 [1, 30000]。每个气温的值的均为华氏度，都是在 [30, 100] 范围内的整数。
+ * // https://leetcode-cn.com/problems/daily-temperatures/solution/leetcode-tu-jie-739mei-ri-wen-du-by-misterbooo/
+*/
+std::vector<int> dailyTemperatures(std::vector<int>& temperatures) {
+    int n = temperatures.size();
+    std::vector<int> res(n, 0);
+    std::stack<int> st;
+    for (int i = 0; i < temperatures.size(); ++i) {
+        while (!st.empty() && temperatures[i] > temperatures[st.top()]) {
+            auto t = st.top(); st.pop();
+            res[t] = i - t;
+        }
+        st.push(i);
+    }
+    return res;
+}
+
+
+/*
+        给定一个整数 n，生成所有由 1 ... n 为节点所组成的二叉搜索树。
+
+        示例:
+
+        输入: 3
+        输出:
+        [
+          [1,null,3,2],
+          [3,2,null,1],
+          [3,1,null,null,2],
+          [2,1,3],
+          [1,null,2,null,3]
+        ]
+
+        解释:
+        以上的输出对应以下 5 种不同结构的二叉搜索树：
+
+           1         3     3      2      1
+            \       /     /      / \      \
+             3     2     1      1   3      2
+            /     /       \                 \
+           2     1         2                 3
+*/
+
+class Solution {
+public:
+    int numTrees(int n) {
+        vector<int> dp(n + 2, 0);
+        dp[0] = 1;
+        dp[1] = 1;
+        for (int i = 2; i <= n; ++i) {
+            for (int j = 0; j < i; ++j) {
+                dp[i] += dp[j] * dp[i - j - 1];
+            }
+        }
+        return dp[n];
+    }
+};
+
+
+
+
+/*
+    思路一：中心扩散
+    从开始每个字符进行判断，回文串字符个数可能为奇数或偶数
+
+    如果是奇数，则中心字符为当前字符，然后向两边扩散
+    如果是偶数，则中心字符为当前字符和下一个字符，然后向两边扩散
+*/
+class CheckHuiWen
+{
+public:
+    void IsHuiWen() {
+        std::string str = "abtx21ba";
+
+        int sum = 0;
+        for ( int i = 0; i < str.size(); ++ i) {
+            sum += helper(str, i, i);
+            sum += helper(str, i, i+1);
+        }
+        std::cout << "sum=" << sum << std::endl;
+        std::cout << "str.size=" << str.size() << std::endl;
+    }
+
+    int helper(std::string& str, int i, int j) {
+        int sum = 0;
+        if (i >= 0 && j < str.size() && str[i] == str[j]) {
+            --i, j++, sum++;
+        }
+        return sum;
+    }
+};
+
 
 void LeetCodeEntry() {
 
+//    ::fmax( x, y)
+    return ;
+    CheckHuiWen checkHuiwen;
+    checkHuiwen.IsHuiWen();
+    return;
+
+    tst_KthBig();
+    return;
+
+    int i1 = 4;
+    int i2 = 12;
+    int ret = i1 & (-i1) ;
+    std::cout << "-i1=" << -i1 << std::endl;
+    std::cout << "ret=" << ret << std::endl;
+    return ;
+
+    CBuildBstByPreInorder buildBst;
+    buildBst.WorkEntry();
+    return;
+
+    CSortedListToBst sortl2bst;
+    sortl2bst.TstEntry();
+    return;
 
     tst_1_lc();
 
