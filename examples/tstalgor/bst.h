@@ -27,6 +27,12 @@ public:
         _rchild(rchild),
         _parent(parent)
     {}
+    BSTNode(T key) :
+        _key( key ),
+        _lchild(nullptr),
+        _rchild(nullptr),
+        _parent(nullptr)
+    {}
 };
 
 
