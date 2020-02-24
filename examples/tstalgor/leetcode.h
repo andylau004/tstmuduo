@@ -30,14 +30,16 @@
 #include "muduo/base/BinaryTree.h"
 
 
+#include "cpp11fun.h"
+
 
 using namespace std;
 
 
 
+extern bool isBalanced(BstNode* root);
 
 extern void LeetCodeEntry();
-
 
 
 

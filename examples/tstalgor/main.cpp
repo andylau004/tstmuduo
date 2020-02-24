@@ -2095,27 +2095,7 @@ void binary_search_wrap() {
     }
 }
 
-// create my bst tree
-class BstNode {
-public:
-    int key_;
-    BstNode* lchild_;
-    BstNode* rchild_;
-    BstNode* parent_;
-public:
-    BstNode(int key, BstNode* lchild, BstNode* rchild, BstNode* parent) :
-        key_( key ),
-        lchild_(lchild),
-        rchild_(rchild),
-        parent_(parent)
-    {}
-    BstNode(int key) :
-        key_( key ),
-        lchild_(nullptr),
-        rchild_(nullptr),
-        parent_(nullptr)
-    {}
-};
+
 
 BstNode* g_pBstTree = nullptr;
 
@@ -2252,24 +2232,33 @@ BstNode* GetKthNode(BstNode* root, int& K) {
     if (target == nullptr && root->rchild_) {
         target = GetKthNode(root->rchild_, K);
     }
-
     return target;
 }
 
 // 二叉搜索树 最接近值 查找
-int ClosestValueInBst( BstNode* root, const int& target ) {
+int ClosestValueInBst_1( BstNode* root, const int& target ) {
+    int res = root->key_;
+    while (root) {
+        if (abs(res - target) >= abs(root->key_ - target)) {
+            res = root->key_;
+        }
+        root = target < root->key_ ? root->lchild_ : root->rchild_;
+    }
+    return res;
+}
+int ClosestValueInBst_2( BstNode* root, const int& target ) {
     int ret = root->key_;
 
     if (target < root->key_ && root->lchild_) {
 
-        int lVal = ClosestValueInBst(root->lchild_, target);
+        int lVal = ClosestValueInBst_2(root->lchild_, target);
         if (abs(ret - target) >= abs(lVal - target))
             ret = lVal;
 
     }
     if (target > root->key_ && root->rchild_) {
 
-        int rVal = ClosestValueInBst( root->rchild_, target );
+        int rVal = ClosestValueInBst_2( root->rchild_, target );
         if (abs(ret - target) >= abs(rVal - target))
             ret = rVal;
 
@@ -2396,8 +2385,12 @@ void tst_my_bst_tree() {
         std::cout << std::endl;
     }
 
-    std::cout << "find k=120 closest value= "
-              << ClosestValueInBst(g_pBstTree, 120) << std::endl;
+    std::cout << "ver1 find k=120 closest value= "
+              << ClosestValueInBst_1(g_pBstTree, 120) << std::endl;
+    std::cout << "ver2 find k=120 closest value= "
+              << ClosestValueInBst_2(g_pBstTree, 120) << std::endl;
+
+    std::cout << "isBalanced=" << isBalanced(g_pBstTree) << std::endl;
 
     // 查找第K大节点；
     int kVal = 3;
@@ -3317,6 +3310,8 @@ int main(int argc, char *argv[])
 
     tst_my_bst_tree();
     std::cout << "res=" << kthSmallest(g_pBstTree, 3) << std::endl;
+
+    LeetCodeEntry();
     return 1;
 
     uint tmpval = 0x10;

@@ -6,6 +6,9 @@
 
 
 
+extern BstNode* g_pBstTree;
+
+
 /* --------------------------------------------------------------------------
  1. Convert Sorted Array to Binary Search Tree
  2. Convert Sorted List to Binary Search Tree
@@ -405,7 +408,7 @@ public:
       9  20
         /  \
        15   7
-    返回 true 。
+    返回 true
 
     示例 2:
 
@@ -418,13 +421,91 @@ public:
        3   3
       / \
      4   4
-    返回 false 。
+    返回 false
 */
 
+int Depth(BstNode* root) {
+    if (!root) return 0;
+    return std::max(Depth(root->lchild_), Depth(root->rchild_)) + 1;
+}
+bool isBalanced(BstNode* root) {
+    if (!root) return true;
+    int d = abs( Depth(root->lchild_) - Depth(root->rchild_) );
+    return d <= 1 && isBalanced(root->lchild_) && isBalanced(root->rchild_);
+}
+
+// Leetcode 98. 验证二叉搜索树
+/*
+        给定一个二叉树，判断其是否是一个有效的二叉搜索树。
+
+        假设一个二叉搜索树具有如下特征：
+
+        节点的左子树只包含小于当前节点的数。
+        节点的右子树只包含大于当前节点的数。
+        所有左子树和右子树自身必须也是二叉搜索树。
+        示例 1:
+        输入:
+            2
+           / \
+          1   3
+        输出: true
+
+        示例 2:
+        输入:
+            5
+           / \
+          1   4
+             / \
+            3   6
+        输出: false
+        解释: 输入为: [5,1,4,null,null,3,6]。
+             根节点的值为 5 ，但是其右子节点值为 4 。
+*/
+class CheckIfBst {
+public:
+//    bool IsValidBst(BstNode* root) {
+//        if (!root) return true;
+//        return IsLeftBst(root->lchild_, root->key_) && IsRightBst(root->rchild_, root->key_);
+//    }
+//    bool IsLeftBst(BstNode* root, int val) {
+//        if (IsValidBst(root)) {
+//            while (root) {
+//                if (root->key_ >= val) return fasle;
+//                root = root->rchild_;
+//            }
+//            return true;
+//        } else {
+//            return false;
+//        }
+//    }
+//    bool IsRightBst(BstNode* root, int val) {
+//        if (IsValidBst(root)) {
+
+//        }
+//    }
+
+    bool IsValidBst_1(BstNode* root) {
+        std::vector<int> arrVal;
+        inorder(root, arrVal);
+        for (int i = 0; i < arrVal.size(); i++) {
+            if (arrVal[i] <= arrVal[i-1]) return false;
+        }
+        return true;
+    }
+    void inorder(BstNode* root, std::vector<int>& arrVal) {
+        if (!root) return;
+        inorder(root->lchild_, arrVal);
+        arrVal.push_back(root->key_);
+        inorder(root->rchild_, arrVal);
+    }
+
+};
 
 void LeetCodeEntry() {
 
-//    ::fmax( x, y)
+    CheckIfBst chck;
+    std::cout << "chck result=" << chck.IsValidBst_1(g_pBstTree) << std::endl;
+
     return ;
     CheckHuiWen checkHuiwen;
     checkHuiwen.IsHuiWen();
