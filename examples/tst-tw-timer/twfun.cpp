@@ -165,8 +165,7 @@ void timer_handler() {
     client_conn_time_wheel.tick();
     alarm(1);
 }
-void timeout_cb(client_data *user_data)
-{
+void timeout_cb(client_data *user_data) {
     epoll_ctl(g_epFd, EPOLL_CTL_DEL, user_data->client_sock, 0);
     LOG_INFO << "time is out!!! close fd=" << user_data->client_sock;
 

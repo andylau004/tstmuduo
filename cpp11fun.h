@@ -24,6 +24,31 @@ using namespace std;
 
 
 
+// create my bst tree
+class BstNode {
+public:
+    int key_;
+    BstNode* lchild_;
+    BstNode* rchild_;
+    BstNode* parent_;
+public:
+    BstNode(int key, BstNode* lchild, BstNode* rchild, BstNode* parent) :
+        key_( key ),
+        lchild_(lchild),
+        rchild_(rchild),
+        parent_(parent)
+    {}
+    BstNode(int key) :
+        key_( key ),
+        lchild_(nullptr),
+        rchild_(nullptr),
+        parent_(nullptr)
+    {}
+};
+
+
+
+
 extern int test_move1();
 
 
