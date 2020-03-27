@@ -42,8 +42,7 @@ class TimerQueue;
 /// This is an interface class, so don't expose too much details.
 
 /*
-
-class EventLoop: 事件循环。
+class EventLoop: 事件循环
 先看一个调用链：EventLoop::loop()->Poller::poll()通过此调用链获得一个vector<Channel*> activeChannels_的就绪事件集合，
 再遍历该容器，执行每个Channel的Channel::handleEvent()完成相应就绪事件回调。
 至此一个完整的Reactor模式即完成。
