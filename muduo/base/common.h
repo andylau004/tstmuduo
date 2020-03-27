@@ -341,6 +341,23 @@ inline void remove_last_comma(std::string& str) {
 
 
 
+
+class DeferFunctor {
+public:
+    DeferFunctor(const boost::function < void() >& deferFunc) :
+        m_defer_func(deferFunc) {
+    }
+    ~DeferFunctor() {
+        m_defer_func();
+//        m_defer_func = nullptr;
+    }
+    boost::function < void() > m_defer_func;
+};
+
+
+
+
+
 // convert<int8_t> 获取到ASCII码
 template <typename out, class in>
 out convert(const in & value) {
@@ -452,10 +469,6 @@ uint64_t stringToUint64_t(const char* lpszVal);
 
 void printf_buffer(const char* title, unsigned char* buffer, int size);
 char* NewAllocMem(int isize);
-
-
-
-//ConfigurationUtil& G_GetConfigObj();
 
 
 uint64_t GetCurMilliSecond();
@@ -585,6 +598,20 @@ static inline void ext_executeCleanupBlock(__strong ext_cleanupBlock_t *block) {
         __attribute__((cleanup(ext_executeCleanupBlock), unused)) = ^
 
 #endif
+
+
+#include "scopeguard.h"
+
+#define CONCATENATE(s1, s2) s1##s2
+
+#ifdef __COUNTER__
+#define deferTime(f) auto CONCATENATE(scopeGuard, __COUNTER__) = timeScopeGuard(f, __FUNCTION__)
+#else
+#define deferTime(f) auto CONCATENATE(scopeGuard, __LINE__)    = timeScopeGuard(f, CONCATENATE(__FUNCTION__, __LINE__))
+//#define deferTime(f) auto CONCATENATE(scopeGuard, __LINE__)    = timeScopeGuard(f, __FUNCTION__)
+#endif
+
+
 
 
 
