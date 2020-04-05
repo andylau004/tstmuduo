@@ -6,7 +6,8 @@ project(tstfun C CXX)
 set(CXX_FLAGS
     -g
     # -DVALGRIND
-     -DMUDUO_STD_STRING
+    -DMUDUO_STD_STRING
+#    -D__GXX_EXPERIMENTAL_CXX0X__
     -DCHECK_PTHREAD_RETURN_VALUE
     -D_FILE_OFFSET_BITS=64
     -Wall
@@ -31,7 +32,7 @@ source_group("Include" FILES ${CURRENT_HEADERS})
 
 
 option( _debug "Debug option" ON )
-
+#add_definitions(-D__GXX_EXPERIMENTAL_CXX0X__)
 
 include_directories("${CMAKE_SOURCE_DIR}")
 include_directories(${CMAKE_SOURCE_DIR}/thirdpart/rapidjson)

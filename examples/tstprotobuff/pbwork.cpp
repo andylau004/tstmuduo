@@ -18,6 +18,7 @@
 #include "muduo/base/Timestamp.h"
 //#include "muduo/base/ThreadPool.h"
 
+#include <google/protobuf/stubs/common.h>
 
 
 #include "addressbook.pb.h"
@@ -255,19 +256,20 @@ void use_shared_ptr( boost::shared_ptr < CTestSharedPtr > in_ptr ) {
     std::cout << "use_shared_ptr usecount=" << in_ptr.use_count() << std::endl;
 }
 
-int tst_protobuff_Work_entry(int argc, char *argv[]) {
+int tst_protobuff_entry(int argc, char *argv[]) {
     GOOGLE_PROTOBUF_VERIFY_VERSION;
+//    std::cout << "proto version=" << GOOGLE_PROTOBUF_VERIFY_VERSION;
 
-    boost::shared_ptr< CTestSharedPtr > pInstance( new CTestSharedPtr );
-    use_shared_ptr( pInstance );
-    std::cout << "aaaaaaaaaaa" << std::endl;
-    std::cout << "usecount=" << pInstance.use_count() << std::endl;
+//    boost::shared_ptr< CTestSharedPtr > pInstance( new CTestSharedPtr );
+//    use_shared_ptr( pInstance );
+//    std::cout << "aaaaaaaaaaa" << std::endl;
+//    std::cout << "usecount=" << pInstance.use_count() << std::endl;
 
-    use_const_shared_ptr( pInstance );
-    std::cout << "bbbbbbbbbbb" << std::endl;
-    std::cout << "usecount=" << pInstance.use_count() << std::endl;
+//    use_const_shared_ptr( pInstance );
+//    std::cout << "bbbbbbbbbbb" << std::endl;
+//    std::cout << "usecount=" << pInstance.use_count() << std::endl;
 
-    return 1;
+//    return 1;
 
     tst_proto_reflection();
     return 1;

@@ -3,7 +3,7 @@
 
 
 
-extern int tst_protobuff_Work_entry(int argc, char *argv[]);
+extern int tst_protobuff_entry(int argc, char *argv[]);
 
 
 

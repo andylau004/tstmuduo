@@ -1172,6 +1172,65 @@ void tst_sum_1() {
 
 
 
+
+void onConnection(const TcpConnectionPtr& conn)
+{
+    if (conn->connected())
+    {
+        conn->setTcpNoDelay(true);
+    }
+}
+
+void onMessage(const TcpConnectionPtr& conn, Buffer* buf, Timestamp)
+{
+    conn->send(buf);
+}
+
+int tst_muduo_tcp_srv(int argc, char* argv[])
+{
+    {
+        LOG_INFO << "pid = " << getpid() << ", tid = " << CurrentThread::tid();
+        Logger::setLogLevel(Logger::INFO);
+
+        const char* ip = "127.0.0.1"/*argv[1]*/;
+        uint16_t port = 9099;
+        int threadCount = 1;
+
+        InetAddress listenAddr(ip, port);
+        EventLoop loop;
+        TcpServer server(&loop, listenAddr, "PingPong");
+
+        server.setConnectionCallback(onConnection);
+        server.setMessageCallback(onMessage);
+
+        if (threadCount > 1) {
+            server.setThreadNum(threadCount);
+        }
+
+        server.start();
+        loop.loop();
+        printf("muduo tcp server exit\n");
+    }
+    return 1;
+}
+
+
+void tst_muduo_srv() {
+//    const char* ip = "127.0.0.1";
+//    uint16_t port = static_cast<uint16_t>(atoi(argv[2]));
+//    int threadCount = atoi(argv[3]);
+//    int blockSize = atoi(argv[4]);
+//    int sessionCount = atoi(argv[5]);
+//    int timeout = atoi(argv[6]);
+
+//    EventLoop loop;
+//    InetAddress serverAddr(ip, port);
+
+//    Client client(&loop, serverAddr, blockSize, sessionCount, timeout, threadCount);
+//    loop.loop();
+//    return 1;
+}
+
 int main(int argc, char *argv[])
 {
     std::setlocale(LC_ALL, "en_US.utf8");

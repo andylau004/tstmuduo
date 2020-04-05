@@ -58,7 +58,7 @@ int main(int argc, char *argv[]) {
     Logger::setLogLevel(Logger::DEBUG);
     LOG_INFO << "pid = " << getpid() << ", tid = " << CurrentThread::tid();
 
-    tst_protobuff_Work_entry(argc, argv);
+    tst_protobuff_entry(argc, argv);
     return 1;
 }
 

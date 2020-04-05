@@ -4,6 +4,18 @@
 
 #include "List.h"
 
+//#define GOOGLE_STRIP_LOG 1
+#include <glog/logging.h>
+#define GOOGLE_STRIP_LOG 1
+
+
+
+//#define LOG_TRACE LOG(INFO)
+//#define LOG_DEBUG LOG(INFO)
+#define LOG_INFOEX   LOG(INFO)
+//#define GDLOG_TRACEEX LOG(INFO) << __PRETTY_FUNCTION__ << " this=" << this << " "
+//#else
+
 
 
 extern BstNode* g_pBstTree;
@@ -501,7 +513,89 @@ public:
 
 };
 
+
+
+#define DISABLE_COPY(ClassName) \
+    ClassName(const ClassName&) = delete;
+#define DISABLE_ASSIGN(ClassName) \
+    ClassName& operator=(const ClassName&) = delete;
+
+
+class ObjA
+{
+//public:
+    DISABLE_COPY(ObjA)
+    DISABLE_ASSIGN(ObjA)
+public:
+    ObjA() {
+
+    }
+public:
+    void PrintSomeInfo() {
+        std::cout << "val ---- " << std::endl;
+    }
+    static ObjA* GetInstance() {
+        return (new ObjA);
+    }
+};
+
 void LeetCodeEntry() {
+
+    {
+        ObjA* oa = ObjA::GetInstance();
+        oa->PrintSomeInfo();
+        ObjA ot;
+//        ObjA ov = ot;
+        return ;
+    }
+
+    {
+//        string home = "./logs";  //要先创建此目录,否则运行报错.
+//        google::InitGoogleLogging("tstout");
+
+//        string info_log = home + "master_info_";
+//        info_log = home;
+//        google::SetLogDestination(google::INFO, info_log.c_str());
+
+//        string warning_log = home + "master_warning_";
+//        warning_log = home;
+//        google::SetLogDestination(google::WARNING, warning_log.c_str());
+
+//        string error_log = home + "master_error_";
+//        error_log = home;
+//        google::SetLogDestination(google::ERROR, error_log.c_str());
+
+//        string fatal_log = home + "master_fatal_";
+//        fatal_log = home;
+//        google::SetLogDestination(google::FATAL, fatal_log.c_str());
+
+//        google::SetStderrLogging(google::GLOG_INFO);
+        FLAGS_alsologtostderr = 1;
+
+        // You can specify one of the following severity levels (in increasing order of severity)
+        LOG(INFO) << "info";
+        LOG(WARNING) << "warning";
+        LOG(ERROR) << "error";
+//        LOG(FATAL) << "fatal";   // Logging a FATAL message terminates the program (after the message is logged)!
+
+//        return ;
+    }
+
+//    google::InitGoogleLogging("outlog");
+//    google::SetLogDestination(google::GLOG_INFO, "loge");
+//    google::SetStderrLogging(google::GLOG_WARNING);
+//    google::SetStderrLogging(google::GLOG_INFO);
+//    FLAGS_colorlogtostderr=true;
+
+//    LOG(INFO) << "check tst";
+//    google::InitGoogleLogging("outlog");
+    for (int i = 0; i < 10; ++i) {
+        LOG_IF(INFO, i > 5) << "LOG_IF i > 5 i:" << i;
+        LOG_EVERY_N(INFO, 3) << "LOG_EVERY_N 3 i:" << i << " google::COUNTER:" << google::COUNTER;
+        LOG_IF_EVERY_N(INFO, (i > 5), 2) << "LOG_IF_EVERY_N i > 5 2 i:" << i;
+        LOG_FIRST_N(INFO, 4) << "LOG_FIRST_N 4 i:" << i << " google::COUNTER:" << google::COUNTER;
+    }
+    return ;
 
     CheckIfBst chck;
     std::cout << "chck result=" << chck.IsValidBst_1(g_pBstTree) << std::endl;

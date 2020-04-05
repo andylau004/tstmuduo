@@ -12,11 +12,16 @@
 #include <thread>         // std::thread, std::this_thread::yield
 
 
+#include <iostream>
+#include <string>
+#include <thread>
+#include <mutex>
+
+
 #include <cstdio>
 #include <cstdlib>
 #include <functional>
 
-#include <atomic>
 
 #include <boost/circular_buffer.hpp>
 
@@ -96,21 +101,6 @@ void test_cpp() {
         free(p);
     };
 }
-
-
-
-class defer {
-public:
-    defer(const boost::function < void() >& deferFunc) :
-        m_defer_func(deferFunc) {
-
-    }
-    ~defer() {
-        m_defer_func();
-//        m_defer_func = nullptr;
-    }
-    boost::function < void() > m_defer_func;
-};
 
 
 
@@ -684,6 +674,7 @@ void GetFileNameFromDir(const char* rootPath)
 }
 
 
+
 void GetCurSecond() {
     {
         struct timeval tv;
@@ -733,9 +724,340 @@ void tst_getline() {
 }
 
 
+class Test {
+public:
+    Test(int a){
+        p = new int(a);
+        std::cout << "default ctor: " << *p << std::endl;
+    }
+    Test(const Test &other) {
+        std::cout << "this is left-ref copy ctor: " << *other.p << std::endl;
+        p = new int(*other.p);
+    }
+    Test(Test &&other) {
+        std::cout << "this is move copy ctor: " << std::endl;
+        p = other.p;
+        other.p = nullptr;
+    }
+    ~Test(){
+        std::cout << "this is dstor" << std::endl;
+        if (p) {
+            delete p;
+            p = nullptr;
+        }
+    }
+    void print() const {
+        if(p == nullptr)
+        {
+            std::cout<<"null"<<std::endl;
+            return;
+        }
+        std::cout<<p<<":"<<*p<<std::endl;
+        return;
+    }
+protected:
+    int *p;
+};
+
+class President
+{
+public:
+    std::string name;
+    std::string country;
+    int year;
+
+    President(std::string p_name, std::string p_country, int p_year)
+        : name(std::move(p_name)), country(std::move(p_country)), year(p_year) {
+        std::cout << "I am being constructed.\n";
+    }
+    President(President&& other)
+        : name(std::move(other.name)), country(std::move(other.country)), year(other.year) {
+        std::cout << "I am being moved.\n";
+    }
+    President& operator=(const President& other) = default;
+};
+void tstLeftRightValue_2() {
+    ::sleep(10);
+    std::cout << "beg work\n";
+    std::vector <President > v1;
+    std::cout << "\nemplace_back:\n";
+    v1.emplace_back("xijinping", "china", 66);
+
+    std::vector<President> v2;
+    std::cout << "\npush_back:\n";
+    v2.push_back(President("sbtrump", "usa", 73));
+
+    std::cout << "\nContents:\n";
+    for (auto const& president: v1) {
+        std::cout << president.name << " was elected president of "
+                  << president.country << " in " << president.year << ".\n";
+    }
+    for (auto const& president: v2) {
+        std::cout << president.name << " was re-elected president of "
+                  << president.country << " in " << president.year << ".\n";
+    }
+}
+void tstLeftRightValue_1() {
+    Test t1(123);
+    Test t2(456);
+    Test t3(789);
+
+    std::list<Test> v;
+    v.push_back(std::move(t1));
+    v.push_back(std::move(t2));
+    v.push_back(std::move(t3));
+
+    for(auto it = v.begin(); it != v.end(); ++it) {
+        std::cout<<"address:"<<&(*it)<<std::endl;
+        it->print();
+    }
+}
+
+void threadfunc(void) {
+    while (1) {
+        std::cout << "i am a thread\n";
+        sleep(3);
+    }
+}
+
+int tstC11Thrd(void) {
+    std::thread t1(threadfunc);
+    t1.join();
+    return 0;
+}
+
+
+//#define STR(s)     #s
+//#define CONS(a,b)  int(a##e##b)
+
+//int tstJing()
+//{
+//    printf(STR(vck));           // 输出字符串"vck"
+//    printf("%d/n", CONS(2,3));  // 2e3 输出:2000
+//    return 0;
+//}
+
+
+
+#define   FUNC2(x,y)   x##y
+#define   FUNC1(x,y)   FUNC2(x,y)
+#define   FUNC(x)      FUNC1(x, __COUNTER__)
+
+//相当于int my_unique_prefix0;
+//int   FUNC(my_unique_prefix);
+//  //相当于int my_unique_prefix1;
+//int   FUNC(my_unique_prefix);
+// //相当于int my_unique_prefix2;
+//int   FUNC(my_unique_prefix);
+
+//void notgood() {
+//    my_unique_prefix0 = 0;
+//    my_unique_prefix1 = 10;
+//    printf("\n%d\n",my_unique_prefix0);
+//    printf("%d\n",my_unique_prefix1);
+//    my_unique_prefix0++;
+//    printf("%d\n",my_unique_prefix0);
+//    printf("%d\n", __COUNTER__);
+////    printf("my_unique_prefix2=%d\n",my_unique_prefix2);
+//}
+
+void tstDefer() {
+
+//    notgood();
+//    return;
+    CHECK_TIME1(tstinterval);
+
+    deferTime([&]() {
+        LOG_INFO << "tst output 111";
+    });
+
+//    LOG_INFO << " __COUNTER__=" << __COUNTER__;
+
+//    LOG_INFO << CONCATENATE(__FUNCTION__, __LINE__);
+    LOG_INFO << " before out";
+
+    {
+        deferTime([&]() {
+            LOG_INFO << "tst output 222";
+        });
+
+        for ( int i = 0; i < 10 ; i ++ ) {
+            ::usleep( 1000 );
+        }
+//        deferTime([&]() {
+//            LOG_INFO << "tst output 333";
+//        });
+    }
+    LOG_INFO << "after out";
+}
+
+
+void tst_align() {
+
+//    struct S1 {short f[3];};
+//    struct S2 {short f[3];} __attribute__((aligned(64)));
+//    struct S5 {short f[40];} __attribute__((aligned(64)));
+//    fprintf(stdout, "S1 size: %d, S2 size: %d, S5 size: %d\n",
+//        sizeof(struct S1), sizeof(struct S2), sizeof(struct S5)); // 6, 64, 128
+//    return;
+
+//    typedef int more_aligned_int __attribute__((aligned(16)));
+//    fprintf(stdout, "aligned: %d, %d\n", alignof(int), alignof(more_aligned_int)); // 4, 16
+
+//    struct S3 {more_aligned_int f;};
+//    struct S4 {int f;};
+//    fprintf(stdout, "S3 size: %d, S4 size: %d\n", sizeof(struct S3), sizeof(struct S4)); // 16, 4
+
+//    int arr[2] __attribute__((aligned(16))) = {1, 2};
+//    fprintf(stdout, "arr size: %d, arr aligned: %d\n", sizeof(arr), alignof(arr)); // 8, 16
+
+//    struct S6 {more_aligned_int f;} __attribute__((packed));
+//    fprintf(stdout, "S6 size: %d\n", sizeof(struct S6)); // 4
+
+//    char c __attribute__((aligned(16))) = 'a';
+//    fprintf(stdout, "c size: %d, aligned: %d\n", sizeof(c), alignof(c)); // 1, 16
+
+//    struct S7 {double f;} __attribute__((aligned(4)));
+//    fprintf(stdout, "S7 size: %d, algined: %d\n", sizeof(struct S7), alignof(struct S7)); // 8, 8
+
+//    struct S8 {double f;} __attribute__((__aligned__(32)));
+//    fprintf(stdout, "S8 size: %d, algined: %d\n", sizeof(struct S8), alignof(struct S8)); // 32, 32
+
+}
+
+__thread unsigned int some_count = 1;
+//thread_local unsigned int some_count = 1;
+std::mutex count_mtx;
+
+void thread_func(const std::string& thread_name) {
+    ++some_count;
+    std::lock_guard<std::mutex> lock(count_mtx);
+    std::cout << "Rage counter for " << thread_name << ", addr=" << &some_count << ", val=" << some_count << '\n';
+}
+void tst_thrd_local() {
+    DeferFunctor pfnExit = boost::function < void() >([&]() {
+        printf("tst_thrd_local function done -----------------\n");
+    });
+
+    std::thread t1(thread_func, "thrd aaa"), t2(thread_func, "thrd bbb");
+    {
+        std::lock_guard< std::mutex> lock(count_mtx);
+        std::cout << "main thrd,                 addr=" << &some_count << ", val=" << some_count << '\n';
+    }
+    t1.join();t2.join();
+}
+
+void func(std::function<void(const std::string& src)> cob, std::string& str) {
+    std::cout << "str1111=" << str << "\n";
+    cob(str);
+}
+
+std::function<void(const std::string& src)> pfff1;
+
+void tst_stdmove() {
+    std::string echo_message = "123";
+    int i = 1;
+
+//    func([&i, &echo_message] (const std::string& srcmsg) {
+////    func([&i, echo_message = std::move(echo_message)] (const std::string& srcmsg) {
+//        std::cout << "msg=" << echo_message.c_str() << "\n";
+//        std::cout << "srcmsg=" << srcmsg.c_str() << "\n";
+//    }, echo_message);
+//    return;
+
+    pfff1 = [&i, &echo_message] (const std::string& srcmsg) {
+//        auto pfn1 = [&i, echo_message = std::move(echo_message)] (std::string& srcmsg) {
+        std::cout << "msg=" << echo_message.c_str() << "\n";
+        std::cout << "srcmsg=" << srcmsg.c_str() << "\n";
+    };
+//    pfn1(echo_message);
+
+}
+
+class CShare {
+public:
+    CShare() {
+        std::cout << "share cst, this=" << this << "\n";
+    }
+    ~CShare() {
+        std::cout << "share dst, this=" << this << "\n";
+    }
+};
+using CSharePtr     = std::shared_ptr<CShare>;
+using CShareWeakPtr = std::weak_ptr<CShare>;
+
+class CUser {
+public:
+    CUser(CSharePtr shareObj) : object_(shareObj) {
+        std::cout << "CUser cst, share count=" << object_.use_count() << " object_=" << object_.get() << "\n";
+    }
+    ~CUser() {
+        std::cout << "CUser dst, object_=" << object_.get() << std::endl;
+        CShareWeakPtr wkptr(object_);
+        if (wkptr.expired()) {
+            std::cout << "CUser dst, expire..." << std::endl;
+        } else {
+            std::cout << "CUser dst, object_ count=" << object_.use_count() << "\n";
+            auto lockobj = wkptr.lock();
+            std::cout << "CUser dst, lockobj count=" << lockobj.use_count() << "\n";
+        }
+    }
+private:
+    CSharePtr object_;
+};
+
+void ShowCount(CSharePtr obj) {
+    std::shared_ptr<CShare> underlying_;
+    underlying_ = obj;
+    std::cout << "count=" << underlying_.use_count() << std::endl;
+}
+CSharePtr GetCShare() {
+    return std::make_shared<CShare>();
+//    CSharePtr obj = std::make_shared<CShare>();
+//    std::cout << "obj count=" << obj.use_count() << std::endl;
+}
+
+void tst_share_1() {
+
+    std::vector <int> temp(3);
+    int a[3] = {1, 2, 3};
+    std::copy(a, a+3, &temp.front());
+    for(int j=0; j<3; j++)
+        cout<< temp[j] << endl;
+
+#if 0
+//    CSharePtr tmpobj = GetCShare();
+    CUser userA(GetCShare());
+    return;
+#endif
+
+#if 0
+    CSharePtr obj1 = GetCShare();
+    std::cout << "obj1 count=" << obj1.use_count() << std::endl;
+    return;
+#endif
+
+#if 0
+    CSharePtr obj = std::make_shared<CShare>();
+    ShowCount(obj);
+#endif
+}
 
 void tst_c11fun_entry() {
+    tst_share_1();
+    return;
+
+    tst_stdmove();
+    pfff1("xxv");
+    return;
+    tst_thrd_local(); return;
+    tst_align(); return;
+    tstDefer(); return;
+
+    tstC11Thrd(); return;
 //    OutputDbgInfo tmpOut( "tst_c11fun_entry begin", "tst_c11fun_entry end" );
+    tstLeftRightValue_2(); return;
+    tstLeftRightValue_1(); return;
 
     tst_getline(); return;
     tst_shared_ptr_2();  return;
@@ -813,7 +1135,7 @@ return ;
 
 
     FILE* file1 = fopen( "file1.txt", "wb" );
-    defer releaseFile = boost::function < void() >([&]()
+    DeferFunctor releaseFile = boost::function < void() >([&]()
     {
         fclose(file1);
         printf("closed file1\n");

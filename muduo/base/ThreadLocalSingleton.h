@@ -17,7 +17,6 @@ template<typename T>
 class ThreadLocalSingleton : boost::noncopyable
 {
 public:
-
     static T& instance()
     {
         if (!t_value_)

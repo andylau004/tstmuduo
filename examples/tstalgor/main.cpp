@@ -3290,12 +3290,23 @@ int kthSmallest(BstNode* root, int k) {
 }
 
 
+void tstC11() {
+
+#ifdef __GXX_EXPERIMENTAL_CXX0X__
+    printf(" __GXX_EXPERIMENTAL_CXX0X__  been define\n");
+#else
+    printf(" __GXX_EXPERIMENTAL_CXX0X__  no been define\n");
+#endif
+
+}
 
 int main(int argc, char *argv[])
 {
     Logger::setLogLevel(Logger::DEBUG);
     LOG_INFO << "pid = " << getpid() << ", tid levelOrder= " << CurrentThread::tid();
 
+    tstC11();
+    return 1;
 //    {
 //        LeetCodeEntry();
 //        return 1;

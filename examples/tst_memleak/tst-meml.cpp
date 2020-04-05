@@ -53,6 +53,16 @@ using namespace muduo::net;
 
 
 
+// for memory access forbidden
+#include <execinfo.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <signal.h>
+// ---------------------------
+
+
+
 /*
  * 安装mtrace
  * sudo yum install glibc-utils
@@ -133,9 +143,83 @@ void tst_mem_leak_() {
     sprintf(hello,"nhello world!");
 }
 
+
+#define STACK_INFO_LEN      1024
+#define MAX_STACK_FRAMES    12
+
+void ShowTraceStack(const char* szBriefInfo)
+{
+    void *pStack[MAX_STACK_FRAMES];
+    static char szStackInfo[STACK_INFO_LEN * MAX_STACK_FRAMES];
+
+    char ** pStackList = NULL;
+    int frames = backtrace(pStack, MAX_STACK_FRAMES);
+    pStackList = backtrace_symbols(pStack, frames);
+    if (NULL == pStackList)
+        return;
+
+    strcpy(szStackInfo, szBriefInfo == NULL ? "stack traceback:\n" : szBriefInfo);
+    for (int i = 0; i < frames; ++i)
+    {
+        if (NULL == pStackList[i])
+            break;
+
+        strncat(szStackInfo, pStackList[i], STACK_INFO_LEN);
+        strcat(szStackInfo, "\n");
+    }
+
+    printf("%s", szStackInfo); // 输出到控制台，也可以打印到日志文件中
+}
+
+void print_stack_frames(int signum) {
+    int j, nptrs;
+#define SIZE 100
+    void *buffer[100];
+    char **strings;
+
+    nptrs = backtrace(buffer, SIZE);
+    strings = backtrace_symbols(buffer, nptrs);
+    if (strings == NULL) {
+        perror("backtrace_symbols");
+        exit(EXIT_FAILURE);
+    }
+
+    for (j = 0; j < nptrs; j++)
+        printf("%s\n", strings[j]);
+
+    free(strings);
+    exit(signum);
+}
+
+void myfunc2(int a) {
+    int *b = nullptr;
+    *b = a;
+}
+
+void myfunc() {
+    ShowTraceStack("myfunc found crash");
+    printf("my func beg -----------------\n");
+    DeferFunctor exitPrint = boost::function < void() >([&]() {
+        printf("my func done -----------------\n");
+    });
+
+    int a = 1;
+    myfunc2(a);
+}
+
+void tst_Stack_print() {
+//    signal(SIGSEGV, print_stack_frames);
+    myfunc();
+    exit(EXIT_SUCCESS);
+}
+
 int tst_meml_entry(int argc, char *argv[]) {
-    int tmp_array[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-    LOG_INFO << "array_size(tmp_array)=" << array_size(tmp_array) * sizeof(int);
+//    int tmp_array[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+//    LOG_INFO << "array_size(tmp_array)=" << array_size(tmp_array) * sizeof(int);
+
+    tst_Stack_print();
+    return 1;
+
 
     tst_mem_leak_();
     return 1;

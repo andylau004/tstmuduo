@@ -34,7 +34,7 @@ add_executable(${PROJECT_NAME}
     stackopr.h stackopr.cpp
     bitmapfun.h bitmapfun.cpp)
 
-target_link_libraries(${PROJECT_NAME} muduo_base muduo_net rt  ssl crypto)
+target_link_libraries(${PROJECT_NAME} muduo_base muduo_net rt ssl crypto glog)
 
 #asan
 

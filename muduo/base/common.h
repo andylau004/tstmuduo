@@ -604,6 +604,7 @@ static inline void ext_executeCleanupBlock(__strong ext_cleanupBlock_t *block) {
 
 #define CONCATENATE(s1, s2) s1##s2
 
+#define __COUNTER__
 #ifdef __COUNTER__
 #define deferTime(f) auto CONCATENATE(scopeGuard, __COUNTER__) = timeScopeGuard(f, __FUNCTION__)
 #else
