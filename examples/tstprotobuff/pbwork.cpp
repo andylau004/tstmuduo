@@ -25,6 +25,8 @@
 #include "query.pb.h"
 #include "codec.h"
 
+#include "parsepbfile.h"
+
 
 
 using namespace std;
@@ -256,8 +258,14 @@ void use_shared_ptr( boost::shared_ptr < CTestSharedPtr > in_ptr ) {
     std::cout << "use_shared_ptr usecount=" << in_ptr.use_count() << std::endl;
 }
 
+
+
+
 int tst_protobuff_entry(int argc, char *argv[]) {
     GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+    tst_pbParse_entry(); return 1;
+
 //    std::cout << "proto version=" << GOOGLE_PROTOBUF_VERIFY_VERSION;
 
 //    boost::shared_ptr< CTestSharedPtr > pInstance( new CTestSharedPtr );

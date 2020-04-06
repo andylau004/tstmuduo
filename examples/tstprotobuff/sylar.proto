@@ -1,0 +1,21 @@
+
+package sylar;
+
+message AA {
+    optional string name = 1;
+    optional int32 age = 2;
+}
+
+message Test {
+    optional string name = 1;
+    optional int32 age = 2;
+    repeated string phones = 3;
+    repeated AA aa = 4;
+}
+
+message XX {
+    optional string name = 1;
+    repeated AA aa = 4;
+}
+
+
