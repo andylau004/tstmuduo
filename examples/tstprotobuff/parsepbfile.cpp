@@ -41,8 +41,7 @@ int DynamicParseFromPBString(const std::string& proto_string,
 int DynamicParseFromPBFile(const std::string& filename,
                            const std::string& classname,
                            std::function<void(::google::protobuf::Message* msg)> cb) {
-
-    //TODO 检查文件名是否合法
+    // TODO 检查文件名是否合法
     auto pos = filename.find_last_of('/');
     std::string path;
     std::string file;
@@ -64,19 +63,25 @@ int DynamicParseFromPBFile(const std::string& filename,
     if (!descriptor) {
         LOG_INFO << "descriptor null";
         return -1;
+    } else {
+        LOG_INFO << "descriptor not null, by classname=" << classname;
     }
 
     ::google::protobuf::DynamicMessageFactory factory;
-    const ::google::protobuf::Message *message
-            = factory.GetPrototype(descriptor);
+    const ::google::protobuf::Message *message = factory.GetPrototype(descriptor);
     if(!message) {
         LOG_INFO << "message null";
         return 2;
+    } else {
+        LOG_INFO << "message not null";
     }
+
     ::google::protobuf::Message* msg = message->New();
     if(!msg) {
         LOG_INFO << "msg null";
         return 3;
+    } else {
+        LOG_INFO << "msg not null";
     }
     cb(msg);
     delete_object(msg);
@@ -87,27 +92,27 @@ int DynamicParseFromPBString(const std::string& proto_string,
                              std::function<void(::google::protobuf::Message* mgs)> cb) {
     std::stringstream ss;
     ss << "/tmp/dps_" << rand() << "_" << rand() << ".proto";
+
     std::ofstream ofs(ss.str());
     ofs << proto_string;
     ofs.close();
+
     return DynamicParseFromPBFile(ss.str(), classname, cb);
 }
 
 
 int tst_pbParse_entry(int argc, char *argv[]) {
-
     return 1;
 }
 int tst_pbParse_entry() {
 
-    //创建一个测试类，并进行初始化
     sylar::Test test;
     test.set_name("test_name");
     test.set_age(100);
     test.add_phones("138xxxxxx");
     test.add_phones("139xxxxxx");
 
-    for(int i = 0; i < 3; ++i) {
+    for (int i = 0; i < 3; ++i) {
         ::sylar::AA* a = test.add_aa();
         a->set_name("a_name_" + std::to_string(i));
         a->set_age(100 + i);
@@ -118,27 +123,28 @@ int tst_pbParse_entry() {
     test.SerializeToString(&pb_str);
     //打印测试类的数据信息
     LOG_INFO << "test.debugstring=" << test.DebugString();
-    LOG_INFO << "===============================" ;
+    LOG_INFO << "pb_str=" << pb_str;
+//    LOG_INFO << "===============================" ;
     //从文件中sylar.proto中的sylar.XX类，解析上面测试类的序列化二进制
     //并输出序列化后的sylar.XX的信息
-    DynamicParseFromPBFile("sylar.proto", "sylar.XX"
-        , [pb_str](::google::protobuf::Message* msg) {
-        if(msg->ParseFromString(pb_str)) {
-            LOG_INFO << "sylar.XX debugstring=" << msg->DebugString() ;
-        }
-    });
-    LOG_INFO << "===============================";
+//    DynamicParseFromPBFile("sylar.proto", "sylar.XX"
+//        , [pb_str](::google::protobuf::Message* msg) {
+//        if(msg->ParseFromString(pb_str)) {
+//            LOG_INFO << "sylar.XX debugstring=" << msg->DebugString() ;
+//        }
+//    });
 
+//    LOG_INFO << "===============================";
     //从文件中sylar.proto中的sylar.Test，解析上面测试类的序列化二进制
     //并输出序列化后的sylar.Test的信息
-    DynamicParseFromPBFile("sylar.proto", "sylar.Test"
-        , [pb_str](::google::protobuf::Message* msg) {
-        if(msg->ParseFromString(pb_str)) {
-            LOG_INFO << "sylar.Test debugstring=" << msg->DebugString() ;
-        }
-    });
+//    DynamicParseFromPBFile("sylar.proto", "sylar.Test"
+//        , [pb_str](::google::protobuf::Message* msg) {
+//        if(msg->ParseFromString(pb_str)) {
+//            LOG_INFO << "sylar.Test debugstring=" << msg->DebugString() ;
+//        }
+//    });
     //字符串pb文件内容
-    std::string pbstr = "package xx;\n"
+    std::string pbstr = "syntax = \"proto2\";\n package xx;\n"
         "message BB { \n"
         "    optional string name = 1; \n"
         "    optional int32 age = 2; \n"
@@ -154,9 +160,9 @@ int tst_pbParse_entry() {
     //pbstr的proto信息中的xx.TT，解析上面测试类的序列化二进制
     //并输出序列化后的xx.TT的信息
     DynamicParseFromPBString(pbstr, "xx.TT"
-        , [pb_str](::google::protobuf::Message* msg) {
+        , [&pb_str](::google::protobuf::Message* msg) {
         if(msg->ParseFromString(pb_str)) {
-            LOG_INFO << "xx.TT debugstring=" << msg->DebugString() ;
+            LOG_INFO << "xx.TT debugstring=" << msg->DebugString();
         }
     });
     LOG_INFO << "===============================";
@@ -165,7 +171,7 @@ int tst_pbParse_entry() {
     DynamicParseFromPBString(pbstr, "xx.BB"
         , [pb_str](::google::protobuf::Message* msg) {
         if(msg->ParseFromString(pb_str)) {
-            LOG_INFO << "xx.BB debugstring=" << msg->DebugString() ;
+            LOG_INFO << "xx.BB debugstring=" << msg->DebugString();
         }
     });
 
