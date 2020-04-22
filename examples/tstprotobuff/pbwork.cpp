@@ -17,6 +17,8 @@
 #include "muduo/base/common.h"
 #include "muduo/base/Timestamp.h"
 //#include "muduo/base/ThreadPool.h"
+#include "muduo/base/Logging.h"
+
 
 #include <google/protobuf/stubs/common.h>
 
@@ -164,29 +166,34 @@ int loadAddInfo() {
 
 template < typename T >
 void testDescriptor() {
+    DeferFunctor PrintLine = boost::function<void()> ([]() {
+        LOG_INFO << "---------------------------------------";
+    });
+
     std::string type_name = T::descriptor()->full_name();
-    cout << type_name << endl;
+    LOG_INFO << "type_name=" << type_name;
 
     const google::protobuf::Descriptor* descriptor =
       google::protobuf::DescriptorPool::generated_pool()->FindMessageTypeByName(type_name);
     assert(descriptor == T::descriptor());
-    cout << "FindMessageTypeByName() = " << descriptor << endl;
-    cout << "T::descriptor()         = " << T::descriptor() << endl;
-    cout << endl;
+    LOG_INFO << "FindMessageTypeByName() = " << descriptor;
+    LOG_INFO << "T::descriptor()         = " << T::descriptor();
+//    LOG_INFO << endl;
 
     const google::protobuf::Message* prototype =
       google::protobuf::MessageFactory::generated_factory()->GetPrototype(descriptor);
     assert(prototype == &T::default_instance());
-    cout << "GetPrototype()        = " << prototype << endl;
-    cout << "T::default_instance() = " << &T::default_instance() << endl;
-    cout << endl;
+    LOG_INFO << "GetPrototype()        = " << prototype;
+    LOG_INFO << "T::default_instance() = " << &T::default_instance();
+//    LOG_INFO << std::endl;
 
     T* new_obj = dynamic_cast<T*>(prototype->New());
     assert(new_obj != NULL);
     assert(new_obj != prototype);
     assert(typeid(*new_obj) == typeid(T::default_instance()));
-    cout << "prototype->New() = " << new_obj << endl;
-    cout << endl;
+    LOG_INFO << "prototype->New() = " << new_obj;
+    LOG_INFO << "typeid(*new_obj) = " << typeid(*new_obj).name();
+//    LOG_INFO << std::endl;
     delete new_obj;
 }
 
@@ -198,14 +205,14 @@ void tst_proto_reflection() {
     assert(newQuery != NULL);
     assert(typeid(*newQuery) == typeid(muduo::Query::default_instance()));
 
-    cout << "typeid(*newQuery) = " << typeid(*newQuery).name() << endl;
-    cout << "typeid(muduo::Query::default_instance()) = " << typeid(muduo::Query::default_instance()).name() << endl;
-    cout << "createMessage(\"muduo.Query\") = " << newQuery << endl;
+    LOG_INFO << "typeid(*newQuery) = " << typeid(*newQuery).name();
+    LOG_INFO << "typeid(muduo::Query::default_instance()) = " << typeid(muduo::Query::default_instance()).name();
+    LOG_INFO << "createMessage(\"muduo.Query\") = " << newQuery;
 
     google::protobuf::Message* newAnswer = createMessage("muduo.Answer");
     assert(newAnswer != NULL);
     assert(typeid(*newAnswer) == typeid(muduo::Answer::default_instance()));
-    cout << "createMessage(\"muduo.Answer\") = " << newAnswer << endl;
+    LOG_INFO << "createMessage(\"muduo.Answer\") = " << newAnswer;
 
     delete newQuery;
     delete newAnswer;
@@ -264,6 +271,8 @@ void use_shared_ptr( boost::shared_ptr < CTestSharedPtr > in_ptr ) {
 int tst_protobuff_entry(int argc, char *argv[]) {
     GOOGLE_PROTOBUF_VERIFY_VERSION;
 
+    tst_proto_reflection(); return 1;
+
     tst_pbParse_entry(); return 1;
 
 //    std::cout << "proto version=" << GOOGLE_PROTOBUF_VERIFY_VERSION;
@@ -279,8 +288,7 @@ int tst_protobuff_entry(int argc, char *argv[]) {
 
 //    return 1;
 
-    tst_proto_reflection();
-    return 1;
+
 
 //    tst_copy_fun(); return 1;
 

@@ -986,6 +986,16 @@ public:
 using CSharePtr     = std::shared_ptr<CShare>;
 using CShareWeakPtr = std::weak_ptr<CShare>;
 
+class DeleterCShare
+{
+public:
+    void operator() (CShare* del) {
+        std::cout << "Deleter function will Del=" << del << std::endl;
+//        delete[] x;
+    }
+};
+
+
 class CUser {
 public:
     CUser(CSharePtr shareObj) : object_(shareObj) {
@@ -1019,12 +1029,21 @@ CSharePtr GetCShare() {
 
 void tst_share_1() {
 
+//#if 0
+    CSharePtr obj1(NULL, DeleterCShare());
+    if (obj1) {
+        std::cout << "obj1 count=" << obj1.use_count() << std::endl;
+    }
+    return;
+//#endif
+
+#if 0
     std::vector <int> temp(3);
     int a[3] = {1, 2, 3};
     std::copy(a, a+3, &temp.front());
     for(int j=0; j<3; j++)
         cout<< temp[j] << endl;
-
+#endif
 #if 0
 //    CSharePtr tmpobj = GetCShare();
     CUser userA(GetCShare());
@@ -1032,7 +1051,7 @@ void tst_share_1() {
 #endif
 
 #if 0
-    CSharePtr obj1 = GetCShare();
+    CSharePtr obj1(GetCShare());
     std::cout << "obj1 count=" << obj1.use_count() << std::endl;
     return;
 #endif
@@ -1043,8 +1062,73 @@ void tst_share_1() {
 #endif
 }
 
+
+std::atomic<int> a(0);
+
+void thread1() {
+    int x = a.fetch_add(1, std::memory_order_relaxed);
+    printf("111 x=%d\n", x);
+}
+void thread2() {
+    int x = a.fetch_add(1, std::memory_order_relaxed);
+    printf("222 x=%d\n", x);
+}
+
+void print_x_val() {
+    std::thread t1(thread1);
+    std::thread t2(thread2);
+
+    t1.join();
+    t2.join();
+
+    printf("last x=%d\n", a.fetch_add(0, std::memory_order_relaxed));
+}
+
+
+
+volatile bool start = 0;
+
+void* thread_run( void* ) {
+    while (1) {
+        if (start) {
+            cout << "Thread malloc" << endl;
+            char *buf = new char[1024];
+            start = 0;
+        }
+        sleep(1);
+    }
+}
+
+void tst_run() {
+    for ( int x = 0; x < 110 ; x ++ ) {
+
+        int a[1024][1024] = {0};
+        for (int i = 0; i < 1024; ++i){
+            for(int j = 0; j < 1024;j++){
+//                a[i][j] += j;
+                a[j][i] +=j;
+            }
+        }
+
+    }
+#if 0
+    pthread_t th;
+    ::getchar();
+    ::getchar();
+    ::pthread_create(&th, 0, thread_run, 0);
+    while(getchar()) {
+        start = 1;
+    }
+#endif
+}
+
+
 void tst_c11fun_entry() {
-    tst_share_1();
+    tst_run();
+    return;
+
+//    tst_share_1();
+    print_x_val();
     return;
 
     tst_stdmove();

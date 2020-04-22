@@ -50,8 +50,7 @@ void print(const std::string& buf)
 }
 
 
-void testQuery()
-{
+void testQuery() {
     muduo::Query query;
     query.set_id(1);
     query.set_questioner("Chen Shuo");
@@ -207,7 +206,7 @@ void tst_codec_test() {
     puts("");
     testAnswer();
     puts("");
-//    testEmpty();
+    testEmpty();
     puts("");
 
     puts("All pass!!!");

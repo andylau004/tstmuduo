@@ -20,7 +20,7 @@
 #include "muduo/base/common.h"
 
 #include "sylar.pb.h"
-
+#include "query.pb.h"
 
 
 
@@ -51,13 +51,14 @@ int DynamicParseFromPBFile(const std::string& filename,
         path = filename.substr(0, pos);
         file = filename.substr(pos + 1);
     }
-
     LOG_INFO << "file=" << file << ", path=" << path;
+
     ::google::protobuf::compiler::DiskSourceTree sourceTree;
     sourceTree.MapPath("", path);
     ::google::protobuf::compiler::Importer importer(&sourceTree, NULL);
     importer.Import(file);
 
+    // 先获得类型的Descriptor
     const ::google::protobuf::Descriptor* descriptor
             = importer.pool()->FindMessageTypeByName(classname);
     if (!descriptor) {
@@ -67,6 +68,7 @@ int DynamicParseFromPBFile(const std::string& filename,
         LOG_INFO << "descriptor not null, by classname=" << classname;
     }
 
+    // 利用Descriptor拿到类型注册的instance. 这个是不可修改的.
     ::google::protobuf::DynamicMessageFactory factory;
     const ::google::protobuf::Message *message = factory.GetPrototype(descriptor);
     if(!message) {
@@ -76,6 +78,7 @@ int DynamicParseFromPBFile(const std::string& filename,
         LOG_INFO << "message not null";
     }
 
+    // 构造一个可用的消息.
     ::google::protobuf::Message* msg = message->New();
     if(!msg) {
         LOG_INFO << "msg null";
@@ -99,12 +102,81 @@ int DynamicParseFromPBString(const std::string& proto_string,
 
     return DynamicParseFromPBFile(ss.str(), classname, cb);
 }
-
-
-int tst_pbParse_entry(int argc, char *argv[]) {
-    return 1;
-}
 int tst_pbParse_entry() {
+
+    {
+        std::string protoDir  = "../examples/tstprotobuff/";
+        std::string protoFile = "query.proto";
+        std::string fileContent = GetFileContent_string(protoFile);
+
+        ::google::protobuf::compiler::DiskSourceTree sourceTree;
+        sourceTree.MapPath("", protoDir.c_str());
+
+        ::google::protobuf::compiler::Importer importer(&sourceTree, NULL);
+        const google::protobuf::FileDescriptor* fd = importer.Import(protoFile);
+        LOG_INFO << "protoFile=" << protoFile << ", fd=" << fd;
+//        importer.Import(protoDir + protoFile);
+//        LOG_INFO << "proto dir+file=" << protoDir + protoFile;
+
+        std::string classname = "muduo.Query";
+
+        // 先获得类型的Descriptor
+        const ::google::protobuf::Descriptor* descriptor
+                = importer.pool()->FindMessageTypeByName(classname);
+        if (!descriptor) {
+            LOG_INFO << "descriptor null, classname=" << classname;
+            return -1;
+        } else {
+            LOG_INFO << "descriptor not null, by classname=" << classname;
+        }
+
+        // 利用Descriptor拿到类型注册的instance. 这个是不可修改的.
+        ::google::protobuf::DynamicMessageFactory factory;
+        const ::google::protobuf::Message *message = factory.GetPrototype(descriptor);
+        if (!message) {
+            LOG_INFO << "message null";
+            return 2;
+        } else {
+            LOG_INFO << "message not null";
+        }
+
+        // 构造一个可用的消息.
+        ::google::protobuf::Message* msg = message->New();
+        if(!msg) {
+            LOG_INFO << "msg null";
+            return 3;
+        } else {
+            LOG_INFO << "msg not null";
+
+//            google::protobuf::Message* newQuery = createMessage("muduo.Query");
+
+//            assert(newQuery != NULL);
+//            assert(typeid(*newQuery) == typeid(muduo::Query::default_instance()));
+
+//            cout << "typeid(*newQuery) = " << typeid(*newQuery).name() << endl;
+//            cout << "typeid(muduo::Query::default_instance()) = " << typeid(muduo::Query::default_instance()).name() << endl;
+//            cout << "createMessage(\"muduo.Query\") = " << newQuery << endl;
+
+
+            google::protobuf::Message* newQuery = (msg);
+            assert(newQuery != NULL);
+            assert(typeid(*newQuery) == typeid(muduo::Query::default_instance()));
+            LOG_INFO << "typeid(*newQuery) = " << typeid(*newQuery).name();
+            LOG_INFO << "typeid(muduo::Query::default_instance()) = " << typeid(muduo::Query::default_instance()).name();
+            LOG_INFO << "createMessage(\"muduo.Query\") = " << newQuery;
+
+            // 直接调用message的具体接口
+            // 其实这些接口是语法糖接口.所以并没有对应的反射机制来对应调用.
+            // 反射机制实现了的Set/Get XXX系列接口，是属于Reflection的接口，接收Message作为参数.
+//            pQueryObj->set_id(1);
+//            pQueryObj->set_questioner("test fuck usa");
+//            pQueryObj->add_question("fire in the hole...");
+//            LOG_INFO << pQueryObj->Utf8DebugString();
+//            delete message;
+        }
+
+        return 1;
+    }
 
     sylar::Test test;
     test.set_name("test_name");
@@ -153,7 +225,7 @@ int tst_pbParse_entry() {
         "    optional string name = 1; \n"
         "    optional int32 age = 2; \n"
         "    repeated string phones = 3; \n"
-        "    repeated BB aa = 4; \n"
+        "    repeated BB aa = 3; \n"
         "}";
 
     LOG_INFO << "===============================";
@@ -175,5 +247,12 @@ int tst_pbParse_entry() {
         }
     });
 
+    return 1;
+}
+
+
+
+
+int tst_pbParse_entry(int argc, char *argv[]) {
     return 1;
 }
