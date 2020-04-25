@@ -4,7 +4,7 @@
 
 
 
-project(tstprotobuf)
+project(tstpb)
 
 
 set(EXECUTABLE_OUTPUT_PATH ../../)

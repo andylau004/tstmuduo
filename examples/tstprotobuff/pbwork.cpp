@@ -271,6 +271,8 @@ void use_shared_ptr( boost::shared_ptr < CTestSharedPtr > in_ptr ) {
 int tst_protobuff_entry(int argc, char *argv[]) {
     GOOGLE_PROTOBUF_VERIFY_VERSION;
 
+    tst_codec_test(); return 1;
+
     tst_proto_reflection(); return 1;
 
     tst_pbParse_entry(); return 1;
@@ -292,7 +294,6 @@ int tst_protobuff_entry(int argc, char *argv[]) {
 
 //    tst_copy_fun(); return 1;
 
-    tst_codec_test(); return 1;
 
 
     int choice;

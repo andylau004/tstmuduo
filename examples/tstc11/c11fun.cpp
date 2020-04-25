@@ -1099,7 +1099,18 @@ void* thread_run( void* ) {
     }
 }
 
+
+
 void tst_run() {
+
+    int a[3] = {11, 21, 23};
+    int b[3] = {0};
+    std::copy(a, a+3, b);
+    for(int j=0; j<3; j++)
+        std::cout << b[j] << std::endl;
+
+
+#if 0
     for ( int x = 0; x < 110 ; x ++ ) {
 
         int a[1024][1024] = {0};
@@ -1111,6 +1122,8 @@ void tst_run() {
         }
 
     }
+#endif
+
 #if 0
     pthread_t th;
     ::getchar();

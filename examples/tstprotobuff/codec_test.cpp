@@ -5,23 +5,22 @@
 #include "codec.h"
 
 
+
+#include <iostream>
+#include <sstream>
+#include <fstream>
+
 #include <stdio.h>
 #include <string>
 #include <stdint.h>
 
-
 #include <stdlib.h>
-#include <string.h>
 
 #include <dirent.h>
 #include <unistd.h>
 #include <sys/stat.h>
 
 #include <errno.h>
-
-#include <iostream>
-#include <sstream>
-#include <fstream>
 
 #include <sys/stat.h>
 
@@ -30,11 +29,7 @@
 
 #include <boost/function.hpp>
 
-
-
 #include "query.pb.h"
-
-
 
 
 void print(const std::string& buf)
@@ -177,7 +172,7 @@ void onAnswer(google::protobuf::Message* message)
 }
 void onUnknownMessageType(google::protobuf::Message* message)
 {
-    std::cout << "Discarding " << message->GetTypeName() << std::endl;
+    std::cout << "Discarding typename=" << message->GetTypeName() << std::endl;
 }
 
 
@@ -200,7 +195,7 @@ void tst_codec_test() {
     GOOGLE_PROTOBUF_VERIFY_VERSION;
 
     tst_dispatcher();
-//    return ;
+    return;
 
     testQuery();
     puts("");
