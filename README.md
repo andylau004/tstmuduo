@@ -8,7 +8,7 @@
 6.    新增 protobuff 测试 序列化/反序列化
 7.    新增 测试thrift传二进制文件，同时，新增thrift server/client 封装工具类，                   
                    
-8.    新增 boost::shared_ptr<TNonblockingIOThread>  m_listenThread;
+8.    新增 `boost::shared_ptr<TNonblockingIOThread>  m_listenThread;`
       此线程只负责侦听接受客户端连接
 ```
     // 主侦听线程，只负责侦听客户端socket，push新连接到io thread
@@ -19,9 +19,11 @@
     m_listenThread->register_io_events();
 ```
 
-9.    新增    
+9.    新增
+```
 class ExProcessorEventHandler: public apache::thrift::TProcessorEventHandler
-      根据 getContext  和 postWrite 之间 调用时间差，打印指定接口--函数的调用耗时
+```
+根据 `getContext` 和 `postWrite` 之间 调用时间差，打印指定接口--函数的调用耗时
 
 
 10.   不修改thrift源码获取thrift客户端IP，通过注入
@@ -30,22 +32,30 @@ class ExServerEventHandler: public apache::thrift::server::TServerEventHandler
 ```
 
 11.   新增　tstc11 测试用例
-      测试　ON_SCOPE_EXIT　C++11 实现 golang defer　延迟释放
+      测试　ON_SCOPE_EXIT C++11 实现 golang defer 延迟释放
 
 12.   新增　tstimewheel
-      测试　时间轮　算法
+      测试 时间轮 算法
 
-13.   新增　模仿muduo内timewheel实现方式，实现时间轮
+13.   新增 模仿muduo内timewheel实现方式，实现时间轮
+```
       ./examples/tstbucketwheel/tstbucketwheel.cpp
+```
 
 14.   新增　在修改过的thrift中实现时间轮，用来监控连接是否在指定时间内是否有数据交互，如果没有则析构连接
+```
       ./examples/transferserver/iothread.cpp
+```
       测试通过
 
-15.   NewAdd kthSmallest ClosestValueInBst GetKthNode
+15.   NewAdd
+```
+kthSmallest ClosestValueInBst GetKthNode
+```
 
-16.   NewAdd kthSmallest ClosestValueInBst GetKthNode
-
+16.   NewAdd
+```
+```
 
 
 计划：
