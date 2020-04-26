@@ -23,7 +23,7 @@ typedef std::shared_ptr<google::protobuf::Message> MessagePtr;
 //
 // FIXME: merge with RpcCodec
 //
-class ProtobufCodec : muduo::noncopyable
+class ProtobufCodec// : muduo::noncopyable
 {
 public:
 
@@ -64,9 +64,15 @@ public:
 
     void send(const muduo::net::TcpConnectionPtr& conn,
               const google::protobuf::Message& message) {
-
+        muduo::net::Buffer buf;
+        fillEmptyBuffer(&buf, message);
+        conn->send(&buf);
     }
 
+    static const muduo::string& errorCodeToString(ErrorCode errCode);
+    static void fillEmptyBuffer(muduo::net::Buffer* retBuf, const google::protobuf::Message& message);
+    static google::protobuf::Message* createMessage(const std::string& type_name);
+    static MessagePtr parse(const char* buf, int len, ErrorCode* errorCode);
 
 private:
     static void defaultErrorCallback(const muduo::net::TcpConnectionPtr&,

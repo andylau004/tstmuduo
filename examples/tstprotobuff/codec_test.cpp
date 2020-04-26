@@ -175,7 +175,6 @@ void onUnknownMessageType(google::protobuf::Message* message)
     std::cout << "Discarding typename=" << message->GetTypeName() << std::endl;
 }
 
-
 void tst_dispatcher() {
     ProtobufDispatcherLite dispatcher(onUnknownMessageType);
     dispatcher.registerMessageCallback(muduo::Query::descriptor(), onQuery);
@@ -188,9 +187,9 @@ void tst_dispatcher() {
     dispatcher.onMessage(&q);
     dispatcher.onMessage(&a);
     dispatcher.onMessage(&e);
-
 //    google::protobuf::ShutdownProtobufLibrary();
 }
+
 void tst_codec_test() {
     GOOGLE_PROTOBUF_VERIFY_VERSION;
 
