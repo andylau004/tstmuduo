@@ -1,23 +1,28 @@
-// Copyright 2010, Shuo Chen.  All rights reserved.
-// http://code.google.com/p/muduo/
-//
-// Use of this source code is governed by a BSD-style license
-// that can be found in the License file.
 
-// Author: Shuo Chen (chenshuo at chenshuo dot com)
-//
-// This is a public header file, it must only include public header files.
+#pragma once
 
-#ifndef MUDUO_NET_CALLBACKS_H
-#define MUDUO_NET_CALLBACKS_H
+#include <functional>
+#include <memory>
 
 #include <boost/function.hpp>
 #include <boost/shared_ptr.hpp>
 
 #include <muduo/base/Timestamp.h>
 
+
 namespace muduo
 {
+
+// should really belong to base/Types.h, but <memory> is not included there.
+template <typename T>
+inline T* get_pointer(const boost::shared_ptr<T>& ptr) {
+    return ptr.get();
+}
+
+//template <typename T>
+//inline T* get_pointer(const std::unique_ptr<T>& ptr) {
+//    return ptr.get();
+//}
 
 // Adapted from google-protobuf stubs/common.h
 // see License in muduo/base/Types.h
@@ -30,13 +35,14 @@ inline ::boost::shared_ptr<To> down_pointer_cast(const ::boost::shared_ptr<From>
   }
 
 #ifndef NDEBUG
-  assert(f == NULL || dynamic_cast<To*>(get_pointer(f)) != NULL);
+//  assert(f == NULL || dynamic_cast<To*>(get_pointer(f)) != NULL);
 #endif
   return ::boost::static_pointer_cast<To>(f);
 }
 
 namespace net
 {
+
 
 // All client visible callbacks go here.
 
@@ -62,4 +68,4 @@ void defaultMessageCallback(const TcpConnectionPtr& conn,
 }
 }
 
-#endif  // MUDUO_NET_CALLBACKS_H
+//#endif  // MUDUO_NET_CALLBACKS_H

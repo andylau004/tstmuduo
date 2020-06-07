@@ -66,14 +66,14 @@ TcpClient::TcpClient(EventLoop* loop,
                 boost::bind(&TcpClient::newConnection, this, _1) );
     // FIXME setConnectFailedCallback
     LOG_INFO << "TcpClient::TcpClient[" << name_
-             << "] - connector " << get_pointer(connector_);
+             << "] - connector " << muduo::get_pointer(connector_);
 }
 
 
 TcpClient::~TcpClient()
 {
     LOG_INFO << "TcpClient::~TcpClient[" << name_
-             << "] - connector " << get_pointer(connector_);
+             << "] - connector " << muduo::get_pointer(connector_);
     TcpConnectionPtr conn;
     bool unique = false;
     {

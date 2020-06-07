@@ -26,11 +26,11 @@ set(net_SRCS
   TcpServer.cpp   TcpServer.h
   Timer.cc Timer.h
   TimerQueue.cc   TimerQueue.h
-
 )
 
 add_library(muduo_net ${net_SRCS})
 target_link_libraries(muduo_net muduo_base)
+set_target_properties(muduo_net PROPERTIES COMPILE_FLAGS "-std=c++11")
 
 add_library(muduo_net_cpp11 ${net_SRCS})
 target_link_libraries(muduo_net_cpp11 muduo_base_cpp11)
@@ -64,12 +64,12 @@ add_subdirectory(http)
 #endif()
 
 if(PROTOBUF_FOUND)
-#  add_subdirectory(protobuf)
-   add_subdirectory(protorpc)
+    add_subdirectory(protobuf)
+    add_subdirectory(protorpc)
 else()
-#    add_subdirectory(protobuf)
-   add_subdirectory(protorpc)
+    add_subdirectory(protobuf)
+    add_subdirectory(protorpc)
 
-#  add_subdirectory(protobuf EXCLUDE_FROM_ALL)
-#  add_subdirectory(protorpc EXCLUDE_FROM_ALL)
+#    add_subdirectory(protobuf EXCLUDE_FROM_ALL)
+#    add_subdirectory(protorpc EXCLUDE_FROM_ALL)
 endif()

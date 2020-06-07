@@ -80,7 +80,6 @@
 #include <boost/utility.hpp>
 #include <boost/function.hpp>
 #include <boost/filesystem.hpp>
-#include <boost/shared_ptr.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/filesystem/exception.hpp>
 #include <boost/enable_shared_from_this.hpp>

@@ -13,7 +13,7 @@
 #include <assert.h>
 #endif
 
-
+#include <string.h>
 #include <string>
 using namespace std;
 
@@ -28,11 +28,16 @@ using namespace std;
 namespace muduo
 {
 
-#ifdef MUDUO_STD_STRING
+//#ifdef MUDUO_STD_STRING
 using std::string;
-#else  // !MUDUO_STD_STRING
-typedef __gnu_cxx::__sso_string string;
-#endif
+//#else  // !MUDUO_STD_STRING
+//typedef __gnu_cxx::__sso_string string;
+//#endif
+
+inline void memZero(void* p, size_t n)
+{
+    memset(p, 0, n);
+}
 
 // Taken from google-protobuf stubs/common.h
 //
