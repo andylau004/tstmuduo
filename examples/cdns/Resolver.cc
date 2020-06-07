@@ -16,12 +16,15 @@
 #include <stdio.h>
 #include <assert.h>
 
+#include <boost/function.hpp>
+#include <boost/bind.hpp>
 
 using namespace muduo;
 using namespace muduo::net;
 using namespace cdns;
 
-
+namespace
+{
 double getSeconds(struct timeval* tv) {
     if (tv) {
         return double(tv->tv_sec) + double(tv->tv_usec) / 1000000.0;
@@ -40,6 +43,7 @@ const char* getSocketType(int type)
 }
 
 const bool kDebug = false;
+}
 
 Resolver::Resolver(EventLoop *loop, Option opt)
     : loop_(loop),
@@ -157,7 +161,7 @@ void Resolver::onSockCreate(int sockfd, int type)
     assert(channels_.find(sockfd) == channels_.end());
 
     Channel* channel = new Channel(loop_, sockfd);
-    channel->setReadCallback(std::bind(&Resolver::onRead, this, sockfd, _1));
+    channel->setReadCallback(/*std*/boost::bind(&Resolver::onRead, this, sockfd, _1));
     channel->enableReading();
     channels_[sockfd].reset(channel);
 }

@@ -2,6 +2,8 @@
 
 #include <stdio.h>
 
+#include <boost/bind.hpp>
+
 #include "examples/cdns/Resolver.h"
 #include "muduo/net/EventLoop.h"
 
@@ -9,8 +11,10 @@ using namespace muduo;
 using namespace muduo::net;
 using namespace cdns;
 
+
+
 EventLoop* g_loop;
-int count = 0;
+int gcount = 0;
 int total = 0;
 
 void quit()
@@ -21,13 +25,13 @@ void quit()
 void resolveCallback(const string& host, const InetAddress& addr)
 {
     printf("resolveCallback %s -> %s\n", host.c_str(), addr.toIpPort().c_str());
-    if (++count == total)
+    if (++gcount == total)
         quit();
 }
 
 void resolve(Resolver* res, const string& host)
 {
-    res->resolve(host, std::bind(&resolveCallback, host, _1));
+    res->resolve(host, /*std*/boost::bind(&resolveCallback, host, _1));
 }
 
 int main(int argc, char* argv[])

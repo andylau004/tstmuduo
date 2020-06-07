@@ -89,7 +89,7 @@ bool stringTrimEx( std::string& sInput, char c ) {
     if ( fst != std::string::npos )
         sInput = sInput.substr( fst, lst - fst + 1 );
 
-    auto it = 1;
+//    auto it = 1;
     return true;
 }
 
