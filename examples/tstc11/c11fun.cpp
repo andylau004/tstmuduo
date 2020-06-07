@@ -1099,10 +1099,58 @@ void* thread_run( void* ) {
     }
 }
 
+void f(unsigned char v) {
+    char c = v;
+    unsigned char uc = v;
+    unsigned int a = c, b = uc;
 
+    int i = c, j = uc;
+
+    printf("----------------\n");
+    printf("%%c: %c, %c\n", c, uc);
+    printf("%%X: %X, %X\n", c, uc);
+    printf("%%u: %u, %u\n", a, b);
+    printf("%%d: %d, %d\n", i, j);
+}
 
 void tst_run() {
 
+    {
+        f(0x80);
+        f(0x7F);
+        return ;
+    }
+
+    {
+        std::string str1 = "%5";
+        auto tmp1 = str1.substr(1);
+        std::cout << "tmp1=" << tmp1 << std::endl;
+        return;
+    }
+    {
+// jdbc:mysql://127.0.0.1:11306/IM_CUSTOMER?useUnicode=true&characterEncoding=utf8
+        std::string jdbcUrl = "jdbc:mysql://127.0.0.1:11306/IM_CUSTOMER?useUnicode=true&characterEncoding=utf8";
+        std::cout << "jdbcUrl=" << jdbcUrl.c_str() << std::endl;
+
+        size_t lPos = jdbcUrl.find("mysql");
+        if (std::string::npos == lPos) {
+            LOG_ERROR << " not find \"mysql\"" << " jdbcUrl: " << jdbcUrl;
+            return ;
+        }
+
+        size_t rPos = jdbcUrl.find_first_of('?');
+        if (std::string::npos == rPos) {
+            LOG_ERROR << " not find \"?\"" << " jdbcUrl: " << jdbcUrl;
+            return ;
+        }
+
+        std::string url = "tcp";
+        size_t shiftLen = strlen("mysql");
+        url += jdbcUrl.substr(lPos + shiftLen, rPos - lPos - shiftLen);
+//        info->sqlAddr = url;
+        std::cout << "url=" << url.c_str() << std::endl;
+        return;
+    }
     int a[3] = {11, 21, 23};
     int b[3] = {0};
     std::copy(a, a+3, b);
