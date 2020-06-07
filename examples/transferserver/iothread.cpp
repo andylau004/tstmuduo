@@ -11,6 +11,8 @@
 #include <deque>
 #include <queue>
 #include <iostream>
+#include <atomic>
+
 #include <boost/unordered_map.hpp>
 #include <boost/get_pointer.hpp>
 
@@ -34,8 +36,6 @@
 #include "muduo/net/TcpClient.h"
 
 #include "../../muduo/base/event_watcher.h"
-
-#include <atomic>
 
 
 using namespace std;

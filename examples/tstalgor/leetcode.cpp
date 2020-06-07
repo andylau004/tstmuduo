@@ -63,7 +63,7 @@ void InOrtderPtrint(TreeNode* root);
         }
     }
     TreeNode* sortedArrayToBst(std::vector<int>& vec) {
-        generateBST(0, vec.size() - 1, vec);
+        return generateBST(0, vec.size() - 1, vec);
     }
     void InOrtderPtrint(TreeNode* root) {
         std::cout << std::endl;
@@ -246,7 +246,7 @@ public:
 
         std::priority_queue < int, vector< int > > p;
 
-        for (int i = 0; i < nums.size(); ++ i) {
+        for (size_t i = 0; i < nums.size(); ++ i) {
 
             if (p.size() < k) p.push(nums[i]);
             else if (p.top() < nums[i]) {
@@ -318,7 +318,7 @@ std::vector<int> dailyTemperatures(std::vector<int>& temperatures) {
     int n = temperatures.size();
     std::vector<int> res(n, 0);
     std::stack<int> st;
-    for (int i = 0; i < temperatures.size(); ++i) {
+    for (size_t i = 0; i < temperatures.size(); ++i) {
         while (!st.empty() && temperatures[i] > temperatures[st.top()]) {
             auto t = st.top(); st.pop();
             res[t] = i - t;
@@ -386,7 +386,7 @@ public:
         std::string str = "abtx21ba";
 
         int sum = 0;
-        for ( int i = 0; i < str.size(); ++ i) {
+        for (size_t i = 0; i < str.size(); ++ i) {
             sum += helper(str, i, i);
             sum += helper(str, i, i+1);
         }
@@ -499,7 +499,7 @@ public:
     bool IsValidBst_1(BstNode* root) {
         std::vector<int> arrVal;
         inorder(root, arrVal);
-        for (int i = 0; i < arrVal.size(); i++) {
+        for (size_t i = 0; i < arrVal.size(); i++) {
             if (arrVal[i] <= arrVal[i-1]) return false;
         }
         return true;

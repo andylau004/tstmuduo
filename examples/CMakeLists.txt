@@ -45,8 +45,9 @@ add_subdirectory(tstskiplist)
 
 #add_subdirectory(${CMAKE_SOURCE_DIR}/thirdpart/rapidjson)
 
+add_subdirectory(cdns)
 #if(CARES_INCLUDE_DIR AND CARES_LIBRARY)
-#  add_subdirectory(cdns)
+#
 #else()
 #  add_subdirectory(cdns EXCLUDE_FROM_ALL)
 #endif()
@@ -57,12 +58,14 @@ add_subdirectory(tstskiplist)
 #  add_subdirectory(curl EXCLUDE_FROM_ALL)
 #endif()
 
+add_subdirectory(tstprotobuf)
 if(PROTOBUF_FOUND)
 #  add_subdirectory(ace/logging)
-  add_subdirectory(protobuf)
+#  add_subdirectory(protobuf)
 else()
 #  add_subdirectory(ace/logging EXCLUDE_FROM_ALL)
-  add_subdirectory(protobuf EXCLUDE_FROM_ALL)
+#  add_subdirectory(protobuf EXCLUDE_FROM_ALL)
+#  add_subdirectory(protobuf)
 endif()
 
 #if(GD_INCLUDE_DIR AND GD_LIBRARY)

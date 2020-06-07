@@ -290,25 +290,17 @@ int tst_protobuff_entry(int argc, char *argv[]) {
 
 //    return 1;
 
-
-
 //    tst_copy_fun(); return 1;
-
-
 
     int choice;
     cout << "input choice: 1 for save, 2 for load" << endl;
     cin >> choice;
 
-    if(1 == choice)
-    {
+    if (1 == choice) {
         saveAddInfo();
-    }
-    else if (2 == choice)
-    {
+    } else if (2 == choice) {
         loadAddInfo();
     }
-
     return 0;
 }
 
