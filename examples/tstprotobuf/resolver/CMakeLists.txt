@@ -6,7 +6,7 @@ add_custom_command(OUTPUT resolver.pb.cc resolver.pb.h
   ARGS --cpp_out . ${CMAKE_CURRENT_SOURCE_DIR}/resolver.proto -I${CMAKE_CURRENT_SOURCE_DIR}
   DEPENDS resolver.proto)
 
-set_source_files_properties(resolver.pb.cc PROPERTIES COMPILE_FLAGS "-Wno-conversion -Wno-shadow")
+set_source_files_properties(resolver.pb.cc PROPERTIES COMPILE_FLAGS "-std=c++11 -Wno-conversion -Wno-shadow")
 include_directories(${PROJECT_BINARY_DIR})
 
 add_library(resolver_proto resolver.pb.cc resolver.pb.h)
@@ -14,11 +14,11 @@ target_link_libraries(resolver_proto protobuf pthread)
 
 
 add_executable(protobuf_rpc_resolver_client client.cc resolver.pb.cc)
-set_target_properties(protobuf_rpc_resolver_client PROPERTIES COMPILE_FLAGS "-Wno-error=shadow")
+set_target_properties(protobuf_rpc_resolver_client PROPERTIES COMPILE_FLAGS "-std=c++11 -Wno-error=shadow")
 target_link_libraries(protobuf_rpc_resolver_client resolver_proto muduo_protorpc)
 
 add_executable(protobuf_rpc_resolver_server server.cc resolver.proto)
-set_target_properties(protobuf_rpc_resolver_server PROPERTIES COMPILE_FLAGS "-Wno-error=shadow")
+set_target_properties(protobuf_rpc_resolver_server PROPERTIES COMPILE_FLAGS "-std=c++11 -Wno-error=shadow")
 #target_link_libraries(protobuf_rpc_resolver_server resolver_proto muduo_protorpc)
 target_link_libraries(protobuf_rpc_resolver_server resolver_proto muduo_protorpc muduo_cdns)
 

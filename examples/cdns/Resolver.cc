@@ -90,7 +90,7 @@ bool Resolver::resolve(StringArg hostname, const Callback& cb)
     struct timeval tv;
     struct timeval* tvp = ares_timeout(ctx_, NULL, &tv);
     double timeout = getSeconds(tvp);
-    LOG_DEBUG << "timeout " <<  timeout << " active " << timerActive_;
+    LOG_INFO << "timeout " <<  timeout << " active " << timerActive_;
     if (!timerActive_)
     {
         loop_->runAfter(timeout, std::bind(&Resolver::onTimer, this));
@@ -101,7 +101,7 @@ bool Resolver::resolve(StringArg hostname, const Callback& cb)
 
 void Resolver::onRead(int sockfd, Timestamp t)
 {
-    LOG_DEBUG << "onRead " << sockfd << " at " << t.toString();
+    LOG_INFO << "onRead " << sockfd << " at " << t.toString();
     ares_process_fd(ctx_, sockfd, ARES_SOCKET_BAD);
 }
 
@@ -112,7 +112,7 @@ void Resolver::onTimer()
     struct timeval tv;
     struct timeval* tvp = ares_timeout(ctx_, NULL, &tv);
     double timeout = getSeconds(tvp);
-    LOG_DEBUG << loop_->pollReturnTime().toString() << " next timeout " <<  timeout;
+    LOG_INFO << loop_->pollReturnTime().toString() << " next timeout " <<  timeout;
 
     if (timeout < 0)
     {
@@ -126,7 +126,7 @@ void Resolver::onTimer()
 
 void Resolver::onQueryResult(int status, struct hostent* result, const Callback& callback)
 {
-    LOG_DEBUG << "onQueryResult " << status;
+    LOG_INFO << "onQueryResult " << status;
     struct sockaddr_in addr;
     memZero(&addr, sizeof addr);
     addr.sin_family = AF_INET;
@@ -195,14 +195,14 @@ void Resolver::ares_host_callback(void* data, int status, int timeouts, struct h
 
 int Resolver::ares_sock_create_callback(int sockfd, int type, void* data)
 {
-    LOG_TRACE << "sockfd=" << sockfd << " type=" << getSocketType(type);
+    LOG_INFO << "sockfd=" << sockfd << " type=" << getSocketType(type);
     static_cast<Resolver*>(data)->onSockCreate(sockfd, type);
     return 0;
 }
 
 void Resolver::ares_sock_state_callback(void* data, int sockfd, int read, int write)
 {
-    LOG_TRACE << "sockfd=" << sockfd << " read=" << read << " write=" << write;
+    LOG_INFO << "sockfd=" << sockfd << " read=" << read << " write=" << write;
     static_cast<Resolver*>(data)->onSockStateChange(sockfd, read, write);
 }
 

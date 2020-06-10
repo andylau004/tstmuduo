@@ -16,7 +16,7 @@
 //   int32_t  checkSum; // adler32 of nameLen, typeName and protobufData
 // }
 
-typedef std::shared_ptr<google::protobuf::Message> MessagePtr;
+typedef /*std*/boost::shared_ptr<google::protobuf::Message> MessagePtr;
 
 //
 // FIXME: merge with RpcCodec
@@ -40,7 +40,7 @@ public:
                                   muduo::Timestamp) > ProtobufMessageCallback;
 
     typedef boost::function< void (const muduo::net::TcpConnectionPtr&,
-                                   const MessagePtr&,
+                                   muduo::net::Buffer*,
                                    muduo::Timestamp,
                                    ErrorCode) > ErrorCallback;
 

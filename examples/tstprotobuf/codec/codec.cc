@@ -19,8 +19,7 @@ void ProtobufCodec::fillEmptyBuffer(Buffer* retbuf, const google::protobuf::Mess
 
     const std::string& typeName = message.GetTypeName();
     int32_t nameLen = static_cast<int32_t>(typeName.size()+1);
-
-    retbuf->appendInt32(namelen);
+    retbuf->appendInt32(nameLen);
     retbuf->append(typeName.c_str(), nameLen);
 
     // code copied from MessageLite::SerializeToArray() and MessageLite::SerializePartialToArray().
@@ -28,7 +27,7 @@ void ProtobufCodec::fillEmptyBuffer(Buffer* retbuf, const google::protobuf::Mess
 
     int byte_size = message.ByteSizeLong();
     printf("byte_size=%d\n", byte_size);
-    buf->ensureWritableBytes(byte_size);
+    retbuf->ensureWritableBytes(byte_size);
 
     uint8_t* start = reinterpret_cast<uint8_t*>(retbuf->beginWrite());
     uint8_t* end = message.SerializeWithCachedSizesToArray(start);
@@ -37,7 +36,9 @@ void ProtobufCodec::fillEmptyBuffer(Buffer* retbuf, const google::protobuf::Mess
     }
     retbuf->hasWritten(byte_size);
 
-    int32_t checkSum = ::adler32(1, retbuf->peek(), retbuf->readableBytes());
+    int32_t checkSum = ::adler32(1,
+                                 reinterpret_cast<const Bytef*>(retbuf->peek()),
+                                 retbuf->readableBytes());
     retbuf->appendInt32(checkSum);
 
     assert(retbuf->readableBytes() == sizeof nameLen + nameLen + byte_size + sizeof checkSum);
@@ -55,13 +56,13 @@ void ProtobufCodec::fillEmptyBuffer(Buffer* retbuf, const google::protobuf::Mess
 
 namespace
 {
-const string kNoErrorStr = "NoError";
-const string kInvalidLengthStr = "InvalidLength";
-const string kCheckSumErrorStr = "CheckSumError";
-const string kInvalidNameLenStr = "InvalidNameLen";
-const string kUnknownMessageTypeStr = "UnknownMessageType";
-const string kParseErrorStr = "ParseError";
-const string kUnknownErrorStr = "UnknownError";
+    const string kNoErrorStr = "NoError";
+    const string kInvalidLengthStr = "InvalidLength";
+    const string kCheckSumErrorStr = "CheckSumError";
+    const string kInvalidNameLenStr = "InvalidNameLen";
+    const string kUnknownMessageTypeStr = "UnknownMessageType";
+    const string kParseErrorStr = "ParseError";
+    const string kUnknownErrorStr = "UnknownError";
 }
 
 const string& ProtobufCodec::errorCodeToString(ErrorCode errorCode)
@@ -152,7 +153,7 @@ google::protobuf::Message* ProtobufCodec::createMessage(const string &type_name)
     return message;
 }
 
-MessagePtr ProtobufCodec::parse(const char *buf, int len, ErrorCode *errorCode) {
+MessagePtr ProtobufCodec::parse(const char *buf, int len, ErrorCode* error) {
     MessagePtr message;
 
     // check sum
@@ -193,7 +194,7 @@ MessagePtr ProtobufCodec::parse(const char *buf, int len, ErrorCode *errorCode) 
         }
 
     } else {
-        *errorCode = kCheckSumError;
+        *error = kCheckSumError;
     }
     return message;
 }

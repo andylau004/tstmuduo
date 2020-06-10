@@ -13,6 +13,8 @@
 #include "muduo/net/TcpConnection.h"
 #include "muduo/net/protorpc/RpcChannel.h"
 
+#include "muduo/net/Callbacks.h"
+
 #include <arpa/inet.h>  // inet_ntop
 
 #include <stdio.h>
@@ -57,9 +59,9 @@ private:
         resolver::ResolveRequest req;
         req.set_address(host);
 
-//        resolver::ResolveResponse* response = new resolver::ResolveResponse;
-//        stub_.Resolve(NULL, req, response,
-//                      ::google::protobuf::NewCallBack(this, &RpcClient::resolved, response, host));
+        resolver::ResolveResponse* response = new resolver::ResolveResponse;
+        stub_.Resolve(NULL, &req, response,
+                      ::google::protobuf::NewCallback(this, &RpcClient::resolved, response, host));
     }
     void resolved(resolver::ResolveResponse* resp, std::string host) {
         if (resp->resolved())
