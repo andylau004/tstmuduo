@@ -25,16 +25,18 @@ TcpServer::TcpServer(EventLoop* loop,
                      const InetAddress& listenAddr,
                      const string& nameArg,
                      Option option)
-    : loop_(CHECK_NOTNULL(loop)),
+    : loop_(CHECK_NOTNULL(loop)),//上面的loop是用户提供的loop
       ipPort_(listenAddr.toIpPort()),
       name_(nameArg),
       acceptor_(new Acceptor(loop, listenAddr, option == kReusePort)),
       threadPool_(new EventLoopThreadPool(loop, name_)),
       connectionCallback_(defaultConnectionCallback),
       messageCallback_(defaultMessageCallback),
-      nextConnId_(1)
-{
-    acceptor_->setNewConnectionCallback(boost::bind(&TcpServer::newConnection, this, _1, _2));
+      nextConnId_(1) {
+    //注册给acceptor的回调
+    //将在Acceptor接受新连接的时候
+    acceptor_->setNewConnectionCallback(
+                boost::bind(&TcpServer::newConnection, this, _1, _2));
 }
 
 TcpServer::~TcpServer()
@@ -69,7 +71,7 @@ void TcpServer::start()
 
 void TcpServer::newConnection(int sockfd, const InetAddress& peerAddr)
 {
-    loop_->assertInLoopThread();
+    loop_->assertInLoopThread();//断言是否在IO线程
 
     EventLoop* ioLoop = threadPool_->getNextLoop();
     LOG_INFO << "post ioLoop->threadId_=" << ioLoop->IoEventLoopTid();// << ", CurTid=" << CurrentThread::tid();

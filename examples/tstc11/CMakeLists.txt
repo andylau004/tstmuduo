@@ -4,7 +4,6 @@
 
 project(tstc11)
 
-
 set(EXECUTABLE_OUTPUT_PATH ../../)
 
 #aux_source_directory(. CODE_LIST)
@@ -13,10 +12,10 @@ include_directories(../gen-cpp)
 
 #aux_source_directory(../gen-cpp O_GENCPP)
 
-
 add_executable(${PROJECT_NAME}
     c11fun.h c11fun.cpp
     tstbacktrace.h tstbacktrace.cpp
+    branch_predict.h branch_predict.cpp
 #${O_GENCPP}
     main.cpp)
 

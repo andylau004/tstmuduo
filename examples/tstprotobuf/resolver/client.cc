@@ -4,6 +4,10 @@
 
 #include <google/protobuf/stubs/callback.h>
 #include <google/protobuf/descriptor.h>
+
+#include <google/protobuf/text_format.h>
+#include <google/protobuf/io/zero_copy_stream_impl.h>
+
 // /usr/local/include/google/protobuf/stubs/callback.h
 
 #include "muduo/base/Logging.h"
@@ -94,7 +98,20 @@ private:
 };
 
 int main(int argc, char* argv[]) {
-//    LOG_INFO("")
+    {
+        resolver::ResolveRequest req;
+        std::string host = "myhost";
+        req.set_address(host);
+        req.set_name("michel jordan");
+        req.set_number(23);
+        req.set_age(30);
+
+        std::string p;
+        google::protobuf::TextFormat::PrintToString(req, &p);
+        printf("p=%s\n", p.c_str());
+        return 1;
+    }
+
     if (argc < 2) {
         LOG_INFO << "lack dst ip";
         return 1;

@@ -60,6 +60,7 @@
 
 
 #include "tstbacktrace.h"
+#include "branch_predict.h"
 
 ///////////////////////////////////
 
@@ -776,8 +777,9 @@ public:
     }
     President& operator=(const President& other) = default;
 };
+
 void tstLeftRightValue_2() {
-    ::sleep(10);
+//    ::sleep(10);
     std::cout << "beg work\n";
     std::vector <President > v1;
     std::cout << "\nemplace_back:\n";
@@ -1184,9 +1186,48 @@ void tst_run() {
 }
 
 
-void tst_c11fun_entry() {
-    tst_run();
-    return;
+class CBase {
+public:
+    CBase() {}
+    CBase(int val) {m_val = val;}
+
+    virtual void Print() {
+        printf("print base val\n");
+    }
+private:
+    int m_val;
+};
+
+class Derive1 : public CBase {
+public:
+    virtual void Print() {
+        printf("print derive1 val\n");
+    }
+    void PrintVal() {
+    }
+};
+
+void tstPrintVal() {
+    Derive1* d1 = new Derive1;
+    {
+        CBase* pbase = (CBase*)d1;
+        pbase->Print();
+    }
+   d1->Print();
+}
+
+// 2020-6-20
+// add new 测试分支预测
+void tst_c11fun_entry(int argc, char *argv[]) {
+
+    tstLeftRightValue_2(); return;
+    tstLeftRightValue_1(); return;
+
+    tstPrintVal(); return;
+
+    tstBranchPredict(argc, argv); return;
+
+    tst_run(); return;
 
 //    tst_share_1();
     print_x_val();
@@ -1201,9 +1242,6 @@ void tst_c11fun_entry() {
 
     tstC11Thrd(); return;
 //    OutputDbgInfo tmpOut( "tst_c11fun_entry begin", "tst_c11fun_entry end" );
-    tstLeftRightValue_2(); return;
-    tstLeftRightValue_1(); return;
-
     tst_getline(); return;
     tst_shared_ptr_2();  return;
 

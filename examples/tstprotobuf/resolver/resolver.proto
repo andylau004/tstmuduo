@@ -5,6 +5,9 @@ option py_generic_services = true;
 
 message ResolveRequest {
   required string address = 1;
+  required string name = 2;
+  required int32 age = 3;
+  required int32 number = 4;
 }
 
 message ResolveResponse {

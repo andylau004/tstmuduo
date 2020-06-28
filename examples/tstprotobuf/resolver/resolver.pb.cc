@@ -63,7 +63,13 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_resolver_2eproto::offsets[] PR
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   PROTOBUF_FIELD_OFFSET(::resolver::ResolveRequest, address_),
+  PROTOBUF_FIELD_OFFSET(::resolver::ResolveRequest, name_),
+  PROTOBUF_FIELD_OFFSET(::resolver::ResolveRequest, age_),
+  PROTOBUF_FIELD_OFFSET(::resolver::ResolveRequest, number_),
   0,
+  1,
+  2,
+  3,
   PROTOBUF_FIELD_OFFSET(::resolver::ResolveResponse, _has_bits_),
   PROTOBUF_FIELD_OFFSET(::resolver::ResolveResponse, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -77,8 +83,8 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_resolver_2eproto::offsets[] PR
   ~0u,
 };
 static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
-  { 0, 6, sizeof(::resolver::ResolveRequest)},
-  { 7, 15, sizeof(::resolver::ResolveResponse)},
+  { 0, 9, sizeof(::resolver::ResolveRequest)},
+  { 13, 21, sizeof(::resolver::ResolveResponse)},
 };
 
 static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] = {
@@ -87,12 +93,13 @@ static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] =
 };
 
 const char descriptor_table_protodef_resolver_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
-  "\n\016resolver.proto\022\010resolver\"!\n\016ResolveReq"
-  "uest\022\017\n\007address\030\001 \002(\t\"D\n\017ResolveResponse"
-  "\022\027\n\010resolved\030\001 \001(\010:\005false\022\n\n\002ip\030\002 \003(\007\022\014\n"
-  "\004port\030\003 \003(\0052Q\n\017ResolverService\022>\n\007Resolv"
-  "e\022\030.resolver.ResolveRequest\032\031.resolver.R"
-  "esolveResponseB\t\200\001\001\210\001\001\220\001\001"
+  "\n\016resolver.proto\022\010resolver\"L\n\016ResolveReq"
+  "uest\022\017\n\007address\030\001 \002(\t\022\014\n\004name\030\002 \002(\t\022\013\n\003a"
+  "ge\030\003 \002(\005\022\016\n\006number\030\004 \002(\005\"D\n\017ResolveRespo"
+  "nse\022\027\n\010resolved\030\001 \001(\010:\005false\022\n\n\002ip\030\002 \003(\007"
+  "\022\014\n\004port\030\003 \003(\0052Q\n\017ResolverService\022>\n\007Res"
+  "olve\022\030.resolver.ResolveRequest\032\031.resolve"
+  "r.ResolveResponseB\t\200\001\001\210\001\001\220\001\001"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_resolver_2eproto_deps[1] = {
 };
@@ -103,7 +110,7 @@ static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_res
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_resolver_2eproto_once;
 static bool descriptor_table_resolver_2eproto_initialized = false;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_resolver_2eproto = {
-  &descriptor_table_resolver_2eproto_initialized, descriptor_table_protodef_resolver_2eproto, "resolver.proto", 225,
+  &descriptor_table_resolver_2eproto_initialized, descriptor_table_protodef_resolver_2eproto, "resolver.proto", 268,
   &descriptor_table_resolver_2eproto_once, descriptor_table_resolver_2eproto_sccs, descriptor_table_resolver_2eproto_deps, 2, 0,
   schemas, file_default_instances, TableStruct_resolver_2eproto::offsets,
   file_level_metadata_resolver_2eproto, 2, file_level_enum_descriptors_resolver_2eproto, file_level_service_descriptors_resolver_2eproto,
@@ -123,6 +130,15 @@ class ResolveRequest::_Internal {
   static void set_has_address(HasBits* has_bits) {
     (*has_bits)[0] |= 1u;
   }
+  static void set_has_name(HasBits* has_bits) {
+    (*has_bits)[0] |= 2u;
+  }
+  static void set_has_age(HasBits* has_bits) {
+    (*has_bits)[0] |= 4u;
+  }
+  static void set_has_number(HasBits* has_bits) {
+    (*has_bits)[0] |= 8u;
+  }
 };
 
 ResolveRequest::ResolveRequest()
@@ -139,12 +155,23 @@ ResolveRequest::ResolveRequest(const ResolveRequest& from)
   if (from._internal_has_address()) {
     address_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.address_);
   }
+  name_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  if (from._internal_has_name()) {
+    name_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.name_);
+  }
+  ::memcpy(&age_, &from.age_,
+    static_cast<size_t>(reinterpret_cast<char*>(&number_) -
+    reinterpret_cast<char*>(&age_)) + sizeof(number_));
   // @@protoc_insertion_point(copy_constructor:resolver.ResolveRequest)
 }
 
 void ResolveRequest::SharedCtor() {
   ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&scc_info_ResolveRequest_resolver_2eproto.base);
   address_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  name_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  ::memset(&age_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&number_) -
+      reinterpret_cast<char*>(&age_)) + sizeof(number_));
 }
 
 ResolveRequest::~ResolveRequest() {
@@ -154,6 +181,7 @@ ResolveRequest::~ResolveRequest() {
 
 void ResolveRequest::SharedDtor() {
   address_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  name_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 }
 
 void ResolveRequest::SetCachedSize(int size) const {
@@ -172,8 +200,18 @@ void ResolveRequest::Clear() {
   (void) cached_has_bits;
 
   cached_has_bits = _has_bits_[0];
-  if (cached_has_bits & 0x00000001u) {
-    address_.ClearNonDefaultToEmptyNoArena();
+  if (cached_has_bits & 0x00000003u) {
+    if (cached_has_bits & 0x00000001u) {
+      address_.ClearNonDefaultToEmptyNoArena();
+    }
+    if (cached_has_bits & 0x00000002u) {
+      name_.ClearNonDefaultToEmptyNoArena();
+    }
+  }
+  if (cached_has_bits & 0x0000000cu) {
+    ::memset(&age_, 0, static_cast<size_t>(
+        reinterpret_cast<char*>(&number_) -
+        reinterpret_cast<char*>(&age_)) + sizeof(number_));
   }
   _has_bits_.Clear();
   _internal_metadata_.Clear();
@@ -195,6 +233,33 @@ const char* ResolveRequest::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE
           #ifndef NDEBUG
           ::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "resolver.ResolveRequest.address");
           #endif  // !NDEBUG
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // required string name = 2;
+      case 2:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 18)) {
+          auto str = _internal_mutable_name();
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
+          #ifndef NDEBUG
+          ::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "resolver.ResolveRequest.name");
+          #endif  // !NDEBUG
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // required int32 age = 3;
+      case 3:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 24)) {
+          _Internal::set_has_age(&has_bits);
+          age_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint(&ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // required int32 number = 4;
+      case 4:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 32)) {
+          _Internal::set_has_number(&has_bits);
+          number_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint(&ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
@@ -236,6 +301,28 @@ failure:
         1, this->_internal_address(), target);
   }
 
+  // required string name = 2;
+  if (cached_has_bits & 0x00000002u) {
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::VerifyUTF8StringNamedField(
+      this->_internal_name().data(), static_cast<int>(this->_internal_name().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::SERIALIZE,
+      "resolver.ResolveRequest.name");
+    target = stream->WriteStringMaybeAliased(
+        2, this->_internal_name(), target);
+  }
+
+  // required int32 age = 3;
+  if (cached_has_bits & 0x00000004u) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(3, this->_internal_age(), target);
+  }
+
+  // required int32 number = 4;
+  if (cached_has_bits & 0x00000008u) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(4, this->_internal_number(), target);
+  }
+
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields(), target, stream);
@@ -244,15 +331,67 @@ failure:
   return target;
 }
 
+size_t ResolveRequest::RequiredFieldsByteSizeFallback() const {
+// @@protoc_insertion_point(required_fields_byte_size_fallback_start:resolver.ResolveRequest)
+  size_t total_size = 0;
+
+  if (_internal_has_address()) {
+    // required string address = 1;
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+        this->_internal_address());
+  }
+
+  if (_internal_has_name()) {
+    // required string name = 2;
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+        this->_internal_name());
+  }
+
+  if (_internal_has_age()) {
+    // required int32 age = 3;
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
+        this->_internal_age());
+  }
+
+  if (_internal_has_number()) {
+    // required int32 number = 4;
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
+        this->_internal_number());
+  }
+
+  return total_size;
+}
 size_t ResolveRequest::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:resolver.ResolveRequest)
   size_t total_size = 0;
 
-  // required string address = 1;
-  if (_internal_has_address()) {
+  if (((_has_bits_[0] & 0x0000000f) ^ 0x0000000f) == 0) {  // All required fields are present.
+    // required string address = 1;
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
         this->_internal_address());
+
+    // required string name = 2;
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+        this->_internal_name());
+
+    // required int32 age = 3;
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
+        this->_internal_age());
+
+    // required int32 number = 4;
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
+        this->_internal_number());
+
+  } else {
+    total_size += RequiredFieldsByteSizeFallback();
   }
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
@@ -289,9 +428,23 @@ void ResolveRequest::MergeFrom(const ResolveRequest& from) {
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  if (from._internal_has_address()) {
-    _has_bits_[0] |= 0x00000001u;
-    address_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.address_);
+  cached_has_bits = from._has_bits_[0];
+  if (cached_has_bits & 0x0000000fu) {
+    if (cached_has_bits & 0x00000001u) {
+      _has_bits_[0] |= 0x00000001u;
+      address_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.address_);
+    }
+    if (cached_has_bits & 0x00000002u) {
+      _has_bits_[0] |= 0x00000002u;
+      name_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.name_);
+    }
+    if (cached_has_bits & 0x00000004u) {
+      age_ = from.age_;
+    }
+    if (cached_has_bits & 0x00000008u) {
+      number_ = from.number_;
+    }
+    _has_bits_[0] |= cached_has_bits;
   }
 }
 
@@ -310,7 +463,7 @@ void ResolveRequest::CopyFrom(const ResolveRequest& from) {
 }
 
 bool ResolveRequest::IsInitialized() const {
-  if ((_has_bits_[0] & 0x00000001) != 0x00000001) return false;
+  if ((_has_bits_[0] & 0x0000000f) != 0x0000000f) return false;
   return true;
 }
 
@@ -320,6 +473,10 @@ void ResolveRequest::InternalSwap(ResolveRequest* other) {
   swap(_has_bits_[0], other->_has_bits_[0]);
   address_.Swap(&other->address_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
+  name_.Swap(&other->name_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
+  swap(age_, other->age_);
+  swap(number_, other->number_);
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata ResolveRequest::GetMetadata() const {

@@ -185,6 +185,9 @@ class ResolveRequest :
 
   enum : int {
     kAddressFieldNumber = 1,
+    kNameFieldNumber = 2,
+    kAgeFieldNumber = 3,
+    kNumberFieldNumber = 4,
   };
   // required string address = 1;
   bool has_address() const;
@@ -206,14 +209,66 @@ class ResolveRequest :
   std::string* _internal_mutable_address();
   public:
 
+  // required string name = 2;
+  bool has_name() const;
+  private:
+  bool _internal_has_name() const;
+  public:
+  void clear_name();
+  const std::string& name() const;
+  void set_name(const std::string& value);
+  void set_name(std::string&& value);
+  void set_name(const char* value);
+  void set_name(const char* value, size_t size);
+  std::string* mutable_name();
+  std::string* release_name();
+  void set_allocated_name(std::string* name);
+  private:
+  const std::string& _internal_name() const;
+  void _internal_set_name(const std::string& value);
+  std::string* _internal_mutable_name();
+  public:
+
+  // required int32 age = 3;
+  bool has_age() const;
+  private:
+  bool _internal_has_age() const;
+  public:
+  void clear_age();
+  ::PROTOBUF_NAMESPACE_ID::int32 age() const;
+  void set_age(::PROTOBUF_NAMESPACE_ID::int32 value);
+  private:
+  ::PROTOBUF_NAMESPACE_ID::int32 _internal_age() const;
+  void _internal_set_age(::PROTOBUF_NAMESPACE_ID::int32 value);
+  public:
+
+  // required int32 number = 4;
+  bool has_number() const;
+  private:
+  bool _internal_has_number() const;
+  public:
+  void clear_number();
+  ::PROTOBUF_NAMESPACE_ID::int32 number() const;
+  void set_number(::PROTOBUF_NAMESPACE_ID::int32 value);
+  private:
+  ::PROTOBUF_NAMESPACE_ID::int32 _internal_number() const;
+  void _internal_set_number(::PROTOBUF_NAMESPACE_ID::int32 value);
+  public:
+
   // @@protoc_insertion_point(class_scope:resolver.ResolveRequest)
  private:
   class _Internal;
+
+  // helper for ByteSizeLong()
+  size_t RequiredFieldsByteSizeFallback() const;
 
   ::PROTOBUF_NAMESPACE_ID::internal::InternalMetadataWithArena _internal_metadata_;
   ::PROTOBUF_NAMESPACE_ID::internal::HasBits<1> _has_bits_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr address_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr name_;
+  ::PROTOBUF_NAMESPACE_ID::int32 age_;
+  ::PROTOBUF_NAMESPACE_ID::int32 number_;
   friend struct ::TableStruct_resolver_2eproto;
 };
 // -------------------------------------------------------------------
@@ -543,6 +598,133 @@ inline void ResolveRequest::set_allocated_address(std::string* address) {
   }
   address_.SetAllocatedNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), address);
   // @@protoc_insertion_point(field_set_allocated:resolver.ResolveRequest.address)
+}
+
+// required string name = 2;
+inline bool ResolveRequest::_internal_has_name() const {
+  bool value = (_has_bits_[0] & 0x00000002u) != 0;
+  return value;
+}
+inline bool ResolveRequest::has_name() const {
+  return _internal_has_name();
+}
+inline void ResolveRequest::clear_name() {
+  name_.ClearToEmptyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline const std::string& ResolveRequest::name() const {
+  // @@protoc_insertion_point(field_get:resolver.ResolveRequest.name)
+  return _internal_name();
+}
+inline void ResolveRequest::set_name(const std::string& value) {
+  _internal_set_name(value);
+  // @@protoc_insertion_point(field_set:resolver.ResolveRequest.name)
+}
+inline std::string* ResolveRequest::mutable_name() {
+  // @@protoc_insertion_point(field_mutable:resolver.ResolveRequest.name)
+  return _internal_mutable_name();
+}
+inline const std::string& ResolveRequest::_internal_name() const {
+  return name_.GetNoArena();
+}
+inline void ResolveRequest::_internal_set_name(const std::string& value) {
+  _has_bits_[0] |= 0x00000002u;
+  name_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value);
+}
+inline void ResolveRequest::set_name(std::string&& value) {
+  _has_bits_[0] |= 0x00000002u;
+  name_.SetNoArena(
+    &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:resolver.ResolveRequest.name)
+}
+inline void ResolveRequest::set_name(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  _has_bits_[0] |= 0x00000002u;
+  name_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:resolver.ResolveRequest.name)
+}
+inline void ResolveRequest::set_name(const char* value, size_t size) {
+  _has_bits_[0] |= 0x00000002u;
+  name_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:resolver.ResolveRequest.name)
+}
+inline std::string* ResolveRequest::_internal_mutable_name() {
+  _has_bits_[0] |= 0x00000002u;
+  return name_.MutableNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+}
+inline std::string* ResolveRequest::release_name() {
+  // @@protoc_insertion_point(field_release:resolver.ResolveRequest.name)
+  if (!_internal_has_name()) {
+    return nullptr;
+  }
+  _has_bits_[0] &= ~0x00000002u;
+  return name_.ReleaseNonDefaultNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+}
+inline void ResolveRequest::set_allocated_name(std::string* name) {
+  if (name != nullptr) {
+    _has_bits_[0] |= 0x00000002u;
+  } else {
+    _has_bits_[0] &= ~0x00000002u;
+  }
+  name_.SetAllocatedNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), name);
+  // @@protoc_insertion_point(field_set_allocated:resolver.ResolveRequest.name)
+}
+
+// required int32 age = 3;
+inline bool ResolveRequest::_internal_has_age() const {
+  bool value = (_has_bits_[0] & 0x00000004u) != 0;
+  return value;
+}
+inline bool ResolveRequest::has_age() const {
+  return _internal_has_age();
+}
+inline void ResolveRequest::clear_age() {
+  age_ = 0;
+  _has_bits_[0] &= ~0x00000004u;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 ResolveRequest::_internal_age() const {
+  return age_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 ResolveRequest::age() const {
+  // @@protoc_insertion_point(field_get:resolver.ResolveRequest.age)
+  return _internal_age();
+}
+inline void ResolveRequest::_internal_set_age(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _has_bits_[0] |= 0x00000004u;
+  age_ = value;
+}
+inline void ResolveRequest::set_age(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _internal_set_age(value);
+  // @@protoc_insertion_point(field_set:resolver.ResolveRequest.age)
+}
+
+// required int32 number = 4;
+inline bool ResolveRequest::_internal_has_number() const {
+  bool value = (_has_bits_[0] & 0x00000008u) != 0;
+  return value;
+}
+inline bool ResolveRequest::has_number() const {
+  return _internal_has_number();
+}
+inline void ResolveRequest::clear_number() {
+  number_ = 0;
+  _has_bits_[0] &= ~0x00000008u;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 ResolveRequest::_internal_number() const {
+  return number_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 ResolveRequest::number() const {
+  // @@protoc_insertion_point(field_get:resolver.ResolveRequest.number)
+  return _internal_number();
+}
+inline void ResolveRequest::_internal_set_number(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _has_bits_[0] |= 0x00000008u;
+  number_ = value;
+}
+inline void ResolveRequest::set_number(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _internal_set_number(value);
+  // @@protoc_insertion_point(field_set:resolver.ResolveRequest.number)
 }
 
 // -------------------------------------------------------------------

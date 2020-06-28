@@ -158,8 +158,7 @@ void EventLoop::loop()
         currentActiveChannel_ = NULL;
         eventHandling_ = false;
 
-        //执行等待队列中的回调函数
-        doPendingFunctors();
+        doPendingFunctors();//处理用户在其他线程注册给IO线程的事件
     }
 
     LOG_TRACE << "EventLoop " << this << " stop looping";

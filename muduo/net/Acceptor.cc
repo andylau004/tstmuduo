@@ -39,7 +39,8 @@ Acceptor::Acceptor(EventLoop* loop, const InetAddress& listenAddr, bool reusepor
     acceptSocket_.setReusePort(reuseport);// 复用port
     acceptSocket_.bindAddress(listenAddr);// 绑定ip和port
 
-    acceptChannel_.setReadCallback(boost::bind(&Acceptor::handleRead, this));//设置Channel的read回调函数
+    acceptChannel_.setReadCallback(
+                boost::bind(&Acceptor::handleRead, this));//设置Channel的read回调函数
 }
 
 Acceptor::~Acceptor()
