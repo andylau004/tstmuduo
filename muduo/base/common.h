@@ -103,7 +103,7 @@
 
 
 using namespace std;
-
+using i64 = int64_t;
 
 
 #define MAX_FILE_NAME_LEN 31

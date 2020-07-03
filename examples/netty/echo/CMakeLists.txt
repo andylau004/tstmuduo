@@ -1,3 +1,8 @@
+
+set(EXECUTABLE_OUTPUT_PATH ../../../)
+
+
+
 add_executable(netty_echo_client client.cc)
 target_link_libraries(netty_echo_client muduo_net)
 

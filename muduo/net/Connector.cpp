@@ -87,6 +87,7 @@ void Connector::connect()
     int sockfd = sockets::createNonblockingOrDie(serverAddr_.family());
     int ret = sockets::connect(sockfd, serverAddr_.getSockAddr());
     int savedErrno = (ret == 0) ? 0 : errno;
+    LOG_INFO << "connect ret=" << ret << ", errno=" << savedErrno;
     switch (savedErrno)//检查错误码
     {
     // 下面的表示可以建立连接.因此可以创建 m_channel
