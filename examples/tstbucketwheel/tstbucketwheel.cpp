@@ -35,13 +35,12 @@
 #include <boost/shared_ptr.hpp>
 
 
-using namespace boost;
-
 using namespace std;
 using namespace muduo;
 using namespace muduo::net;
 
 
+using  WeakTcpConnectionPtr = boost::weak_ptr<muduo::net::TcpConnection>;
 
 // RFC 862
 class EchoServerEx
@@ -57,10 +56,7 @@ private:
 
     void onTimer();
 
-    void dumpConnectionBuckets() const;
-
-
-    typedef boost::weak_ptr<muduo::net::TcpConnection> WeakTcpConnectionPtr;
+    void dumpConnectionBuckets();
 
     struct Entry : public muduo::copyable
     {
@@ -146,7 +142,7 @@ void EchoServerEx::onTimer()
     dumpConnectionBuckets();
 }
 
-void EchoServerEx::dumpConnectionBuckets() const
+void EchoServerEx::dumpConnectionBuckets()
 {
     LOG_INFO << "";
     LOG_INFO << "dump Connection Buckets beg";
@@ -161,7 +157,7 @@ void EchoServerEx::dumpConnectionBuckets() const
         for (const auto& it : bucket)
         {
             bool connectionDead = it->weakConn_.expired();
-            printf("%p(%ld)%s, ", get_pointer(it), it.use_count(), connectionDead ? " DEAD" : "");
+            printf("%p(%ld)%s, ", boost::get_pointer(it), it.use_count(), connectionDead ? " DEAD" : "");
         }
 //        puts("");
         printf("\n");

@@ -223,7 +223,7 @@ void TimerQueue::handleRead()
     callingExpiredTimers_ = false;
 
     //因为可能有些定时器需要在一定间隔内循环触发，这里会刷新一遍定时器队列
-    // 重置定时器，主要是处理那些需要重复的任务
+    //重置定时器，主要是处理那些需要重复的任务
     reset(expired, now);
 }
 

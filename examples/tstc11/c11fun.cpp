@@ -863,11 +863,38 @@ int tstC11Thrd(void) {
 ////    printf("my_unique_prefix2=%d\n",my_unique_prefix2);
 //}
 
+
+void call_over(bool bval) {
+    printf("call_over bval=%d\n", bval);
+}
+void one_way(bool bval) {
+    printf("one_way bval=%d\n", bval);
+}
+
 void tstDefer() {
+    int val = EV_READ|EV_PERSIST;
+    std::cout << val << std::endl;
+    return;
+
+    bool bval = false;
+
+    DeferFunctor pfnExit = boost::function < void() >([&]() {
+        call_over(bval);
+        one_way(bval);
+    });
+
+    if (0) {
+        bval = true;
+    } else {
+        bval = false;
+    }
+
+    printf("exec some code\n");
+    return ;
 
 //    notgood();
 //    return;
-    CHECK_TIME1(tstinterval);
+//    CHECK_TIME1(tstinterval);
 
     deferTime([&]() {
         LOG_INFO << "tst output 111";
@@ -944,7 +971,7 @@ void tst_thrd_local() {
     std::thread t1(thread_func, "thrd aaa"), t2(thread_func, "thrd bbb");
     {
         std::lock_guard< std::mutex> lock(count_mtx);
-        std::cout << "main thrd,                 addr=" << &some_count << ", val=" << some_count << '\n';
+        std::cout << "main thrd, addr=" << &some_count << ", val=" << some_count << '\n';
     }
     t1.join();t2.join();
 }
@@ -1216,9 +1243,53 @@ void tstPrintVal() {
    d1->Print();
 }
 
+void prepare(void)
+{
+    printf("pid = %d prepare ...\n", static_cast<int>(getpid()));
+}
+
+void parent(void)
+{
+    printf("pid = %d parent ...\n", static_cast<int>(getpid()));
+}
+
+void child(void)
+{
+    printf("pid = %d child ...\n", static_cast<int>(getpid()));
+}
+
+void tstAtFork() {
+    printf("pid = %d Entering main ...\n", static_cast<int>(getpid()));
+
+    ::pthread_atfork(prepare, parent, child);
+    //父进程调用parent函数，子进程调用child函数；
+    //这两个函数的调用顺序不一定
+    fork();
+
+    printf("pid = %d Exiting main ...\n",static_cast<int>(getpid()));
+}
+
+class CSomeThing {
+private:
+    int64_t microSecondsSinceEpoch_;
+};
+
+class CNull {
+};
+
+BOOST_STATIC_ASSERT(sizeof(CSomeThing) == sizeof(int64_t));
+
 // 2020-6-20
 // add new 测试分支预测
 void tst_c11fun_entry(int argc, char *argv[]) {
+
+    tstDefer(); return;
+
+    std::cout << "sizeof(CSomeThing)=" << sizeof(CSomeThing) << std::endl;
+    std::cout << "sizeof(CNull)=" << sizeof(CNull) << std::endl;
+    return;
+
+    tstAtFork(); return;
 
     tstLeftRightValue_2(); return;
     tstLeftRightValue_1(); return;
@@ -1238,7 +1309,6 @@ void tst_c11fun_entry(int argc, char *argv[]) {
     return;
     tst_thrd_local(); return;
     tst_align(); return;
-    tstDefer(); return;
 
     tstC11Thrd(); return;
 //    OutputDbgInfo tmpOut( "tst_c11fun_entry begin", "tst_c11fun_entry end" );

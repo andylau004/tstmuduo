@@ -44,9 +44,6 @@ using namespace muduo::net;
 
 using namespace boost;
 
-//using namespace apache::thrift;
-//extern log4cplus::Logger gLogger;
-
 
 typedef struct conn_queue_s {
     MutexLock               m_newlock;

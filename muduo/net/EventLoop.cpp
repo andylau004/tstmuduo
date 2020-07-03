@@ -299,10 +299,10 @@ void EventLoop::queueInLoop(Functor&& cb)
         pendingFunctors_.push_back(std::move(cb));  // emplace_back
     }
     if (!isInLoopThread() || callingPendingFunctors_) {
-        char tmpout[ 2048 ] = {0};
-        sprintf( tmpout, "queueInLoop trig Functor&& cb isInLoopThread: %d eventloopTid_: %d  callingPendingFunctors_: %d",
-                 isInLoopThread(), threadId_, /*CurrentThread::tid(),*/ callingPendingFunctors_ );
-        LOG_INFO << tmpout;
+//        char tmpout[ 2048 ] = {0};
+//        sprintf( tmpout, "queueInLoop trig Functor&& cb isInLoopThread: %d eventloopTid_: %d  callingPendingFunctors_: %d",
+//                 isInLoopThread(), threadId_, /*CurrentThread::tid(),*/ callingPendingFunctors_ );
+//        LOG_INFO << tmpout;
         wakeup();
     }
 }

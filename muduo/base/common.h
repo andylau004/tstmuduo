@@ -346,10 +346,14 @@ public:
     DeferFunctor(const boost::function < void() >& deferFunc) :
         m_defer_func(deferFunc) {
     }
+    DeferFunctor(const DeferFunctor& other) {
+        m_defer_func = other.m_defer_func;
+    }
     ~DeferFunctor() {
         m_defer_func();
 //        m_defer_func = nullptr;
     }
+private:
     boost::function < void() > m_defer_func;
 };
 

@@ -38,7 +38,9 @@ void RpcServer::onConnection(const TcpConnectionPtr &conn)
     if (conn->connected()) {
         RpcChannelPtr channel(new RpcChannel(conn));
         channel->setServices(&service_);
-        conn->setMessageCallback(boost::bind(&RpcChannel::onMessage, muduo::get_pointer(channel), _1, _2, _3));
+
+        conn->setMessageCallback(
+                    boost::bind(&RpcChannel::onMessage, muduo::get_pointer(channel), _1, _2, _3));
         conn->setContext(channel);
     } else {
         conn->setContext(RpcChannelPtr());

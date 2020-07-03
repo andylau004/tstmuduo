@@ -42,6 +42,10 @@ add_subdirectory(tst_rdshamem)
 add_subdirectory(tst_wrshamem)
 add_subdirectory(tstskiplist)
 
+add_subdirectory(netty/discard)
+add_subdirectory(netty/echo)
+#add_subdirectory(netty/uptime)
+
 
 #add_subdirectory(${CMAKE_SOURCE_DIR}/thirdpart/rapidjson)
 

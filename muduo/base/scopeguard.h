@@ -91,7 +91,7 @@ private:
 
 template < class F >
 TimeScopeGuard<F> timeScopeGuard(F f, const std::string& name) {
-    LOG_INFO << "recv name=" << name;
+//    LOG_INFO << "recv name=" << name;
     return TimeScopeGuard<F>(std::move(f), name);
 }
 

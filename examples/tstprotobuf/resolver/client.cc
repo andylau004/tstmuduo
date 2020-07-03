@@ -99,6 +99,7 @@ private:
 
 int main(int argc, char* argv[]) {
     {
+        // 测试 proto buf 对象, 序列化为 json
         resolver::ResolveRequest req;
         std::string host = "myhost";
         req.set_address(host);

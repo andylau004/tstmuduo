@@ -105,7 +105,7 @@ void TcpServer::newConnection(int sockfd, const InetAddress& peerAddr)
     conn->setMessageCallback(messageCallback_);
     conn->setWriteCompleteCallback(writeCompleteCallback_);
 
-    //将TcpServer的removeConnection设知道了TcpConnection的关闭回调函数中
+    //将TcpServer的removeConnection设置到了TcpConnection的关闭回调函数中
     conn->setCloseCallback(boost::bind(&TcpServer::removeConnection, this, _1)); // FIXME: unsafe
 
     //调用TcpConenction::connectEstablished函数内部会将use_count加一然后减一，此处仍为2

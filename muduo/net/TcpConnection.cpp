@@ -174,7 +174,7 @@ void TcpConnection::sendInLoop(const StringPiece& message)
  */
 void TcpConnection::sendInLoop(const void* data, size_t len)
 {
-    LOG_INFO << "sendInLoop len=" << len;
+//    LOG_INFO << "sendInLoop len=" << len;
 
     loop_->assertInLoopThread();
     ssize_t nwrote = 0;
