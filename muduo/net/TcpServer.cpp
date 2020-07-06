@@ -33,8 +33,6 @@ TcpServer::TcpServer(EventLoop* loop,
       connectionCallback_(defaultConnectionCallback),
       messageCallback_(defaultMessageCallback),
       nextConnId_(1) {
-    //注册给acceptor的回调
-    //将在Acceptor接受新连接的时候
     acceptor_->setNewConnectionCallback(
                 boost::bind(&TcpServer::newConnection, this, _1, _2));
 }

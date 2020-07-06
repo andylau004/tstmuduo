@@ -19,11 +19,6 @@
 #include <boost/bind.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 
-
-//#include "poco/Bugcheck.h"
-//#include "poco/Foundation.h"
-//#include "poco/Alignment.h"
-
 #include "muduo/base/common.h"
 
 #include "muduo/net/InetAddress.h"
@@ -54,7 +49,5 @@ int main(int argc, char *argv[])
     tst_heapopr_entry();
     return 1;
 
-    tst_tw_entry();
-
-    return 1;
+    tst_tw_entry(); return 1;
 }

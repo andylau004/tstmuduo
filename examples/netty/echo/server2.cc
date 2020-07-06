@@ -71,7 +71,7 @@ private:
     }
     void printConnection() {
         string procStatus = ProcessInfo::procStatus();
-        printf("%d conn, files %d , VmSize %ld KiB, RSS %ld KiB, ",
+        printf("%d conn, files %d, VmSize %ld KiB, RSS %ld KiB, ",
                connections_.get(),
                ProcessInfo::openedFiles(),
                getLong(procStatus, "VmSize:"),

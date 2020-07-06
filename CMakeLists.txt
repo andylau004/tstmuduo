@@ -27,13 +27,15 @@ set(CXX_FLAGS
     -rdynamic
     )
 
-file(GLOB_RECURSE CURRENT_HEADERS *.h *.hpp *.cpp)
+file(GLOB_RECURSE CURRENT_HEADERS *.h *.hpp *.cpp *.cc)
 source_group("Include" FILES ${CURRENT_HEADERS})
 
 
 option( _debug "Debug option" ON )
 #add_definitions(-D__GXX_EXPERIMENTAL_CXX0X__)
 
+include_directories(/usr/local/include/c++/4.8.5/)
+include_directories(/usr/local/include)
 include_directories("${CMAKE_SOURCE_DIR}")
 include_directories(${CMAKE_SOURCE_DIR}/thirdpart/rapidjson)
 include_directories(${CMAKE_SOURCE_DIR}/thirdpart/thrift/thrift-0.9.3)
@@ -41,20 +43,18 @@ include_directories(${CMAKE_SOURCE_DIR}/thirdpart/thrift/thrift-0.9.3/lib/cpp/sr
 #include_directories(${PROJECT_SOURCE_DIR}/thirdpart/concurrentqueue)
 #include_directories(${PROJECT_SOURCE_DIR}/thirdpart/concurrentqueue/concurrentqueue-src)
 
-
 aux_source_directory(. SRC_LIST)
 aux_source_directory(./muduo/base BASE_LIST)
 aux_source_directory(./muduo/net  NET_LIST)
 aux_source_directory(./muduo/net/poller  POLLER_LIST)
 #aux_source_directory(./poco              POCO_LIST)
 
-#add_executable(${PROJECT_NAME} ${SRC_LIST} ${BASE_LIST}  ${NET_LIST}  ${POLLER_LIST} )
+aux_source_directory(cthrift      CTHRIFT_SRC)
+aux_source_directory(cthrift/util CTHRIFT_UTIL)
+
 
 link_directories(${LIBRARY_OUTPUT_PATH})
-#link_directories(/usr/lib)
-link_directories(/usr/local/lib)
-link_directories(/opt/openssl/lib/)
-
+link_directories(/opt/gmssl/lib/)
 
 
 add_subdirectory(thirdpart/thrift)
@@ -62,14 +62,12 @@ add_subdirectory(thirdpart/thrift)
 #add_subdirectory(thirdpart/concurrentqueue-src)
 add_subdirectory(muduo/base)
 add_subdirectory(muduo/net)
+add_subdirectory(cthrift)
 
 add_subdirectory(examples)
 
-
-
 #target_link_libraries(${PROJECT_NAME} uuid pthread log4cplus boost_thread boost_system boost_filesystem )
 #target_link_libraries(${PROJECT_NAME} boost_system rt mysqlcppconn )
-
 
 # if(_debug)
 #     message("here, build debug version")

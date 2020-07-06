@@ -269,12 +269,12 @@ void EventLoop::runInLoop(const Functor& cb)
 {
     if (isInLoopThread())
     {
-//        LOG_INFO << ( "aaaaaaaaaaaaaaaaaaaaaaaaaa" );
+//        LOG_INFO << "new aaaaaaaaaaaaaaaaaaaaaaaaaa";
         cb();
     }
     else
     {
-        LOG_INFO << ( "bbbbbbbbbbbbbbbbbbbbbbbbbb" );
+        LOG_INFO << "new bbbbbbbbbbbbbbbbbbbbbbbbbb";
         queueInLoop(cb);
     }
 }
@@ -284,11 +284,11 @@ void EventLoop::runInLoop(const Functor& cb)
 void EventLoop::runInLoop(Functor&& cb)
 {
     if (isInLoopThread()) {
-        LOG_INFO << ( "new aaaaaaaaaaaaaaaaaaaaaaaaaa" );
+        LOG_INFO << "new aaaaaaaaaaaaaaaaaaaaaaaaaa";
         cb();
     }
     else {
-        LOG_INFO << ( "new bbbbbbbbbbbbbbbbbbbbbbbbbb" );
+        LOG_INFO << "new bbbbbbbbbbbbbbbbbbbbbbbbbb";
         queueInLoop(std::move(cb));
     }
 }

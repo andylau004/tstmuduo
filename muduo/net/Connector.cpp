@@ -92,9 +92,9 @@ void Connector::connect()
     {
     // 下面的表示可以建立连接.因此可以创建 m_channel
     case 0:// 0 表示 是由 ret 复制的 errno 没有发生错误
-    case EINPROGRESS://非阻塞套接字，未连接成功返回码是EINPROGRESS表示正在连接
-    case EINTR:// 被信号中断,设置的errno
-    case EISCONN: //连接成功
+    case EINPROGRESS://115, 非阻塞套接字，未连接成功返回码是EINPROGRESS表示正在连接
+    case EINTR://4, 被信号中断,设置的errno
+    case EISCONN://106, 连接成功
         connecting(sockfd);// 在这些情况下，都认为会连接成功，因此下面就去构造 channel
         break;
 
@@ -103,6 +103,7 @@ void Connector::connect()
     case EADDRNOTAVAIL:
     case ECONNREFUSED:
     case ENETUNREACH:
+        LOG_INFO << "connect failed, errno=" << savedErrno;
         retry(sockfd);
         break;//重连
 
@@ -172,10 +173,25 @@ void Connector::resetChannel()
     channel_.reset();
 }
 
+const char* Connector::stateToString() const
+{   // kDisconnected, kConnecting, kConnected
+    switch (state_)
+    {
+    case kDisconnected:
+        return "kDisconnected";
+    case kConnecting:
+        return "kConnecting";
+    case kConnected:
+        return "kConnected";
+    default:
+        return "unknown state";
+    }
+}
+
 // 当非阻塞的连接,可写的时候,表示连接创建了 然后执行回调函数
 void Connector::handleWrite()
 {
-    LOG_INFO << "Connector::handleWrite " << state_;
+    LOG_INFO << "Connector::handleWrite state=" << stateToString();
 
     // 能够到达这里,状态都是 kConnecting
     if (state_ == kConnecting)
@@ -196,12 +212,15 @@ void Connector::handleWrite()
         }
         else
         {
+            LOG_INFO << "Connector::handle write succ, connected";
             // 没出错的情况下,那么设置 连接成功
             // 然后执行回调函数
             // 但前面可能又执行了关闭连接,所以这里要重新判断
             setState(kConnected);
             if (connect_)
             {
+                // real execute function
+                // 1. TcpClient::newConnection
                 newConnectionCallback_(sockfd);
             }
             else
@@ -219,7 +238,7 @@ void Connector::handleWrite()
 
 void Connector::handleError()
 {
-    LOG_ERROR << "Connector::handleError state=" << state_;
+    LOG_ERROR << "Connector::handleError state=" << stateToString();
     if (state_ == kConnecting)
     {
         int sockfd = removeAndResetChannel();

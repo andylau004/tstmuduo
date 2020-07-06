@@ -8,11 +8,6 @@ project(tst_emplaceback)
 set(EXECUTABLE_OUTPUT_PATH ../../)
 
 
-#include_directories(../gen-cpp)
-
-#aux_source_directory(../gen-cpp O_GENCPP)
-
-
 add_executable(${PROJECT_NAME}
     tst_emplaceback.h tst_emplaceback.cpp
     ${O_GENCPP}

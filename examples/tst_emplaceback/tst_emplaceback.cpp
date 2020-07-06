@@ -2,8 +2,6 @@
 
 #include "tst_emplaceback.h"
 
-
-
 #include <cstdio>
 #include <cstdlib>
 #include <functional>
@@ -12,12 +10,8 @@
 #include <atomic>         // std::atomic
 #include <thread>         // std::thread, std::this_thread::yield
 
-#include <atomic>
-
-
 #include <unordered_set>
 #include <boost/circular_buffer.hpp>
-
 
 #include "muduo/base/common.h"
 

@@ -13,6 +13,7 @@ include_directories(../gen-cpp)
 #aux_source_directory(../gen-cpp O_GENCPP)
 
 add_executable(${PROJECT_NAME}
+    boostany.h boostany.cpp
     c11fun.h c11fun.cpp
     tstbacktrace.h tstbacktrace.cpp
     branch_predict.h branch_predict.cpp

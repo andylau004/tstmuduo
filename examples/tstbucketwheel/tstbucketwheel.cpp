@@ -1,46 +1,25 @@
 
-
-
 #include "tstbucketwheel.h"
 
-
-#include <stdio.h>
-#include <unistd.h>
-#include <sys/poll.h>
-
-
-#include <list>
-
-
-#include <fcntl.h>
-#include <arpa/inet.h>
-#include <assert.h>
-
-#include <unordered_set>
+//#include <unordered_set>
 #include <boost/circular_buffer.hpp>
+#include <boost/function.hpp>
+#include <boost/shared_ptr.hpp>
+#include <boost/unordered_set.hpp>
 
-
-#include "muduo/net/Callbacks.h"
+//#include "muduo/net/Callbacks.h"
 #include "muduo/base/common.h"
 #include "muduo/base/Logging.h"
 
 #include "muduo/net/EventLoop.h"
 #include "muduo/base/Timestamp.h"
-
-#include "muduo/base/libevent.h"
-
 #include "muduo/net/TcpServer.h"
-
-#include <boost/function.hpp>
-#include <boost/shared_ptr.hpp>
-
 
 using namespace std;
 using namespace muduo;
 using namespace muduo::net;
 
-
-using  WeakTcpConnectionPtr = boost::weak_ptr<muduo::net::TcpConnection>;
+using WeakTcpConnectionPtr = boost::weak_ptr<muduo::net::TcpConnection>;
 
 // RFC 862
 class EchoServerEx
@@ -51,21 +30,20 @@ public:
 
 private:
     void onConnection(const muduo::net::TcpConnectionPtr& conn);
-
     void onMessage(const muduo::net::TcpConnectionPtr& conn, muduo::net::Buffer* buf, muduo::Timestamp time);
-
     void onTimer();
-
     void dumpConnectionBuckets();
 
     struct Entry : public muduo::copyable
     {
-        // 初始化时候获得muduo::net::TcpConnection类型对象的弱指针
-        explicit Entry(const WeakTcpConnectionPtr& weakConn) : weakConn_(weakConn) {
+        // 初始化时, 获得 TcpConnection 类型对象弱指针
+        explicit Entry(const WeakTcpConnectionPtr& weakConn)
+            : weakConn_(weakConn)
+        {
         }
-        ~Entry() {// 析构时候将弱指针提升为强指针,提升成功则关闭写端
-            OutputDbgInfo tmp("--------------Entry Obj Destroying beg--------------",
-                              "--------------Entry Obj Destroying beg--------------");
+        ~Entry() {// 析构时候将弱指针提升为强指针, 提升成功则关闭写端
+            OutputDbgInfo tmp("--------------dst Entry Obj beg--------------",
+                              "--------------dst Entry Obj end--------------");
             muduo::net::TcpConnectionPtr conn = weakConn_.lock();
             if (conn) {
                 conn->shutdown();
@@ -74,24 +52,30 @@ private:
         }
         WeakTcpConnectionPtr weakConn_;
     };
-    typedef std/*boost*/::shared_ptr<Entry> EntryPtr;
-    typedef std/*boost*/::weak_ptr<Entry>   WeakEntryPtr;
+    typedef boost::shared_ptr<Entry> EntryPtr;
+    typedef boost::weak_ptr  <Entry> WeakEntryPtr;
 
-    typedef std::unordered_set<EntryPtr>   Bucket;
-    typedef boost::circular_buffer<Bucket> WeakConnectionList;
+    typedef boost::unordered_set<EntryPtr>  Bucket;
+    typedef boost::circular_buffer<Bucket>  WeakConnectionList;
 
     muduo::net::TcpServer server_;
-    WeakConnectionList connectionBuckets_;// 存放连接的强指针
+    WeakConnectionList    connectionBuckets_;// 存放连接的强指针
     // connectionBuckets是个循环队列，当往队尾插入一个元素空的Bucket时候，
-    // 队头就会被删掉，此时队头的Bucket中每个EntryPtr的引用计数均会-1的，当该EntryPtr的引用计数值为0时候就会调用Entry对象的析构函数
+    // 队头就会被删掉，此时队头Bucket中每个EntryPtr的引用计数均会-1，
+    // 当该EntryPtr的引用计数值为0时, 调用Entry析构
 };
 
 EchoServerEx::EchoServerEx(EventLoop* loop, const InetAddress& listenAddr, int idleSeconds)
-    : server_(loop, listenAddr, "EchoServer"), connectionBuckets_(idleSeconds)
+    : server_(loop, listenAddr, "EchoServer"),
+      connectionBuckets_(idleSeconds)
 {
-    server_.setConnectionCallback(boost::bind(&EchoServerEx::onConnection, this, _1));
-    server_.setMessageCallback(boost::bind(&EchoServerEx::onMessage, this, _1, _2, _3));
+    server_.setConnectionCallback(
+                boost::bind(&EchoServerEx::onConnection, this, _1));
+    server_.setMessageCallback(
+                boost::bind(&EchoServerEx::onMessage, this, _1, _2, _3));
+
     loop->runEvery(1.0, boost::bind(&EchoServerEx::onTimer, this));
+
     connectionBuckets_.resize(idleSeconds);
     dumpConnectionBuckets();
 }
@@ -100,38 +84,38 @@ void EchoServerEx::start() { server_.start(); }
 
 void EchoServerEx::onConnection(const TcpConnectionPtr& conn)
 {
-    LOG_INFO << "EchoServerEx - " << conn->peerAddress().toIpPort() << " -> "
-             << conn->localAddress().toIpPort() << " is "
-             << (conn->connected() ? "UP" : "DOWN");
+    LOG_INFO << "EchoServerEx - (" << conn->peerAddress().toIpPort() << ") -> ("
+             << conn->localAddress().toIpPort() << ") is "
+             << (conn->connected() ? "up" : "down");
 
     if (conn->connected()) {
-        // 当客户端连接上时候，客户的conn为TcpConnectionPtr；
+        // 当客户端连接上时，客户的conn为TcpConnectionPtr；
         EntryPtr entry(new Entry(conn)); // 强引用计数+1
         connectionBuckets_.back().insert(entry);// 将该强引用指针放入Bucket的末尾的set中
 
         dumpConnectionBuckets();
 
-        WeakEntryPtr weakEntry(entry); //将弱指针保存在conn中,如果将强指针存于conn中则永远删不掉
+        WeakEntryPtr weakEntry(entry); // 将弱指针保存在conn中,如果将强指针存于conn中则永远删不掉
         conn->setContext(weakEntry);
     } else {
         assert(!conn->getContext().empty());
         WeakEntryPtr weakEntry(boost::any_cast<WeakEntryPtr>(conn->getContext()));
-        LOG_DEBUG << "Entry use_count = " << weakEntry.use_count();
+        LOG_INFO << "Entry use_count = " << weakEntry.use_count();
     }
 }
 void EchoServerEx::onMessage(const TcpConnectionPtr& conn, Buffer* buf, Timestamp time)
 {
-    string msg(buf->retrieveAllAsString());
-    LOG_INFO << conn->name() << " echo " << msg.size() << " bytes at " << time.toString();
-    conn->send(msg);
+//    std::string msg(buf->retrieveAllAsString());
+    LOG_INFO << "client: " << conn->name() << ", on msg size=" << buf->readableBytes()
+             << " bytes, at time: " << time.toString();
+    conn->send(buf);
 
     assert(!conn->getContext().empty());
     WeakEntryPtr weakEntry(boost::any_cast<WeakEntryPtr>(conn->getContext()));
     EntryPtr entry(weakEntry.lock());
-    if (entry)
-    {
+    if (entry) {
         connectionBuckets_.back().insert(entry);
-        dumpConnectionBuckets();
+//        dumpConnectionBuckets();
     }
 }
 void EchoServerEx::onTimer()
@@ -165,6 +149,33 @@ void EchoServerEx::dumpConnectionBuckets()
     LOG_INFO << "dump Connection Buckets end";
     LOG_INFO << "";
 }
+
+int tst_bucket_wheel_entry(int argc, char *argv[]) {
+    EventLoop loop;
+    InetAddress listenAddr(2007);
+
+    int idleSeconds = 10;
+    if (argc > 1) {
+        idleSeconds = atoi(argv[1]);
+    }
+
+    EchoServerEx server(&loop, listenAddr, idleSeconds);
+    server.start();
+    loop.loop();
+    return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 class CTxxx {
@@ -204,20 +215,3 @@ void tst_wk_shared_fun() {
     else
         std::cout << "cpySp is destroyed" << std::endl;
 }
-int tst_bucket_wheel_entry(int argc, char *argv[]) {
-    EventLoop loop;
-
-    InetAddress listenAddr(2007);
-    int idleSeconds = 10;
-    if (argc > 1) {
-        idleSeconds = atoi(argv[1]);
-    }
-
-    EchoServerEx server(&loop, listenAddr, idleSeconds);
-    server.start();
-    loop.loop();
-    return 0;
-}
-
-
-

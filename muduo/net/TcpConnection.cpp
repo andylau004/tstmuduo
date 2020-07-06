@@ -63,7 +63,8 @@ TcpConnection::TcpConnection(EventLoop* loop,
 {
     channel_->setReadCallback(
                 boost::bind(&TcpConnection::handleRead, this, _1));
-    //如果tcp缓冲区不足以全部容纳数据，就会开启对可写事件的监听，当tcp缓冲区可写，就调用Channel的回调函数，这个回调函数也是在TcpConnection构造函数中传给Channel的
+    //如果tcp缓冲区不足以全部容纳数据，就会开启对可写事件的监听，当tcp缓冲区可写，就调用Channel的回调函数，
+    //这个回调函数也是在TcpConnection构造函数中传给Channel
     channel_->setWriteCallback(
                 boost::bind(&TcpConnection::handleWrite, this));
     channel_->setCloseCallback(
@@ -76,9 +77,9 @@ TcpConnection::TcpConnection(EventLoop* loop,
 
 TcpConnection::~TcpConnection()
 {
-    LOG_INFO  << "TcpConnection::dtor[" <<  name_ << "] at " << this
-              << " fd=" << channel_->fd()
-              << " state=" << stateToString();
+    LOG_INFO << "TcpConnection::dtor[" <<  name_ << "] at " << this
+             << " fd=" << channel_->fd()
+             << " state=" << stateToString();
     assert(state_ == kDisconnected);
 }
 
@@ -125,33 +126,34 @@ void TcpConnection::send(const StringPiece& message)
     }
 }
 
-// FIXME efficiency!!!
-
 // 情景一: 如果 TcpConnection::send() 调用发生在该 TcpConnection 所属的那个 IO 线程，
 // 那么它会转而调用 TcpConnection::sendInLoop()，sendInLoop() 会在当前线程（也就是 IO 线程）操作 output buffer；
 // 情景二: 如果 TcpConnection::send() 调用发生在别的线程，它不会在当前线程调用 sendInLoop() ，
 // 而是通过 EventLoop::runInLoop() 把 sendInLoop() 函数调用转移到 IO 线程（听上去颇为神奇？），
 // 这样 sendInLoop() 还是会在 IO 线程操作 output buffer，不会有线程安全问题。
-// 当然，跨线程的函数转移调用涉及函数参数的跨线程传递，一种简单的做法是把数据拷一份，绝对安全（不明白的同学请阅读代码）。
 
-// 另一种更为高效做法是用 swap()。这就是为什么 TcpConnection::send() 的某个重载以 Buffer* 为参数，而不是 const Buffer&，这样可以避免拷贝，而用 Buffer::swap() 实现高效的线程间数据转移。（最后这点，仅为设想，暂未实现。目前仍然以数据拷贝方式在线程间传递，略微有些性能损失。）
+// 当然，跨线程函数转移调用, 涉及函数参数的跨线程传递, 一种简单的做法是把数据拷一份, 绝对安全（不明白的同学请阅读代码）。
+// 另一种更为高效做法是用 swap()。
+// 这就是为什么 TcpConnection::send() 的某个重载以 Buffer* 为参数，而不是 const Buffer&，这样可以避免拷贝，
+// 而用 Buffer::swap() 实现高效的线程间数据转移。（最后这点，仅为设想，暂未实现。目前仍然以数据拷贝方式在线程间传递，略微有些性能损失。）
 
 // 本函数的两种情况都是执行sendInLoop
 // 但是根据是否跨线程，一种是直接在本线程执行(此时本线程就是loop线程);
-// 另一种是将sendInLoop送入loop的任务队列中
+//                  另一种是将sendInLoop送入loop的任务队列中;
+// FIXME efficiency!!!
 void TcpConnection::send(Buffer* buf)
 {
     if (state_ == kConnected)
     {
         if (loop_->isInLoopThread())
         {
-            LOG_INFO << ( "loop_->isInLoopThread()" );
+            LOG_INFO << "send oper isInLoopThread()";
             sendInLoop(buf->peek(), buf->readableBytes());
             buf->retrieveAll();
         }
         else
         {
-            LOG_INFO << ( "not loop_->isInLoopThread()" );
+            LOG_INFO << "send oper not isInLoopThread()";
             loop_->runInLoop(
                         boost::bind(&TcpConnection::sendInLoop,
                                     this,     // FIXME
@@ -175,30 +177,26 @@ void TcpConnection::sendInLoop(const StringPiece& message)
 void TcpConnection::sendInLoop(const void* data, size_t len)
 {
 //    LOG_INFO << "sendInLoop len=" << len;
-
     loop_->assertInLoopThread();
+
     ssize_t nwrote = 0;
-    /* 没有写入tcp缓冲区的字节数 */
-    size_t remaining = len;
+    size_t remaining = len;// 没有写入tcp缓冲区的字节数
     bool faultError = false;
 
-    /* 当前TcpConnection状态，TcpConnection有四种状态，kDisconnected表示已经断开连接，不能再写了，直接返回 */
-    if (state_ == kDisconnected)
-    {
+    if (state_ == kDisconnected) {
         LOG_WARN << "disconnected, give up writing";
         return;
     }
 
     // if no thing in output queue, try writing directly
-    /* 如果输出缓冲区有数据，就不能尝试发送数据了，否则数据会乱，应该直接写到缓冲区中 */
+    // 如果输出缓冲区有数据，就不能尝试发送数据了，否则数据会乱，应该直接写到缓冲区中
     // 通道没有关注可写事件并且应用层发送缓冲区没有数据，直接write
     if (!channel_->isWriting() && outputBuffer_.readableBytes() == 0)
     {
         nwrote = sockets::write(channel_->fd(), data, len);
         if (nwrote >= 0)
         {
-            /* 写入了一些数据 */
-            remaining = len - nwrote;
+            remaining = len - nwrote;// 写入了一些数据
             /*
              * 完全写入tcp缓冲区，且用户有提供写数据的回调函数，等待执行完后调用
              * 因为当前TcpConnection和EventLoop所在同一个线程，
@@ -218,8 +216,7 @@ void TcpConnection::sendInLoop(const void* data, size_t len)
             nwrote = 0;
             if (errno != EWOULDBLOCK)
             {
-                /* EPIPE表示客户端已经关闭了连接，服务器仍然尝试写入，就会出现EPIPE */
-                LOG_SYSERR << "TcpConnection::sendInLoop";
+                LOG_SYSERR << "TcpConnection::sendInLoop";// EPIPE表示客户端已经关闭了连接，服务器仍然尝试写入，就会出现EPIPE
                 if (errno == EPIPE || errno == ECONNRESET) // FIXME: any others?
                 {
                     faultError = true;
@@ -232,8 +229,7 @@ void TcpConnection::sendInLoop(const void* data, size_t len)
     // 没有错误，并且还有未写完的数据（说明内核发送缓冲区满，要将未写完的数据添加到output buffer中）
     if (!faultError && remaining > 0)
     {
-        /* 获取写缓冲区数据总量 */
-        size_t oldLen = outputBuffer_.readableBytes();
+        size_t oldLen = outputBuffer_.readableBytes();// 获取写缓冲区数据总量
 
         // 如果超过highWaterMark_（高水位标），回调highWaterMarkCallback_
         if (oldLen + remaining >= highWaterMark_
@@ -243,7 +239,9 @@ void TcpConnection::sendInLoop(const void* data, size_t len)
 /*
 高水位回调和低水位回调：在发送数据时，如果发送过快会造成数据在本地积累。
 muduo解决这个问题的办法是用了高水位回调和低水位回调，分别用函数HighWaterMarkCallback和WriteCompleteCallback代表。
-原理为：设置一个发送缓冲区的上限值，如果大于这个上限值，停止接收数据；WriteCompleteCallback函数为发送缓冲区为空时调用，在这个函数重启开启接收数据。
+原理：
+设置一个发送缓冲区的上限值，如果大于这个上限值，停止接收数据；
+WriteCompleteCallback函数为发送缓冲区为空时调用，在这个函数重启开启接收数据。
 */
             loop_->queueInLoop(boost::bind(highWaterMarkCallback_, shared_from_this(), oldLen + remaining));
         }
@@ -393,7 +391,7 @@ void TcpConnection::stopReadInLoop()
 //TcpServer::newConnection() 创建完 TcpConnection 对象，设置好回调函数之后调用的，
 //主要是调用 Channel::enableReading() 将 TcpConnection 对应的 sockfd 注册读事件，
 //然后执行用户指定的 connectionCallback_() ，并将 TcpConnection 状态置为 kConnected。
-//这个函数如何被执行呢？ Acceptor 持有的 fd 有可读事件发生，
+//这个函数如何被执行呢? Acceptor 持有的 fd 有可读事件发生，
 //即有连接请求，此时Channel::handleEvent() -> Acceptor::handleRead() -> TcpServer::newConnection() -> …… ->TcpConnection::connectEstablished()
 //中间省略的部分是线程转移，转移到TcpConnection 所在的 IO 线程执行，TcpServer 和 TcpConnection 可能不在同一线程。
 void TcpConnection::connectEstablished()
@@ -412,9 +410,9 @@ void TcpConnection::connectEstablished()
     //而tie是weak_ptr并不会改变引用计数，所以该函数执行完之后引用计数不会更改
     channel_->tie(shared_from_this());
 
-    // 对于新建连接的socket描述符，还需要设置期望监控的事件（POLLIN | POLLPRI），
-    // 并且将此socket描述符放入poll函数的监控描述符集合中，用于等待接收客户端从此连接上发送来的消息
-    // 这些工作，都是由TcpConnection::connectEstablished函数完成。
+    //对于新建连接的socket，还需要设置监控事件（POLLIN | POLLPRI），
+    //并且将此socket放入poll函数的监控集合中，用于等待接收客户端从此连接上发送来的消息
+    //这些工作，都是由TcpConnection::connectEstablished函数完成。
     channel_->enableReading();
 
     // 此函数对应 TcpServer::connectionCallback_ ,最终指向一个用户服务器定义的回调函数
@@ -495,7 +493,7 @@ void TcpConnection::handleWrite()
     {
         /* 尝试写入写缓冲区的所有数据，返回实际写入的字节数（tcp缓冲区很有可能仍然不能容纳所有数据） */
         ssize_t n = sockets::write(channel_->fd(), outputBuffer_.peek(), outputBuffer_.readableBytes());
-//        LOG_INFO << "handleWrite writelen=" << n;
+        LOG_INFO << "handleWrite writelen=" << n;
         if (n > 0)
         {
             outputBuffer_.retrieve(n);//调整写缓冲区的readerIndex
@@ -524,7 +522,7 @@ void TcpConnection::handleWrite()
         }
         else
         {
-            LOG_SYSERR << "TcpConnection::handleWrite";
+            LOG_SYSERR << "TcpConnection::handleWrite sys error!!!";
             // if (state_ == kDisconnecting)
             // {
             //   shutdownInLoop();
@@ -539,9 +537,9 @@ void TcpConnection::handleWrite()
 }
 
 /*
- * TcpConnection的断开是采用被动方式，即对方先关闭连接，本地read(2)返回0后，调用顺序如下：
-handleClose()->TcpServer::removeConnection->TcpConnection::connectDestroyed()。
- * */
+    TcpConnection的断开是采用被动方式，即对方先关闭连接，本地read返回0后，调用顺序如下：
+    handleClose()->TcpServer::removeConnection->TcpConnection::connectDestroyed()
+*/
 void TcpConnection::handleClose()
 {
     loop_->assertInLoopThread();

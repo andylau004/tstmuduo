@@ -22,7 +22,7 @@
 #include <cstdlib>
 #include <functional>
 
-
+#include <boost/atomic.hpp>
 #include <boost/circular_buffer.hpp>
 
 #include "muduo/base/common.h"
@@ -35,6 +35,11 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/thread/thread.hpp>
 
+#include <boost/circular_buffer.hpp>
+#include <boost/function.hpp>
+#include <boost/shared_ptr.hpp>
+#include <boost/unordered_set.hpp>
+#include <boost/any.hpp>
 
 #include "muduo/net/InetAddress.h"
 #include "muduo/net/Channel.h"
@@ -58,9 +63,13 @@
 #include <thrift/server/TNonblockingServer.h>
 
 
-
 #include "tstbacktrace.h"
 #include "branch_predict.h"
+#include "muduo/base/BlockingQueue.h"
+#include "muduo/base/BoundedBlockingQueue.h"
+
+
+#include "boostany.h"
 
 ///////////////////////////////////
 
@@ -426,10 +435,6 @@ void tst_ref_count_4() {
     getchar();
 }
 
-#include <boost/atomic.hpp>
-#include <atomic>
-
-using namespace std;
 
 atomic_uint64_t  g_tstatomic;// 此处 用的 其实是 boost 内的 原子 类型
 std::atomic<std::uint64_t> g_ucount;// 此处 用的 才是真正c11内置 atmoic 类型
@@ -863,7 +868,6 @@ int tstC11Thrd(void) {
 ////    printf("my_unique_prefix2=%d\n",my_unique_prefix2);
 //}
 
-
 void call_over(bool bval) {
     printf("call_over bval=%d\n", bval);
 }
@@ -872,12 +876,50 @@ void one_way(bool bval) {
 }
 
 void tstDefer() {
+    typedef boost::shared_ptr<President>        PresidentPtr;
+    typedef boost::unordered_set<PresidentPtr>  Bucket;
+    {
+        tst_boost_any();
+        return;
+    }
+//    {
+//        President* obj1 = new President("name1", "usa", 72);
+//        boost::shared_ptr<President> p1(obj1);
+//        {
+//            Bucket obj_bucket;
+//            obj_bucket.insert(p1);
+//            LOG_INFO << "a p1 usecount=" << p1.use_count();
+//        }
+//        LOG_INFO << "b p1 usecount=" << p1.use_count();
+//        return;
+//    }
+    {
+        President* obj1 = new President("name1", "usa", 72);
+        boost::shared_ptr<President> p1(obj1);
+        boost::shared_ptr<President> p2(obj1);
+        if (p1 == p2) {// 两个 shared_ptr 封装了一个内存对象，这两个shared_ptr对象比较时，认为相同；
+            LOG_INFO << "p1 == p2";
+        } else {
+            LOG_INFO << "p1 != p2";
+        }
+
+        Bucket obj_bucket;
+        obj_bucket.insert(p1);
+        obj_bucket.insert(p2);
+
+        LOG_INFO << "bkt size=" << obj_bucket.size();
+        getchar();
+    // output:
+    // 20200704 07:47:54.115630Z 38579 INFO  p1 == p2 - c11fun.cpp:887
+    // 20200704 07:47:54.115696Z 38579 INFO  bkt size=1 - c11fun.cpp:898
+        return;
+    }
+
     int val = EV_READ|EV_PERSIST;
-    std::cout << val << std::endl;
+    LOG_INFO << val;
     return;
 
     bool bval = false;
-
     DeferFunctor pfnExit = boost::function < void() >([&]() {
         call_over(bval);
         one_way(bval);
@@ -1279,10 +1321,148 @@ class CNull {
 
 BOOST_STATIC_ASSERT(sizeof(CSomeThing) == sizeof(int64_t));
 
+
+using Functor = boost::function<void()>;//任务T
+muduo::BoundedBlockingQueue<Functor> gTaskQueue(10);
+
+class TaskObj {
+public:
+    TaskObj(int val)
+        : val_(val)
+    {
+    }
+    void showval() {
+        LOG_INFO << "val=" << val_;
+    }
+private:
+    int val_;
+};
+
+bool running = true;
+void/***/ Producer(/*void* param*/) {
+    LOG_INFO << "producer start, param=";
+
+    int idx = 0;
+    Timestamp begTime;
+
+    while (running) {
+        TaskObj obj(idx++);
+
+        begTime = Timestamp::now();
+
+        gTaskQueue.put(boost::bind(&TaskObj::showval, &obj));
+
+        double cost = timeDifference(Timestamp::now(), begTime);
+        LOG_INFO << "put cost=" << cost;
+    }
+}
+void/***/ Consumer(/*void* param*/) {
+    while(running){
+        Functor task = gTaskQueue.take();
+        task();
+    }
+}
+
+void tstProducerConsumer() {
+//    pthread_t pid0;
+//    pthread_t pid2[2];
+//    ::pthread_create(&pid0, nullptr, Producer, nullptr);
+//    for (int ii = 0; ii < 2; ii ++) {
+//        ::pthread_create(&pid2[i], nullptr, Consumer, nullptr);
+//    }
+//    ::sleep(1);
+
+    muduo::Thread producer1(Producer);
+    producer1.start();
+
+//    muduo::Thread producer2(Producer);
+//    producer2.start();
+
+//    muduo::Thread producer3(Producer);
+//    producer3.start();
+
+//    muduo::Thread producer4(Producer);
+//    producer4.start();
+
+//    producer2.join();
+//    producer3.join();
+//    producer4.join();
+
+    muduo::Thread c1(Consumer);
+    c1.start();
+    muduo::Thread c2(Consumer);
+    c2.start();
+    c1.join();
+    c2.join();
+    producer1.join();
+
+    ::sleep(1);
+}
+
+int tstopenfd(int argc, char* argv[]) {
+    // 第一次打开
+    int a = open("demo.txt", O_RDONLY);
+    // 第二次打开
+    int b = open("demo.txt", O_RDONLY);
+
+    printf("a = %d, b = %d \n", a, b);
+    // 关闭a文件描述符
+    close(a);
+
+    // 第三次打开
+    int c = open("demo.txt", O_RDONLY);
+    printf("b = %d, c = %d \n", b, c);
+    return EXIT_SUCCESS;
+    // output:
+    // a = 3, b = 4
+    // b = 4, c = 3
+}
+
+
+class CTvvv {
+public:
+    CTvvv(int val)
+    {
+        g_val = val;
+        LOG_INFO << "cst CTvvv" << ", init=" << g_val;
+    }
+    ~CTvvv() {
+        LOG_INFO << "dst CTvvv" << ", uninit=" << g_val;
+    }
+    void ShowVal() {
+        LOG_INFO << "val=" << g_val << ", addr=" << &g_val;
+    }
+private:
+    static __thread int g_val;
+};
+__thread int CTvvv::g_val;
+
+void tst__thread() {
+    CTvvv o1(33);
+    CTvvv o2(44);
+    CTvvv o3(77);
+
+    muduo::Thread t1(boost::bind(&CTvvv::ShowVal, &o1));
+    muduo::Thread t2(boost::bind(&CTvvv::ShowVal, &o2));
+    muduo::Thread t3(boost::bind(&CTvvv::ShowVal, &o3));
+    t1.start();
+    t2.start();
+    t3.start();
+
+    t1.join();
+    t2.join();
+    t3.join();
+}
+
 // 2020-6-20
 // add new 测试分支预测
 void tst_c11fun_entry(int argc, char *argv[]) {
 
+    tst__thread(); return;
+
+    tstopenfd(argc, argv); return;
+
+//    tstProducerConsumer(); return;
     tstDefer(); return;
 
     std::cout << "sizeof(CSomeThing)=" << sizeof(CSomeThing) << std::endl;

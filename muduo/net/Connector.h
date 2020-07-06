@@ -43,6 +43,7 @@ public:
     void stop();  // can be called in any thread
 
     const InetAddress& serverAddress() const { return serverAddr_; }
+    const char* stateToString() const;
 
 private:
     enum States { kDisconnected, kConnecting, kConnected };

@@ -189,12 +189,9 @@ int main(int argc, char *argv[]) {
     Logger::setLogLevel(Logger::DEBUG);
     LOG_INFO << "pid = " << getpid() << ", tid = " << CurrentThread::tid();
 
-    tstMultiParseCrt(argc, argv);
-    return 1;
+    tst_threadpoolWork_entry(); return 1;
 
-    tst_pthread_key();
-    return 1;
+    tstMultiParseCrt(argc, argv); return 1;
 
-    tst_threadpoolWork_entry();
-    return 1;
+    tst_pthread_key(); return 1;
 }

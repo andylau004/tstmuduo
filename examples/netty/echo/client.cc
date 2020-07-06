@@ -35,30 +35,32 @@ public:
     }
 private:
     void onConnection(const TcpConnectionPtr& conn) {
-        LOG_INFO << "client, " << conn->localAddress().toIpPort() << " -> "
-                  << conn->peerAddress().toIpPort() << " is "
-                  << (conn->connected() ? "UP" : "DOWN");
+        LOG_INFO << "client (" << conn->localAddress().toIpPort() << ") -> ("
+                 << conn->peerAddress().toIpPort() << ") is "
+                 << (conn->connected() ? "UP" : "DOWN");
 
-        if (conn->connected())
-        {
+        if (conn->connected()) {
             conn->setTcpNoDelay(true);
             conn->send(message_);
         }
         else
         {
+//            conn->disconnected();
             loop_->quit();
         }
     }
     void onMesssage(const TcpConnectionPtr& conn, Buffer* buf, Timestamp time ) {
-        LOG_INFO << "client recv msg=" << buf->peek();
+//        LOG_INFO << "client recv msg=" << buf->peek();
         conn->send(buf);
+        ::usleep(1000 * 200);
+//        loop_->quit();
+//        conn->forceClose();
     }
 
 private:
     EventLoop* loop_;
     TcpClient client_;
     std::string message_;
-
 };
 
 int main(int argc, char* argv[]) {
@@ -68,9 +70,8 @@ int main(int argc, char* argv[]) {
         EventLoop loop;
         InetAddress serverAddr(argv[1], 2007);
 
-        int size = 16;
-        if (argc > 2)
-        {
+        int size = 8;
+        if (argc > 2) {
             size = atoi(argv[2]);
         }
 
