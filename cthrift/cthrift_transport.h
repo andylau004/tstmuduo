@@ -233,6 +233,13 @@ private:
     // for note timeout to clientworker immediately
     boost::shared_ptr<bool> sp_bool_timeout_;
 
+    void AppendReadBuf(const uint8_t* buf, uint32_t len) {
+        muduo::MutexLockGuard lock(*sp_mutexlock_read_buf);
+        if (!sp_read_tmembuf_.unique()) {
+
+        }
+
+    }
 
 };
 

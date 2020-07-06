@@ -1424,10 +1424,10 @@ public:
     CTvvv(int val)
     {
         g_val = val;
-        LOG_INFO << "cst CTvvv" << ", init=" << g_val;
+        LOG_INFO << "cst CTvvv" << ", create=" << g_val;
     }
     ~CTvvv() {
-        LOG_INFO << "dst CTvvv" << ", uninit=" << g_val;
+        LOG_INFO << "dst CTvvv" << ", destroy=" << g_val;
     }
     void ShowVal() {
         LOG_INFO << "val=" << g_val << ", addr=" << &g_val;
@@ -1454,9 +1454,22 @@ void tst__thread() {
     t3.join();
 }
 
+void tst_unique() {
+    boost::shared_ptr<CTvvv> obj(new CTvvv(123));
+
+    LOG_INFO << "obj use count=" << obj.use_count() << ", unique=" << obj.unique();
+    {
+        boost::shared_ptr<CTvvv> cpy = obj;
+        LOG_INFO << "cpy use count=" << cpy.use_count() << ", unique=" << cpy.unique();
+    }
+    LOG_INFO << "obj use count=" << obj.use_count() << ", unique=" << obj.unique();
+}
+
 // 2020-6-20
 // add new 测试分支预测
 void tst_c11fun_entry(int argc, char *argv[]) {
+
+//    tst_unique(); return;
 
     tst__thread(); return;
 
@@ -1480,7 +1493,7 @@ void tst_c11fun_entry(int argc, char *argv[]) {
 
     tst_run(); return;
 
-//    tst_share_1();
+    tst_share_1();
     print_x_val();
     return;
 
