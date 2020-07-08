@@ -231,7 +231,7 @@ void TcpConnection::sendInLoop(const void* data, size_t len)
     {
         size_t oldLen = outputBuffer_.readableBytes();// 获取写缓冲区数据总量
 
-        // 如果超过highWaterMark_（高水位标），回调highWaterMarkCallback_
+        // 如果超过 highWaterMark_ (高水位标)，回调 highWaterMarkCallback_
         if (oldLen + remaining >= highWaterMark_
                 && oldLen < highWaterMark_
                 && highWaterMarkCallback_)
@@ -239,7 +239,7 @@ void TcpConnection::sendInLoop(const void* data, size_t len)
 /*
 高水位回调和低水位回调：在发送数据时，如果发送过快会造成数据在本地积累。
 muduo解决这个问题的办法是用了高水位回调和低水位回调，分别用函数HighWaterMarkCallback和WriteCompleteCallback代表。
-原理：
+原理:
 设置一个发送缓冲区的上限值，如果大于这个上限值，停止接收数据；
 WriteCompleteCallback函数为发送缓冲区为空时调用，在这个函数重启开启接收数据。
 */

@@ -126,9 +126,9 @@ struct SharedBetweenWorkerTransport {
     int8_t GetAsyncWriteBuf(muduo::net::Buffer *p_buf) {
         if (CTHRIFT_UNLIKELY(!p_buf || !sp_send_tmembuf)) {
 //          CTHRIFT_LOG_ERROR("async p_buf OR sp_send_tmembuf NULL");
-          return -1;
+            return -1;
         }
-        uint8_t* buf = nullptr;
+        uint8_t* buf = 0;
         uint32_t u32_len = 0;
 
         sp_send_tmembuf->getBuffer(&buf, &u32_len);
@@ -143,8 +143,7 @@ struct SharedBetweenWorkerTransport {
         return 1;
     }
     int8_t GetWriteBuf(muduo::net::Buffer *p_buf) {
-        boost::shared_ptr<muduo::MutexLock> sp_mutexlock_write_buf
-                = wp_mutexlock_write_buf.lock();
+        boost::shared_ptr<muduo::MutexLock> sp_mutexlock_write_buf = wp_mutexlock_write_buf.lock();
         if (CTHRIFT_UNLIKELY(!sp_mutexlock_write_buf || !p_sp_write_tmembuf)) {
 //            CTHRIFT_LOG_ERROR("p_sp_write_tmembuf OR p_mutexlock_write_buf NULL");
             return -1;
@@ -163,7 +162,7 @@ struct SharedBetweenWorkerTransport {
 //        CTHRIFT_LOG_DEBUG("u32_len " << u32_len);
 
         if (0 == u32_len) {
-            CTHRIFT_LOG_WARN("0 == u32_len");
+//            CTHRIFT_LOG_WARN("0 == u32_len");
             return -1;
         }
 
@@ -173,17 +172,16 @@ struct SharedBetweenWorkerTransport {
     }
 
     void ResetReadBuf(uint8_t *p_buf, uint32_t u32_len) {
-        boost::shared_ptr<muduo::MutexLock> sp_mutexlock_read_buf
-                = wp_mutexlock_read_buf.lock();
+        boost::shared_ptr<muduo::MutexLock> sp_mutexlock_read_buf = wp_mutexlock_read_buf.lock();
         if (CTHRIFT_UNLIKELY(!sp_mutexlock_read_buf || !p_sp_read_tmembuf)) {
-            CTHRIFT_LOG_ERROR("p_sp_read_tmembuf OR p_mutexlock_read_buf NULL");
+//            CTHRIFT_LOG_ERROR("p_sp_read_tmembuf OR p_mutexlock_read_buf NULL");
             return;
         }
 
         muduo::MutexLockGuard lock(*sp_mutexlock_read_buf);
         if (!(p_sp_read_tmembuf->unique())) {
-          // No need copy original buf since reset
-          *p_sp_read_tmembuf = boost::make_shared<TMemoryBuffer>();
+            // No need copy original buf since reset
+            *p_sp_read_tmembuf = boost::make_shared<TMemoryBuffer>();
         }
 
         (*p_sp_read_tmembuf)->resetBuffer(p_buf, u32_len, TMemoryBuffer::COPY);
@@ -191,8 +189,7 @@ struct SharedBetweenWorkerTransport {
 
     void ResetRecvBuf(uint8_t *p_buf, uint32_t u32_len) {
         if (CTHRIFT_UNLIKELY(!p_buf || u32_len <= 0)) {
-//            CTHRIFT_LOG_WARN("p_buf invalid OR u32_len <= 0,"
-//                             << " maybe task timeout befor network transport");
+//            CTHRIFT_LOG_WARN("p_buf invalid OR u32_len <= 0, maybe task timeout befor network transport");
             return;
         }
         // 避免重复buffer拷贝，将传入的内存生命周期交给TMemoryBuffer对象管理
@@ -203,7 +200,6 @@ struct SharedBetweenWorkerTransport {
 
 typedef boost::shared_ptr<SharedBetweenWorkerTransport> SharedContSharedPtr;
 typedef boost::weak_ptr<SharedBetweenWorkerTransport> WeakContSharedPtr;
-
 }
 
 
@@ -235,12 +231,99 @@ private:
 
     void AppendReadBuf(const uint8_t* buf, uint32_t len) {
         muduo::MutexLockGuard lock(*sp_mutexlock_read_buf);
+
         if (!sp_read_tmembuf_.unique()) {
-
+            uint8_t *p_buf = 0;
+            uint32_t u32_len = 0;
+            sp_read_tmembuf_->getBuffer(&p_buf, &u32_len);
+            sp_read_tmembuf_ = boost::make_shared<TMemoryBuffer>(p_buf, u32_len, TMemoryBuffer::COPY);
         }
-
+        sp_read_tmembuf_->write(buf, len);
     }
 
+    void AppendWriteBuf(const uint8_t* buf, uint32_t len) {
+        muduo::MutexLockGuard lock(*sp_mutexlock_write_buf);
+
+        if (!(sp_write_tmembuf_.unique())) {
+            uint8_t *p_buf = 0;
+            uint32_t u32_len = 0;
+
+            sp_write_tmembuf_->getBuffer(&p_buf, &u32_len);
+            sp_write_tmembuf_ = boost::make_shared<TMemoryBuffer>(p_buf, u32_len, TMemoryBuffer::COPY);
+        }
+
+        sp_write_tmembuf_->write(buf, len);
+    }
+
+    uint32_t ReadBufAvaliableReadSize(void) {
+        TMemBufSharedPtr sp_read_buf;
+        {
+            muduo::MutexLockGuard lock(*sp_mutexlock_read_buf);
+            sp_read_buf = sp_read_tmembuf_;
+        }
+        return sp_read_buf->available_read();
+    }
+
+    uint32_t ReadBufRead(uint8_t *buf, uint32_t len) {
+        muduo::MutexLockGuard lock(*sp_mutexlock_read_buf);
+        if (!(sp_read_tmembuf_.unique())) {
+            uint8_t *p_buf = 0;
+            uint32_t u32_len = 0;
+
+            sp_read_tmembuf_->getBuffer(&p_buf, &u32_len);
+            sp_read_tmembuf_ = boost::make_shared<TMemoryBuffer>(p_buf, u32_len, TMemoryBuffer::COPY);
+        }
+
+        return sp_read_tmembuf_->read(buf, len);
+    }
+
+    void ResetReadBuf(void) {
+        muduo::MutexLockGuard lock(*sp_mutexlock_read_buf);
+        if (!(sp_read_tmembuf_.unique())) {
+            // No need copy original buf since reset
+            sp_read_tmembuf_ = boost::make_shared<TMemoryBuffer>();
+        }
+
+        sp_read_tmembuf_->resetBuffer();
+    }
+
+public:
+    CthriftTransport(const std::string &str_svr_appkey,
+                     const int32_t &i32_timeout,
+                     const std::string &str_cli_appkey,
+                     const boost::shared_ptr<CthriftClientWorker>& sp_cthrift_client_worker)
+        : str_svr_appkey_(str_svr_appkey),
+          // cthrift_client already check i32_timeout
+          i32_timeout_ms_(i32_timeout),
+          str_cli_appkey_(str_cli_appkey),
+          cond_ready_read(mutexlock_conn_ready),
+          sp_cthrift_client_worker_(sp_cthrift_client_worker) {
+        sp_mutexlock_read_buf = boost::make_shared<muduo::MutexLock>();
+        sp_mutexlock_write_buf = boost::make_shared<muduo::MutexLock>();
+
+        sp_read_tmembuf_ = boost::make_shared<TMemoryBuffer>();
+        sp_write_tmembuf_ = boost::make_shared<TMemoryBuffer>();
+
+        sp_shared_worker_transport_ = boost::make_shared<
+                SharedBetweenWorkerTransport>(&mutexlock_conn_ready,
+                                              &cond_ready_read,
+                                              sp_mutexlock_read_buf,
+                                              &sp_read_tmembuf_,
+                                              sp_mutexlock_write_buf,
+                                              &sp_write_tmembuf_,
+                                              i32_timeout_ms_);
+    }
+
+    virtual uint32_t read_virt(uint8_t *buf, uint32_t len) throw
+    (TTransportException);
+
+    virtual void write_virt(const uint8_t *buf, uint32_t len);
+
+    void flush(void) throw(TTransportException);
+
+    void SetID2Transport(const std::string &str_id);
+
+    void ResetWriteBuf(void);
 };
 
 

@@ -50,15 +50,19 @@
 #include <list>
 
 
+
 #include <boost/make_shared.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/unordered_set.hpp>
+#include <boost/unordered_map.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/bind.hpp>
 #include <boost/shared_array.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/function.hpp>
 #include <boost/algorithm/string.hpp>
+#include <boost/circular_buffer.hpp>
+
 
 #include <thrift/protocol/TBinaryProtocol.h>
 #include <thrift/transport/TBufferTransports.h>
@@ -104,7 +108,7 @@
 #include "log4cplus.h"
 #include "cthrift_config.h"
 
-//#include <mns_sdk/mns_sdk.h>
+//#include "mns_sdk/mns_sdk.h"
 //#include <octoidl/naming_data_types.h>
 //#include <octoidl/naming_common_types.h>
 
@@ -117,6 +121,13 @@ extern "C" {
 #endif
 #include <zookeeper/zookeeper.h>
 }
+
+
+
+#define THRIFT_OVERLOAD_IF_DEFN(T, Y)                                                              \
+  typename ::boost::enable_if<typename ::boost::is_convertible<T*, Y*>::type, void*>::type
+
+#define THRIFT_OVERLOAD_IF(T, Y) THRIFT_OVERLOAD_IF_DEFN(T, Y) = NULL
 
 
 namespace meituan_cthrift {
@@ -246,6 +257,21 @@ std::string StrToLower(const std::string &str_tmp);
 extern const int16_t kI16CpuNum;
 
 extern muduo::AtomicInt32 g_atomic_i32_seq_id;
+
+
+#define MNS_SAFE_DELETE(p) { if(p) { delete (p); (p)=NULL; } }
+#define MNS_SAFE_FREE(p) { if(p) { free(p); (p)=NULL; } }
+#define MNS_SAFE_DELETE_ARRAY(p) { if(p) { delete[] (p); (p)=NULL; } }
+#define MNS_SAFE_RELEASE(p) { if(p) { (p)->Release(); (p)=NULL; } }
+
+#define  kDRetryIntervalSec  10.0
+#define  kI32DefaultTimeoutMS 5000
+#define  kI32DefaultTimeoutForReuestMS 100
+
+typedef enum {
+  PROD, STAGING, DEV, PPE, TEST
+} Appenv;
+
 
 #endif  // CTHRIFT_SRC_CTHRIFT_UTIL_CTHRIFT_COMMON_H_
 

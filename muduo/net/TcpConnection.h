@@ -162,7 +162,7 @@ private:
 
     // 将所有的数据都发送完 writeCompleCallback回调 继续发送
     WriteCompleteCallback writeCompleteCallback_;// 低水位回调函数
-    HighWaterMarkCallback highWaterMarkCallback_;// 高水位回调函数 outbuffer快满了
+    HighWaterMarkCallback highWaterMarkCallback_;// 高水位回调函数 outbuffer 快满了
 
     CloseCallback closeCallback_;
     size_t highWaterMark_;

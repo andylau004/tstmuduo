@@ -1,6 +1,7 @@
 
 
 
+set(EXECUTABLE_OUTPUT_PATH ../../../)
 
 SET(CTHRIFT_SRC
         cthrift_svr.cc
@@ -9,6 +10,8 @@ SET(CTHRIFT_SRC
         cthrift_name_service.h
         cthrift_transport.cc
         cthrift_transport.h
+        cthrift_tbinary_protocol.cc
+        cthrift_tbinary_protocol.h
         cthrift_client_worker.cc
         cthrift_client_worker.h
         cthrift_client.cc
@@ -37,10 +40,15 @@ SET(MNS_ZK_SRC
         )
     include_directories(/usr/local/include/c++/4.8.5/)
     include_directories(/usr/local/include)
+    INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/thrid/include)
+    INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/thrid/include/thrift)
 
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -gdwarf-2 -Wno-deprecated -ffunction-sections -W -Wall -pthread -Wno-missing-braces -Wparentheses -std=c++11" )
+# -std=c++11
 
 ADD_LIBRARY(cthrift STATIC ${CTHRIFT_SRC} ${MNS_ZK_SRC})
 #ADD_LIBRARY(cthrift_dynamic SHARED ${CTHRIFT_SRC} ${MNS_ZK_SRC})
+target_link_libraries(cthrift muduo_base muduo_net pthread boost_system boost_thread muduo_base muduo_net rt thriftnb thrift event ssl crypto)
 
 #SET_TARGET_PROPERTIES(cthrift_dynamic PROPERTIES OUTPUT_NAME "cthrift")
 

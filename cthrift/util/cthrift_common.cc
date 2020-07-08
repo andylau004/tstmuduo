@@ -62,27 +62,23 @@ int32_t meituan_cthrift::GetStringLimit() {
 bool meituan_cthrift::CheckOverTime(const muduo::Timestamp &timestamp,
                                     const double &d_overtime_secs,
                                     double *p_d_left_secs) {
-  double
-      d_time_diff_secs = timeDifference(Timestamp::now(), timestamp);
+    double d_time_diff_secs = timeDifference(Timestamp::now(), timestamp);
 
 //  CTHRIFT_LOG_DEBUG("d_time_diff_secs " << d_time_diff_secs);
 
-  if (p_d_left_secs) {
-    *p_d_left_secs = d_overtime_secs >
-        d_time_diff_secs ? d_overtime_secs - d_time_diff_secs : 0;
-  }
+    if (p_d_left_secs) {
+        *p_d_left_secs = d_overtime_secs >
+                d_time_diff_secs ? d_overtime_secs - d_time_diff_secs : 0;
+    }
 
-  if (d_overtime_secs < d_time_diff_secs
-      || (CheckDoubleEqual(
-          d_overtime_secs,
-          d_time_diff_secs))) {
+    if (d_overtime_secs < d_time_diff_secs ||
+            (CheckDoubleEqual(d_overtime_secs, d_time_diff_secs))) {
 //    CTHRIFT_LOG_WARN("overtime " << d_overtime_secs << "secs, timediff "
 //                                 << d_time_diff_secs << " secs");
+        return true;
+    }
 
-    return true;
-  }
-
-  return false;
+    return false;
 }
 
 bool meituan_cthrift::ValidatePort(const unsigned int &port) {

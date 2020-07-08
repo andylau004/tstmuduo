@@ -95,7 +95,7 @@ void EchoServerEx::onConnection(const TcpConnectionPtr& conn)
 
         dumpConnectionBuckets();
 
-        WeakEntryPtr weakEntry(entry); // 将弱指针保存在conn中,如果将强指针存于conn中则永远删不掉
+        WeakEntryPtr weakEntry(entry); // 将弱指针保存在conn中，如果将强指针存于conn中则永远删不掉
         conn->setContext(weakEntry);
     } else {
         assert(!conn->getContext().empty());
