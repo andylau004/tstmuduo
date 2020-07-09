@@ -3,59 +3,37 @@
 
 
 
-
+#include <stdio.h>
 #include <iostream>
-
 #include <sstream>
 
 
 
-
-
-#include "tst_1.h"
+#include <boost/bind.hpp>
 
 #include "codeconvert.h"
 
-
 //#include "poco/Bugcheck.h"
 //#include "poco/Foundation.h"
-
 //#include "poco/Alignment.h"
 
 #include "muduo/net/InetAddress.h"
-
 #include "muduo/net/Channel.h"
-
 #include "muduo/net/EventLoop.h"
 #include "muduo/net/EventLoopThread.h"
 #include "muduo/net/EventLoopThreadPool.h"
 #include "muduo/net/TcpServer.h"
-
 #include "muduo/base/Logging.h"
-
 #include "muduo/net/TcpClient.h"
 
-#include "discardserver.h"
-
-#include "quicksort.h"
-#include "tst_signal.h"
 #include "mysqlinsert.h"
 #include "cpp11fun.h"
-
-
-#include <boost/bind.hpp>
-
-#include <stdio.h>
-
+#include "tstidleconnection_srv.h"
 
 
 using namespace std;
 using namespace muduo;
 using namespace muduo::net;
-
-
-#include "tstidleconnection_srv.h"
-
 
 
 

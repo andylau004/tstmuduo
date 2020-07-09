@@ -16,7 +16,7 @@
 
 #include <time.h>
 #include <sys/time.h>
-#include "tst_1.h"
+//#include "tst_1.h"
 
 #include "codeconvert.h"
 
@@ -31,13 +31,8 @@
 #include "muduo/net/TcpServer.h"
 
 #include "muduo/base/Logging.h"
-
 #include "muduo/net/TcpClient.h"
 
-#include "discardserver.h"
-
-#include "quicksort.h"
-#include "tst_signal.h"
 #include "mysqlinsert.h"
 #include "cpp11fun.h"
 
