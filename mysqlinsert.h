@@ -14,10 +14,6 @@
 
 
 
-#include "common.h"
-
-
-
 
 extern void tst_insert_badword();
 
