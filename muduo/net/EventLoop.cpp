@@ -85,7 +85,7 @@ EventLoop::EventLoop()
       wakeupChannel_(new Channel(this, wakeupFd_)),
       currentActiveChannel_(NULL)
 {
-    LOG_INFO << "wakeupFd_=" << wakeupFd_;
+//    LOG_INFO << "wakeupFd_=" << wakeupFd_;
 
 //    LOG_DEBUG << "EventLoop created " << this << " in thread " << threadId_;
     // 如果t_loopInThisThread不为空，那么说明本线程已经开启了一个EventLoop
@@ -288,7 +288,7 @@ void EventLoop::runInLoop(Functor&& cb)
         cb();
     }
     else {
-        LOG_INFO << "new bbbbbbbbbbbbbbbbbbbbbbbbbb";
+//        LOG_INFO << "new bbbbbbbbbbbbbbbbbbbbbbbbbb";
         queueInLoop(std::move(cb));
     }
 }

@@ -182,6 +182,40 @@ void tstMultiParseCrt(int argc, char *argv[]) {
     LOG_INFO << "fail count=" << g_failCount.get();
 }
 
+
+void WorkerFun(int idx, muduo::CountDownLatch *p_countdown) {
+
+//    LOG_INFO << "workerIdx=" << idx << " is running...";
+    DeferFunctor pfnExit = boost::function < void() >([&]() {
+        LOG_INFO << "workerIdx=" << idx << " is exiting...";
+    });
+
+    if (idx == 2) {
+        LOG_INFO << "I am idx2 thread, sleep moment";
+        sleep(5);
+    }
+
+    p_countdown->countDown();
+}
+
+void tst_countdown_fun() {
+    int numThread = 4;
+
+    muduo::CountDownLatch cdlatch(numThread);
+
+    for (int i = 0; i < numThread; i ++) {
+        muduo::net::EventLoopThread* pt = new muduo::net::EventLoopThread;
+        pt->startLoop()->runInLoop(boost::bind(&WorkerFun,
+                                               i,
+                                               &cdlatch));
+    }
+
+//    LOG_INFO << "before cdlatch wait";
+    cdlatch.wait();
+    LOG_INFO << "after cdlatch wait";
+
+}
+
 int main(int argc, char *argv[]) {
     UNUSED(argc);
     UNUSED(argv);
@@ -189,7 +223,9 @@ int main(int argc, char *argv[]) {
     Logger::setLogLevel(Logger::DEBUG);
     LOG_INFO << "pid = " << getpid() << ", tid = " << CurrentThread::tid();
 
-    tst_threadpoolWork_entry(); return 1;
+    tst_countdown_fun(); return 1;
+
+    tst_threadpoolWork_entry();  return 1;
 
     tstMultiParseCrt(argc, argv); return 1;
 

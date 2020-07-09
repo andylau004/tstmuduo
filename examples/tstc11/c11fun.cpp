@@ -1473,23 +1473,29 @@ void tst_unique() {
 
 void tst_htonl_fun() {
     int len = 1024;
-
     LOG_INFO << "htonl(len-4)=" << htonl(len-4);
     LOG_INFO << "htonl(len)-4=" << htonl(len)-4;
 }
+
+void tst_trim() {
+    std::string tmp = " adfasdf 111 ";
+    boost::trim(tmp);
+    LOG_INFO << "tmp=" << tmp;
+}
+
+
+muduo::MutexLock gMtx;
+
 
 // 2020-6-20
 // add new 测试分支预测
 void tst_c11fun_entry(int argc, char *argv[]) {
 
+    tst_trim();      return;
+
     tst_htonl_fun(); return;
 
     tst_thrd_local(); return;
-
-    std::string tmp = " adfasdf 111 ";
-    boost::trim(tmp);
-    LOG_INFO << "tmp=" << tmp;
-    return;
 
 //    tst_unique(); return;
 

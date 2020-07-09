@@ -3,11 +3,6 @@
 
 #include "tpwork.h"
 
-//#include <stdio.h>
-//#include <iostream>
-//#include <string>
-
-//#include <list>
 
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
