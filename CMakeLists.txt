@@ -34,7 +34,7 @@ source_group("Include" FILES ${CURRENT_HEADERS})
 option( _debug "Debug option" ON )
 #add_definitions(-D__GXX_EXPERIMENTAL_CXX0X__)
 
-include_directories(/usr/local/include/c++/4.8.5/)
+#include_directories(/usr/local/include/c++/4.8.5/)
 include_directories(/usr/local/include)
 include_directories("${CMAKE_SOURCE_DIR}")
 include_directories(${CMAKE_SOURCE_DIR}/thirdpart/rapidjson)
@@ -44,13 +44,17 @@ include_directories(${CMAKE_SOURCE_DIR}/thirdpart/thrift/thrift-0.9.3/lib/cpp/sr
 #include_directories(${PROJECT_SOURCE_DIR}/thirdpart/concurrentqueue/concurrentqueue-src)
 
 aux_source_directory(. SRC_LIST)
-aux_source_directory(./muduo/base BASE_LIST)
-aux_source_directory(./muduo/net  NET_LIST)
-aux_source_directory(./muduo/net/poller  POLLER_LIST)
-#aux_source_directory(./poco              POCO_LIST)
+aux_source_directory(muduo/base BASE_LIST)
+aux_source_directory(muduo/net  NET_LIST)
+aux_source_directory(muduo/net/poller  POLLER_LIST)
+#aux_source_directory(poco              POCO_LIST)
 
 aux_source_directory(cthrift      CTHRIFT_SRC)
 aux_source_directory(cthrift/util CTHRIFT_UTIL)
+
+#aux_source_directory(cthrift/mns_sdk MNS_SDK_SRC)
+#aux_source_directory(cthrift/mns_sdk/util MNS_SDK_UTIL_SRC)
+#aux_source_directory(cthrift/octoidl OCTOIDL_SRC)
 
 
 link_directories(${LIBRARY_OUTPUT_PATH})

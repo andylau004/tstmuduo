@@ -100,7 +100,6 @@
 
 //#include <concurrency/PosixThreadFactory.h>
 
-
 #include <thirdpart/rapidjson/document.h>
 #include <thirdpart/rapidjson/writer.h>
 #include <thirdpart/rapidjson/stringbuffer.h>
@@ -108,9 +107,9 @@
 #include "log4cplus.h"
 #include "cthrift_config.h"
 
-//#include "mns_sdk/mns_sdk.h"
-//#include <octoidl/naming_data_types.h>
-//#include <octoidl/naming_common_types.h>
+#include "../mns_sdk/mns_sdk.h"
+#include "../octoidl/naming_data_types.h"
+#include "../octoidl/naming_common_types.h"
 
 extern "C" {
 #ifdef htonl
@@ -268,9 +267,9 @@ extern muduo::AtomicInt32 g_atomic_i32_seq_id;
 #define  kI32DefaultTimeoutMS 5000
 #define  kI32DefaultTimeoutForReuestMS 100
 
-typedef enum {
-  PROD, STAGING, DEV, PPE, TEST
-} Appenv;
+//typedef enum {
+//  PROD, STAGING, DEV, PPE, TEST
+//} Appenv;
 
 
 #endif  // CTHRIFT_SRC_CTHRIFT_UTIL_CTHRIFT_COMMON_H_

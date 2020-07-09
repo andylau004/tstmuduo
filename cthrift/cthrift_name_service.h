@@ -52,10 +52,10 @@ class CthriftNameService {
 //  static CthriftNsInterface ns_interface_;
 
   CthriftNameService(void) throw(TException);
-//  static void PackDefaultSgservice(const std::string &str_svr_appkey,
-//                                   const std::string &str_local_ip,
-//                                   const uint16_t &u16_port,
-//                                   meituan_mns::SGService *p_sgservice);
+  static void PackDefaultSgservice(const std::string &str_svr_appkey,
+                                   const std::string &str_local_ip,
+                                   const uint16_t &u16_port,
+                                   meituan_mns::SGService *p_sgservice);
 
 //  static std::string SGService2String(const meituan_mns::SGService &sgservice);
 

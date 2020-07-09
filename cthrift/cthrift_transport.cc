@@ -5,14 +5,13 @@
 using namespace apache::thrift::transport;
 using namespace meituan_cthrift;
 
-uint32_t CthriftTransport::read_virt(uint8_t *buf,
-                                     uint32_t len) throw(TTransportException) {
+uint32_t CthriftTransport::read_virt(uint8_t *buf, uint32_t len) throw(TTransportException) {
     bool b_timeout;
     double d_left_secs = 0.0;
 
     while (1) {
         if (0 == ReadBufAvaliableReadSize()) {
-//          CTHRIFT_LOG_DEBUG("wait for read buf");
+          CTHRIFT_LOG_DEBUG("wait for read buf");
         } else {
             return ReadBufRead(buf, len);
         }
@@ -27,16 +26,16 @@ uint32_t CthriftTransport::read_virt(uint8_t *buf,
 
             if (b_timeout) {
                 if (CTHRIFT_UNLIKELY(ReadBufAvaliableReadSize())) {
-//                    CTHRIFT_LOG_DEBUG("miss notify, but buf already get");
+                    CTHRIFT_LOG_DEBUG("miss notify, but buf already get");
                     return ReadBufRead(buf, len);
                 }
                 break;
             }
 
         } else if (ReadBufAvaliableReadSize()) {  // check again for safe
-//            CTHRIFT_LOG_DEBUG("get read buf for appkey " << str_svr_appkey_
-//                                                         << " id "
-//                                                         << sp_shared_worker_transport_->str_id);
+            CTHRIFT_LOG_DEBUG("get read buf for appkey " << str_svr_appkey_
+                                                         << " id "
+                                                         << sp_shared_worker_transport_->str_id);
             // TODO(正常读取消息的场景下不用删除map中的context？)
             return ReadBufRead(buf, len);
         } else {
@@ -139,18 +138,19 @@ void CthriftTransport::flush(void) throw(TTransportException) {
     size_t sz_queue_size = sp_cthrift_client_worker_->getP_event_loop_()->queueSize();
 
     if (CTHRIFT_UNLIKELY(10 <= sz_queue_size)) {
-//        CTHRIFT_LOG_WARN("worker queue size " << sz_queue_size);
+        CTHRIFT_LOG_WARN("worker queue size " << sz_queue_size);
     } else {
-//        CTHRIFT_LOG_DEBUG("worker queue size " << sz_queue_size);
+        CTHRIFT_LOG_DEBUG("worker queue size " << sz_queue_size);
     }
 
     SharedContSharedPtr sp_shared
             = boost::make_shared<SharedBetweenWorkerTransport>(*sp_shared_worker_transport_);
 
-    sp_cthrift_client_worker_->getP_event_loop_()->runInLoop(
-                boost::bind(&CthriftClientWorker::SendTransportReq,
-                            sp_cthrift_client_worker_.get(),
-                            sp_shared));    // NOT sp_shared_worker_transport_ itself
+    auto pfnSend = boost::bind(&CthriftClientWorker::SendTransportReq,
+                               sp_cthrift_client_worker_.get(),
+                               sp_shared);
+
+    sp_cthrift_client_worker_->getP_event_loop_()->runInLoop(pfnSend);    // NOT sp_shared_worker_transport_ itself
 }
 
 // call by cthrift_protocol

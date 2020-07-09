@@ -31,6 +31,7 @@ void CthriftClientChannel::sendAndRecvMessage(
     uint8_t *src_buf;
     uint32_t sz = 0;
     sendBuf->getBuffer(&src_buf, &sz);
+
     TMemBufSharedPtr sp_send_tmembuf_ = boost::make_shared<TMemoryBuffer>();
     sp_send_tmembuf_->resetBuffer(src_buf, sz, TMemoryBuffer::COPY);
 
@@ -41,13 +42,12 @@ void CthriftClientChannel::sendAndRecvMessage(
     try {
         str_id = boost::lexical_cast<std::string>(seqid);
     } catch (boost::bad_lexical_cast &e) {
-//        CTHRIFT_LOG_ERROR("boost::bad_lexical_cast :" << e.what()
-//                          << "seqid " << seqid);
-
+        CTHRIFT_LOG_ERROR("boost::bad_lexical_cast :" << e.what()
+                          << "seqid " << seqid);
         return;
     }
-//    CTHRIFT_LOG_DEBUG("async sp_send_tmembuf_ message "
-//                      "id: " << str_id << " & size: " << sz);
+    CTHRIFT_LOG_DEBUG("async sp_send_tmembuf_ message "
+                      "id: " << str_id << " & size: " << sz);
     sendBuf->resetBuffer();
 
     // 构建上下文内容

@@ -38,14 +38,14 @@ int32_t CthriftTBinaryProtocolT<TMemoryBuffer>::GetSeqID(void) {
         readString(str_name);
         readI32(i32_seq_id);
 
-        //CTHRIFT_LOG_DEBUG("seq_id " << i32_seq_id);
+        CTHRIFT_LOG_DEBUG("seq_id " << i32_seq_id);
         return i32_seq_id;
     } else if (0 <= i32_size && !(this->strict_read_)) {
         readStringBody(str_name, i32_size);
         readByte(i8_type);
         readI32(i32_seq_id);
 
-        //CTHRIFT_LOG_DEBUG("seq_id " << i32_seq_id);
+        CTHRIFT_LOG_DEBUG("seq_id " << i32_seq_id);
         return i32_seq_id;
     }
 
@@ -129,10 +129,8 @@ writeMessageBegin(const std::string &name,
         try {
             str_id = boost::lexical_cast<std::string>(i32_seq_id);
         } catch (boost::bad_lexical_cast &e) {
-
-//            CTHRIFT_LOG_ERROR("boost::bad_lexical_cast :" << e.what()
-//                              << "i32_seq_id : "
-//                              << i32_seq_id);
+            CTHRIFT_LOG_ERROR("boost::bad_lexical_cast :" << e.what()
+                              << "i32_seq_id : " << i32_seq_id);
         }
 
         boost::dynamic_pointer_cast<CthriftTransport>
@@ -566,9 +564,9 @@ uint32_t CthriftTBinaryProtocolT<Transport_>::readStringBody(std::string &str,
         throw TProtocolException(TProtocolException::NEGATIVE_SIZE);
     }
     if (this->string_limit_ > 0 && size > this->string_limit_) {
-//        CTHRIFT_LOG_ERROR("throw  TProtocolException::SIZE_LIMIT : "
-//                          << this->string_limit_
-//                          << " read size:" << size);
+        CTHRIFT_LOG_ERROR("throw  TProtocolException::SIZE_LIMIT : "
+                          << this->string_limit_
+                          << " read size:" << size);
         throw TProtocolException(TProtocolException::SIZE_LIMIT);
     }
 

@@ -996,24 +996,30 @@ void tst_align() {
 
 }
 
-__thread unsigned int some_count = 1;
-//thread_local unsigned int some_count = 1;
+//__thread unsigned int some_count = 1;
+thread_local unsigned int some_count = 1;
 std::mutex count_mtx;
 
 void thread_func(const std::string& thread_name) {
     ++some_count;
     std::lock_guard<std::mutex> lock(count_mtx);
-    std::cout << "Rage counter for " << thread_name << ", addr=" << &some_count << ", val=" << some_count << '\n';
+    size_t findPos = thread_name.find("aaa");
+    if (findPos == std::string::npos) {
+        some_count = 1024;
+    } else {
+        some_count = 4096;
+    }
+    LOG_INFO << thread_name << ", addr=" << &some_count << ", val=" << some_count;
 }
 void tst_thrd_local() {
     DeferFunctor pfnExit = boost::function < void() >([&]() {
-        printf("tst_thrd_local function done -----------------\n");
+        LOG_INFO << ("tst_thrd_local function done -----------------");
     });
 
-    std::thread t1(thread_func, "thrd aaa"), t2(thread_func, "thrd bbb");
+    std::thread t1(thread_func, " thrd aaa"), t2(thread_func, " thrd bbb");
     {
         std::lock_guard< std::mutex> lock(count_mtx);
-        std::cout << "main thrd, addr=" << &some_count << ", val=" << some_count << '\n';
+        LOG_INFO << "main thrd, addr=" << &some_count << ", val=" << some_count;
     }
     t1.join();t2.join();
 }
@@ -1465,9 +1471,25 @@ void tst_unique() {
     LOG_INFO << "obj use count=" << obj.use_count() << ", unique=" << obj.unique();
 }
 
+void tst_htonl_fun() {
+    int len = 1024;
+
+    LOG_INFO << "htonl(len-4)=" << htonl(len-4);
+    LOG_INFO << "htonl(len)-4=" << htonl(len)-4;
+}
+
 // 2020-6-20
 // add new 测试分支预测
 void tst_c11fun_entry(int argc, char *argv[]) {
+
+    tst_htonl_fun(); return;
+
+    tst_thrd_local(); return;
+
+    std::string tmp = " adfasdf 111 ";
+    boost::trim(tmp);
+    LOG_INFO << "tmp=" << tmp;
+    return;
 
 //    tst_unique(); return;
 
@@ -1500,7 +1522,6 @@ void tst_c11fun_entry(int argc, char *argv[]) {
     tst_stdmove();
     pfff1("xxv");
     return;
-    tst_thrd_local(); return;
     tst_align(); return;
 
     tstC11Thrd(); return;

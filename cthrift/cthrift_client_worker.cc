@@ -1,7 +1,5 @@
 
 
-
-
 #include "cthrift_tbinary_protocol.h"
 #include "cthrift_client_worker.h"
 
@@ -10,7 +8,7 @@ using namespace muduo::net;
 using namespace meituan_cthrift;
 
 const int32_t CthriftClientWorker::kI32HighWaterSize = 64 * 1024;  // 64K
-const int8_t CthriftClientWorker::kI8TimeWheelNum = 2;
+const int8_t CthriftClientWorker::kI8TimeWheelNum = 5;
 
 //void ConnInfo::UptSgservice(const meituan_mns::SGService &sgservice) {
 //    double d_old_weight = CthriftNameService::FetchOctoWeight(sgservice_.fweight,
@@ -38,11 +36,8 @@ const int8_t CthriftClientWorker::kI8TimeWheelNum = 2;
 
 void ConnInfo::setSp_tcpclient_(const TcpClientSharedPtr &sp_tcpclient) {
     if (CTHRIFT_UNLIKELY(sp_tcpclient_.get())) {
-//        CTHRIFT_LOG_ERROR("client ip: " << (sp_tcpclient_->connection()
-//                                            ->peerAddress()).toIp() << " port: "
-//                          << (sp_tcpclient_->connection()->peerAddress()).toPort()
-//                          << " replace");
-
+        CTHRIFT_LOG_ERROR("client ip: " << (sp_tcpclient_->connection()->peerAddress()).toIp() <<
+                          " port: " << (sp_tcpclient_->connection()->peerAddress()).toPort() << " replace");
         p_map_weight_tcpclientwp_->erase(it_map_weight_tcpclientwp_index_);
     }
 
@@ -75,7 +70,7 @@ CthriftClientWorker::CthriftClientWorker(
       i16_server_port_(i16_server_port),
       b_user_set_ip(!str_server_ip.empty()),
       p_async_event_loop_(NULL) {
-    // atomic_avaliable_conn_num_ defalut init by value
+    // atomic_avaliable_conn_num_ default init by value
     // start real worker thread
     sp_event_thread_ = boost::make_shared<muduo::net::EventLoopThread>();
     p_event_loop_ = sp_event_thread_->startLoop();
@@ -150,10 +145,9 @@ bool ConnInfo::CheckConnHealthy(void) const {
     return true;
 }
 
-int8_t CthriftClientWorker::ChooseNextReadyConn(
-        TcpClientWeakPtr *p_wp_tcpcli) {
+int8_t CthriftClientWorker::ChooseNextReadyConn(TcpClientWeakPtr *p_wp_tcpcli) {
     if (CTHRIFT_UNLIKELY(p_multimap_weight_wptcpcli_->empty())) {
-//        CTHRIFT_LOG_ERROR("multimap_weight_wptcpcli_ empty");
+        CTHRIFT_LOG_ERROR("multimap_weight_wptcpcli_ empty");
         return -1;
     }
 
@@ -189,8 +183,7 @@ int8_t CthriftClientWorker::ChooseNextReadyConn(
 //        CTHRIFT_LOG_DEBUG("Address: " << (sp_tcpconn->peerAddress()).toIpPort() << " weight " << iter->first);
 
         try {
-            str_port = boost::lexical_cast<std::string>(
-                        (sp_tcpconn->peerAddress()).toPort());
+            str_port = boost::lexical_cast<std::string>((sp_tcpconn->peerAddress()).toPort());
         } catch (boost::bad_lexical_cast &e) {
 //            CTHRIFT_LOG_ERROR("boost::bad_lexical_cast :" << e.what()
 //                              << "tcp connnect peer port : "
@@ -246,7 +239,7 @@ int8_t CthriftClientWorker::ChooseNextReadyConn(
     }
 
     if (CTHRIFT_UNLIKELY(0 == vec_weight.size())) {
-//        CTHRIFT_LOG_INFO("Not avaliable conn can be choosed, maybe all occupied");
+        CTHRIFT_LOG_INFO("Not avaliable conn can be choosed, maybe all occupied");
         return 1;
     }
     // 将所有候选节点的权重进行求和：d_total_weight
@@ -280,14 +273,14 @@ int8_t CthriftClientWorker::ChooseNextReadyConn(
 
     boost::unordered_map<double, vector<TcpClientWeakPtr> >::iterator it_map = map_weight_vec.find(d_choose);
     if (CTHRIFT_UNLIKELY(it_map == map_weight_vec.end())) {
-//        CTHRIFT_LOG_ERROR("not find weight " << d_choose);
+        CTHRIFT_LOG_ERROR("not find weight " << d_choose);
         return -1;
     }
 
     if (1 == (it_map->second).size()) {
         *p_wp_tcpcli = *((it_map->second).begin());
     } else {
-//        CTHRIFT_LOG_DEBUG((it_map->second).size() << " conn need be choose one equally");
+        CTHRIFT_LOG_DEBUG((it_map->second).size() << " conn need be choose one equally");
 
         *p_wp_tcpcli = (it_map->second)[rand() % ((it_map->second).size())];
     }
@@ -427,14 +420,12 @@ void CthriftClientWorker::InitSgagentHandlerThread(void) {
                 boost::bind(&CthriftClientWorker::GetSvrList, this));
 
     p_event_loop_sgagent_->runEvery(CthriftNameService::kDGetSvrListIntervalSecs,
-                                    boost::bind(&CthriftClientWorker::GetSvrList,
-                                                this));
+                                    boost::bind(&CthriftClientWorker::GetSvrList, this));
 }
 
 void CthriftClientWorker::InitWorker(void) {
 //    CTHRIFT_LOG_INFO("InitWorker begin");
-    p_multimap_weight_wptcpcli_ =
-            new multimap<double, TcpClientWeakPtr, WeightSort>;  // exit del, safe
+    p_multimap_weight_wptcpcli_ = new multimap<double, TcpClientWeakPtr, WeightSort>;  // exit del, safe
 
 //    if (b_user_set_ip) {
 //        CTHRIFT_LOG_INFO("InitWorker b_user_set_ip  ip:"
@@ -453,8 +444,7 @@ void CthriftClientWorker::InitWorker(void) {
 //                                             this,
 //                                             list));
 //    } else {
-//        sp_event_thread_sgagent_ =
-//                boost::make_shared<muduo::net::EventLoopThread>();
+//        sp_event_thread_sgagent_ = boost::make_shared<muduo::net::EventLoopThread>();
 
 //        p_event_loop_sgagent_ = sp_event_thread_sgagent_->startLoop();
 //        p_event_loop_sgagent_->runInLoop(boost::bind(
@@ -688,22 +678,18 @@ void CthriftClientWorker::GetSvrList(void) {
 //}
 
 void CthriftClientWorker::OnConn(const muduo::net::TcpConnectionPtr &conn) {
-//    CTHRIFT_LOG_INFO(conn->localAddress().toIpPort() << " -> "
-//                     << conn->peerAddress().toIpPort()
-//                     << " is "
-//                     << (conn->connected() ? "UP"
-//                                           : "DOWN"));
+    CTHRIFT_LOG_INFO("(" << conn->localAddress().toIpPort() << ") -> ("
+                     << conn->peerAddress().toIpPort()
+                     << ") is " << (conn->connected() ? "UP" : "DOWN"));
 
     if (conn->connected()) {
         string str_port;
         try {
             str_port = boost::lexical_cast<std::string>((conn->peerAddress()).toPort());
         } catch (boost::bad_lexical_cast &e) {
-//            CTHRIFT_LOG_ERROR("boost::bad_lexical_cast :" << e.what()
-//                              << "toPort "
-//                              << (conn->peerAddress()).toPort()
-//                              << "conn peerAddr "
-//                              << (conn->peerAddress()).toIpPort());
+            CTHRIFT_LOG_ERROR("boost::bad_lexical_cast :" << e.what()
+                              << "toPort " << (conn->peerAddress()).toPort()
+                              << "conn peerAddr " << (conn->peerAddress()).toIpPort());
             conn->shutdown();
             return;
         }
@@ -729,18 +715,18 @@ void CthriftClientWorker::OnConn(const muduo::net::TcpConnectionPtr &conn) {
                                 _2),
                     kI32HighWaterSize);  // every conn, 64K buff
 
-        boost::shared_ptr<ConnContext4Worker> conn_context_ptr =
+        Context4WorkerSharedPtr conn_context_ptr =
                 boost::make_shared<ConnContext4Worker>(unordered_map_iter->second);
         conn->setContext(conn_context_ptr);
 
-//        Context4WorkerSharedPtr tmp;
-//        try {
-//            tmp = boost::any_cast<Context4WorkerSharedPtr>(conn->getContext());
-//        } catch (boost::bad_any_cast &e) {
-////            CTHRIFT_LOG_ERROR("bad_any_cast:" << e.what());
-//            return;
-//        }
-//        // tmp->t_last_conn_time_ = time(0);
+        Context4WorkerSharedPtr tmp;
+        try {
+            tmp = boost::any_cast<Context4WorkerSharedPtr>(conn->getContext());
+        } catch (boost::bad_any_cast &e) {
+            CTHRIFT_LOG_ERROR("bad_any_cast:" << e.what());
+            return;
+        }
+//        tmp->wp_conn_info->t_last_recv_time_ = time(0);
 
         if (CTHRIFT_UNLIKELY(1 == atomic_avaliable_conn_num_.incrementAndGet())) {
             muduo::MutexLockGuard lock(mutexlock_avaliable_conn_ready_);
@@ -748,13 +734,13 @@ void CthriftClientWorker::OnConn(const muduo::net::TcpConnectionPtr &conn) {
         }
     } else {
         if (CTHRIFT_UNLIKELY((conn->getContext()).empty())) {
-//            CTHRIFT_LOG_WARN("conn context empty, maybe shutdown when conn");
+            CTHRIFT_LOG_WARN("conn context empty, maybe shutdown when conn");
         } else {
             Context4WorkerSharedPtr sp_context;
             try {
                 sp_context = boost::any_cast<Context4WorkerSharedPtr>(conn->getContext());
             } catch (boost::bad_any_cast &e) {
-//                CTHRIFT_LOG_ERROR("bad_any_cast:" << e.what());
+                CTHRIFT_LOG_ERROR("bad_any_cast:" << e.what());
                 return;
             }
 
@@ -771,7 +757,7 @@ void CthriftClientWorker::OnConn(const muduo::net::TcpConnectionPtr &conn) {
                     && (0 >= (atomic_avaliable_conn_num_.decrementAndGet()))) {
                 atomic_avaliable_conn_num_.getAndSet(0);  // adjust for safe
 
-//                CTHRIFT_LOG_WARN("atomic_avaliable_conn_num_ 0");
+                CTHRIFT_LOG_WARN("atomic_avaliable_conn_num_ 0");
             }
         }
     }
@@ -787,9 +773,8 @@ void CthriftClientWorker::HandleThriftMsg(const muduo::net::TcpConnectionPtr &co
     int32_t i32_seqid = (*sp_p_cthrift_tbinary_protocol_)->GetSeqID();
 
     if (CTHRIFT_UNLIKELY(0 >= i32_seqid)) {
-//        CTHRIFT_LOG_ERROR("seqid " << i32_seqid << " str_appkey " <<
-//                          str_svr_appkey_ << " close connection to "
-//                          << (conn->peerAddress()).toIpPort());
+        CTHRIFT_LOG_ERROR("seqid " << i32_seqid << " str_appkey " <<
+                          str_svr_appkey_ << " close connection to " << (conn->peerAddress()).toIpPort());
         conn->shutdown();
         return;
     }
@@ -798,25 +783,24 @@ void CthriftClientWorker::HandleThriftMsg(const muduo::net::TcpConnectionPtr &co
     try {
         str_id = boost::lexical_cast<std::string>(i32_seqid);
     } catch (boost::bad_lexical_cast &e) {
-//        CTHRIFT_LOG_ERROR("boost::bad_lexical_cast :" << e.what()
-//                          << "seqid " << i32_seqid
-//                          << " str_appkey "
-//                          << str_svr_appkey_
-//                          << " close connection to "
-//                          << (conn->peerAddress()).toIpPort());
+        CTHRIFT_LOG_ERROR("boost::bad_lexical_cast :" << e.what()
+                          << "seqid " << i32_seqid
+                          << " str_appkey " << str_svr_appkey_
+                          << " close connection to " << (conn->peerAddress()).toIpPort());
         conn->shutdown();
         return;
     }
 
     MapID2SharedPointerIter map_iter = map_id_sharedcontextsp_.find(str_id);
     if (CTHRIFT_UNLIKELY(map_id_sharedcontextsp_.end() == map_iter)) {
-//        CTHRIFT_LOG_ERROR("Not find id " << str_id << " maybe timeout, conn from:"<<(conn->peerAddress()).toIpPort());
+        CTHRIFT_LOG_ERROR("Not find id " << str_id << " maybe timeout, conn from:"
+                          << (conn->peerAddress()).toIpPort());
 
     } else {
         SharedContSharedPtr& sp_shared = map_iter->second;
 
-//        CTHRIFT_LOG_DEBUG("id " << str_id << " send & recv cost "
-//                          << timeDifference(Timestamp::now(), sp_shared->timestamp_cliworker_send) << " secs");
+        CTHRIFT_LOG_DEBUG("id " << str_id << " send & recv cost "
+                          << timeDifference(Timestamp::now(), sp_shared->timestamp_cliworker_send) << " secs");
         if (sp_shared->async_flag) {
             // copy一份recv数据，避免异步回调线程与IO线程竞争读/写
             // mutex不能保证这里逻辑的正确性，因为OnMsg一直被调用，muduo::buffer一直被重复填充数据
@@ -832,7 +816,7 @@ void CthriftClientWorker::HandleThriftMsg(const muduo::net::TcpConnectionPtr &co
                                                recv_buf,
                                                sp_shared));  // will use event_loop in
         } else if (sp_shared->IsTimeout()) {
-//            CTHRIFT_LOG_WARN("seq id " << str_id << " already expire, discard the msg");
+            CTHRIFT_LOG_WARN("seq id " << str_id << " already expire, discard the msg");
         } else { // when transport timeout during write readbuf, still
             // safe
             sp_shared->ResetReadBuf(buf, static_cast<uint32_t>(length));
@@ -843,7 +827,7 @@ void CthriftClientWorker::HandleThriftMsg(const muduo::net::TcpConnectionPtr &co
             // int clientStatus = 0;   NOT used by cmtrace, just fill
             // CLIENT_RECV(clientStatus);
 
-//            CTHRIFT_LOG_DEBUG("write and notify for id " << str_id << " done");
+            CTHRIFT_LOG_DEBUG("write and notify for id " << str_id << " done");
         }
 
         // 异步、同步删除map中item都在这里处理；异步化的回调中传递了shared_ptr，这里删除后异步回调中内存仍然可用
@@ -863,10 +847,9 @@ void CthriftClientWorker::HandleMsg(const muduo::net::TcpConnectionPtr &conn,
     sp_context_worker->enum_state = kExpectFrameSize;
 
     if (CTHRIFT_UNLIKELY(buffer->readableBytes())) {
-//        CTHRIFT_LOG_DEBUG("still " << buffer->readableBytes()
-//                          << " left in receive buf");
+        CTHRIFT_LOG_DEBUG("still " << buffer->readableBytes() << " left in receive buf");
     } else {
-//        CTHRIFT_LOG_DEBUG("retrieve all");
+        CTHRIFT_LOG_DEBUG("retrieve all");
         sp_context_worker->b_occupied = false;
     }
 }
@@ -874,14 +857,12 @@ void CthriftClientWorker::HandleMsg(const muduo::net::TcpConnectionPtr &conn,
 void CthriftClientWorker::OnMsg(const muduo::net::TcpConnectionPtr &conn,
                                 muduo::net::Buffer *buffer,
                                 muduo::Timestamp receiveTime) {
-//    CTHRIFT_LOG_DEBUG((conn->peerAddress()).toIpPort() << " msg received "
-//                      << (buffer->toStringPiece()).data()
-//                      << " len "
-//                      << buffer->readableBytes());
+    CTHRIFT_LOG_INFO((conn->peerAddress()).toIpPort() << " msg received "
+                      << (buffer->toStringPiece()).data()
+                      << " len " << buffer->readableBytes());
 
     if (CTHRIFT_UNLIKELY((conn->getContext()).empty())) {
-//        CTHRIFT_LOG_ERROR("peer address " << conn->peerAddress().toIpPort()
-//                          << " context empty");
+        CTHRIFT_LOG_ERROR("peer address " << conn->peerAddress().toIpPort() << " context empty");
         conn->shutdown();
         return;
     }
@@ -890,7 +871,7 @@ void CthriftClientWorker::OnMsg(const muduo::net::TcpConnectionPtr &conn,
     try {
         sp_context_worker = boost::any_cast<Context4WorkerSharedPtr>(conn->getContext());
     } catch (boost::bad_any_cast &e) {
-//        CTHRIFT_LOG_ERROR("bad_any_cast:" << e.what());
+        CTHRIFT_LOG_ERROR("bad_any_cast:" << e.what());
         return;
     }
 
@@ -900,20 +881,19 @@ void CthriftClientWorker::OnMsg(const muduo::net::TcpConnectionPtr &conn,
                 sp_context_worker->i32_want_size = static_cast<uint32_t>(buffer->readInt32());
                 sp_context_worker->enum_state = kExpectFrame;
             } else {
-//                CTHRIFT_LOG_WARN("not enough size for protocol, thrift total length, wait for more");
+                CTHRIFT_LOG_WARN("not enough size for protocol, thrift total length, wait for more");
                 return;
             }
         } else if (sp_context_worker->enum_state == kExpectFrame) {
             if (buffer->readableBytes() >= static_cast<size_t>(sp_context_worker->i32_want_size)) {
 
-                // sp_context_worker->t_last_recv_time_ = time(0);
+//                 sp_context_worker->wp_conn_info->t_last_recv_time_ = time(0);
                 HandleMsg(conn, sp_context_worker, buffer);
 
             } else {
-//                CTHRIFT_LOG_DEBUG("body len " << buffer->readableBytes()
-//                                  << " < want len "
-//                                  << sp_context_worker->i32_want_size
-//                                  << " continue wait");
+                CTHRIFT_LOG_DEBUG("body len " << buffer->readableBytes()
+                                  << " < want len "
+                                  << sp_context_worker->i32_want_size << " continue wait");
                 break;
             }
         }
@@ -921,13 +901,11 @@ void CthriftClientWorker::OnMsg(const muduo::net::TcpConnectionPtr &conn,
 }
 
 void CthriftClientWorker::OnWriteComplete(const muduo::net::TcpConnectionPtr &conn) {
-//    CTHRIFT_LOG_DEBUG(conn->localAddress().toIpPort() << " -> "
-//                      << conn->peerAddress().toIpPort()
-//                      << " OnWriteComplete");
+    CTHRIFT_LOG_INFO(conn->localAddress().toIpPort() << " -> "
+                     << conn->peerAddress().toIpPort() << " OnWriteComplete");
 
     if (CTHRIFT_UNLIKELY((conn->getContext()).empty())) {
-//        CTHRIFT_LOG_ERROR("address: " << (conn->peerAddress()).toIpPort() << " "
-//                                                                             "context empty");    // NOT clear here
+        CTHRIFT_LOG_ERROR("address: " << (conn->peerAddress()).toIpPort() << "context empty");    // NOT clear here
         return;
     }
 
@@ -935,7 +913,7 @@ void CthriftClientWorker::OnWriteComplete(const muduo::net::TcpConnectionPtr &co
     try {
         conn_info = boost::any_cast<Context4WorkerSharedPtr>(conn->getContext());
     } catch (boost::bad_any_cast &e) {
-//        CTHRIFT_LOG_ERROR("bad_any_cast:" << e.what());
+        CTHRIFT_LOG_ERROR("bad_any_cast:" << e.what());
         return;
     }
     conn_info->b_highwater = false;
@@ -946,15 +924,13 @@ void CthriftClientWorker::OnWriteComplete(const muduo::net::TcpConnectionPtr &co
     }
 }
 
-void CthriftClientWorker::OnHighWaterMark(const muduo::net::TcpConnectionPtr &conn,
-                                          size_t len)
+void CthriftClientWorker::OnHighWaterMark(const muduo::net::TcpConnectionPtr &conn, size_t len)
 {
-//    CTHRIFT_LOG_INFO((conn->localAddress()).toIpPort() << " -> "
-//                     << (conn->peerAddress()).toIpPort()
-//                     << " OnHighWaterMark");
+    CTHRIFT_LOG_INFO((conn->localAddress()).toIpPort() << " -> "
+                     << (conn->peerAddress()).toIpPort() << " OnHighWaterMark");
 
     if (CTHRIFT_UNLIKELY((conn->getContext()).empty())) {
-//        CTHRIFT_LOG_ERROR("address: " << (conn->peerAddress()).toIpPort() << "context empty");    // NOT clear here
+        CTHRIFT_LOG_ERROR("address: " << (conn->peerAddress()).toIpPort() << "context empty");    // NOT clear here
         return;
     }
 
@@ -962,7 +938,7 @@ void CthriftClientWorker::OnHighWaterMark(const muduo::net::TcpConnectionPtr &co
     try {
         conn_info = boost::any_cast<Context4WorkerSharedPtr>(conn->getContext());
     } catch (boost::bad_any_cast &e) {
-//        CTHRIFT_LOG_ERROR("bad_any_cast:" << e.what());
+        CTHRIFT_LOG_ERROR("bad_any_cast:" << e.what());
         return;
     }
 
@@ -970,7 +946,7 @@ void CthriftClientWorker::OnHighWaterMark(const muduo::net::TcpConnectionPtr &co
 
     if (0 >= atomic_avaliable_conn_num_.decrementAndGet()) {
         atomic_avaliable_conn_num_.getAndSet(0);  // adjust for safe
-//        CTHRIFT_LOG_WARN("atomic_avaliable_conn_num_ 0");
+        CTHRIFT_LOG_WARN("atomic_avaliable_conn_num_ 0");
     }
 }
 
@@ -980,7 +956,7 @@ void CthriftClientWorker::SendTransportReq(SharedContSharedPtr sp_shared) {
         return;
     }
 
-//    CTHRIFT_LOG_DEBUG("send_buf.size " << send_buf.readableBytes());
+    CTHRIFT_LOG_DEBUG("send_buf.size " << send_buf.readableBytes());
 
     TcpClientWeakPtr wp_tcpcli;
     if (ChooseNextReadyConn(&wp_tcpcli)) {
@@ -993,11 +969,11 @@ void CthriftClientWorker::SendTransportReq(SharedContSharedPtr sp_shared) {
     try {
         str_port = boost::lexical_cast<std::string>((sp_tcpcli->connection()->peerAddress()).toPort());
     } catch (boost::bad_lexical_cast &e) {
-//        CTHRIFT_LOG_ERROR("boost::bad_lexical_cast :" << e.what()
-//                          << " ip:"
-//                          << (sp_tcpcli->connection()->peerAddress()).toIp()
-//                          << " port:"
-//                          << (sp_tcpcli->connection()->peerAddress()).toPort());
+        CTHRIFT_LOG_ERROR("boost::bad_lexical_cast :" << e.what()
+                          << " ip:"
+                          << (sp_tcpcli->connection()->peerAddress()).toIp()
+                          << " port:"
+                          << (sp_tcpcli->connection()->peerAddress()).toPort());
         return;
     }
 
@@ -1005,15 +981,15 @@ void CthriftClientWorker::SendTransportReq(SharedContSharedPtr sp_shared) {
             iter_ipport_spconninfo = map_ipport_spconninfo_.find(
                 (sp_tcpcli->connection()->peerAddress()).toIp() + ":" + str_port);
     if (CTHRIFT_UNLIKELY(iter_ipport_spconninfo == map_ipport_spconninfo_.end())) {
-//        CTHRIFT_LOG_ERROR("Not find ip:"
-//                          << (sp_tcpcli->connection()->peerAddress()).toIp()
-//                          << " port:"
-//                          << str_port << " in map_ipport_spconninfo_");
+        CTHRIFT_LOG_ERROR("Not find ip:"
+                          << (sp_tcpcli->connection()->peerAddress()).toIp()
+                          << " port:"
+                          << str_port << " in map_ipport_spconninfo_");
         return;
     }
 
     if (CTHRIFT_UNLIKELY((sp_tcpcli->connection()->getContext()).empty())) {
-//        CTHRIFT_LOG_ERROR("conn context empty");
+        CTHRIFT_LOG_ERROR("conn context empty");
         return;
     }
 
@@ -1021,22 +997,21 @@ void CthriftClientWorker::SendTransportReq(SharedContSharedPtr sp_shared) {
                                        static_cast<double>(sp_shared->i32_timeout_ms)
                                        / MILLISENCOND_COUNT_IN_SENCOND,
                                        0))) {
-//        CTHRIFT_LOG_WARN("before send, appkey " << str_svr_appkey_ << " id "
-//                         << sp_shared->str_id
-//                         << " timeout return");
+        CTHRIFT_LOG_WARN("before send, appkey " << str_svr_appkey_ << " id "
+                         << sp_shared->str_id
+                         << " timeout return");
         return;
     }
 
     sp_tcpcli->connection()->send(&send_buf);
 
-//    CTHRIFT_LOG_DEBUG("send id " << sp_shared->str_id << " done");
+    CTHRIFT_LOG_DEBUG("send id " << sp_shared->str_id << " done");
 
     Context4WorkerSharedPtr sp_context;
     try {
-        sp_context =
-                boost::any_cast<Context4WorkerSharedPtr>(sp_tcpcli->connection()->getContext());
+        sp_context = boost::any_cast<Context4WorkerSharedPtr>(sp_tcpcli->connection()->getContext());
     } catch (boost::bad_any_cast &e) {
-//        CTHRIFT_LOG_ERROR("bad_any_cast:" << e.what());
+        CTHRIFT_LOG_ERROR("bad_any_cast:" << e.what());
         return;
     }
 
@@ -1064,7 +1039,6 @@ void CthriftClientWorker::EnableAsync(const int32_t &i32_timeout_ms) {
         p_async_event_loop_->setContext(kTaskStateInit);
     }
 
-    // Init Garbage Collection timewheel
     cnxt_entry_circul_buf_.resize(kI8TimeWheelNum);
 
     double timeout = i32_timeout_ms > MILLISENCOND_COUNT_IN_SENCOND ?
@@ -1080,11 +1054,11 @@ void CthriftClientWorker::AsyncCallback(const uint32_t &size,
     if (CheckOverTime(sp_shared->timestamp_start,
                       static_cast<double>(sp_shared->i32_timeout_ms) / MILLISENCOND_COUNT_IN_SENCOND,
                       &d_left_secs)) {
-//        CTHRIFT_LOG_WARN("async wait appkey " << str_svr_appkey_ << " id "
-//                         << sp_shared->str_id
-//                         << " already "
-//                         << sp_shared->i32_timeout_ms
-//                         << " ms for readbuf, timeout");
+        CTHRIFT_LOG_WARN("async wait appkey " << str_svr_appkey_ << " id "
+                         << sp_shared->str_id
+                         << " already "
+                         << sp_shared->i32_timeout_ms
+                         << " ms for readbuf, timeout");
         p_async_event_loop_->setContext(kTaskStateTimeOut);
     } else {
         p_async_event_loop_->setContext(kTaskStateSuccess);
@@ -1095,7 +1069,7 @@ void CthriftClientWorker::AsyncCallback(const uint32_t &size,
     try {
         sp_shared->cob_();
     } catch (...) {
-//        CTHRIFT_LOG_ERROR("Catch exception in async callback");
+        CTHRIFT_LOG_ERROR("Catch exception in async callback");
     }
 }
 
@@ -1105,7 +1079,7 @@ void CthriftClientWorker::AsyncSendReq(SharedContSharedPtr sp_shared) {
     if (CheckOverTime(sp_shared->timestamp_start,
                       static_cast<double>(sp_shared->i32_timeout_ms)
                       / MILLISENCOND_COUNT_IN_SENCOND, &d_left_secs)) {
-//        CTHRIFT_LOG_WARN("async task already timeout, before send packet");
+        CTHRIFT_LOG_WARN("async task already timeout, before send packet");
 
         uint32_t buf_size = 0;
         uint8_t *recv_buf = NULL;
@@ -1120,12 +1094,12 @@ void CthriftClientWorker::AsyncSendReq(SharedContSharedPtr sp_shared) {
         return;
     }
 
-//    CTHRIFT_LOG_DEBUG("send_buf.size " << send_buf.readableBytes());
+    CTHRIFT_LOG_DEBUG("send_buf.size " << send_buf.readableBytes());
 
     TcpClientWeakPtr wp_tcpcli;
     if (ChooseNextReadyConn(&wp_tcpcli)) {
-//        CTHRIFT_LOG_ERROR("No candidate connection to send packet, "
-//                          "async task will be dropped");
+        CTHRIFT_LOG_ERROR("No candidate connection to send packet, "
+                          "async task will be dropped");
         return;
     }
 
@@ -1135,11 +1109,11 @@ void CthriftClientWorker::AsyncSendReq(SharedContSharedPtr sp_shared) {
     try {
         str_port = boost::lexical_cast<std::string>((sp_tcpcli->connection()->peerAddress()).toPort());
     } catch (boost::bad_lexical_cast &e) {
-//        CTHRIFT_LOG_ERROR("boost::bad_lexical_cast :" << e.what()
-//                          << " ip:"
-//                          << (sp_tcpcli->connection()->peerAddress()).toIp()
-//                          << " port:"
-//                          << (sp_tcpcli->connection()->peerAddress()).toPort());
+        CTHRIFT_LOG_ERROR("boost::bad_lexical_cast :" << e.what()
+                          << " ip:"
+                          << (sp_tcpcli->connection()->peerAddress()).toIp()
+                          << " port:"
+                          << (sp_tcpcli->connection()->peerAddress()).toPort());
         return;
     }
 
@@ -1147,26 +1121,23 @@ void CthriftClientWorker::AsyncSendReq(SharedContSharedPtr sp_shared) {
             iter_ipport_spconninfo = map_ipport_spconninfo_.find(
                 (sp_tcpcli->connection()->peerAddress()).toIp() + ":" + str_port);
     if (CTHRIFT_UNLIKELY(iter_ipport_spconninfo == map_ipport_spconninfo_.end())) {
-//        CTHRIFT_LOG_ERROR("Not find ip:"
-//                          << (sp_tcpcli->connection()->peerAddress()).toIp()
-//                          << " port:"
-//                          << str_port << " in map_ipport_spconninfo_");
+        CTHRIFT_LOG_ERROR("Not find ip:"
+                          << (sp_tcpcli->connection()->peerAddress()).toIp()
+                          << " port:"
+                          << str_port << " in map_ipport_spconninfo_");
         return;
     }
 
     if (CTHRIFT_UNLIKELY((sp_tcpcli->connection()->getContext()).empty())) {
-//        CTHRIFT_LOG_ERROR("conn context empty");
+        CTHRIFT_LOG_ERROR("conn context empty");
         return;
     }
 
     if (CTHRIFT_UNLIKELY(CheckOverTime(sp_shared->timestamp_start,
-                                       static_cast<double>(
-                                           sp_shared->i32_timeout_ms)
-                                       / MILLISENCOND_COUNT_IN_SENCOND,
+                                       static_cast<double>(sp_shared->i32_timeout_ms) / MILLISENCOND_COUNT_IN_SENCOND,
                                        0))) {
-//        CTHRIFT_LOG_WARN("before send, appkey " << str_svr_appkey_ << " id "
-//                         << sp_shared->str_id
-//                         << " timeout return");
+        CTHRIFT_LOG_WARN("before send, appkey " << str_svr_appkey_ << " id "
+                         << sp_shared->str_id << " timeout return");
         return;
     }
 
@@ -1178,7 +1149,7 @@ void CthriftClientWorker::AsyncSendReq(SharedContSharedPtr sp_shared) {
     try {
         sp_context = boost::any_cast<Context4WorkerSharedPtr>(sp_tcpcli->connection()->getContext());
     } catch (boost::bad_any_cast &e) {
-//        CTHRIFT_LOG_ERROR("bad_any_cast:" << e.what());
+        CTHRIFT_LOG_ERROR("bad_any_cast:" << e.what());
         return;
     }
 

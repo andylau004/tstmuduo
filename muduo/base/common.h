@@ -75,6 +75,7 @@
 
 #include <boost/any.hpp>
 #include <boost/unordered_map.hpp>
+#include <boost/algorithm/string/trim.hpp>
 
 #include <boost/thread.hpp>
 #include <boost/utility.hpp>

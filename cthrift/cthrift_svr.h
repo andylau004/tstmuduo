@@ -95,7 +95,7 @@ private:
     muduo::AtomicInt64 atom_i64_worker_thread_pos_;
     std::vector<muduo::net::EventLoop *> vec_worker_event_loop_;
 
-//    meituan_mns::SGService sg_service_;
+    meituan_mns::SGService sg_service_;
 
     boost::shared_ptr<muduo::net::TimerId> sp_timerid_regsvr_;  // use to control getsvrlist
 

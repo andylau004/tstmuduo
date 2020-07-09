@@ -199,7 +199,7 @@ struct SharedBetweenWorkerTransport {
 };
 
 typedef boost::shared_ptr<SharedBetweenWorkerTransport> SharedContSharedPtr;
-typedef boost::weak_ptr<SharedBetweenWorkerTransport> WeakContSharedPtr;
+typedef boost::weak_ptr<SharedBetweenWorkerTransport>   WeakContSharedPtr;
 }
 
 

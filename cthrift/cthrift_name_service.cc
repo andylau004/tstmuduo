@@ -50,25 +50,25 @@ CthriftNameService::CthriftNameService(void) throw(TException) {
     GetHostIPInfo();  // fill str_local_ip_, b_isMac_, str_host_
 }
 
-//void CthriftNameService::PackDefaultSgservice(
-//    const string &str_svr_appkey,
-//    const string &str_local_ip,
-//    const uint16_t &u16_port,
-//    meituan_mns::SGService *p_sgservice) {
-//  p_sgservice->__set_appkey(str_svr_appkey);
-//  p_sgservice->__set_version(g_cthrift_config.server_version_);
-//  p_sgservice->__set_ip(str_local_ip);
-//  p_sgservice->__set_port(u16_port);
-//  p_sgservice->__set_weight(10);
+void CthriftNameService::PackDefaultSgservice(
+    const string &str_svr_appkey,
+    const string &str_local_ip,
+    const uint16_t &u16_port,
+    meituan_mns::SGService *p_sgservice) {
+  p_sgservice->__set_appkey(str_svr_appkey);
+  p_sgservice->__set_version(g_cthrift_config.server_version_);
+  p_sgservice->__set_ip(str_local_ip);
+  p_sgservice->__set_port(u16_port);
+  p_sgservice->__set_weight(10);
 
-//  p_sgservice->__set_status(meituan_mns::fb_status::ALIVE);
+  p_sgservice->__set_status(meituan_mns::fb_status::ALIVE);
 
-//  p_sgservice->__set_lastUpdateTime(static_cast<int32_t>(time(0)));
-//  p_sgservice->__set_fweight(10.0);
-//  p_sgservice->__set_serverType(0);
-//  p_sgservice->__set_protocol("thrift");
-//  p_sgservice->__set_heartbeatSupport(0);
-//}
+  p_sgservice->__set_lastUpdateTime(static_cast<int32_t>(time(0)));
+  p_sgservice->__set_fweight(10.0);
+  p_sgservice->__set_serverType(0);
+  p_sgservice->__set_protocol("thrift");
+  p_sgservice->__set_heartbeatSupport(0);
+}
 
 //string CthriftNameService::SGService2String(
 //    const meituan_mns::SGService &sgservice) {
@@ -274,18 +274,17 @@ double CthriftNameService::FetchOctoWeight(const double &fweight,
 
 int32_t CthriftNameService::InitNS() {
     if (b_is_init_ns_) {
-        ////CTHRIFT_LOG_DEBUG("InitNS already SUCCESS");
+        CTHRIFT_LOG_DEBUG("InitNS already SUCCESS");
         return 0;
     }
 
     muduo::MutexLockGuard lock(s_lock);
 
     if (b_is_init_ns_) {
-        ////CTHRIFT_LOG_DEBUG("InitNS already SUCCESS");
+        CTHRIFT_LOG_DEBUG("InitNS already SUCCESS");
         return 0;
     }
-
-    ////CTHRIFT_LOG_INFO("InitNS BEGIN");
+    CTHRIFT_LOG_INFO("InitNS BEGIN");
 
     if(g_cthrift_config.mns_origin_){
         // 用户可以设置自己的注册及获取服务列表函数 桥接模式
@@ -319,19 +318,19 @@ int32_t CthriftNameService::InitNS() {
 //    }
 
     b_is_init_ns_ = true;
-    //////CTHRIFT_LOG_INFO("InitNS END");
+    CTHRIFT_LOG_INFO("InitNS END");
     return 0;
 }
 
 void CthriftNameService::UnInitNS() {
     if (!b_is_init_ns_) {
-        //    ////CTHRIFT_LOG_DEBUG("InitNS have no init");
+        CTHRIFT_LOG_DEBUG("InitNS have no init");
     }
 
     muduo::MutexLockGuard lock(s_lock);
 
     if (!b_is_init_ns_) {
-        //    ////CTHRIFT_LOG_DEBUG("InitNS already uinit");
+        CTHRIFT_LOG_DEBUG("InitNS already uinit");
     }
 
     //  ns_interface_.Destory();

@@ -6,8 +6,7 @@ using namespace meituan_cthrift;
 
 const int32_t CthriftClient::kI32DefaultTimeoutMsForClient = 5000;  // 5s
 muduo::MutexLock CthriftClient::work_resource_lock_;
-boost::unordered_multimap<string, CthriftClient::WorkerWeakPtr>
-CthriftClient::map_appkey_worker_;
+boost::unordered_multimap<string, CthriftClient::WorkerWeakPtr> CthriftClient::map_appkey_worker_;
 
 CthriftClient::CthriftClient(const std::string &str_svr_appkey,
                              const int32_t &i32_timeout_ms)
@@ -46,6 +45,8 @@ int CthriftClient::InitWorker(bool async) {
             str_svr_appkey_ + str_serviceName_filter_ +
             boost::lexical_cast<std::string>(i32_port_filter_) + str_server_ip_
             + boost::lexical_cast<std::string>(i16_server_port_);
+    printf("async=%d srvip=%s port=%d\n", async, str_server_ip_.c_str(), i16_server_port_);
+    printf("map_key=%s\n", map_key.c_str());
     // async模式下，必须开启并发模式；因为异步场景下thrift本身的sendBuf无法保证线程安全
     if (async) {
         b_parallel_ = true;
@@ -72,15 +73,13 @@ int CthriftClient::InitWorker(bool async) {
                         i32_port_filter_,
                         str_server_ip_,
                         i16_server_port_);
-
             if (async) {
                 // startup async thread
                 sp_cthrift_client_worker_->EnableAsync(i32_timeout_ms_);
             }
 
-//            map_appkey_worker_[map_key] = sp_cthrift_client_worker_;
             map_appkey_worker_.insert(
-                        std::make_pair/*<string, WorkerWeakPtr>*/(map_key, sp_cthrift_client_worker_));
+                        std::make_pair(map_key, sp_cthrift_client_worker_));
         }
     } while (0);
 
@@ -95,8 +94,7 @@ int CthriftClient::InitWorker(bool async) {
     bool b_timeout = false;
 
     while (0 >= sp_cthrift_client_worker_->atomic_avaliable_conn_num()) {  // while, NOT if
-//        CTHRIFT_LOG_WARN("No good conn for appkey " << str_svr_appkey_
-//                         << " from worker, wait");
+        CTHRIFT_LOG_WARN("No good conn for appkey " << str_svr_appkey_ << " from worker, wait");
 
         if (!CheckOverTime(timestamp_start, d_default_timeout_secs, &d_left_time_sec)) {
             do {
@@ -106,19 +104,19 @@ int CthriftClient::InitWorker(bool async) {
 
             if (b_timeout) {
                 if (CTHRIFT_UNLIKELY(0 < sp_cthrift_client_worker_->atomic_avaliable_conn_num())) {
-//                    CTHRIFT_LOG_DEBUG("miss notify, but already get");
+                    CTHRIFT_LOG_DEBUG("miss notify, but already get");
                 } else {
-//                    CTHRIFT_LOG_WARN("wait " << d_left_time_sec
-//                                     << " secs for good conn for "
-//                                     << "appkey " << str_svr_appkey_
-//                                     << " timeout, maybe need more time");
+                    CTHRIFT_LOG_WARN("wait " << d_left_time_sec
+                                     << " secs for good conn for "
+                                     << "appkey " << str_svr_appkey_
+                                     << " timeout, maybe need more time");
                 }
                 return SUCCESS;
             }
 
             if (CTHRIFT_UNLIKELY(CheckOverTime(timestamp_start, d_default_timeout_secs, 0))) {
-                //CTHRIFT_LOG_WARN(d_default_timeout_secs << "secs countdown to 0, "
-//                                                           "but no good conn ready, maybe need more time");
+                CTHRIFT_LOG_WARN(d_default_timeout_secs << "secs countdown to 0, "
+                                                        <<  "but no good conn ready, maybe need more time");
                 return SUCCESS;
             }
         }
@@ -133,15 +131,19 @@ int CthriftClient::InitWorker(bool async) {
 int CthriftClient::Init(void) {
     boost::trim(str_svr_appkey_);
     if (str_svr_appkey_.empty() && (str_server_ip_.empty() || i16_server_port_ <= 0)) {
-//        CTHRIFT_LOG_ERROR("Fail to init cthrift client, the server appkey "
-//                          "can't be empty || ip port empty.");
+        printf("ip port is null\n");
+        CTHRIFT_LOG_ERROR("Fail to init cthrift client, the server appkey "
+                          "can't be empty || ip port empty.");
         return ERR_PARA_INVALID;
     }
+    printf("svr appkey=%s svr ip=%s port=%d\n",
+           str_svr_appkey_.c_str(), str_server_ip_.c_str(), i16_server_port_);
 
     int ret = g_cthrift_config.LoadConfig(true);
     if (ret != SUCCESS) {
+        printf("loadconfig failed\n");
 //        CTHRIFT_LOG_ERROR("Fail to load config. errno" <<  ret);
-        return ret;
+//        return ret;
     }
 
     if (str_cli_appkey_.empty()) {
@@ -149,9 +151,10 @@ int CthriftClient::Init(void) {
     }
 
     if (str_server_ip_.empty()) {
+        printf("init ns\n");
         int ret = CthriftNameService::InitNS();
         if (0 != ret) {
-//            CTHRIFT_LOG_ERROR("init zk failed ");
+            CTHRIFT_LOG_ERROR("init zk failed ");
             return ERR_NS_CON_NOT_READY;
         }
     }
@@ -161,8 +164,8 @@ int CthriftClient::Init(void) {
 
 int CthriftClient::SetFilterPort(const unsigned int &i32_port) {
     if (!ValidatePort(i32_port)) {
-//        CTHRIFT_LOG_ERROR("Fail to set the filter port, it can't be < 1 "
-//                          "|| > 65535. i32_port =" << i32_port);
+        CTHRIFT_LOG_ERROR("Fail to set the filter port, it can't be < 1 "
+                          "|| > 65535. i32_port =" << i32_port);
         return ERR_PARA_INVALID;
     }
     i32_port_filter_ = i32_port;
@@ -173,7 +176,7 @@ int CthriftClient::SetFilterService(const std::string &str_serviceName) {
     string tmp = str_serviceName;
     boost::trim(tmp);
     if (tmp.empty()) {
-//        CTHRIFT_LOG_ERROR("The servicename can't be empty");
+        CTHRIFT_LOG_ERROR("The servicename can't be empty");
         return ERR_PARA_INVALID;
     }
     str_serviceName_filter_ = tmp;
@@ -184,7 +187,7 @@ int CthriftClient::SetClientAppkey(const std::string &str_appkey) {
     string tmp = str_appkey;
     boost::trim(tmp);
     if (tmp.empty()) {
-//        CTHRIFT_LOG_ERROR("The client appkey shouldn't be empty");
+        CTHRIFT_LOG_ERROR("The client appkey shouldn't be empty");
         return ERR_PARA_INVALID;
     } else {
         str_cli_appkey_ = tmp;
@@ -192,10 +195,10 @@ int CthriftClient::SetClientAppkey(const std::string &str_appkey) {
     return SUCCESS;
 }
 
-boost::shared_ptr<TProtocol>
-CthriftClient::GetCthriftProtocol(void) {
+boost::shared_ptr<TProtocol> CthriftClient::GetCthriftProtocol(void) {
 //    CTHRIFT_LOG_INFO("cthrift transport init, thread info: "
 //                     << CurreCthriftTransportntThread::tid());
+
     boost::shared_ptr<CthriftTransport> sp_cthrift_transport_
             = boost::make_shared<CthriftTransport>(
                 str_svr_appkey_,

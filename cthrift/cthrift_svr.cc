@@ -109,7 +109,7 @@ int32_t CthriftSvr::Init(void) {
                                                                muduo::net::InetAddress(u16_svr_port_),
                                                                str_svr_appkey_ + "_" + "cthrift_svr");
     } catch (const muduo::Exception& ex) {
-//        CTHRIFT_LOG_ERROR("port: " << u16_svr_port_ << " has been occupied by other process.");
+        CTHRIFT_LOG_ERROR("port: " << u16_svr_port_ << " has been occupied by other process.");
         return ERR_PARA_INVALID;
     }
 
@@ -129,26 +129,27 @@ int32_t CthriftSvr::Init(void) {
                 boost::bind(&CthriftSvr::OnWriteComplete, this, _1));
 
     muduo::CountDownLatch countdown_connthread_init(i16_conn_thread_num_);
+
     // just set, NOT start thread until start()
 //    sp_server_.setThreadNum(i16_conn_thread_num_);
 
-//    // NO InitStaticThreadLocalMember in main thread since NO handle here
+    // NO InitStaticThreadLocalMember in main thread since NO handle here
 //    sp_server_.setThreadInitCallback(boost::bind(&CthriftSvr::ConnThreadInit,
 //                                                 this,
 //                                                 &countdown_connthread_init));
 
 //    sp_server_.start();
 
-//    setInputProtocolFactory(boost::make_shared<CthriftTBinaryProtocolFactory>());
-//    setOutputProtocolFactory(boost::make_shared<CthriftTBinaryProtocolFactory>());
+    setInputProtocolFactory(boost::make_shared<CthriftTBinaryProtocolFactory>());
+    setOutputProtocolFactory(boost::make_shared<CthriftTBinaryProtocolFactory>());
 
-//    CthriftNameService::PackDefaultSgservice(str_svr_appkey_,
-//                                             CthriftNameService::str_local_ip_,
-//                                             u16_svr_port_,
-//                                             &sg_service_);
+    CthriftNameService::PackDefaultSgservice(str_svr_appkey_,
+                                             CthriftNameService::str_local_ip_,
+                                             u16_svr_port_,
+                                             &sg_service_);
 
     countdown_connthread_init.wait();
-//    CTHRIFT_LOG_INFO("conn thread init done");
+    CTHRIFT_LOG_INFO("conn thread init done");
 
     // init worker thread
     string str_pool_name("cthrift_svr_worker_event_thread_pool");
@@ -189,7 +190,7 @@ int32_t CthriftSvr::ArgumentCheck(const string &str_app_key,
     try {
         str_port = boost::lexical_cast<std::string>(u16_port);
     } catch (boost::bad_lexical_cast &e) {
-//        CTHRIFT_LOG_ERROR("boost::bad_lexical_cast :" << e.what() << "u16_port : " << u16_port);
+        CTHRIFT_LOG_ERROR("boost::bad_lexical_cast :" << e.what() << "u16_port : " << u16_port);
         return ERR_INVALID_PORT;
     }
 
@@ -201,9 +202,9 @@ int32_t CthriftSvr::ArgumentCheck(const string &str_app_key,
       try {
         str_svr_overtime_ms = boost::lexical_cast<std::string>(i32_svr_overtime_ms);
       } catch (boost::bad_lexical_cast &e) {
-//        CTHRIFT_LOG_ERROR("boost::bad_lexical_cast :" << e.what()
-//                                                      << "i32_svr_overtime_ms : "
-//                                                      << i32_svr_overtime_ms);
+        CTHRIFT_LOG_ERROR("boost::bad_lexical_cast :" << e.what()
+                                                      << "i32_svr_overtime_ms : "
+                                                      << i32_svr_overtime_ms);
         return ERR_INVALID_TIMEOUT;
       }
 
@@ -213,9 +214,9 @@ int32_t CthriftSvr::ArgumentCheck(const string &str_app_key,
       try {
           str_max_conn_num = boost::lexical_cast<std::string>(i32_max_conn_num);
       } catch (boost::bad_lexical_cast &e) {
-//        CTHRIFT_LOG_ERROR("boost::bad_lexical_cast :" << e.what()
-//                                                      << "i32_max_conn_num : "
-//                                                      << i32_max_conn_num);
+        CTHRIFT_LOG_ERROR("boost::bad_lexical_cast :" << e.what()
+                                                      << "i32_max_conn_num : "
+                                                      << i32_max_conn_num);
         return ERR_INVALID_MAX_CONNNUM;
       }
 
@@ -228,7 +229,7 @@ int32_t CthriftSvr::ArgumentCheck(const string &str_app_key,
         // i32_svr_overtime_ms/i32_max_conn_num can be 0, means NO limit
         || 0 > i32_max_conn_num)))) {
         p_str_reason->assign("argument: " + str_argument + ", some or all of " "them invalid, please check");
-//      CTHRIFT_LOG_WARN(*p_str_reason);
+      CTHRIFT_LOG_WARN(*p_str_reason);
       return ERR_PARA_INVALID;
     }
 
@@ -261,17 +262,16 @@ void CthriftSvr::stop() {
 }
 
 void CthriftSvr::OnWriteComplete(const muduo::net::TcpConnectionPtr &conn) {
-    //  CTHRIFT_LOG_DEBUG("OnWriteComplete");
+      CTHRIFT_LOG_DEBUG("OnWriteComplete");
 }
 
 void CthriftSvr::OnConn(const TcpConnectionPtr &conn) {
-//    CTHRIFT_LOG_INFO(conn->localAddress().toIpPort() << " -> "
-//                     << conn->peerAddress().toIpPort()
-//                     << " is "
-//                     << (conn->connected() ? "UP" : "DOWN")
-//                     << " Name:" << conn->name());
+    CTHRIFT_LOG_INFO(conn->localAddress().toIpPort() << " -> "
+                     << conn->peerAddress().toIpPort()
+                     << " is "
+                     << (conn->connected() ? "UP" : "DOWN")
+                     << " Name:" << conn->name());
     if (conn->connected()) {
-
         ++i32_curr_conn_num_;
 
         ConnEntrySharedPtr sp_conn_entry = boost::make_shared<ConnEntry>(conn);
@@ -296,7 +296,7 @@ void CthriftSvr::Process(const boost::shared_ptr<muduo::net::Buffer> &sp_buf,
     TcpConnectionPtr sp_conn(wp_tcp_conn.lock());
 
     if (!CTHRIFT_LIKELY(sp_conn && sp_conn->connected())) {
-//        CTHRIFT_LOG_ERROR("connection broken, discard response pkg ");
+        CTHRIFT_LOG_ERROR("connection broken, discard response pkg ");
         return;
     }
 
@@ -381,17 +381,17 @@ void CthriftSvr::Process(const int32_t &i32_req_size,
     (*sp_p_output_tmemorybuffer_)->getBuffer(&p_u8_res_buf, &u32_res_size);
 
     if (CTHRIFT_UNLIKELY(sizeof(int32_t) >= u32_res_size)) {
-//        CTHRIFT_LOG_ERROR("u32_res_size " << u32_res_size << " NOT enough ");
+        CTHRIFT_LOG_ERROR("u32_res_size " << u32_res_size << " NOT enough ");
         return;
     }
 
-    int32_t i32_body_size = static_cast<int32_t>(htonl(static_cast<uint32_t>(u32_res_size - sizeof(int32_t))));
+    int32_t i32_body_size = (int32_t)(htonl((uint32_t)(u32_res_size - sizeof(int32_t))));
     memcpy(p_u8_res_buf, &i32_body_size, sizeof(int32_t));
 
     if (CTHRIFT_LIKELY(sp_tcp_conn && sp_tcp_conn->connected())) {
         sp_tcp_conn->send(p_u8_res_buf, u32_res_size);  // already check when begin
     } else {
-//        CTHRIFT_LOG_WARN("connection broken, discard response pkg ");
+        CTHRIFT_LOG_WARN("connection broken, discard response pkg ");
     }
 //    CTHRIFT_LOG_INFO("Process Done from Peer:" << (sp_tcp_conn->peerAddress()).toIpPort());
 }
@@ -405,20 +405,21 @@ void CthriftSvr::OnMsg(const TcpConnectionPtr &conn, Buffer *buffer, Timestamp r
     try {
         sp_conn_info = boost::any_cast<ConnContextSharedPtr>(conn->getContext());
     } catch (boost::bad_any_cast& e) {
-//        CTHRIFT_LOG_ERROR("bad_any_cast:" << e.what());
+        CTHRIFT_LOG_ERROR("bad_any_cast:" << e.what());
         return;
     }
-
     sp_conn_info->t_last_active = time(0);
 
-    // 时间轮插入,新的entry,防止该连对象被清理;
-    ConnEntrySharedPtr sp_conn_entry(sp_conn_info->wp_conn_entry.lock());
-    if (!sp_conn_entry.get()) {
-//        CTHRIFT_LOG_ERROR("sp_conn_entry invalid??");
-        return;
-    } else {
-        (LocalSingConnEntryCirculBuf::instance()).back().insert(sp_conn_entry);
-    }
+    auto pfnInsertTimeWheel = [&]() {
+        // 时间轮插入,新的entry,防止该连对象被清理;
+        ConnEntrySharedPtr sp_conn_entry(sp_conn_info->wp_conn_entry.lock());
+        if (!sp_conn_entry.get()) {
+            CTHRIFT_LOG_ERROR("sp_conn_entry invalid??");
+            return;
+        } else {
+            (LocalSingConnEntryCirculBuf::instance()).back().insert(sp_conn_entry);
+        }
+    };
 
     bool more = true;
     while (more) {
@@ -467,23 +468,55 @@ void CthriftSvr::OnMsg(const TcpConnectionPtr &conn, Buffer *buffer, Timestamp r
                 // 放在while循环后，永远无法执行该段逻辑
                 sp_conn_info->t_last_active = time(0);
 
-                ConnEntrySharedPtr sp_conn_entry((sp_conn_info->wp_conn_entry).lock());
-                if (CTHRIFT_UNLIKELY(!sp_conn_entry)) {
-                    CTHRIFT_LOG_ERROR("sp_conn_entry invalid??");
-                    return;
-                } else {
-                    (LocalSingConnEntryCirculBuf::instance()).back().insert(sp_conn_entry);
-                }
-
+                pfnInsertTimeWheel();
             }
 
         } else {
-
+            more = false;
         }
 
-    }
-
+    }// end while ...
 
 }
 
+void CthriftSvr::TimewheelKick() {
+    (LocalSingConnEntryCirculBuf::instance()).push_back(ConnEntryBucket());
+}
+
+void CthriftSvr::ConnThreadInit(muduo::CountDownLatch* p_countdown_connthread_init) {
+
+    InitStaticThreadLocalMember();
+
+    // time wheel
+    assert(LocalSingConnEntryCirculBuf::pointer() == NULL);
+    LocalSingConnEntryCirculBuf::instance();
+
+    assert(LocalSingConnEntryCirculBuf::pointer() != NULL);
+    (LocalSingConnEntryCirculBuf::instance()).resize(kI8TimeWheelGridNum);
+
+    double dLoopInter = (0.0 == con_collection_interval_) ?
+                ((kTMaxCliIdleTimeSec) / kI8TimeWheelGridNum) :
+                (con_collection_interval_ / kI8TimeWheelGridNum);
+    CTHRIFT_LOG_DEBUG("dLoopInter " << dLoopInter);
+
+    EventLoop::getEventLoopOfCurrentThread()->runEvery(dLoopInter,
+                                                       boost::bind(&CthriftSvr::TimewheelKick, this));
+    p_countdown_connthread_init->countDown();
+}
+
+void CthriftSvr::WorkerThreadInit(muduo::CountDownLatch *p_countdown_workthread_init) {
+    InitStaticThreadLocalMember();
+    p_countdown_workthread_init->countDown();
+}
+
+void CthriftSvr::StatMsgNumPerMin(void) {
+    CTHRIFT_LOG_INFO(atom_i64_recv_msg_per_min_.getAndSet(0) / SENCOND_COUNT_IN_MIN << " msg per second");
+}
+
+// init start pos for avoid big-number-mod performance issue
+void CthriftSvr::InitWorkerThreadPos(void) {
+    if (CTHRIFT_LIKELY(1 < i16_worker_thread_num_)) {
+        CTHRIFT_LOG_DEBUG(atom_i64_worker_thread_pos_.getAndSet(0) << " msg per 5 mins");
+    }
+}
 

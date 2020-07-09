@@ -45,6 +45,8 @@ add_subdirectory(tstskiplist)
 add_subdirectory(netty/discard)
 add_subdirectory(netty/echo)
 #add_subdirectory(netty/uptime)
+add_subdirectory(cthrift_cli)
+add_subdirectory(cthrift_srv)
 
 
 #add_subdirectory(${CMAKE_SOURCE_DIR}/thirdpart/rapidjson)

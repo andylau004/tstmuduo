@@ -2,6 +2,8 @@
 #ifndef CTHRIFT_SRC_CTHRIFT_CTHRIFT_CLIENT_WORKER_H_
 #define CTHRIFT_SRC_CTHRIFT_CTHRIFT_CLIENT_WORKER_H_
 
+
+#include "octoidl/naming_common_types.h"
 #include "cthrift/util/cthrift_common.h"
 #include "cthrift_name_service.h"
 #include "cthrift_client.h"
@@ -20,7 +22,7 @@ struct WeightSort {
 
 class ConnInfo {
 private:
-//    meituan_mns::SGService sgservice_;
+    meituan_mns::SGService sgservice_;
     TcpClientSharedPtr sp_tcpclient_;
 
     std::multimap<double, TcpClientWeakPtr, WeightSort> *p_map_weight_tcpclientwp_;
@@ -38,12 +40,11 @@ public:
 
     ~ConnInfo(void) {
         if (CTHRIFT_UNLIKELY(!p_map_weight_tcpclientwp_)) {
-//            CTHRIFT_LOG_ERROR("p_map_weight_tcpclientwp_ NULL");
+            CTHRIFT_LOG_ERROR("p_map_weight_tcpclientwp_ NULL");
         } else {
-//            CTHRIFT_LOG_INFO("delete appkey " << sgservice_.appkey << " ip: "
-//                             << sgservice_.ip << " port: "
-//                             << sgservice_.port
-//                             << " from weight pool");
+            CTHRIFT_LOG_INFO("delete appkey " << sgservice_.appkey << " ip: "
+                             << sgservice_.ip << " port: "
+                             << sgservice_.port << " from weight pool");
             p_map_weight_tcpclientwp_->erase(it_map_weight_tcpclientwp_index_);
         }
     }
@@ -162,12 +163,11 @@ private:
     boost::shared_ptr<CthriftTBinaryProtocolWithTMemoryBuf>* sp_p_cthrift_tbinary_protocol_;
 
     // for common srvlist update
+    typedef boost::unordered_map<std::string, ConnInfoSharedPtr>::iterator UnorderedMapIpPort2ConnInfoSP;
     boost::unordered_map<std::string, ConnInfoSharedPtr> map_ipport_spconninfo_;
 
     // ONLY used by conninfo
     std::multimap<double, TcpClientWeakPtr, WeightSort>* p_multimap_weight_wptcpcli_;
-
-    typedef boost::unordered_map<std::string, ConnInfoSharedPtr>::iterator UnorderedMapIpPort2ConnInfoSP;
 
     typedef std::multimap<double, TcpClientWeakPtr, WeightSort>::iterator MultiMapIter;
 
