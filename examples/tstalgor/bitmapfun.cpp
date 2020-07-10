@@ -41,7 +41,7 @@ void tst_bitmap_1() {
     std::bitset< max_cout > bit_map;
     bit_map.reset();  //所有位置0
 
-    int i = 0;
+    size_t i = 0;
     for (i = 0; i < array_size(arr); ++i ) {
         bit_map.set( arr[i] );
     }

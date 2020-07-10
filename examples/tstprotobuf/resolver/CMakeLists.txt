@@ -17,10 +17,9 @@ add_executable(protobuf_rpc_resolver_client client.cc resolver.pb.cc)
 set_target_properties(protobuf_rpc_resolver_client PROPERTIES COMPILE_FLAGS "-std=c++11 -Wno-error=shadow")
 target_link_libraries(protobuf_rpc_resolver_client resolver_proto muduo_protorpc)
 
-add_executable(protobuf_rpc_resolver_server server.cc resolver.proto)
-set_target_properties(protobuf_rpc_resolver_server PROPERTIES COMPILE_FLAGS "-std=c++11 -Wno-error=shadow")
-#target_link_libraries(protobuf_rpc_resolver_server resolver_proto muduo_protorpc)
-target_link_libraries(protobuf_rpc_resolver_server resolver_proto muduo_protorpc muduo_cdns)
+#add_executable(protobuf_rpc_resolver_server server.cc resolver.proto)
+#set_target_properties(protobuf_rpc_resolver_server PROPERTIES COMPILE_FLAGS "-std=c++11 -Wno-error=shadow")
+#target_link_libraries(protobuf_rpc_resolver_server resolver_proto muduo_protorpc muduo_cdns)
 
 
 

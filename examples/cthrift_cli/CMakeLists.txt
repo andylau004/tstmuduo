@@ -10,7 +10,6 @@ set(EXECUTABLE_OUTPUT_PATH ../../)
 add_executable(${PROJECT_NAME}
     echo_types.h echo_types.cpp
     echo_constants.h echo_constants.cpp
-
     Echo.h Echo.cpp
     main.cpp)
 

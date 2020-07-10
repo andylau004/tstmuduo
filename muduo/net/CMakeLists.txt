@@ -30,7 +30,7 @@ set(net_SRCS
 
 add_library(muduo_net ${net_SRCS})
 target_link_libraries(muduo_net muduo_base)
-set_target_properties(muduo_net PROPERTIES COMPILE_FLAGS "-std=c++11")
+#set_target_properties(muduo_net PROPERTIES COMPILE_FLAGS "-std=c++11")
 
 add_library(muduo_net_cpp11 ${net_SRCS})
 target_link_libraries(muduo_net_cpp11 muduo_base_cpp11)

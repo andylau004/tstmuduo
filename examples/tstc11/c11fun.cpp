@@ -1487,9 +1487,38 @@ void tst_trim() {
 muduo::MutexLock gMtx;
 
 
+void testHash()
+{
+    boost::hash< std::shared_ptr<int> > h;
+    std::shared_ptr<int> x1(new int(10));
+    std::shared_ptr<int> x2(new int(10));
+    h(x1);
+    LOG_INFO << "h(x1)=" << h(x1);
+    LOG_INFO << "h(x2)=" << h(x2);
+
+    {
+        boost::hash < int > hnew;
+        LOG_INFO << "hnew(1)=" << hnew(1);
+        LOG_INFO << "hnew(2)=" << hnew(2);
+    }
+    return;
+
+    assert(h(x1) != h(x2));
+    x1 = x2;
+    assert(h(x1) == h(x2));
+    x1.reset();
+    assert(h(x1) != h(x2));
+    x2.reset();
+    assert(h(x1) == h(x2));
+}
+
+
 // 2020-6-20
 // add new 测试分支预测
 void tst_c11fun_entry(int argc, char *argv[]) {
+
+
+    testHash(); return;
 
     tst_trim();      return;
 

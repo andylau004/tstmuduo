@@ -284,7 +284,7 @@ void EventLoop::runInLoop(const Functor& cb)
 void EventLoop::runInLoop(Functor&& cb)
 {
     if (isInLoopThread()) {
-        LOG_INFO << "new aaaaaaaaaaaaaaaaaaaaaaaaaa";
+//        LOG_INFO << "new aaaaaaaaaaaaaaaaaaaaaaaaaa";
         cb();
     }
     else {

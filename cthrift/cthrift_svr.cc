@@ -92,6 +92,8 @@ int32_t CthriftSvr::Init(void) {
     i16_worker_thread_num_ = static_cast<int16_t >(g_cthrift_config.server_work_threadnum_);
     con_collection_interval_ = static_cast<double >(g_cthrift_config.server_conn_gctime_);
 
+    CTHRIFT_LOG_INFO("port=" << u16_svr_port_);
+    std::cout << "port=" << u16_svr_port_ << std::endl;
 //    std::string str_reason;
 //    ret = ArgumentCheck(str_svr_appkey_,
 //                        u16_svr_port_,
@@ -131,14 +133,13 @@ int32_t CthriftSvr::Init(void) {
     muduo::CountDownLatch countdown_connthread_init(i16_conn_thread_num_);
 
     // just set, NOT start thread until start()
-//    sp_server_.setThreadNum(i16_conn_thread_num_);
+    sp_server_->setThreadNum(i16_conn_thread_num_);
 
     // NO InitStaticThreadLocalMember in main thread since NO handle here
-//    sp_server_.setThreadInitCallback(boost::bind(&CthriftSvr::ConnThreadInit,
-//                                                 this,
-//                                                 &countdown_connthread_init));
-
-//    sp_server_.start();
+    sp_server_->setThreadInitCallback(boost::bind(&CthriftSvr::ConnThreadInit,
+                                                 this,
+                                                 &countdown_connthread_init));
+    sp_server_->start();
 
     setInputProtocolFactory(boost::make_shared<CthriftTBinaryProtocolFactory>());
     setOutputProtocolFactory(boost::make_shared<CthriftTBinaryProtocolFactory>());

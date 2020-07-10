@@ -41,7 +41,7 @@ using namespace std;
 using namespace muduo;
 using namespace muduo::net;
 
-#include <gtest/gtest.h>
+//#include <gtest/gtest.h>
 #include <iostream>
 
 #include "ched_ssl.h"

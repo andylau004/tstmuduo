@@ -106,7 +106,7 @@ void tst_lru_entry() {
 //    std::list< std::pair < int, int > > listNode;
 
     std::list < int > listInts;
-    int i = 0;
+    size_t i = 0;
     for ( i ; i < 10; i ++ ) {
         listInts.push_back(i);
     }

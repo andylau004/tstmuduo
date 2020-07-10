@@ -103,7 +103,7 @@ void tst_twfun_entry() {
 //    int timer3 = time_wheel.AddTimer(500, f500);
 //	time_wheel.AddTimer(1500, f1500);
 
-    bool b = true;
+//    bool b = true;
     int nLoop = 0;
     while (1)
     {

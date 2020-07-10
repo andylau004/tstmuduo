@@ -105,13 +105,12 @@ void CthriftTransport::flush(void) throw(TTransportException) {
 
             if (b_timeout) {
                 if (CTHRIFT_UNLIKELY(0 < sp_cthrift_client_worker_->atomic_avaliable_conn_num())) {
-//                    CTHRIFT_LOG_DEBUG("miss notify, but already get avaliable conn");
+                    CTHRIFT_LOG_DEBUG("miss notify, but already get avaliable conn");
                 } else {
-//                    CTHRIFT_LOG_ERROR("wait " << d_wait_secs
-//                                      << " secs for good conn timeout");
+                    CTHRIFT_LOG_ERROR("wait " << d_wait_secs << " secs for good conn timeout");
 
                     throw TTransportException(TTransportException::TIMED_OUT,
-                                              "wait for good conn timeout, maybe conn all "
+                                              "flusha wait for good conn timeout, maybe conn all "
                                               "be occupied or server list empty");
                 }
             }
@@ -122,7 +121,7 @@ void CthriftTransport::flush(void) throw(TTransportException) {
 //                                    "but no good conn ready, maybe server busy");
 
                 throw TTransportException(TTransportException::TIMED_OUT,
-                                          "wait for good conn timeout, maybe conn "
+                                          "flushb wait for good conn timeout, maybe conn "
                                           "all be occupied or server list empty");
             }
         }

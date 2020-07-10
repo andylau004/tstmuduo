@@ -6,30 +6,23 @@
 
 
 #include <stdio.h>
-
 #include <iostream>
 #include <unordered_map>
 #include <stack>
 #include <vector>
 
-
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
 #include <boost/scoped_ptr.hpp>
-//#include <Windows.h>
 
 #include "boost_use_1.h"
 
-#include "muduo/base/Timestamp.h"
-//#include <muduo/base/Timestamp.h>
-
 #include "muduo/base/common.h"
-
+#include "muduo/base/Timestamp.h"
 
 
 using namespace std;
 using namespace muduo;
-//using namespace muduo::net;
 
 
 
@@ -42,8 +35,9 @@ using namespace muduo;
 
 bool IsPopOrder(vector<int> pushV,vector<int> popV) {
     vector<int> stack;
-    for(int i = 0,j = 0 ;i < pushV.size();i++){
+    for(size_t i = 0, j = 0 ;i < pushV.size();i++){
         stack.push_back(pushV[i]);
+
         //根据出栈顺序模拟出栈
         while(j < popV.size() && stack.back() == popV[j]){
             std::cout << "stack.back=" << stack.back() << ", popV[" << j << "]=" << popV[j] << std::endl;

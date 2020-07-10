@@ -568,7 +568,7 @@ bool IOThreadImpl::create_connection(Item_t * item) {
         LOG_ERROR << " init ctx error, ctx=" << ctx << ", activeNum=" << activeCtxnum_;
         delete_object(ctx);
     } else {
-        ret == true;
+        ret = true;
 //        boost::shared_ptr<ClientCtx> sp_ctx(ctx);
 //        SaveNewCtx(sp_ctx);
 

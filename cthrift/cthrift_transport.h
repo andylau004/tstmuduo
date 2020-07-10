@@ -271,7 +271,9 @@ private:
             uint32_t u32_len = 0;
 
             sp_read_tmembuf_->getBuffer(&p_buf, &u32_len);
-            sp_read_tmembuf_ = boost::make_shared<TMemoryBuffer>(p_buf, u32_len, TMemoryBuffer::COPY);
+            sp_read_tmembuf_ = boost::make_shared<TMemoryBuffer>(p_buf,
+                                                                 u32_len,
+                                                                 TMemoryBuffer::COPY);
         }
 
         return sp_read_tmembuf_->read(buf, len);
@@ -298,6 +300,7 @@ public:
           str_cli_appkey_(str_cli_appkey),
           cond_ready_read(mutexlock_conn_ready),
           sp_cthrift_client_worker_(sp_cthrift_client_worker) {
+
         sp_mutexlock_read_buf = boost::make_shared<muduo::MutexLock>();
         sp_mutexlock_write_buf = boost::make_shared<muduo::MutexLock>();
 

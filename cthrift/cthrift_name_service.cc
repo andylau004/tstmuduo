@@ -51,23 +51,23 @@ CthriftNameService::CthriftNameService(void) throw(TException) {
 }
 
 void CthriftNameService::PackDefaultSgservice(
-    const string &str_svr_appkey,
-    const string &str_local_ip,
-    const uint16_t &u16_port,
-    meituan_mns::SGService *p_sgservice) {
-  p_sgservice->__set_appkey(str_svr_appkey);
-  p_sgservice->__set_version(g_cthrift_config.server_version_);
-  p_sgservice->__set_ip(str_local_ip);
-  p_sgservice->__set_port(u16_port);
-  p_sgservice->__set_weight(10);
+        const string &str_svr_appkey,
+        const string &str_local_ip,
+        const uint16_t &u16_port,
+        meituan_mns::SGService *p_sgservice) {
+    p_sgservice->__set_appkey(str_svr_appkey);
+    p_sgservice->__set_version(g_cthrift_config.server_version_);
+    p_sgservice->__set_ip(str_local_ip);
+    p_sgservice->__set_port(u16_port);
+    p_sgservice->__set_weight(10);
 
-  p_sgservice->__set_status(meituan_mns::fb_status::ALIVE);
+    p_sgservice->__set_status(meituan_mns::fb_status::ALIVE);
 
-  p_sgservice->__set_lastUpdateTime(static_cast<int32_t>(time(0)));
-  p_sgservice->__set_fweight(10.0);
-  p_sgservice->__set_serverType(0);
-  p_sgservice->__set_protocol("thrift");
-  p_sgservice->__set_heartbeatSupport(0);
+    p_sgservice->__set_lastUpdateTime(static_cast<int32_t>(time(0)));
+    p_sgservice->__set_fweight(10.0);
+    p_sgservice->__set_serverType(0);
+    p_sgservice->__set_protocol("thrift");
+    p_sgservice->__set_heartbeatSupport(0);
 }
 
 //string CthriftNameService::SGService2String(

@@ -45,7 +45,7 @@
 //#include "quicksort.h"
 //#include "tst_signal.h"
 #include "mysqlinsert.h"
-#include "cpp11fun.h"
+//#include "cpp11fun.h"
 
 
 //#include "tst_1.h"
@@ -2865,7 +2865,7 @@ char* Serialize(BstNode *root) {
 // 输入某二叉树的前序遍历和中序遍历的结果，请重建出该二叉树。
 // 假设输入的前序遍历和中序遍历的结果中都不含重复的数字。
 // 例如输入前序遍历序列{1,2,4,7,3,5,6,8}和中序遍历序列{4,7,2,1,5,3,8,6}，则重建二叉树并返回。
-BstNode* reConstructBinaryTree(vector<int> pre, vector<int> vin) {
+//BstNode* reConstructBinaryTree(vector<int> pre, vector<int> vin) {
     /*
 解题思路：
 1.  前序遍历的第一个数字总是树的根节点的值。
@@ -2875,28 +2875,28 @@ BstNode* reConstructBinaryTree(vector<int> pre, vector<int> vin) {
     所以由后续遍历推断出左子树中节点的数目之后，前序遍历中根节点之后的相同数目的值都是左子树的节点的值。剩下的就是右子树的值。这样就分别找到了左右子树序列。
 3.  分别确定了根节点和左右子树的前序、中序遍历，我们可以用同样的方法构建左右子树，剩下的可以用递归来完成。
     */
-    int vinlen = vin.size();
+//    int vinlen = vin.size();
 
-    vector<int> leftpre, rightpre, leftvin, rightvin;
-    BstNode* newNode = new BstNode(pre[0], nullptr, nullptr, nullptr);
+//    vector<int> leftpre, rightpre, leftvin, rightvin;
+//    BstNode* newNode = new BstNode(pre[0], nullptr, nullptr, nullptr);
 
-    int root = pre[0];
-    auto posi = std::find(vin.begin(), vin.end(), root);
-    if (posi == vin.end()) {
-        printf("cant't found root=%d\n", root);
-        return nullptr;
-    }
-    int leftSize = posi - vin.begin();
-    int rightSize= vin.end() - posi - 1;
+//    int root = pre[0];
+//    auto posi = std::find(vin.begin(), vin.end(), root);
+//    if (posi == vin.end()) {
+//        printf("cant't found root=%d\n", root);
+//        return nullptr;
+//    }
+//    int leftSize = posi - vin.begin();
+//    int rightSize= vin.end() - posi - 1;
 
-    //递归求解
-    //这里取前序和后序遍历的左右子树可能有点绕，可以好好思考一下
-    newNode->lchild_ = reConstructBinaryTree(vector<int>(pre.begin() + 1, pre.begin() + 1 + leftSize),
-                                             vector<int>(vin.begin(), vin.begin() + leftSize));
-    newNode->rchild_ = reConstructBinaryTree(vector<int>(pre.begin() + 1 + leftSize, pre.end()),
-                                             vector<int>(vin.begin() + 1 + leftSize, vin.end()));
-    return nullptr;
-}
+//    //递归求解
+//    //这里取前序和后序遍历的左右子树可能有点绕，可以好好思考一下
+//    newNode->lchild_ = reConstructBinaryTree(vector<int>(pre.begin() + 1, pre.begin() + 1 + leftSize),
+//                                             vector<int>(vin.begin(), vin.begin() + leftSize));
+//    newNode->rchild_ = reConstructBinaryTree(vector<int>(pre.begin() + 1 + leftSize, pre.end()),
+//                                             vector<int>(vin.begin() + 1 + leftSize, vin.end()));
+//    return nullptr;
+//}
 
 
 template <typename ...Args>

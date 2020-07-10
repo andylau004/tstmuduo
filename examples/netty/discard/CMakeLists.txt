@@ -1,9 +1,9 @@
 
 add_executable(netty_discard_client client.cc)
-target_link_libraries(netty_discard_client muduo_net)
+target_link_libraries(netty_discard_client muduo_net_cpp11 boost_system boost_filesystem)
 
 add_executable(netty_discard_server server.cc)
-target_link_libraries(netty_discard_server muduo_net)
+target_link_libraries(netty_discard_server muduo_net_cpp11 boost_system boost_filesystem)
 
 
 

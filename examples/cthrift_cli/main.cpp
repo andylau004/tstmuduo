@@ -47,7 +47,7 @@ void Work(const string &str_svr_appkey,
           muduo::CountDownLatch *p_countdown) {
 
     //建议CthriftClient生命期也和线程保持一致，不要一次请求创建销毁一次
-    CthriftClient cthrift_client(str_svr_appkey, i32_timeout_ms);
+    CthriftClient cthrift_client("172.17.0.2", int16_t(16888)/*str_svr_appkey*/, i32_timeout_ms);
 
     //cthrift_client.SetFilterService("echo.Echo");
 

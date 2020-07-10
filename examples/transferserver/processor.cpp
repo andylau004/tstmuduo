@@ -28,7 +28,7 @@ IOThread* Processor::get_iothread() {
     if (m_clientctx == NULL) {
         return NULL;
     }
-    m_clientctx->get_iothread();
+    return m_clientctx->get_iothread();
 }
 
 void Processor::set_transport(void *ctx) {

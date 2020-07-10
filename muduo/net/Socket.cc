@@ -66,7 +66,7 @@ void Socket::bindAddress(const InetAddress& addr)
 void Socket::listen()
 {
     sockets::listenOrDie(sockfd_);
-    LOG_INFO << "listenFd=" << sockfd_;
+//    LOG_INFO << "listenFd=" << sockfd_;
 }
 
 int Socket::accept(InetAddress* peeraddr)

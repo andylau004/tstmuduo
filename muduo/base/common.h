@@ -650,6 +650,36 @@ struct shared_use_st
 #define SHM_SIZE 2048
 
 
+struct BstNode {
+    BstNode* rchild_;
+    BstNode* lchild_;
+    BstNode* parent_;
+    int      key_;
+public:
+    BstNode(int key, BstNode* lchild, BstNode* rchild, BstNode* parent) :
+        rchild_(rchild),
+        lchild_(lchild),
+        parent_(parent),
+        key_(key)
+    {}
+    BstNode(int key) :
+        rchild_(nullptr),
+        lchild_(nullptr),
+        parent_(nullptr),
+        key_(key)
+    {}
+    BstNode() :
+        rchild_(nullptr),
+        lchild_(nullptr),
+        parent_(nullptr),
+        key_(0) {
+
+    }
+
+};
+
+
+
 
 #endif  // TST_PRJ_BASE_COMMON_H_
 

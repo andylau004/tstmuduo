@@ -188,12 +188,12 @@ private:
     typedef boost::unordered_map<std::string, SharedContSharedPtr>::iterator
     MapID2SharedPointerIter;
 
-//    void AddSrv(
-//            const std::vector<meituan_mns::SGService> &vec_add_sgservice);
-//    void DelSrv(
-//            const std::vector<meituan_mns::SGService> &vec_add_sgservice);
-//    void ChgSrv(
-//            const std::vector<meituan_mns::SGService> &vec_add_sgservice);
+    void AddSrv(
+            const std::vector<meituan_mns::SGService> &vec_add_sgservice);
+    void DelSrv(
+            const std::vector<meituan_mns::SGService> &vec_add_sgservice);
+    void ChgSrv(
+            const std::vector<meituan_mns::SGService> &vec_add_sgservice);
 
     void OnConn(const muduo::net::TcpConnectionPtr &conn);
     void OnMsg(const muduo::net::TcpConnectionPtr &conn,

@@ -523,14 +523,14 @@ void CthriftClientWorker::GetSvrList(void) {
 //                                         servicelist));
 }
 
-//void CthriftClientWorker::AddSrv(const vector<meituan_mns::SGService> &vec_add_sgservice) {
-//    string str_port;
-//    vector<meituan_mns::SGService> vec_chg_sgservice;
-//    MultiMapIter it_multimap;
+void CthriftClientWorker::AddSrv(const vector<meituan_mns::SGService> &vec_add_sgservice) {
+    string str_port;
+    vector<meituan_mns::SGService> vec_chg_sgservice;
+    MultiMapIter it_multimap;
 
-//    vector<meituan_mns::SGService>::const_iterator
-//            it_sgservice = vec_add_sgservice
-//            .begin();
+    vector<meituan_mns::SGService>::const_iterator
+            it_sgservice = vec_add_sgservice
+            .begin();
 //    while (it_sgservice != vec_add_sgservice.end()) {
 //        const meituan_mns::SGService &sgservice = *it_sgservice;
 
@@ -601,11 +601,11 @@ void CthriftClientWorker::GetSvrList(void) {
 ////        CTHRIFT_LOG_ERROR("Add trans to Chg");
 //        ChgSrv(vec_chg_sgservice);
 //    }
-//}
+}
 
-//void CthriftClientWorker::DelSrv(
-//        const vector<meituan_mns::SGService> &vec_del_sgservice) {
-//    string str_port;
+void CthriftClientWorker::DelSrv(
+        const vector<meituan_mns::SGService> &vec_del_sgservice) {
+    string str_port;
 
 //    vector<meituan_mns::SGService>::const_iterator it_sgservice
 //            = vec_del_sgservice.begin();
@@ -629,14 +629,14 @@ void CthriftClientWorker::GetSvrList(void) {
 
 //        ++it_sgservice;
 //    }
-//}
+}
 
-//void CthriftClientWorker::ChgSrv(
-//        const vector<meituan_mns::SGService> &vec_chg_sgservice) {
-//    string str_port;
-//    string str_key;
+void CthriftClientWorker::ChgSrv(
+        const vector<meituan_mns::SGService> &vec_chg_sgservice) {
+    string str_port;
+    string str_key;
 
-//    vector<meituan_mns::SGService> vec_add_sgservice;
+    vector<meituan_mns::SGService> vec_add_sgservice;
 
 //    vector<meituan_mns::SGService>::const_iterator
 //            it_sgservice = vec_chg_sgservice.begin();
@@ -675,12 +675,12 @@ void CthriftClientWorker::GetSvrList(void) {
 ////        CTHRIFT_LOG_ERROR("Chg trans to Add");
 //        AddSrv(vec_add_sgservice);
 //    }
-//}
+}
 
 void CthriftClientWorker::OnConn(const muduo::net::TcpConnectionPtr &conn) {
-    CTHRIFT_LOG_INFO("(" << conn->localAddress().toIpPort() << ") -> ("
-                     << conn->peerAddress().toIpPort()
-                     << ") is " << (conn->connected() ? "UP" : "DOWN"));
+    CTHRIFT_LOG_INFO("(" << conn->localAddress().toIpPort() << ") -> (" <<
+                     conn->peerAddress().toIpPort() <<
+                     ") is " << (conn->connected() ? "UP" : "DOWN"));
 
     if (conn->connected()) {
         string str_port;
@@ -695,14 +695,14 @@ void CthriftClientWorker::OnConn(const muduo::net::TcpConnectionPtr &conn) {
         }
 
         // check in map
-        UnorderedMapIpPort2ConnInfoSP unordered_map_iter =
+        UnorderedMapIpPort2ConnInfoSP unordered_map_iter;
+        unordered_map_iter =
                 map_ipport_spconninfo_.find((conn->peerAddress()).toIp() + ":" + str_port);
-        if (CTHRIFT_UNLIKELY(unordered_map_iter == map_ipport_spconninfo_.end())) {
-//            CTHRIFT_LOG_ERROR("conn peerAddr " << (conn->peerAddress()).toIpPort()
-//                              << " localaddr "
-//                              << (conn->localAddress()).toIpPort()
-//                              << " NOT find key in map_ipport_spconninfo_");
 
+        if (CTHRIFT_UNLIKELY(unordered_map_iter == map_ipport_spconninfo_.end())) {
+            CTHRIFT_LOG_ERROR("conn peerAddr " << (conn->peerAddress()).toIpPort()
+                              << " localaddr " << (conn->localAddress()).toIpPort()
+                              << " NOT find key in map_ipport_spconninfo_");
             conn->shutdown();
             return;
         }
@@ -740,7 +740,7 @@ void CthriftClientWorker::OnConn(const muduo::net::TcpConnectionPtr &conn) {
             try {
                 sp_context = boost::any_cast<Context4WorkerSharedPtr>(conn->getContext());
             } catch (boost::bad_any_cast &e) {
-                CTHRIFT_LOG_ERROR("bad_any_cast:" << e.what());
+                CTHRIFT_LOG_ERROR("bad_any_cast exception, what=" << e.what());
                 return;
             }
 
@@ -784,9 +784,9 @@ void CthriftClientWorker::HandleThriftMsg(const muduo::net::TcpConnectionPtr &co
         str_id = boost::lexical_cast<std::string>(i32_seqid);
     } catch (boost::bad_lexical_cast &e) {
         CTHRIFT_LOG_ERROR("boost::bad_lexical_cast :" << e.what()
-                          << "seqid " << i32_seqid
+                          << " seqid " << i32_seqid
                           << " str_appkey " << str_svr_appkey_
-                          << " close connection to " << (conn->peerAddress()).toIpPort());
+                          << " close connection to " << conn->peerAddress().toIpPort());
         conn->shutdown();
         return;
     }

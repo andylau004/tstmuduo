@@ -4,6 +4,7 @@
 
 #include "List.h"
 
+
 //#define GOOGLE_STRIP_LOG 1
 #include <glog/logging.h>
 #define GOOGLE_STRIP_LOG 1
@@ -497,18 +498,18 @@ public:
 //    }
 
     bool IsValidBst_1(BstNode* root) {
-        std::vector<int> arrVal;
-        inorder(root, arrVal);
-        for (size_t i = 0; i < arrVal.size(); i++) {
-            if (arrVal[i] <= arrVal[i-1]) return false;
-        }
+//        std::vector<int> arrVal;
+//        inorder(root, arrVal);
+//        for (size_t i = 0; i < arrVal.size(); i++) {
+//            if (arrVal[i] <= arrVal[i-1]) return false;
+//        }
         return true;
     }
     void inorder(BstNode* root, std::vector<int>& arrVal) {
-        if (!root) return;
-        inorder(root->lchild_, arrVal);
-        arrVal.push_back(root->key_);
-        inorder(root->rchild_, arrVal);
+//        if (!root) return;
+//        inorder(root->lchild_, arrVal);
+//        arrVal.push_back(root->key_);
+//        inorder(root->rchild_, arrVal);
     }
 
 };
