@@ -6,9 +6,6 @@
 #include <unistd.h>
 
 #include "muduo/base/common.h"
-//#include "logs/log.h"
-
-#include "muduo/base/common.h"
 
 #include "muduo/net/InetAddress.h"
 #include "muduo/net/Channel.h"
@@ -19,8 +16,6 @@
 #include "muduo/base/Logging.h"
 #include "muduo/net/TcpClient.h"
 
-
-//extern log4cplus::Logger gLogger;
 
 event_thread::event_thread(int id) : m_status(false),
     m_id(id), m_isrun(false), m_eventBase(nullptr) {

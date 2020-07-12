@@ -2,26 +2,22 @@
 
 #include "stockfactory.h"
 
-#include "muduo/base/Mutex.h"
-#include "muduo/base/Thread.h"
-
-
-#include <boost/noncopyable.hpp>
-#include <boost/thread/thread.hpp>
-#include <iostream>
-
-#include <memory>
-#include <unordered_map>
-
 #include <iostream>
 #include <sstream>
 #include <assert.h>
 #include <stdio.h>
 #include <unistd.h>
 
-using std::string;
+#include <memory>
+#include <unordered_map>
 
 
+#include <boost/noncopyable.hpp>
+#include <boost/thread/thread.hpp>
+
+
+#include "muduo/base/Mutex.h"
+#include "muduo/base/Thread.h"
 #include "muduo/base/Logging.h"
 
 

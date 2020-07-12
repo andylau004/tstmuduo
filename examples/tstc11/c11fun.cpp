@@ -1263,8 +1263,14 @@ void tst_run() {
 
 class CBase {
 public:
-    CBase() {}
-    CBase(int val) {m_val = val;}
+    CBase() { std::cout << "cst cbase" << std::endl; }
+    CBase(int val) {
+        std::cout << "cst cbase" << std::endl;
+        m_val = val;
+    }
+    ~CBase() {
+        std::cout << "dst cbase" << std::endl;
+    }
 
     virtual void Print() {
         printf("print base val\n");
@@ -1275,6 +1281,11 @@ private:
 
 class Derive1 : public CBase {
 public:
+    Derive1() { std::cout << "cst derive1" << std::endl; }
+    ~Derive1() {
+        std::cout << "dst derive1" << std::endl;
+    }
+
     virtual void Print() {
         printf("print derive1 val\n");
     }
@@ -1427,21 +1438,32 @@ int tstopenfd(int argc, char* argv[]) {
 
 class CTvvv {
 public:
+    CTvvv() {
+        LOG_INFO << "this=" << this << ", default cst CTvvv" << ", selfval=" << selfVal_;
+    }
     CTvvv(int val)
+        :
+          selfVal_(val)
     {
         g_val = val;
-        LOG_INFO << "cst CTvvv" << ", create=" << g_val;
+        LOG_INFO << "this=" << this << ", param cst CTvvv" << ", selfval=" << selfVal_;
     }
     ~CTvvv() {
-        LOG_INFO << "dst CTvvv" << ", destroy=" << g_val;
+        LOG_INFO << "this=" << this << ", dst CTvvv" << ", selfval=" << selfVal_;
     }
     void ShowVal() {
-        LOG_INFO << "val=" << g_val << ", addr=" << &g_val;
+        LOG_INFO << "this=" << this << ", show val selfval=" << selfVal_ << ", addr=" << &selfVal_;
     }
 private:
+    int                 selfVal_;
     static __thread int g_val;
 };
+
 __thread int CTvvv::g_val;
+
+typedef boost::shared_ptr<CTvvv> CTvvvPtr;
+typedef boost::weak_ptr<CTvvv>   CTvvvWkPtr;
+
 
 void tst__thread() {
     CTvvv o1(33);
@@ -1486,9 +1508,132 @@ void tst_trim() {
 
 muduo::MutexLock gMtx;
 
+CTvvv GetCTvvObj(int val) {
+    return CTvvv(val);
+}
+
+
+class CUseTv {
+public:
+    CUseTv()
+        : data_(new CTvvv) {
+
+    }
+
+    CTvvvPtr GetData() {
+        return data_;
+    }
+
+public:
+    CTvvvPtr data_;
+};
+
+
+void SetVal(int& val) {
+    std::cout << "&val=" << val << std::endl;
+}
+void SetVal(int&& val) {
+    std::cout << "&&val=" << val << std::endl;
+}
 
 void testHash()
 {
+
+    {
+#if 0
+        int val = 13;
+        SetVal(val);
+        SetVal(std::move(val));
+        std::cout << "lst val=" << val << std::endl;
+//       output:
+//        &val=13
+//        &&val=13
+//        lst val=13
+        return;
+#endif
+    }
+
+    {
+        CUseTv useObj;
+        CTvvvPtr sp_obj = useObj.GetData();
+        LOG_INFO << "sp_obj1 use count=" << sp_obj.use_count();
+
+        CTvvvWkPtr wktmp(sp_obj);
+        sp_obj = nullptr;
+
+        LOG_INFO << "sp_obj2 use count=" << sp_obj.use_count();
+
+        if (wktmp.expired()) {
+            LOG_INFO << "wktmp expired";
+        } else {
+            LOG_INFO << "wktmp not expired";
+        }
+
+        {
+            CTvvvPtr obj = wktmp.lock();
+            LOG_INFO << "new obj use count=" << obj.use_count();
+        }
+        return;
+    }
+    {
+        CUseTv useObj;
+        CTvvvPtr tmptv = useObj.GetData();
+        LOG_INFO << "tmptv use count=" << tmptv.use_count();
+        return;
+    }
+    {
+        auto p1 = new CTvvv(1122);
+        std::unique_ptr<CTvvv> obj1(p1);
+        LOG_INFO << "before obj1 = " << obj1.get();
+        std::unique_ptr<CTvvv> obj2 = std::move(obj1);
+        LOG_INFO << "after obj1 = " << obj1.get();
+        LOG_INFO << "after obj2 = " << obj2.get();
+        return ;
+    }
+    {
+        std::vector< std::unique_ptr<CTvvv> > vecCtvv_;
+//        vecCtvv_.push_back(/*std::move*/(new CTvvv(3311)));
+
+        std::vector< std::unique_ptr<CTvvv> >::value_type someobj(new CTvvv(3311));
+        vecCtvv_.push_back(std::move(someobj));
+        return;
+    }
+    {
+        std::vector < std::string > vecStrings;
+        std::vector < std::string >::value_type strTmp = "test value type";
+        std::cout << "value type = " << strTmp << std::endl;
+
+        return;
+    }
+    {
+        GetCTvvObj(9981);
+        GetCTvvObj(8864);
+        return ;
+    }
+    {
+        auto pfnPrint = [&](const char* msg, int len) {// defaultOutput(const char* msg, int len)
+
+            size_t n = fwrite(msg, 1, len, stdout);
+            //FIXME check n
+            (void)n;
+        };
+
+        std::string log1 = "tst msg1\n";
+        pfnPrint(log1.c_str(), log1.size());
+
+        std::string log2 = "tst msg2\n";
+        pfnPrint(log2.c_str(), log2.size());
+        return;
+    }
+
+    {
+        boost::shared_ptr< Derive1 > d1 = boost::make_shared<Derive1>();
+        boost::shared_ptr< CBase > d2 = d1;
+        d1.reset();
+        return ;
+    }
+
+
     boost::hash< std::shared_ptr<int> > h;
     std::shared_ptr<int> x1(new int(10));
     std::shared_ptr<int> x2(new int(10));
@@ -1498,8 +1643,8 @@ void testHash()
 
     {
         boost::hash < int > hnew;
-        LOG_INFO << "hnew(1)=" << hnew(1);
-        LOG_INFO << "hnew(2)=" << hnew(2);
+        LOG_INFO << "hnew(1)=" << hnew(3);
+        LOG_INFO << "hnew(2)=" << hnew(11);
     }
     return;
 
