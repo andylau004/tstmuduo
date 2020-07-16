@@ -22,6 +22,7 @@
 
 
 #include "muduo/base/common.h"
+#include "muduo/base/Thread.h"
 #include "muduo/base/ThreadPool.h"
 #include "muduo/base/Atomic.h"
 
@@ -35,14 +36,11 @@
 #include "muduo/net/TcpClient.h"
 
 
-
-
 using namespace std;
 using namespace muduo;
 using namespace muduo::net;
 
 //#include <gtest/gtest.h>
-#include <iostream>
 
 #include "ched_ssl.h"
 
@@ -64,43 +62,92 @@ int main(int argc, char **argv) {
 }
 */
 
-pthread_key_t key;
+pthread_key_t p_key;
 
 struct test_struct {
     int i;
     float k;
 };
-void *child1(void *arg)
+void child1()
 {
     struct test_struct struct_data;
     struct_data.i = 10;
     struct_data.k = 3.1415;
-    pthread_setspecific(key, &struct_data);
+    pthread_setspecific(p_key, &struct_data);
 
     printf("child1--address of struct_data is --> 0x%p\n", &(struct_data));
-    printf("child1--from pthread_getspecific(key) get the pointer and it points to --> 0x%p\n", (struct test_struct *)pthread_getspecific(key));
-    printf("child1--from pthread_getspecific(key) get the pointer and print it's content:\nstruct_data.i:%d\nstruct_data.k: %f\n",
-        ((struct test_struct *)pthread_getspecific(key))->i, ((struct test_struct *)pthread_getspecific(key))->k);
+    printf("child1--from pthread_getspecific(p_key) get the pointer and it points to --> 0x%p\n", (struct test_struct *)pthread_getspecific(p_key));
+    printf("child1--from pthread_getspecific(p_key) get the pointer and print it's content:\nstruct_data.i:%d\nstruct_data.k: %f\n",
+        ((struct test_struct *)pthread_getspecific(p_key))->i, ((struct test_struct *)pthread_getspecific(p_key))->k);
     printf("------------------------------------------------------\n");
 }
-void *child2(void *arg)
+void child2()
 {
     int temp = 20;
     sleep(2);
     printf("child2--temp's address is 0x%p\n", &temp);
-    pthread_setspecific(key, &temp);
-    printf("child2--from pthread_getspecific(key) get the pointer and it points to --> 0x%p\n", (int *)pthread_getspecific(key));
-    printf("child2--from pthread_getspecific(key) get the pointer and print it's content --> temp:%d\n", *((int *)pthread_getspecific(key)));
+    pthread_setspecific(p_key, &temp);
+    printf("child2--from pthread_getspecific(p_key) get the pointer and it points to --> 0x%p\n", (int *)pthread_getspecific(p_key));
+    printf("child2--from pthread_getspecific(p_key) get the pointer and print it's content --> temp:%d\n", *((int *)pthread_getspecific(p_key)));
 }
 
+
+void func1()
+{
+    int *tmp = (int*)pthread_getspecific(p_key);//同一线程内的各个函数间共享数据。
+//    printf("%d is runing in %s\n", *tmp, __func__);
+    LOG_INFO << "222, tmp=" << *tmp << " is runing";
+}
+
+void* keyThreadProc(void* arg) {
+    pthread_setspecific(p_key, arg);
+
+    int *tmp = (int*)pthread_getspecific(p_key);//获得线程的私有空间
+    LOG_INFO << "111, tmp=" << *tmp << " is runing";
+
+    *tmp = (*tmp)*100;//修改私有变量的值
+
+    func1();
+    return (void*)0;
+}
 void tst_pthread_key() {
-    pthread_t tid1, tid2;
+    pthread_key_create(&p_key, NULL); // 这里是构建一个pthread_key_t类型，确实是相当于一个key
+
+    int a = 1;
+    int b = 2;
+    muduo::Thread t1(boost::bind(&keyThreadProc, &a));
+    muduo::Thread t2(boost::bind(&keyThreadProc, &b));
+    t1.start();
+    t2.start();
+    t1.join();
+    t2.join();
+
+    pthread_key_delete(p_key);
+    return;
+
+#if 0
     pthread_key_create(&key, NULL); // 这里是构建一个pthread_key_t类型，确实是相当于一个key
-    pthread_create(&tid1, NULL, child1, NULL);
-    pthread_create(&tid2, NULL, child2, NULL);
-    pthread_join(tid1, NULL);
-    pthread_join(tid2, NULL);
+
+    muduo::Thread t1(child1);
+    muduo::Thread t2(child2);
+    t1.start();
+    t2.start();
+    t1.join();
+    t2.join();
+
     pthread_key_delete(key);
+return;
+#endif
+
+#if 0
+//    pthread_t tid1, tid2;
+//    pthread_key_create(&key, NULL); // 这里是构建一个pthread_key_t类型，确实是相当于一个key
+//    pthread_create(&tid1, NULL, child1, NULL);
+//    pthread_create(&tid2, NULL, child2, NULL);
+//    pthread_join(tid1, NULL);
+//    pthread_join(tid2, NULL);
+//    pthread_key_delete(key);
+#endif
 }
 
 bool get_int_value(const rapidjson::Document& d, const char* name, int& value) {
@@ -223,11 +270,12 @@ int main(int argc, char *argv[]) {
     Logger::setLogLevel(Logger::DEBUG);
     LOG_INFO << "pid = " << getpid() << ", tid = " << CurrentThread::tid();
 
+    tst_pthread_key(); return 1;
+
     tst_countdown_fun(); return 1;
 
     tst_threadpoolWork_entry();  return 1;
 
     tstMultiParseCrt(argc, argv); return 1;
 
-    tst_pthread_key(); return 1;
 }

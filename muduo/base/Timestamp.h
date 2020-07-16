@@ -33,7 +33,7 @@ public:
     ///
     /// @param microSecondsSinceEpoch
     explicit Timestamp(int64_t microSecondsSinceEpochArg)
-        : microSecondsSinceEpoch_(microSecondsSinceEpochArg)
+        :   microSecondsSinceEpoch_(microSecondsSinceEpochArg)
     {
     }
 

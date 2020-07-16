@@ -3461,9 +3461,7 @@ int main(int argc, char *argv[])
     tst_HeapSortEntry_(); return 1;
     tst_dpfun_entry(); return 1;
 
-
     call_reverse_list(); return 1;
-
 
     call_find_max_in_array(); return 1;
     call_Max_array_Sum(); return 1;
@@ -3481,8 +3479,6 @@ int main(int argc, char *argv[])
 //    tst_ptr_vec(); return 1;
     tst_MergeSortEntry_(); return 1;
 
-
-
     tst_ListEntry_(); return 1;
 
 #ifdef __cplusplus//C++编译器定义了-cplusplus
@@ -3491,7 +3487,7 @@ std::cout << "c++" << std::endl;
 std::cout << "c" << std::endl;
 #endif
 
-std::cout << "argc=" << argc << std::endl;
+    std::cout << "argc=" << argc << std::endl;
 /////////////////////
     if (argc >= 2) {
         if ( 0 == strcmp(argv[1], "heapsort"/*, strlen("heapsort")*/) ) {
@@ -3519,9 +3515,6 @@ std::cout << "argc=" << argc << std::endl;
 
 //    CopyFileEx("template-openssl.cnf", "123.cnf");
 //    return 1;
-
-//    std::cout << std::endl;
-    std::cout << std::endl;
 
     tst_ComplexDataEntry_(); return 1;
 

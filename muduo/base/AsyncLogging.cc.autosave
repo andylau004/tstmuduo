@@ -73,7 +73,7 @@ void AsyncLogging::threadFunc()
     BufferPtr newBuffer2(new Buffer);//用来填充使用后的nextBuffer_
     newBuffer1->bzero();
     newBuffer2->bzero();
-    BufferVector buffersToWrite;
+    BufferVector buffersToWrite;//后端缓冲区队列，初始大小为16
     buffersToWrite.reserve(16);
     while (running_)
     {

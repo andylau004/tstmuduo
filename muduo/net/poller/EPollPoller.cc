@@ -96,8 +96,7 @@ Timestamp EPollPoller::poll(int timeoutMs, ChannelList* activeChannels)
     return now;
 }
 
-void EPollPoller::fillActiveChannels(int numEvents,
-                                     ChannelList* activeChannels) const
+void EPollPoller::fillActiveChannels(int numEvents, ChannelList* activeChannels) const
 {
     assert(implicit_cast<size_t>(numEvents) <= events_.size());
     for (int i = 0; i < numEvents; ++i)//挨个处理发生的numEvents个事件，epoll模式返回的events_数组中都是已经发生de事件，这有别于select和poll
@@ -112,7 +111,7 @@ void EPollPoller::fillActiveChannels(int numEvents,
                    } epoll_data_t;
                    struct epoll_event {
                        uint32_t     events;    // Epoll events
-                       epoll_data_t data;      //User data variable
+                       epoll_data_t data;      // User data variable
                    };
 */
         Channel* channel = static_cast<Channel*>(events_[i].data.ptr);

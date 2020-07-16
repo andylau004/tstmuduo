@@ -8,14 +8,9 @@
 #include <sstream>
 
 
-
 #include <boost/bind.hpp>
 
 #include "codeconvert.h"
-
-//#include "poco/Bugcheck.h"
-//#include "poco/Foundation.h"
-//#include "poco/Alignment.h"
 
 #include "muduo/net/InetAddress.h"
 #include "muduo/net/Channel.h"
@@ -27,7 +22,6 @@
 #include "muduo/net/TcpClient.h"
 
 #include "mysqlinsert.h"
-//#include "cpp11fun.h"
 #include "tstidleconnection_srv.h"
 
 

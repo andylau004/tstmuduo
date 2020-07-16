@@ -318,7 +318,6 @@ void tst_shared_ptr_2() {
 
     }
 
-
 //    std::shared_ptr < Connect > objC( new Connect );
 //    std::shared_ptr < Connect > p23 = objC;
 //    std::cout << "objC usecount=" << objC.use_count() << std::endl;
@@ -333,10 +332,8 @@ void tst_shared_ptr_2() {
 
     return;
 
-
     std::shared_ptr<CA> item = getItem();
     std::cout << "item usecount=" << item.use_count() << std::endl;
-
 }
 
 typedef std::shared_ptr<Connect>            SP_ConnectPtr;
@@ -1053,12 +1050,20 @@ void tst_stdmove() {
 
 class CShare {
 public:
-    CShare() {
-        std::cout << "share cst, this=" << this << "\n";
+    CShare(int val) : val_(val) {
+        LOG_INFO << "cst share val, this=" << this;
+    }
+    CShare() : val_(0) {
+        LOG_INFO << "cst share, this=" << this;
     }
     ~CShare() {
-        std::cout << "share dst, this=" << this << "\n";
+        LOG_INFO << "dst share, this=" << this << "val=" << val_;
     }
+    void showit() {
+        LOG_INFO << "val=" << val_;
+    }
+private:
+    int val_;
 };
 using CSharePtr     = std::shared_ptr<CShare>;
 using CShareWeakPtr = std::weak_ptr<CShare>;
@@ -1106,13 +1111,53 @@ CSharePtr GetCShare() {
 
 void tst_share_1() {
 
-//#if 0
+    {
+        CSharePtr p1 = std::make_shared<CShare>(9981);
+        CSharePtr p2 = p1;
+
+        LOG_INFO << "sleep ----------------1" << ", count2=" << p2.use_count() << ", count1=" << p1.use_count();
+
+        CSharePtr p3 = std::make_shared<CShare>(100);
+        p2 = p3;
+
+//        LOG_INFO << "count lst=" << ;
+
+        ::getchar();
+        return;
+    }
+
+    {
+        CSharePtr p1 = std::make_shared<CShare>(9981);
+        CSharePtr p2 = p1;
+        CSharePtr p3 = p2;
+        p2.reset();
+        LOG_INFO << "sleep ----------------1" << ", count2=" << p2.use_count() << ", count1=" << p1.use_count();
+        ::sleep(1);
+        ::getchar();
+        return;
+    }
+
+    CSharePtr obj1 = std::make_shared<CShare>(1998);
+    CSharePtr obj2 = obj1;
+//    CSharePtr obj3 = obj2;
+
+    ::sleep(1);
+    LOG_INFO << "sleep ----------------1" << ", count2=" << obj2.use_count() << ", count1=" << obj1.use_count();
+    obj1.reset(new CShare(1999));
+    LOG_INFO << "sleep ----------------1.5" << ", count2=" << obj2.use_count() << ", count1=" << obj1.use_count();
+//    LOG_INFO << "sleep ----------------2";
+//    ::sleep(1);
+//    LOG_INFO << "sleep ----------------3";
+
+    return;
+
+#if 0
     CSharePtr obj1(NULL, DeleterCShare());
     if (obj1) {
         std::cout << "obj1 count=" << obj1.use_count() << std::endl;
     }
     return;
-//#endif
+#endif
 
 #if 0
     std::vector <int> temp(3);
@@ -1602,17 +1647,15 @@ void testHash()
         std::vector < std::string > vecStrings;
         std::vector < std::string >::value_type strTmp = "test value type";
         std::cout << "value type = " << strTmp << std::endl;
-
         return;
     }
     {
         GetCTvvObj(9981);
         GetCTvvObj(8864);
-        return ;
+        return;
     }
     {
         auto pfnPrint = [&](const char* msg, int len) {// defaultOutput(const char* msg, int len)
-
             size_t n = fwrite(msg, 1, len, stdout);
             //FIXME check n
             (void)n;
@@ -1632,7 +1675,6 @@ void testHash()
         d1.reset();
         return ;
     }
-
 
     boost::hash< std::shared_ptr<int> > h;
     std::shared_ptr<int> x1(new int(10));
@@ -1658,10 +1700,67 @@ void testHash()
 }
 
 
+boost::shared_ptr < std::vector<int> > sp_obj_;
+muduo::MutexLock gRwMtx;
+
+void readFunc() {
+    boost::shared_ptr < std::vector<int> > rd_obj;
+    {
+        LOG_INFO << "--------------------- read wait";
+        muduo::MutexLockGuard lock(gRwMtx); // 临界区足够小，适合用mutex
+        rd_obj = sp_obj_; // 利用局部的shared_ptr来增加数据的引用计数，告诉写线程不要修改这份数据
+        LOG_INFO << "read sleep 1" << ", rd use_count=" << rd_obj.use_count();
+        sleep(1); // 为了阻塞其它线程
+    }
+    LOG_INFO << "read size " << rd_obj->size() << ", sleep 1";
+    sleep(1);
+}
+void writeFunc(int val) {
+    {
+        LOG_INFO << "------------------------------ write wait";
+        muduo::MutexLockGuard lock(gRwMtx);// 写线程的临界区比较大
+        if (!sp_obj_.unique())
+        {
+            // 如果sp_data引用计数大于1，说明有其他线程在读（通过read_data()提升了引用计数）。
+            // 此时将数据复制一份，再利用 reset 或 swap 让 sp_obj_ 指向新数据，老数据让读线程继续读。
+            // 这个写线程现在独占了 sp_obj_ ，而之前那份数据在所有读线程读完之后，引用计数会变成0，被最后一个读线程自动析构。
+            sp_obj_.reset(new vector<int>(*sp_obj_));
+            LOG_INFO << "-------------------------------- copy on write";
+        }
+        sp_obj_->push_back(val);
+    }
+    LOG_INFO << "------------------------------ sleep write" << ", wr use_count=" << sp_obj_.use_count();
+    sleep(2);
+}
+void read_thread() {
+    while (1) {
+        readFunc();
+    }
+}
+void write_thread() {
+    int val = 1;
+    while (1) {
+        writeFunc(val++);
+    }
+}
+void tstCowFun() {
+    sp_obj_ = boost::make_shared< std::vector<int> >();
+
+    muduo::Thread t1(read_thread);
+    muduo::Thread t2(write_thread);
+    t1.start();
+    t2.start();
+    t1.join();
+    t2.join();
+}
+
 // 2020-6-20
 // add new 测试分支预测
 void tst_c11fun_entry(int argc, char *argv[]) {
 
+    tst_share_1(); return;
+
+    tstCowFun(); return;
 
     testHash(); return;
 
@@ -1695,7 +1794,6 @@ void tst_c11fun_entry(int argc, char *argv[]) {
 
     tst_run(); return;
 
-    tst_share_1();
     print_x_val();
     return;
 
@@ -1708,7 +1806,6 @@ void tst_c11fun_entry(int argc, char *argv[]) {
 //    OutputDbgInfo tmpOut( "tst_c11fun_entry begin", "tst_c11fun_entry end" );
     tst_getline(); return;
     tst_shared_ptr_2();  return;
-
 
     GetCurSecond();  return;
 

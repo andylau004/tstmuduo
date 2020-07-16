@@ -405,11 +405,11 @@ void EventLoop::doPendingFunctors()
         functors.swap(pendingFunctors_);
     }
 
-    char tmpout[ 2048 ] = { 0 };
-    if ( functors.size() )
-        sprintf( tmpout, "doPendingFunctors work functors_size=%ld", functors.size() );
-    else
-        sprintf( tmpout, "doPendingFunctors work size==0" );
+//    char tmpout[ 2048 ] = { 0 };
+//    if ( functors.size() )
+//        sprintf( tmpout, "doPendingFunctors work functors_size=%ld", functors.size() );
+//    else
+//        sprintf( tmpout, "doPendingFunctors work size==0" );
 //    LOG_INFO << tmpout;
 
     for (size_t i = 0; i < functors.size(); ++i) {

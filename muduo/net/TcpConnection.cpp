@@ -460,15 +460,13 @@ muduo采用Level Trigger，而不是Edge Trigger。原因作者提到了三点
  */
 void TcpConnection::handleRead(Timestamp receiveTime)
 {
-    loop_->assertInLoopThread();
+    loop_->assertInLoopThread();// 断言是否在loop线程
     int savedErrno = 0;
-    ssize_t n = inputBuffer_.readFd(channel_->fd(), &savedErrno);
-    if (n > 0) {
-        /* 如果成功读取数据，调用用户提供的可读时回调函数 */
+    ssize_t n = inputBuffer_.readFd(channel_->fd(), &savedErrno);// 读数据到inputBuffer_中
+    if (n > 0) {// 如果成功读取数据，调用用户提供的可读时回调函数
         messageCallback_(shared_from_this(), &inputBuffer_, receiveTime);
     }
-    else if (n == 0) {
-        /* 如果返回0，说明对端已经close连接，处理close事件，关闭tcp连接 */
+    else if (n == 0) {// 读到了0，说明对端已经close连接，处理close事件，关闭tcp连接
         handleClose();
     }
     else {
@@ -491,12 +489,17 @@ void TcpConnection::handleWrite()
     loop_->assertInLoopThread();
     if (channel_->isWriting())
     {
-        /* 尝试写入写缓冲区的所有数据，返回实际写入的字节数（tcp缓冲区很有可能仍然不能容纳所有数据） */
-        ssize_t n = sockets::write(channel_->fd(), outputBuffer_.peek(), outputBuffer_.readableBytes());
-        LOG_INFO << "handleWrite writelen=" << n;
+        // 尝试写入写缓冲区的所有数据，返回实际写入的字节数（tcp缓冲区很有可能仍然不能容纳所有数据）
+        ssize_t n = sockets::write(channel_->fd(),
+                                   outputBuffer_.peek(),
+                                   outputBuffer_.readableBytes());
+//        LOG_INFO << "handleWrite writelen=" << n;
         if (n > 0)
         {
-            outputBuffer_.retrieve(n);//调整写缓冲区的readerIndex
+            outputBuffer_.retrieve(n);// 调整发送buffer的内部index，以便下次继续发送
+
+            // 如果可读的数据量为0，这里可读是针对系统发送函数来说的，不是针对用户
+            // 如果对于系统发送函数来说，可读的数据量为0，表示所有数据都被发送完毕了，即写完成了
             if (outputBuffer_.readableBytes() == 0)// 应用层发送缓冲区已清空
             {
                 channel_->disableWriting();// 停止关注POLLOUT事件，以免出现busy loop
@@ -507,7 +510,7 @@ void TcpConnection::handleWrite()
                 /*
                  * 如果连接正在关闭（通常关闭读端），那么关闭写端，但是是在已经写完的前提下
                  * 如果还有数据没有写完，不能关闭，要在写完再关
-                 */
+                */
                 if (state_ == kDisconnecting)
                 {
                     /*

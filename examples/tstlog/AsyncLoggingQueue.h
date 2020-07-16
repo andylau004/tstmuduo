@@ -43,9 +43,11 @@ public:
         queue_.put(MSG(logline, len));
     }
     void start() {
+        // 在构造函数中latch_的值为1
+        // 线程运行之后将latch_的减为0
         running_ = true;
         thread_.start();
-        latch_.wait();
+        latch_.wait();// 必须等到latch_变为0才能从start函数中返回，这表明初始化已经完成
     }
     void stop() {
         running_ = false;
