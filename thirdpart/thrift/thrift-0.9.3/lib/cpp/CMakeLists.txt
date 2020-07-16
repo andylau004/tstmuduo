@@ -172,36 +172,38 @@ set( thriftcppqt_SOURCES
 )
 
 # Contains the thrift specific ADD_LIBRARY_THRIFT and TARGET_LINK_LIBRARIES_THRIFT
-include(ThriftMacros)
+#include(ThriftMacros)
 
-ADD_LIBRARY_THRIFT(thrift STATIC ${thriftcpp_SOURCES} ${thriftcpp_threads_SOURCES})
-TARGET_LINK_LIBRARIES_THRIFT(thrift ${SYSLIBS})
+ADD_LIBRARY(thrift STATIC ${thriftcpp_SOURCES} ${thriftcpp_threads_SOURCES})
+TARGET_LINK_LIBRARIES(thrift ${SYSLIBS})
+#ADD_LIBRARY_THRIFT(thrift STATIC ${thriftcpp_SOURCES} ${thriftcpp_threads_SOURCES})
+#TARGET_LINK_LIBRARIES_THRIFT(thrift ${SYSLIBS})
 
-if(WITH_LIBEVENT)
-    find_package(Libevent REQUIRED)  # Libevent comes with CMake support form upstream
-    include_directories(SYSTEM ${LIBEVENT_INCLUDE_DIRS})
+#if(WITH_LIBEVENT)
+#    find_package(Libevent REQUIRED)  # Libevent comes with CMake support form upstream
+#    include_directories(SYSTEM ${LIBEVENT_INCLUDE_DIRS})
 
-    ADD_LIBRARY_THRIFT(thriftnb STATIC ${thriftcppnb_SOURCES})
-    TARGET_LINK_LIBRARIES_THRIFT(thriftnb ${SYSLIBS} ${LIBEVENT_LIBRARIES})
-    TARGET_LINK_LIBRARIES_THRIFT_AGAINST_THRIFT_LIBRARY(thriftnb thrift)
-endif()
+#    ADD_LIBRARY_THRIFT(thriftnb STATIC ${thriftcppnb_SOURCES})
+#    TARGET_LINK_LIBRARIES_THRIFT(thriftnb ${SYSLIBS} ${LIBEVENT_LIBRARIES})
+#    TARGET_LINK_LIBRARIES_THRIFT_AGAINST_THRIFT_LIBRARY(thriftnb thrift)
+#endif()
 
-if(WITH_ZLIB)
-    find_package(ZLIB REQUIRED)
-    include_directories(SYSTEM ${ZLIB_INCLUDE_DIRS})
+#if(WITH_ZLIB)
+#    find_package(ZLIB REQUIRED)
+#    include_directories(SYSTEM ${ZLIB_INCLUDE_DIRS})
 
-    ADD_LIBRARY_THRIFT(thriftz STATIC ${thriftcppz_SOURCES})
-    TARGET_LINK_LIBRARIES_THRIFT(thriftz ${SYSLIBS} ${ZLIB_LIBRARIES})
-    TARGET_LINK_LIBRARIES_THRIFT_AGAINST_THRIFT_LIBRARY(thriftz thrift)
-endif()
+#    ADD_LIBRARY_THRIFT(thriftz STATIC ${thriftcppz_SOURCES})
+#    TARGET_LINK_LIBRARIES_THRIFT(thriftz ${SYSLIBS} ${ZLIB_LIBRARIES})
+#    TARGET_LINK_LIBRARIES_THRIFT_AGAINST_THRIFT_LIBRARY(thriftz thrift)
+#endif()
 
-if(WITH_QT4)
-    set(CMAKE_AUTOMOC ON)
-    find_package(Qt4 REQUIRED COMPONENTS QtCore QtNetwork)
-    ADD_LIBRARY_THRIFT(thriftqt STATIC ${thriftcppqt_SOURCES})
-    TARGET_LINK_LIBRARIES_THRIFT(thriftqt ${SYSLIBS} Qt4::QtCore Qt4::QtNetwork)
-    TARGET_LINK_LIBRARIES_THRIFT_AGAINST_THRIFT_LIBRARY(thriftqt thrift)
-endif()
+#if(WITH_QT4)
+#    set(CMAKE_AUTOMOC ON)
+#    find_package(Qt4 REQUIRED COMPONENTS QtCore QtNetwork)
+#    ADD_LIBRARY_THRIFT(thriftqt STATIC ${thriftcppqt_SOURCES})
+#    TARGET_LINK_LIBRARIES_THRIFT(thriftqt ${SYSLIBS} Qt4::QtCore Qt4::QtNetwork)
+#    TARGET_LINK_LIBRARIES_THRIFT_AGAINST_THRIFT_LIBRARY(thriftqt thrift)
+#endif()
 
 if(WITH_QT5)
     # Qt5 has its own directory to avoid conflict with Qt4 caused by CMAKE_AUTOMOC

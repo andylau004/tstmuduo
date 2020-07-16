@@ -39,17 +39,17 @@ string(REGEX REPLACE "[0-9]+\\.[0-9]+\\.([0-9]+)" "\\1" thrift_VERSION_PATCH ${t
 message(STATUS "Parsed Thrift version: ${thrift_VERSION} (${thrift_VERSION_MAJOR}.${thrift_VERSION_MINOR}.${thrift_VERSION_PATCH})")
 
 # Some default settings
-include(DefineCMakeDefaults)
+#include(DefineCMakeDefaults)
 
 # Build time options are defined here
-include(DefineOptions)
-include(DefineInstallationPaths)
+#include(DefineOptions)
+#include(DefineInstallationPaths)
 
 # Based on the options set some platform specifics
-include(DefinePlatformSpecifc)
+#include(DefinePlatformSpecifc)
 
 # Generate the config.h file
-include(ConfigureChecks)
+#include(ConfigureChecks)
 
 # Package it
 #include(CPackConfig) ## haiwei
@@ -110,4 +110,4 @@ if(BUILD_PYTHON)
 #    endif()
 endif()
 
-PRINT_CONFIG_SUMMARY()
+#PRINT_CONFIG_SUMMARY()
