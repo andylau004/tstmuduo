@@ -391,8 +391,8 @@ void TcpConnection::stopReadInLoop()
 //TcpServer::newConnection() 创建完 TcpConnection 对象，设置好回调函数之后调用的，
 //主要是调用 Channel::enableReading() 将 TcpConnection 对应的 sockfd 注册读事件，
 //然后执行用户指定的 connectionCallback_() ，并将 TcpConnection 状态置为 kConnected。
-//这个函数如何被执行呢? Acceptor 持有的 fd 有可读事件发生，
-//即有连接请求，此时Channel::handleEvent() -> Acceptor::handleRead() -> TcpServer::newConnection() -> …… ->TcpConnection::connectEstablished()
+//这个函数如何被执行呢? Acceptor 持有的 fd 有可读事件发生，即有连接请求
+//Channel::handleEvent() -> Acceptor::handleRead() -> TcpServer::newConnection() -> …… ->TcpConnection::connectEstablished()
 //中间省略的部分是线程转移，转移到TcpConnection 所在的 IO 线程执行，TcpServer 和 TcpConnection 可能不在同一线程。
 void TcpConnection::connectEstablished()
 {
@@ -401,8 +401,7 @@ void TcpConnection::connectEstablished()
 
     setState(kConnected);//将状态设置为已连接
 
-    //之前引用计数为2
-    EventLoop* ioLoop = getLoop();
+    EventLoop* ioLoop = getLoop();//之前引用计数为2
     LOG_INFO << "connectEstablished threadId_=" << ioLoop->IoEventLoopTid();// << ", CurTid=" << CurrentThread::tid();
 
     //将自身这个TcpConnection对象提升，由于是智能指针，所以不能直接用this

@@ -80,9 +80,10 @@ void resetTimerfd(int timerfd, Timestamp expiration)
     struct itimerspec oldValue;
     bzero(&newValue, sizeof newValue);
     bzero(&oldValue, sizeof oldValue);
-    newValue.it_value = howMuchTimeFromNow(expiration);
-    int ret = ::timerfd_settime(timerfd, 0, &newValue, &oldValue);
-    if (ret)
+    newValue.it_value = howMuchTimeFromNow(expiration);//提供所给时间与现在的差值 大于100微秒
+    //expiration到now的时间 大于等于100微秒 也就是说timer_fd触发时一定有可执行的回调 也有一个重置定时器的作用
+    int ret = ::timerfd_settime(timerfd, 0, &newValue, &oldValue);//重新设置定时器,第四个参数可为空
+    if (ret)//成功返回零 失败返回-1
     {
         LOG_SYSERR << "timerfd_settime()";
     }
@@ -125,7 +126,7 @@ TimerQueue::~TimerQueue()
     ::close(timerfd_);
 
     // do not remove channel, since we're in EventLoop::dtor();
-    for (TimerList::iterator it = timers_.begin(); it != timers_.end(); ++it) {
+    for (TimerSet::iterator it = timers_.begin(); it != timers_.end(); ++it) {
         delete it->second;
     }
 }
@@ -135,13 +136,11 @@ TimerId TimerQueue::addTimer(const TimerCallback& cb,
                              Timestamp when,
                              double interval)
 {
-    // 新建一个Timer
-    Timer* timer = new Timer(cb, when, interval);
+    Timer* timer = new Timer(cb, when, interval);// 新建一个Timer
     //在当前TimerQuene所属的loop中调用addTimerLoop
     //在loop中执行真正的add操作
     loop_->runInLoop(boost::bind(&TimerQueue::addTimerInLoop, this, timer));
-    // 返回一个定时任务的标示
-    return TimerId(timer, timer->sequence());
+    return TimerId(timer, timer->sequence());// 唯一标识一个Timer
 }
 
 #ifdef __GXX_EXPERIMENTAL_CXX0X__
@@ -161,12 +160,10 @@ void TimerQueue::cancel(TimerId timerId)
     loop_->runInLoop(boost::bind(&TimerQueue::cancelInLoop, this, timerId));
 }
 
-// 在loop线程中添加timer
-void TimerQueue::addTimerInLoop(Timer* timer)
+void TimerQueue::addTimerInLoop(Timer* timer)// 在loop线程中添加timer
 {
-    // 禁止跨线程
-    loop_->assertInLoopThread();
-    // 将timer插入至任务集合，同时返回timer是否是最早的一个任务
+    loop_->assertInLoopThread();// 禁止跨线程
+    //将timer插入至任务集合，同时返回timer是否是最早的一个任务
     bool earliestChanged = insert(timer);//如果当前插入的定时器 比队列中的定时器都早 则返回真
 
     //如果当前加入的timmer到时时间比原先TimerQuene中的所有定时器到时时间都短，则需要更新timefd_
@@ -183,7 +180,7 @@ void TimerQueue::cancelInLoop(TimerId timerId)
 
     ActiveTimer timer(timerId.timer_, timerId.sequence_);
     ActiveTimerSet::iterator it = activeTimers_.find(timer);
-    if (it != activeTimers_.end())
+    if (it != activeTimers_.end())//已加入的集合中找到了要删除的元素
     {
         size_t n = timers_.erase(Entry(it->first->expiration(), it->first));
         assert(n == 1); (void)n;
@@ -192,7 +189,7 @@ void TimerQueue::cancelInLoop(TimerId timerId)
     }
     else if (callingExpiredTimers_)
     {
-        cancelingTimers_.insert(timer);
+        cancelingTimers_.insert(timer);//加入删除队列 在被触发时删除
     }
 
     assert(timers_.size() == activeTimers_.size());
@@ -205,7 +202,7 @@ void TimerQueue::handleRead()
 
     // 将计时器里数据（这个数据是通过timerfd_settime写入的）读取出来，否则会重复激发定时器
     Timestamp now(Timestamp::now());
-    readTimerfd(timerfd_, now);
+    readTimerfd(timerfd_, now);//读取超时时间,因为muduo默认LT 防止多次触发
 
     //获取在这个时间点到时的所有定时器，并把他们存储在expired数组中
     //同时这个函数也会把这些定时器从timers_中删除掉
@@ -239,18 +236,16 @@ std::vector<TimerQueue::Entry> TimerQueue::getExpired(Timestamp now)
     // 生成一个entry，用于比较，提供过期的界限
     Entry sentry(now, reinterpret_cast<Timer*>(UINTPTR_MAX));
 
-    // lower_bound：找到第一个大于等于参数的位置，返回迭代器(此处如果超时时间恰好是now，应该不算作超时)
+    // lower_bound:找到第一个大于等于参数的位置，返回迭代器(此处如果超时时间恰好是now，应该不算作超时)
     // 以sentry为上界，取出所有时间戳小于now的entry 此时begin和end之间，就是已经过期的任务
     // set中的任务是按照时间戳从小到大排列
-    TimerList::iterator end = timers_.lower_bound(sentry);
+    TimerSet::iterator end = timers_.lower_bound(sentry);
     // 断言，要么所有任务都过期，要么now小于end结点的时间（end不属于过期的entry）
     assert(end == timers_.end() || now < end->first);
 
     /* back_inserter：容器适配器，将数据插入到参数的尾部 */
-    // 拷贝entry
     std::copy(timers_.begin(), end, back_inserter(expired));
-    // 从timers中删除这些任务
-    timers_.erase(timers_.begin(), end);
+    timers_.erase(timers_.begin(), end);// 从timers中删除这些任务
 
     for (std::vector<Entry>::iterator it = expired.begin(); it != expired.end(); ++it)
     {
@@ -313,23 +308,26 @@ bool TimerQueue::insert(Timer* timer)
 
     //获取这个timer的到时时间
     Timestamp when = timer->expiration();
-    TimerList::iterator it = timers_.begin();
+    // 获取队列中定时时间最短的项(即第一个), 因为数据结构是set,红黑树有序,
+    // 比较顺序为pair的比较顺序 即先比较first,相同比较second
+    TimerSet::iterator it = timers_.begin();
 
     //如果当前的定时器二叉树 times_ 为空 或 里面最邻近到时的定时器的到时时间比timer久，则设置earliestChanged
     if (it == timers_.end() || when < it->first)
     {
-        earliestChanged = true;
+        earliestChanged = true;//为true说明插入timers后为第一个元素 即更新最小值
     }
     {
         //将timer加入到timers中，timers是一个set，它里面的元素按大小顺序存放
-        std::pair<TimerList::iterator, bool> result = timers_.insert(Entry(when, timer));
-        assert(result.second); (void)result;
+        //就算Timestamp一样后面的地址也一定不一样
+        std::pair<TimerSet::iterator, bool> result = timers_.insert(Entry(when, timer));
+        assert(result.second); (void)result;//断言永真
     }
     {
         //将timer加入到ActiveTimerset中
         std::pair<ActiveTimerSet::iterator, bool> result
                 = activeTimers_.insert(ActiveTimer(timer, timer->sequence()));
-        assert(result.second); (void)result;
+        assert(result.second); (void)result;// TODO activeTimers是干什么的?
     }
 
     assert(timers_.size() == activeTimers_.size());

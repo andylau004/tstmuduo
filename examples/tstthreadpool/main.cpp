@@ -96,7 +96,7 @@ void func1()
 {
     int *tmp = (int*)pthread_getspecific(p_key);//同一线程内的各个函数间共享数据。
 //    printf("%d is runing in %s\n", *tmp, __func__);
-    LOG_INFO << "222, tmp=" << *tmp << " is runing";
+    LOG_INFO << "222, tmp=" << *tmp << " is runing, in Function: " << __func__;
 }
 
 void* keyThreadProc(void* arg) {

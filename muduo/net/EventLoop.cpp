@@ -179,14 +179,14 @@ void EventLoop::quit()
 }
 
 /*
-1、不是简单地在临界区内依次调用Functor，而是把回调列表swap到functors中，
+1. 不是简单地在临界区内依次调用Functor，而是把回调列表swap到functors中，
 这样一方面减小了临界区的长度（意味着不会阻塞其它线程的queueInLoop()），
 另一方面，也避免了死锁（因为Functor可能再次调用queueInLoop()）
 
-2、由于doPendingFunctors()调用的Functor可能再次调用queueInLoop(cb)，
+2. 由于doPendingFunctors()调用的Functor可能再次调用queueInLoop(cb)，
 这时，queueInLoop()就必须wakeup()，否则新增的cb可能就不能及时调用了
 
-3、muduo没有反复执行doPendingFunctors()直到pendingFunctors_为空而是每次poll返回就执行一次，
+3. muduo没有反复执行doPendingFunctors()直到pendingFunctors_为空而是每次poll返回就执行一次，
 这是有意的，否则IO线程可能陷入死循环，无法处理IO事件。
 */
 void EventLoop::queueInLoop(const Functor& cb)
@@ -200,7 +200,8 @@ void EventLoop::queueInLoop(const Functor& cb)
         pendingFunctors_.push_back(cb);
     }
     /*
-     * runInLoop的实现：需要使用eventfd唤醒的两种情况 (1) 调用queueInLoop的线程不是当前IO线程。(2)是当前IO线程并且正在调用pendingFunctor。
+     * runInLoop的实现：需要使用eventfd唤醒的两种情况
+     * 1. 调用queueInLoop的线程不是当前IO线程。2. 是当前IO线程并且正在调用pendingFunctor。
     */
     if (!isInLoopThread() || callingPendingFunctors_)
     {
@@ -340,10 +341,9 @@ void EventLoop::updateChannel(Channel* channel)
 // 移除Channel
 void EventLoop::removeChannel(Channel* channel)
 {
-    // 该Channel必须位于本EventLoop内
-    assert(channel->ownerLoop() == this);
-    // 禁止跨线程
-    assertInLoopThread();
+    assert(channel->ownerLoop() == this);// 该Channel必须位于本EventLoop内
+    assertInLoopThread();// 禁止跨线程
+
     if (eventHandling_)
     {
         assert(currentActiveChannel_ == channel ||

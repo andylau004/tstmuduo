@@ -1754,9 +1754,28 @@ void tstCowFun() {
     t2.join();
 }
 
+void tst_set() {
+    typedef std::set<int> IntSet;
+
+    IntSet iSets;
+    iSets.insert(189);
+    iSets.insert(99);
+    iSets.insert(67);
+
+    for (auto& it : iSets) {
+        LOG_INFO << it << " ";
+    }
+
+    int findval = 68;
+    IntSet::iterator findIter = iSets.lower_bound(findval);
+    LOG_INFO << "findIter =" << *findIter;
+}
+
 // 2020-6-20
 // add new 测试分支预测
 void tst_c11fun_entry(int argc, char *argv[]) {
+
+    tst_set(); return;
 
     tst_share_1(); return;
 

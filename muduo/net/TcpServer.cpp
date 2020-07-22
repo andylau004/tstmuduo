@@ -111,7 +111,7 @@ void TcpServer::newConnection(int sockfd, const InetAddress& peerAddr)
     LOG_INFO << "before runInLoop new conn use_count=" << conn.use_count();
     // !!!--------------重要--------------!!!
     // 下面 connectEstablished 会在 eventloop 工作线程中执行
-    // 当前线程应该是主线程,也就是,侦听+接受套接字线程
+    // 当前线程应该是主线程: 侦听 + 接受client socket线程
     ioLoop->runInLoop(boost::bind(&TcpConnection::connectEstablished, conn));
     LOG_INFO << "after  runInLoop new conn use_count=" << conn.use_count();
 }
@@ -135,10 +135,10 @@ void TcpServer::removeConnection(const TcpConnectionPtr& conn) {
 // 3. 停止监听所有的事件
 // 4. 执行用户的close逻辑
 // 5. 执行close回调函数：
-// 6. 执行TcpServer中的removeConnection（removeConnectionInLoop）
+// 6. 执行TcpServer中的 removeConnection (removeConnectionInLoop)
 // 7. connections_中移除conn，引用计数-1
-// 8. 执行TcpTcpConnection中connectDestroyed，将Channel指针从loop中移除
-// 在上述关闭过程中，为什么需要用到TcpServer中的函数，原因是connections_这个数据结构的存在
+// 8. 执行 TcpTcpConnection 中 connectDestroyed ，将Channel指针从loop中移除
+// 在上述关闭过程中，为什么需要用到TcpServer中的函数，原因是 connections_ 这个数据结构的存在
 // 为了维持TcpConnection的生存期，需要将ptr保存在connections_中，当tcp关闭时，也必须去处理这个数据结构
 void TcpServer::removeConnectionInLoop(const TcpConnectionPtr& conn)
 {

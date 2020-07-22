@@ -48,3 +48,12 @@ build/netty*
 build/transfer*
 build/thirdpart
 
+build/Makefile
+
+build/httpd.c
+build/include/
+
+build/muduo/
+build/vgcore.127017
+
+build/mysavefile

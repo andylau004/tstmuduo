@@ -38,8 +38,8 @@ Connector::~Connector()
     assert(!channel_);
 }
 
-// 实际的start的函数，因为每个Channel都需要在eventloop线程执行
-// 当执行函数是在别的线程执行的时候，就将要执行的函数封装成函数对象，放到 eventloop 的待执行队列中
+// 每个Channel都需要在eventloop线程执行
+// 当执行函数是在别的线程执行时，就将要执行的函数封装成函数对象，放到 eventloop 的待执行队列中
 // 然后唤醒 epoll 执行
 void Connector::start()
 {

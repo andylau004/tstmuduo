@@ -60,7 +60,7 @@ Channel::~Channel()
 void Channel::tie(const boost::shared_ptr<void>& obj)
 {
     LOG_INFO << " in tie function usecount=" << obj.use_count();
-    tie_  = obj;
+    tie_  = obj;// obj==TcpConnectionPtr;
     tied_ = true;
 }
 
@@ -81,7 +81,7 @@ void Channel::handleEvent(Timestamp receiveTime) {
     boost::shared_ptr<void> guard;
     if (tied_)
     {
-        //lock从被观测的shared_ptr获得一个可用的shared_ptr对象，从而操作资源
+        //lock从被观测的(TcpConnectionPtr)获得一个可用的shared_ptr对象，从而操作资源
         //handleEventWithGuard会进行recv处理，POLLIN可读就调用Channel之前注册的读回调函数，
         //此外还有写回调，关闭回调等，这些都是TcpServer注册到TcpConnection在关联到TcpConnection所拥有的已连接套接字的，通过执行newConnection()函数之时，你可以回头看看。
         //可见，处理连接事件时，对TcpConnection的智能指针进行了提升，因为已连接套接字fd的生命期是由TcpConnection管理的，我们要确保处理事件时该对象还存活，否则使用一个已经死亡的对象，结果只有core dump。
