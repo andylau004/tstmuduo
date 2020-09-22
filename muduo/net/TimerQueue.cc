@@ -300,6 +300,7 @@ void TimerQueue::reset(const std::vector<Entry>& expired, Timestamp now)
     }
 }
 
+//将timer插入到有序的TimerQueue队列中，timer时间最短的话需要更新最短时间
 bool TimerQueue::insert(Timer* timer)
 {
     loop_->assertInLoopThread();
