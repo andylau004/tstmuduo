@@ -36,13 +36,15 @@ class TimerId;
 ///
 
 /*---------------------------------------------------------------------------------------------*
-timers_和activeTimers_保存的是相同的数据，timers_是按到期时间排序，activeTimers_按照对象地址排序，并且timerQueue只关注最早
-的那个定时器，所以当发生可读事件的时候，需要使用getExpired()获取所有的超时事件，因为可能有同一时刻的多个定时器。
+timers_和activeTimers_保存的是相同的数据
+timers_是按到期时间排序
+activeTimers_按照对象地址排序
+并且timerQueue只关注最早的那个定时器，所以当发生可读事件的时候，需要使用getExpired()获取所有的超时事件，因为可能有同一时刻的多个定时器。
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 /*---------------------------------------------------------------------------------------------*
  * 分析: TimerQueue 中有多个定时器，一次性的和重复的，事件循环开始 EventLoop::loop()                     *
- *   当最早到期定时器超时，poll() 返回timerfd_ 的可读事件(timerfdChannel_)                       *
+ *   当最早到期定时器超时，poll() 返回timerfd_的可读事件(timerfdChannel_)                       *
  *   调用 Channel::handleEvent(),调用readCallback_(receiveTime);                                  *
  *   进而调用 Channel::setReadCallback 注册的TimerQueue::handleRead(), 在函数内先 read 掉 timerfd_ 数据，                     *
  *   避免一直触发可读事件，接着遍历 TimerQueue 中此时所有超时的定时器，调用每个定时器构造时传递的回调函数。                     *
@@ -104,7 +106,7 @@ private:
     // 然后调用 timerfdChannel_ 的可读事件回调 handleRead()，
     // 通过 getExpired() 找出所有的超时事件，然后执行相应的超时回调函数 Timer::run()。
     // 为了复用定时器，每次处理完之后，会检查这些超时定时器是否需要重复定时，如果需要重复，就再次添加到定时器集合中
-    const int timerfd_;
+    const int timerfd_;//只有一个定时器，防止同时开启多个定时器，占用多余的文件描述符
     Channel timerfdChannel_; //timerfd 对应的Channel，借此来观察timerfd_ 上的readable事件
     // Timer list sorted by expiration
     TimerSet timers_;

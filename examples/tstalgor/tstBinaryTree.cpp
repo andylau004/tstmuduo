@@ -349,7 +349,7 @@ void tst_maxheap_sort() {
         arrInt.push_back( rand()%(10) );
         std::cout << "index_" << arrInt[i] << std::endl;
     }
-return;
+    return;
 
     {
         srand(time(NULL));

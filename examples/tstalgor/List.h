@@ -2,17 +2,19 @@
 
 #include <stdio.h>
 
-struct ListNode
-{
+
+struct ListNode {
+public:
     int       m_nValue;
     ListNode* m_pNext;
-    ListNode () :
-        m_nValue(-1), m_pNext (NULL)
-    {}
 
-    ListNode (int val) :
-        m_nValue(val), m_pNext (NULL)
-    {}
+public:
+    ListNode() : m_nValue( -1 ), m_pNext(nullptr) {
+
+    }
+    ListNode(int val) : m_nValue( val ), m_pNext(nullptr) {
+
+    }
 };
 
 //#define open TRUE

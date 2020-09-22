@@ -30,16 +30,24 @@
 #include "muduo/base/common.h"
 
 
-//#include "cpp11fun.h"
 
 
 using namespace std;
 
 
+struct ListNode;
+
 
 extern bool isBalanced(BstNode* root);
 
 extern void LeetCodeEntry();
+
+
+extern ListNode* ConstructTestList();
+
+extern ListNode* ConstructTestList(const std::vector<int>& vecInts);
+
+
 
 
 

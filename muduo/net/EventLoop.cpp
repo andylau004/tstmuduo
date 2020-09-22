@@ -338,8 +338,7 @@ void EventLoop::updateChannel(Channel* channel)
     poller_->updateChannel(channel);
 }
 
-// 移除Channel
-void EventLoop::removeChannel(Channel* channel)
+void EventLoop::removeChannel(Channel* channel)// 移除Channel
 {
     assert(channel->ownerLoop() == this);// 该Channel必须位于本EventLoop内
     assertInLoopThread();// 禁止跨线程

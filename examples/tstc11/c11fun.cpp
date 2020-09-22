@@ -70,6 +70,7 @@
 
 
 #include "boostany.h"
+#include "threadsepcific.h"
 
 ///////////////////////////////////
 
@@ -1551,7 +1552,7 @@ void tst_trim() {
 }
 
 
-muduo::MutexLock gMtx;
+//muduo::MutexLock gMtx;
 
 CTvvv GetCTvvObj(int val) {
     return CTvvv(val);
@@ -1581,8 +1582,10 @@ void SetVal(int&& val) {
     std::cout << "&&val=" << val << std::endl;
 }
 
+
 void testHash()
 {
+
 
     {
 #if 0
@@ -1771,9 +1774,12 @@ void tst_set() {
     LOG_INFO << "findIter =" << *findIter;
 }
 
+
 // 2020-6-20
 // add new 测试分支预测
 void tst_c11fun_entry(int argc, char *argv[]) {
+
+    tst_boost_specfic_fun(); return;
 
     tst_set(); return;
 

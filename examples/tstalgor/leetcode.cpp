@@ -83,12 +83,105 @@ void InOrtderPtrint(TreeNode* root);
             someInOrder(root->right);
     }
 //};
+    ListNode* ConstructTestList(const std::vector<int>& vecInts) {
 
+        std::vector< ListNode* > vecNodes;
+
+        for ( auto ii : vecInts ) {
+            vecNodes.push_back(CreateListNode(ii));
+        }
+
+        for ( int i = 0; i < vecNodes.size(); i ++ ) {
+            auto next = i + 1;
+            if ( next != vecNodes.size() ) {
+                ConnectListNodes(vecNodes[i], vecNodes[next]);
+            }
+        }
+        return *vecNodes.begin();
+    }
 
 // Convert Sorted List to Binary Search Tree -- LeetCode 将有序链表转为二叉搜索树
 
 class CSortedListToBst {
 public:
+
+    ListNode* reverseList( ListNode* pHead ) {
+        if (!pHead) return nullptr;
+        {
+            ListNode* prePtr = nullptr, *curPtr = pHead, *nextPtr = curPtr->m_pNext;
+            while (nextPtr) {
+                curPtr->m_pNext = prePtr;
+                prePtr = curPtr;
+
+                curPtr = nextPtr;
+                nextPtr = nextPtr->m_pNext;
+            }
+            curPtr->m_pNext = prePtr;
+            return curPtr;
+        }
+
+        ListNode* prePtr = nullptr, *curPtr = pHead, *nextPtr = curPtr->m_pNext;
+        while (nextPtr) {
+            curPtr->m_pNext = prePtr;
+            prePtr = curPtr;
+
+            curPtr = nextPtr;
+            nextPtr = nextPtr->m_pNext;
+        }
+        curPtr->m_pNext = prePtr;
+        return curPtr;
+    }
+
+    void TstList1() {
+        ListNode* pNode1 = CreateListNode(11);
+        ListNode* pNode2 = CreateListNode(23);
+        ListNode* pNode3 = CreateListNode(35);
+        ListNode* pNode4 = CreateListNode(47);
+        ListNode* pNode5 = CreateListNode(51);
+        ListNode* pNode6 = CreateListNode(53);
+        ListNode* pNode7 = CreateListNode(198);
+        ListNode* pNode8 = CreateListNode(2739);
+        ListNode* pNode9 = CreateListNode(31798);
+
+        ConnectListNodes(pNode1, pNode2);
+        ConnectListNodes(pNode2, pNode3);
+        ConnectListNodes(pNode3, pNode4);
+        ConnectListNodes(pNode4, pNode5);
+        ConnectListNodes(pNode5, pNode6);
+        ConnectListNodes(pNode6, pNode7);
+        ConnectListNodes(pNode7, pNode8);
+        ConnectListNodes(pNode8, pNode9);
+
+        PrintList(pNode1);
+
+        ListNode* pReverseList = reverseList( pNode1 );
+        PrintList(pReverseList);
+    }
+
+
+
+    ListNode* ConstructTestList() {
+        ListNode* pNode1 = CreateListNode(11);
+        ListNode* pNode2 = CreateListNode(23);
+        ListNode* pNode3 = CreateListNode(35);
+        ListNode* pNode4 = CreateListNode(47);
+        ListNode* pNode5 = CreateListNode(51);
+        ListNode* pNode6 = CreateListNode(53);
+        ListNode* pNode7 = CreateListNode(198);
+        ListNode* pNode8 = CreateListNode(2739);
+        ListNode* pNode9 = CreateListNode(31798);
+
+        ConnectListNodes(pNode1, pNode2);
+        ConnectListNodes(pNode2, pNode3);
+        ConnectListNodes(pNode3, pNode4);
+        ConnectListNodes(pNode4, pNode5);
+        ConnectListNodes(pNode5, pNode6);
+        ConnectListNodes(pNode6, pNode7);
+        ConnectListNodes(pNode7, pNode8);
+        ConnectListNodes(pNode8, pNode9);
+        return pNode1;
+    }
+
     void TstEntry() {
         ListNode* pNode1 = CreateListNode(11);
         ListNode* pNode2 = CreateListNode(23);
@@ -540,8 +633,120 @@ public:
     }
 };
 
-void LeetCodeEntry() {
+/**
+ * 二分查找
+ * @param n int整型 数组长度
+ * @param v int整型 查找值
+ * @param a int整型vector 有序数组
+ * @return int整型
+ */
+int upper_bound_(int n, int v, vector<int>& a) {
+    int left = 0, right = n - 1;
+    int mid = 0;
+    while ( left < right ) {
+        mid = (left + right) >> 1;
+//        sleep(1);
+//        std::cout << "mid=" << mid  << std::endl;
+//        if (a[mid] < v) {
+//            right = mid + 1;
+//        } else {
+//            right = mid;
+//        }
+        if ( a[ mid ] >= v ) {
+            if ( mid == 0 || a[mid - 1] < v ) {
+                return mid/* + 1*/;
+            }
+            else {
+                right = mid;
+            }
+        } else {
+            left = mid + 1;
+        }
+    }
+    return n + 1;
+}
 
+void tstupper_bound() {
+    std::vector<int> a{1, 2, 3, 4, 4, 5};
+    std::cout << upper_bound_(a.size(), 4, a) << std::endl;
+}
+void LeetCodeEntry() {
+    std::vector<int> a{11, 23, 35, 47, 51, 53, 198, 2739, 31798};
+    ListNode* retnode = ConstructTestList(a);
+    PrintList(retnode);
+    return;
+
+    tstupper_bound();
+    return;
+    {
+        list<int> l1 = { 1, 2, 3, 4, 5 };
+        list<int> l2 = { 6, 7, 8 };
+        list<int>::iterator it;
+
+        // iterator pointing to 1
+        it = l1.begin();
+
+        // advance the iterator by 2 positions
+        printf("--- it=%d\n", *it);
+
+        printf("--- l2 beg\n");
+        advance(it, 2);
+        printf("--- l2 end\n");
+        printf("--- it=%d\n", *it);
+        printf("\n"); //
+
+        // transfer 3, 4 and 5 at the
+        // beginning of l2
+        l2.splice(l2.begin(), l2, it, l1.end());
+
+        cout << "list l2 after splice operation" << endl;
+        for (auto x : l2)
+            cout << x << " ";
+
+        cout << std::endl;
+
+
+        printf("l1 beg\n");
+        PrintInContainer(l1);//
+        printf("l1 end\n");
+        return;
+    }
+    {
+        std::list < int > l1, l2;
+        std::list < int >::iterator it;
+
+        for ( int i = 0; i < 4; i ++ ) {
+            l1.push_back(i+1);
+        }
+        for ( int i = 10; i <= 30; i += 10 ) {
+            l2.push_back(i);
+        }
+        printf("--- l2 beg\n");
+        PrintInContainer(l2);//  1 10 20 30 2 3 4
+        printf("--- l2 end\n");
+        printf("\n"); //
+
+        it = l1.begin();
+        ++ it;
+        printf("it=%d\n", *it); // 2
+
+        l1.splice(it, l2);
+
+        PrintInContainer(l1);//  1 10 20 30 2 3 4
+        printf("\n"); //
+
+        printf("l2 beg\n");
+        PrintInContainer(l2);//
+        printf("l2 end\n");
+
+        return;
+    }
+
+    {
+        CSortedListToBst listObj;
+        listObj.TstList1();
+        return;
+    }
     {
         ObjA* oa = ObjA::GetInstance();
         oa->PrintSomeInfo();

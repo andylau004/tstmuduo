@@ -1354,6 +1354,7 @@ ListNode* IsCycle(ListNode *pHead) {
 //    }
 //    return NULL;
 }
+
 void call_cycle() {
     ListNode* pNode1 = CreateListNode(1);
     ListNode* pNode2 = CreateListNode(2);
@@ -3298,13 +3299,17 @@ void tstC11() {
 
 }
 
+
+
 int main(int argc, char *argv[])
 {
     Logger::setLogLevel(Logger::DEBUG);
     LOG_INFO << "pid = " << getpid() << ", tid levelOrder= " << CurrentThread::tid();
 
-    tstC11();
-    return 1;
+    LeetCodeEntry(); return 1;
+
+    tstC11();  return 1;
+
 //    {
 //        LeetCodeEntry();
 //        return 1;
@@ -3320,8 +3325,7 @@ int main(int argc, char *argv[])
     tst_my_bst_tree();
     std::cout << "res=" << kthSmallest(g_pBstTree, 3) << std::endl;
 
-    LeetCodeEntry();
-    return 1;
+
 
     uint tmpval = 0x10;
     LOG_INFO << "tmpval=" << tmpval;

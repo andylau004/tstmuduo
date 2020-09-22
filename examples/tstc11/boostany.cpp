@@ -17,8 +17,6 @@
 
 #include <boost/circular_buffer.hpp>
 
-#include "muduo/base/common.h"
-
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
 #include <boost/scoped_ptr.hpp>
@@ -34,25 +32,14 @@
 #include <boost/any.hpp>
 #include <boost/format.hpp>
 
-#include "muduo/net/InetAddress.h"
-#include "muduo/net/Channel.h"
-#include "muduo/net/EventLoop.h"
-#include "muduo/net/EventLoopThread.h"
-#include "muduo/net/EventLoopThreadPool.h"
-#include "muduo/net/TcpServer.h"
+#include "muduo/base/common.h"
 #include "muduo/base/Logging.h"
-#include "muduo/net/TcpClient.h"
-
-#include "muduo/base/ThreadPool.h"
-
 
 
 using namespace std;
 using namespace muduo;
-using namespace muduo::net;
 
 using namespace boost;
-
 
 
 using BoostListAny = std::list<boost::any>;
