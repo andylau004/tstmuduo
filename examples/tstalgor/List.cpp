@@ -32,8 +32,7 @@ void PrintList(ListNode* pHead)
     printf("PrintList starts.\n");
 
     ListNode* pNode = pHead;
-    while(pNode != NULL)
-    {
+    while (pNode) {
         printf("%d\t", pNode->m_nValue);
         pNode = pNode->m_pNext;
     }

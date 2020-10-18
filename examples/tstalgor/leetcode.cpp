@@ -82,9 +82,8 @@ void InOrtderPtrint(TreeNode* root);
         if (root->right)
             someInOrder(root->right);
     }
-//};
-    ListNode* ConstructTestList(const std::vector<int>& vecInts) {
 
+    ListNode* ConstructTestList(const std::vector<int>& vecInts) {
         std::vector< ListNode* > vecNodes;
 
         for ( auto ii : vecInts ) {
@@ -101,7 +100,6 @@ void InOrtderPtrint(TreeNode* root);
     }
 
 // Convert Sorted List to Binary Search Tree -- LeetCode 将有序链表转为二叉搜索树
-
 class CSortedListToBst {
 public:
 
@@ -670,8 +668,11 @@ void tstupper_bound() {
     std::vector<int> a{1, 2, 3, 4, 4, 5};
     std::cout << upper_bound_(a.size(), 4, a) << std::endl;
 }
+
 void LeetCodeEntry() {
+
     std::vector<int> a{11, 23, 35, 47, 51, 53, 198, 2739, 31798};
+
     ListNode* retnode = ConstructTestList(a);
     PrintList(retnode);
     return;

@@ -1321,41 +1321,53 @@ void call_rever_KthNode() {
 }
 
 ListNode* IsCycle(ListNode *pHead) {
-    if (NULL == pHead || NULL == pHead->m_pNext)
-        return NULL;
+//    if (nullptr == pHead || nullptr == pHead->m_pNext)
+//        return nullptr;
 
-    std::set<ListNode*> setNodes;
-    ListNode* pnode = pHead;
-    while (pnode) {
-        int iPos = setNodes.insert(pnode).second;
-        if ( iPos ) {
-            pnode = pnode->m_pNext;
-            std::cout << "" << iPos << " insert success! nodeval=" << pnode->m_nValue << std::endl;
-        }
-        else {
-            std::cout << "" << iPos << " insert duplicate! nodeval=" << pnode->m_nValue << std::endl;
-            return pnode;
-        }
-    }
-    return NULL;
-
-//    if (!pHead)
-//        return NULL;
-
-//    ListNode* pFast = pHead;
-//    ListNode* pSlow = pHead;
-
-//    while (pFast && pFast->m_pNext) {
-//        pFast = pFast->m_pNext->m_pNext;
-//        pSlow = pSlow->m_pNext;
-//        if (pFast == pSlow) {
-//            return pFast;
+//    std::set<ListNode*> setNodes;
+//    ListNode* pnode = pHead;
+//    while (pnode) {
+//        int iPos = setNodes.insert(pnode).second;
+//        if ( iPos ) {
+//            pnode = pnode->m_pNext;
+//            std::cout << "" << iPos << " insert success! nodeval=" << pnode->m_nValue << std::endl;
+//        }
+//        else {
+//            std::cout << "" << iPos << " insert duplicate! nodeval=" << pnode->m_nValue << std::endl;
+//            return pnode;
 //        }
 //    }
 //    return NULL;
+
+    if (!pHead)
+        return nullptr;
+
+    ListNode* pFast = pHead;
+    ListNode* pSlow = pHead;
+
+    while (pFast && pFast->m_pNext) {
+
+        pSlow = pSlow->m_pNext;
+
+        if (pFast->m_pNext)
+            pFast = pFast->m_pNext->m_pNext;
+
+        if (pSlow == pFast)
+            return pFast;
+    }
+    return nullptr;
+
+    while (pFast && pFast->m_pNext) {
+        pFast = pFast->m_pNext->m_pNext;
+        pSlow = pSlow->m_pNext;
+        if (pFast == pSlow) {
+            return pFast;
+        }
+    }
+    return NULL;
 }
 
-void call_cycle() {
+void check_cyclelist() {
     ListNode* pNode1 = CreateListNode(1);
     ListNode* pNode2 = CreateListNode(2);
     ListNode* pNode3 = CreateListNode(3);
@@ -2098,7 +2110,54 @@ void binary_search_wrap() {
 
 BstNode* g_pBstTree = nullptr;
 
+void mockAddBstNode(BstNode*& root, BstNode* pNewNode) {
+    {
+        BstNode* parent = nullptr;
+        BstNode* tmp = root;
+        while (tmp) {
+            parent = tmp;
+            if (pNewNode->key_ > tmp->key_) {
+                tmp = tmp->rchild_;
+            } else {
+                tmp = tmp->lchild_;
+            }
+        }
+        pNewNode->parent_ = parent;
+
+        if (!parent) {
+            root = pNewNode;
+        } else if (pNewNode->key_ > parent->key_) {
+            parent->rchild_ = pNewNode;
+        } else {
+            parent->lchild_ = pNewNode;
+        }
+        return ;
+    }
+    BstNode* parent = nullptr;
+    BstNode* tmp = root;
+
+    while (tmp) {
+        parent = tmp;
+        if (pNewNode->key_ > tmp->key_) {
+            tmp = tmp->rchild_;
+        } else {
+            tmp = tmp->lchild_;
+        }
+    }
+    pNewNode->parent_ = parent;
+
+    if (!parent) {
+        root = pNewNode;
+    } else if (pNewNode->key_ > parent->key_) {
+        parent->rchild_ = pNewNode;
+    } else {
+        parent->lchild_ = pNewNode;
+    }
+}
+
 void AddNewNode(BstNode*& root, BstNode* pNewNode) {
+
+    return mockAddBstNode(root, pNewNode);
 
     {
         BstNode* parent = nullptr;
@@ -2323,23 +2382,28 @@ int tst_add_two_num() {
 
 
 
-// 构建二叉树；
-void CreateBstTree() {
+
+void CreateBstTree() {// 构建二叉树；
 //    std::cout << "-------------------------------" << std::endl;
 //    std::cout << std::boolalpha;
 //    std::cout << "Minimum value for int: " << std::numeric_limits<int>::min() << std::endl;
 //    std::cout << "Maximum value for int: " << std::numeric_limits<int>::max() << std::endl;
 
+    {
+        ::srand(time(NULL));
+
+        std::cout << "-------------------------------beg random val-------------------------------" << std::endl;
+        for ( int i = 0; i < 10; i++ ) {
+            int randVal = rand() % 200;
+
+            BstNode* newNode = new BstNode(randVal);
+            AddNewNode(g_pBstTree, newNode);
+        }
+        return;
+    }
     srand(time(NULL));
 
     int count = 20;
-    std::cout << "  " << std::endl;
-//    for (int i = 0; i < count; ++i) {
-//        int r = rand()%(300);
-//        std::cout << "  " << r;
-//    }
-    std::cout << "  " << std::endl;
-
     std::cout << "-------------------------------beg random val-------------------------------" << std::endl;
     for (int i = 0; i < count; ++i) {
         int randVal = rand() % (300);
@@ -2399,7 +2463,7 @@ void tst_my_bst_tree() {
 }
 
 void tst_my_bst_1() {
-//5，3，7，2，4，6，8
+    //5，3，7，2，4，6，8
     int tmpInts[ ] = {5, 3, 7, 2, 4, 6, 8};
     int size = sizeof(tmpInts)/sizeof(tmpInts[0]);
     std::cout << "size=" << size << std::endl;
@@ -3300,11 +3364,96 @@ void tstC11() {
 }
 
 
+// 删除链表中反向第K个节点，时间复杂度O(n)
+void removeNthFromEnd(int k) {
+    std::vector <int> vecInts{ 10, 97, 21, 16, 2, 0};
+
+    auto head = ConstructTestList(vecInts);
+
+    LOG_INFO << "print list node 111";
+    PrintList(head);
+    LOG_INFO << "print list node 222";
+
+    ListNode* p1 = head;
+    ListNode* p2 = head;
+
+    for ( int i = 0; i < k; i ++ ) {
+        p1 = p1->m_pNext;
+    }
+    if (p1 == nullptr) {
+        head = head->m_pNext;
+        return;
+    }
+    while (p1->m_pNext) {
+        p1 = p1->m_pNext;
+        p2 = p2->m_pNext;
+    }
+    p2->m_pNext = p2->m_pNext->m_pNext;
+
+    PrintList(head);
+}
+
+// 将两个有序的链表合并为一个新链表，要求新的链表是通过拼接两个链表的节点来生成的。
+ListNode* mergeTwoList(ListNode* l1, ListNode* l2) {
+    if (!l1) return l2;
+    if (!l2) return l1;
+    ListNode* h;
+    if (l1->m_nValue <= l2->m_nValue) {
+        h = l1;
+        l1->m_pNext = mergeTwoList(l1->m_pNext, l2);
+    } else {
+        h = l2;
+        l2->m_pNext = mergeTwoList(l1, l2->m_pNext);
+    }
+    return h;
+}
+void Test_mergeTwoList() {
+
+    std::vector <int> vecInts1{ 10, 97, 113, 269, 398, 10000};
+
+    auto list_1 = ConstructTestList(vecInts1);
+
+//    LOG_INFO << "print list node 111";
+//    PrintList(list_1);
+//    LOG_INFO << "print list node 222";
+
+
+    std::vector <int> vecInts2{ 2000, 9700, 21000, 21999, 32000};
+
+    auto list_2 = ConstructTestList(vecInts2);
+
+//    LOG_INFO << "print list node 111";
+//    PrintList(list_1);
+//    LOG_INFO << "print list node 222";
+
+    auto listNew = mergeTwoList(list_1, list_2);
+
+    LOG_INFO << "print list node 111";
+    PrintList(listNew);
+    LOG_INFO << "print list node 222";
+
+
+}
 
 int main(int argc, char *argv[])
 {
     Logger::setLogLevel(Logger::DEBUG);
     LOG_INFO << "pid = " << getpid() << ", tid levelOrder= " << CurrentThread::tid();
+
+    Test_mergeTwoList();
+    return 1;
+
+    removeNthFromEnd(3);
+    return 1;
+
+    CreateBstTree();
+//    std::cout << "serial ret=" << Serialize(g_pBstTree) << std::endl;
+
+    tst_my_bst_tree();
+    std::cout << "res=" << kthSmallest(g_pBstTree, 3) << std::endl;
+    return 1;
+
+    check_cyclelist(); return 1;
 
     LeetCodeEntry(); return 1;
 
@@ -3319,11 +3468,6 @@ int main(int argc, char *argv[])
 //    std::cout << "sizeof(data)=" << sizeof(data) << std::endl;
 //    return 1;
 
-    CreateBstTree();
-//    std::cout << "serial ret=" << Serialize(g_pBstTree) << std::endl;
-
-    tst_my_bst_tree();
-    std::cout << "res=" << kthSmallest(g_pBstTree, 3) << std::endl;
 
 
 
@@ -3470,7 +3614,6 @@ int main(int argc, char *argv[])
     call_find_max_in_array(); return 1;
     call_Max_array_Sum(); return 1;
 
-    call_cycle(); return 1;
 
     call_rever_KthNode(); return 1;
 
