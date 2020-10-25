@@ -19,11 +19,6 @@
 #include <boost/bind.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 
-
-//#include "poco/Bugcheck.h"
-//#include "poco/Foundation.h"
-//#include "poco/Alignment.h"
-
 #include "muduo/base/common.h"
 
 #include "muduo/net/InetAddress.h"

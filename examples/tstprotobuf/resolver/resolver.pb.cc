@@ -32,7 +32,6 @@ static void InitDefaultsscc_info_ResolveRequest_resolver_2eproto() {
     new (ptr) ::resolver::ResolveRequest();
     ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
   }
-  ::resolver::ResolveRequest::InitAsDefaultInstance();
 }
 
 ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_ResolveRequest_resolver_2eproto =
@@ -46,7 +45,6 @@ static void InitDefaultsscc_info_ResolveResponse_resolver_2eproto() {
     new (ptr) ::resolver::ResolveResponse();
     ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
   }
-  ::resolver::ResolveResponse::InitAsDefaultInstance();
 }
 
 ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_ResolveResponse_resolver_2eproto =
@@ -108,22 +106,19 @@ static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_res
   &scc_info_ResolveResponse_resolver_2eproto.base,
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_resolver_2eproto_once;
-static bool descriptor_table_resolver_2eproto_initialized = false;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_resolver_2eproto = {
-  &descriptor_table_resolver_2eproto_initialized, descriptor_table_protodef_resolver_2eproto, "resolver.proto", 268,
+  false, false, descriptor_table_protodef_resolver_2eproto, "resolver.proto", 268,
   &descriptor_table_resolver_2eproto_once, descriptor_table_resolver_2eproto_sccs, descriptor_table_resolver_2eproto_deps, 2, 0,
   schemas, file_default_instances, TableStruct_resolver_2eproto::offsets,
   file_level_metadata_resolver_2eproto, 2, file_level_enum_descriptors_resolver_2eproto, file_level_service_descriptors_resolver_2eproto,
 };
 
 // Force running AddDescriptors() at dynamic initialization time.
-static bool dynamic_init_dummy_resolver_2eproto = (  ::PROTOBUF_NAMESPACE_ID::internal::AddDescriptors(&descriptor_table_resolver_2eproto), true);
+static bool dynamic_init_dummy_resolver_2eproto = (static_cast<void>(::PROTOBUF_NAMESPACE_ID::internal::AddDescriptors(&descriptor_table_resolver_2eproto)), true);
 namespace resolver {
 
 // ===================================================================
 
-void ResolveRequest::InitAsDefaultInstance() {
-}
 class ResolveRequest::_Internal {
  public:
   using HasBits = decltype(std::declval<ResolveRequest>()._has_bits_);
@@ -139,25 +134,30 @@ class ResolveRequest::_Internal {
   static void set_has_number(HasBits* has_bits) {
     (*has_bits)[0] |= 8u;
   }
+  static bool MissingRequiredFields(const HasBits& has_bits) {
+    return ((has_bits[0] & 0x0000000f) ^ 0x0000000f) != 0;
+  }
 };
 
-ResolveRequest::ResolveRequest()
-  : ::PROTOBUF_NAMESPACE_ID::Message(), _internal_metadata_(nullptr) {
+ResolveRequest::ResolveRequest(::PROTOBUF_NAMESPACE_ID::Arena* arena)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena) {
   SharedCtor();
-  // @@protoc_insertion_point(constructor:resolver.ResolveRequest)
+  RegisterArenaDtor(arena);
+  // @@protoc_insertion_point(arena_constructor:resolver.ResolveRequest)
 }
 ResolveRequest::ResolveRequest(const ResolveRequest& from)
   : ::PROTOBUF_NAMESPACE_ID::Message(),
-      _internal_metadata_(nullptr),
       _has_bits_(from._has_bits_) {
-  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   address_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   if (from._internal_has_address()) {
-    address_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.address_);
+    address_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from._internal_address(),
+      GetArena());
   }
   name_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   if (from._internal_has_name()) {
-    name_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.name_);
+    name_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from._internal_name(),
+      GetArena());
   }
   ::memcpy(&age_, &from.age_,
     static_cast<size_t>(reinterpret_cast<char*>(&number_) -
@@ -169,21 +169,30 @@ void ResolveRequest::SharedCtor() {
   ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&scc_info_ResolveRequest_resolver_2eproto.base);
   address_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   name_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  ::memset(&age_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&number_) -
+  ::memset(reinterpret_cast<char*>(this) + static_cast<size_t>(
+      reinterpret_cast<char*>(&age_) - reinterpret_cast<char*>(this)),
+      0, static_cast<size_t>(reinterpret_cast<char*>(&number_) -
       reinterpret_cast<char*>(&age_)) + sizeof(number_));
 }
 
 ResolveRequest::~ResolveRequest() {
   // @@protoc_insertion_point(destructor:resolver.ResolveRequest)
   SharedDtor();
+  _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
 void ResolveRequest::SharedDtor() {
+  GOOGLE_DCHECK(GetArena() == nullptr);
   address_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   name_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 }
 
+void ResolveRequest::ArenaDtor(void* object) {
+  ResolveRequest* _this = reinterpret_cast< ResolveRequest* >(object);
+  (void)_this;
+}
+void ResolveRequest::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
+}
 void ResolveRequest::SetCachedSize(int size) const {
   _cached_size_.Set(size);
 }
@@ -202,10 +211,10 @@ void ResolveRequest::Clear() {
   cached_has_bits = _has_bits_[0];
   if (cached_has_bits & 0x00000003u) {
     if (cached_has_bits & 0x00000001u) {
-      address_.ClearNonDefaultToEmptyNoArena();
+      address_.ClearNonDefaultToEmpty();
     }
     if (cached_has_bits & 0x00000002u) {
-      name_.ClearNonDefaultToEmptyNoArena();
+      name_.ClearNonDefaultToEmpty();
     }
   }
   if (cached_has_bits & 0x0000000cu) {
@@ -214,7 +223,7 @@ void ResolveRequest::Clear() {
         reinterpret_cast<char*>(&age_)) + sizeof(number_));
   }
   _has_bits_.Clear();
-  _internal_metadata_.Clear();
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
 const char* ResolveRequest::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
@@ -251,7 +260,7 @@ const char* ResolveRequest::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE
       case 3:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 24)) {
           _Internal::set_has_age(&has_bits);
-          age_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint(&ptr);
+          age_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
@@ -259,7 +268,7 @@ const char* ResolveRequest::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE
       case 4:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 32)) {
           _Internal::set_has_number(&has_bits);
-          number_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint(&ptr);
+          number_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
@@ -269,7 +278,9 @@ const char* ResolveRequest::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE
           ctx->SetLastTag(tag);
           goto success;
         }
-        ptr = UnknownFieldParse(tag, &_internal_metadata_, ptr, ctx);
+        ptr = UnknownFieldParse(tag,
+            _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+            ptr, ctx);
         CHK_(ptr != nullptr);
         continue;
       }
@@ -325,7 +336,7 @@ failure:
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
-        _internal_metadata_.unknown_fields(), target, stream);
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
   }
   // @@protoc_insertion_point(serialize_to_array_end:resolver.ResolveRequest)
   return target;
@@ -424,19 +435,17 @@ void ResolveRequest::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
 void ResolveRequest::MergeFrom(const ResolveRequest& from) {
 // @@protoc_insertion_point(class_specific_merge_from_start:resolver.ResolveRequest)
   GOOGLE_DCHECK_NE(&from, this);
-  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
   cached_has_bits = from._has_bits_[0];
   if (cached_has_bits & 0x0000000fu) {
     if (cached_has_bits & 0x00000001u) {
-      _has_bits_[0] |= 0x00000001u;
-      address_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.address_);
+      _internal_set_address(from._internal_address());
     }
     if (cached_has_bits & 0x00000002u) {
-      _has_bits_[0] |= 0x00000002u;
-      name_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.name_);
+      _internal_set_name(from._internal_name());
     }
     if (cached_has_bits & 0x00000004u) {
       age_ = from.age_;
@@ -463,20 +472,22 @@ void ResolveRequest::CopyFrom(const ResolveRequest& from) {
 }
 
 bool ResolveRequest::IsInitialized() const {
-  if ((_has_bits_[0] & 0x0000000f) != 0x0000000f) return false;
+  if (_Internal::MissingRequiredFields(_has_bits_)) return false;
   return true;
 }
 
 void ResolveRequest::InternalSwap(ResolveRequest* other) {
   using std::swap;
-  _internal_metadata_.Swap(&other->_internal_metadata_);
+  _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
   swap(_has_bits_[0], other->_has_bits_[0]);
-  address_.Swap(&other->address_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
-    GetArenaNoVirtual());
-  name_.Swap(&other->name_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
-    GetArenaNoVirtual());
-  swap(age_, other->age_);
-  swap(number_, other->number_);
+  address_.Swap(&other->address_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  name_.Swap(&other->name_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  ::PROTOBUF_NAMESPACE_ID::internal::memswap<
+      PROTOBUF_FIELD_OFFSET(ResolveRequest, number_)
+      + sizeof(ResolveRequest::number_)
+      - PROTOBUF_FIELD_OFFSET(ResolveRequest, age_)>(
+          reinterpret_cast<char*>(&age_),
+          reinterpret_cast<char*>(&other->age_));
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata ResolveRequest::GetMetadata() const {
@@ -486,8 +497,6 @@ void ResolveRequest::InternalSwap(ResolveRequest* other) {
 
 // ===================================================================
 
-void ResolveResponse::InitAsDefaultInstance() {
-}
 class ResolveResponse::_Internal {
  public:
   using HasBits = decltype(std::declval<ResolveResponse>()._has_bits_);
@@ -496,18 +505,20 @@ class ResolveResponse::_Internal {
   }
 };
 
-ResolveResponse::ResolveResponse()
-  : ::PROTOBUF_NAMESPACE_ID::Message(), _internal_metadata_(nullptr) {
+ResolveResponse::ResolveResponse(::PROTOBUF_NAMESPACE_ID::Arena* arena)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena),
+  ip_(arena),
+  port_(arena) {
   SharedCtor();
-  // @@protoc_insertion_point(constructor:resolver.ResolveResponse)
+  RegisterArenaDtor(arena);
+  // @@protoc_insertion_point(arena_constructor:resolver.ResolveResponse)
 }
 ResolveResponse::ResolveResponse(const ResolveResponse& from)
   : ::PROTOBUF_NAMESPACE_ID::Message(),
-      _internal_metadata_(nullptr),
       _has_bits_(from._has_bits_),
       ip_(from.ip_),
       port_(from.port_) {
-  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   resolved_ = from.resolved_;
   // @@protoc_insertion_point(copy_constructor:resolver.ResolveResponse)
 }
@@ -519,11 +530,19 @@ void ResolveResponse::SharedCtor() {
 ResolveResponse::~ResolveResponse() {
   // @@protoc_insertion_point(destructor:resolver.ResolveResponse)
   SharedDtor();
+  _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
 void ResolveResponse::SharedDtor() {
+  GOOGLE_DCHECK(GetArena() == nullptr);
 }
 
+void ResolveResponse::ArenaDtor(void* object) {
+  ResolveResponse* _this = reinterpret_cast< ResolveResponse* >(object);
+  (void)_this;
+}
+void ResolveResponse::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
+}
 void ResolveResponse::SetCachedSize(int size) const {
   _cached_size_.Set(size);
 }
@@ -543,7 +562,7 @@ void ResolveResponse::Clear() {
   port_.Clear();
   resolved_ = false;
   _has_bits_.Clear();
-  _internal_metadata_.Clear();
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
 const char* ResolveResponse::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
@@ -558,7 +577,7 @@ const char* ResolveResponse::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPAC
       case 1:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
           _Internal::set_has_resolved(&has_bits);
-          resolved_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint(&ptr);
+          resolved_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
@@ -583,7 +602,7 @@ const char* ResolveResponse::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPAC
           ptr -= 1;
           do {
             ptr += 1;
-            _internal_add_port(::PROTOBUF_NAMESPACE_ID::internal::ReadVarint(&ptr));
+            _internal_add_port(::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr));
             CHK_(ptr);
             if (!ctx->DataAvailable(ptr)) break;
           } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<24>(ptr));
@@ -598,7 +617,9 @@ const char* ResolveResponse::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPAC
           ctx->SetLastTag(tag);
           goto success;
         }
-        ptr = UnknownFieldParse(tag, &_internal_metadata_, ptr, ctx);
+        ptr = UnknownFieldParse(tag,
+            _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+            ptr, ctx);
         CHK_(ptr != nullptr);
         continue;
       }
@@ -640,7 +661,7 @@ failure:
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
-        _internal_metadata_.unknown_fields(), target, stream);
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
   }
   // @@protoc_insertion_point(serialize_to_array_end:resolver.ResolveResponse)
   return target;
@@ -705,7 +726,7 @@ void ResolveResponse::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
 void ResolveResponse::MergeFrom(const ResolveResponse& from) {
 // @@protoc_insertion_point(class_specific_merge_from_start:resolver.ResolveResponse)
   GOOGLE_DCHECK_NE(&from, this);
-  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
@@ -736,7 +757,7 @@ bool ResolveResponse::IsInitialized() const {
 
 void ResolveResponse::InternalSwap(ResolveResponse* other) {
   using std::swap;
-  _internal_metadata_.Swap(&other->_internal_metadata_);
+  _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
   swap(_has_bits_[0], other->_has_bits_[0]);
   ip_.InternalSwap(&other->ip_);
   port_.InternalSwap(&other->port_);
@@ -839,10 +860,10 @@ void ResolverService_Stub::Resolve(::PROTOBUF_NAMESPACE_ID::RpcController* contr
 }  // namespace resolver
 PROTOBUF_NAMESPACE_OPEN
 template<> PROTOBUF_NOINLINE ::resolver::ResolveRequest* Arena::CreateMaybeMessage< ::resolver::ResolveRequest >(Arena* arena) {
-  return Arena::CreateInternal< ::resolver::ResolveRequest >(arena);
+  return Arena::CreateMessageInternal< ::resolver::ResolveRequest >(arena);
 }
 template<> PROTOBUF_NOINLINE ::resolver::ResolveResponse* Arena::CreateMaybeMessage< ::resolver::ResolveResponse >(Arena* arena) {
-  return Arena::CreateInternal< ::resolver::ResolveResponse >(arena);
+  return Arena::CreateMessageInternal< ::resolver::ResolveResponse >(arena);
 }
 PROTOBUF_NAMESPACE_CLOSE
 

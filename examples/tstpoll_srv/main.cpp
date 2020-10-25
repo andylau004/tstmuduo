@@ -10,17 +10,8 @@
 
 
 
-
-
-//#include "tst_1.h"
-
 #include "codeconvert.h"
 
-
-//#include "poco/Bugcheck.h"
-//#include "poco/Foundation.h"
-
-//#include "poco/Alignment.h"
 
 #include "muduo/net/InetAddress.h"
 
@@ -135,8 +126,7 @@ int main(int argc, char *argv[])
     TestClient client(&loop, serverAddr);
     client.connect();
     loop.loop();
-
-
+    return 1;
 }
 
 

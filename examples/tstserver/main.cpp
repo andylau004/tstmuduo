@@ -1304,7 +1304,7 @@ int main(int argc, char *argv[])
     printf( "no define SO_REUSEPORT\n" );
 #endif
 
-
+    return 1;
 }
 
 

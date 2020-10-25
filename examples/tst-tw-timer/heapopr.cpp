@@ -130,7 +130,7 @@ int start_heap_server() {
     addsig(SIGPIPE);
 
     bool stop_server = false;
-    bool timeout = false;
+//    bool timeout = false;
 
     epoll_event events[MAX_EVENT_NUMBER];
     client_data* users = new client_data[FD_LIMIT];

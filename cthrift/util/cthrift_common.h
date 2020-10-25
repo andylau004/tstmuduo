@@ -118,7 +118,7 @@ extern "C" {
 #ifdef htonll
 #undef htonll
 #endif
-#include <zookeeper/zookeeper.h>
+//#include <zookeeper/zookeeper.h>
 }
 
 

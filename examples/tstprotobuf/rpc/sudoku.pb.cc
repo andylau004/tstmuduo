@@ -32,7 +32,6 @@ static void InitDefaultsscc_info_SudokuRequest_sudoku_2eproto() {
     new (ptr) ::sudoku::SudokuRequest();
     ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
   }
-  ::sudoku::SudokuRequest::InitAsDefaultInstance();
 }
 
 ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_SudokuRequest_sudoku_2eproto =
@@ -46,7 +45,6 @@ static void InitDefaultsscc_info_SudokuResponse_sudoku_2eproto() {
     new (ptr) ::sudoku::SudokuResponse();
     ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
   }
-  ::sudoku::SudokuResponse::InitAsDefaultInstance();
 }
 
 ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_SudokuResponse_sudoku_2eproto =
@@ -99,43 +97,44 @@ static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_sud
   &scc_info_SudokuResponse_sudoku_2eproto.base,
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_sudoku_2eproto_once;
-static bool descriptor_table_sudoku_2eproto_initialized = false;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_sudoku_2eproto = {
-  &descriptor_table_sudoku_2eproto_initialized, descriptor_table_protodef_sudoku_2eproto, "sudoku.proto", 208,
+  false, false, descriptor_table_protodef_sudoku_2eproto, "sudoku.proto", 208,
   &descriptor_table_sudoku_2eproto_once, descriptor_table_sudoku_2eproto_sccs, descriptor_table_sudoku_2eproto_deps, 2, 0,
   schemas, file_default_instances, TableStruct_sudoku_2eproto::offsets,
   file_level_metadata_sudoku_2eproto, 2, file_level_enum_descriptors_sudoku_2eproto, file_level_service_descriptors_sudoku_2eproto,
 };
 
 // Force running AddDescriptors() at dynamic initialization time.
-static bool dynamic_init_dummy_sudoku_2eproto = (  ::PROTOBUF_NAMESPACE_ID::internal::AddDescriptors(&descriptor_table_sudoku_2eproto), true);
+static bool dynamic_init_dummy_sudoku_2eproto = (static_cast<void>(::PROTOBUF_NAMESPACE_ID::internal::AddDescriptors(&descriptor_table_sudoku_2eproto)), true);
 namespace sudoku {
 
 // ===================================================================
 
-void SudokuRequest::InitAsDefaultInstance() {
-}
 class SudokuRequest::_Internal {
  public:
   using HasBits = decltype(std::declval<SudokuRequest>()._has_bits_);
   static void set_has_checkerboard(HasBits* has_bits) {
     (*has_bits)[0] |= 1u;
   }
+  static bool MissingRequiredFields(const HasBits& has_bits) {
+    return ((has_bits[0] & 0x00000001) ^ 0x00000001) != 0;
+  }
 };
 
-SudokuRequest::SudokuRequest()
-  : ::PROTOBUF_NAMESPACE_ID::Message(), _internal_metadata_(nullptr) {
+SudokuRequest::SudokuRequest(::PROTOBUF_NAMESPACE_ID::Arena* arena)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena) {
   SharedCtor();
-  // @@protoc_insertion_point(constructor:sudoku.SudokuRequest)
+  RegisterArenaDtor(arena);
+  // @@protoc_insertion_point(arena_constructor:sudoku.SudokuRequest)
 }
 SudokuRequest::SudokuRequest(const SudokuRequest& from)
   : ::PROTOBUF_NAMESPACE_ID::Message(),
-      _internal_metadata_(nullptr),
       _has_bits_(from._has_bits_) {
-  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   checkerboard_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   if (from._internal_has_checkerboard()) {
-    checkerboard_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.checkerboard_);
+    checkerboard_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from._internal_checkerboard(),
+      GetArena());
   }
   // @@protoc_insertion_point(copy_constructor:sudoku.SudokuRequest)
 }
@@ -148,12 +147,20 @@ void SudokuRequest::SharedCtor() {
 SudokuRequest::~SudokuRequest() {
   // @@protoc_insertion_point(destructor:sudoku.SudokuRequest)
   SharedDtor();
+  _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
 void SudokuRequest::SharedDtor() {
+  GOOGLE_DCHECK(GetArena() == nullptr);
   checkerboard_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 }
 
+void SudokuRequest::ArenaDtor(void* object) {
+  SudokuRequest* _this = reinterpret_cast< SudokuRequest* >(object);
+  (void)_this;
+}
+void SudokuRequest::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
+}
 void SudokuRequest::SetCachedSize(int size) const {
   _cached_size_.Set(size);
 }
@@ -171,10 +178,10 @@ void SudokuRequest::Clear() {
 
   cached_has_bits = _has_bits_[0];
   if (cached_has_bits & 0x00000001u) {
-    checkerboard_.ClearNonDefaultToEmptyNoArena();
+    checkerboard_.ClearNonDefaultToEmpty();
   }
   _has_bits_.Clear();
-  _internal_metadata_.Clear();
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
 const char* SudokuRequest::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
@@ -202,7 +209,9 @@ const char* SudokuRequest::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_
           ctx->SetLastTag(tag);
           goto success;
         }
-        ptr = UnknownFieldParse(tag, &_internal_metadata_, ptr, ctx);
+        ptr = UnknownFieldParse(tag,
+            _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+            ptr, ctx);
         CHK_(ptr != nullptr);
         continue;
       }
@@ -236,7 +245,7 @@ failure:
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
-        _internal_metadata_.unknown_fields(), target, stream);
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
   }
   // @@protoc_insertion_point(serialize_to_array_end:sudoku.SudokuRequest)
   return target;
@@ -283,13 +292,12 @@ void SudokuRequest::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
 void SudokuRequest::MergeFrom(const SudokuRequest& from) {
 // @@protoc_insertion_point(class_specific_merge_from_start:sudoku.SudokuRequest)
   GOOGLE_DCHECK_NE(&from, this);
-  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
   if (from._internal_has_checkerboard()) {
-    _has_bits_[0] |= 0x00000001u;
-    checkerboard_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.checkerboard_);
+    _internal_set_checkerboard(from._internal_checkerboard());
   }
 }
 
@@ -308,16 +316,15 @@ void SudokuRequest::CopyFrom(const SudokuRequest& from) {
 }
 
 bool SudokuRequest::IsInitialized() const {
-  if ((_has_bits_[0] & 0x00000001) != 0x00000001) return false;
+  if (_Internal::MissingRequiredFields(_has_bits_)) return false;
   return true;
 }
 
 void SudokuRequest::InternalSwap(SudokuRequest* other) {
   using std::swap;
-  _internal_metadata_.Swap(&other->_internal_metadata_);
+  _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
   swap(_has_bits_[0], other->_has_bits_[0]);
-  checkerboard_.Swap(&other->checkerboard_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
-    GetArenaNoVirtual());
+  checkerboard_.Swap(&other->checkerboard_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata SudokuRequest::GetMetadata() const {
@@ -327,8 +334,6 @@ void SudokuRequest::InternalSwap(SudokuRequest* other) {
 
 // ===================================================================
 
-void SudokuResponse::InitAsDefaultInstance() {
-}
 class SudokuResponse::_Internal {
  public:
   using HasBits = decltype(std::declval<SudokuResponse>()._has_bits_);
@@ -340,19 +345,20 @@ class SudokuResponse::_Internal {
   }
 };
 
-SudokuResponse::SudokuResponse()
-  : ::PROTOBUF_NAMESPACE_ID::Message(), _internal_metadata_(nullptr) {
+SudokuResponse::SudokuResponse(::PROTOBUF_NAMESPACE_ID::Arena* arena)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena) {
   SharedCtor();
-  // @@protoc_insertion_point(constructor:sudoku.SudokuResponse)
+  RegisterArenaDtor(arena);
+  // @@protoc_insertion_point(arena_constructor:sudoku.SudokuResponse)
 }
 SudokuResponse::SudokuResponse(const SudokuResponse& from)
   : ::PROTOBUF_NAMESPACE_ID::Message(),
-      _internal_metadata_(nullptr),
       _has_bits_(from._has_bits_) {
-  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   checkerboard_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   if (from._internal_has_checkerboard()) {
-    checkerboard_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.checkerboard_);
+    checkerboard_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from._internal_checkerboard(),
+      GetArena());
   }
   solved_ = from.solved_;
   // @@protoc_insertion_point(copy_constructor:sudoku.SudokuResponse)
@@ -367,12 +373,20 @@ void SudokuResponse::SharedCtor() {
 SudokuResponse::~SudokuResponse() {
   // @@protoc_insertion_point(destructor:sudoku.SudokuResponse)
   SharedDtor();
+  _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
 void SudokuResponse::SharedDtor() {
+  GOOGLE_DCHECK(GetArena() == nullptr);
   checkerboard_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 }
 
+void SudokuResponse::ArenaDtor(void* object) {
+  SudokuResponse* _this = reinterpret_cast< SudokuResponse* >(object);
+  (void)_this;
+}
+void SudokuResponse::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
+}
 void SudokuResponse::SetCachedSize(int size) const {
   _cached_size_.Set(size);
 }
@@ -390,11 +404,11 @@ void SudokuResponse::Clear() {
 
   cached_has_bits = _has_bits_[0];
   if (cached_has_bits & 0x00000001u) {
-    checkerboard_.ClearNonDefaultToEmptyNoArena();
+    checkerboard_.ClearNonDefaultToEmpty();
   }
   solved_ = false;
   _has_bits_.Clear();
-  _internal_metadata_.Clear();
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
 const char* SudokuResponse::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
@@ -409,7 +423,7 @@ const char* SudokuResponse::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE
       case 1:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
           _Internal::set_has_solved(&has_bits);
-          solved_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint(&ptr);
+          solved_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
@@ -430,7 +444,9 @@ const char* SudokuResponse::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE
           ctx->SetLastTag(tag);
           goto success;
         }
-        ptr = UnknownFieldParse(tag, &_internal_metadata_, ptr, ctx);
+        ptr = UnknownFieldParse(tag,
+            _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+            ptr, ctx);
         CHK_(ptr != nullptr);
         continue;
       }
@@ -470,7 +486,7 @@ failure:
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
-        _internal_metadata_.unknown_fields(), target, stream);
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
   }
   // @@protoc_insertion_point(serialize_to_array_end:sudoku.SudokuResponse)
   return target;
@@ -526,15 +542,14 @@ void SudokuResponse::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
 void SudokuResponse::MergeFrom(const SudokuResponse& from) {
 // @@protoc_insertion_point(class_specific_merge_from_start:sudoku.SudokuResponse)
   GOOGLE_DCHECK_NE(&from, this);
-  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
   cached_has_bits = from._has_bits_[0];
   if (cached_has_bits & 0x00000003u) {
     if (cached_has_bits & 0x00000001u) {
-      _has_bits_[0] |= 0x00000001u;
-      checkerboard_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.checkerboard_);
+      _internal_set_checkerboard(from._internal_checkerboard());
     }
     if (cached_has_bits & 0x00000002u) {
       solved_ = from.solved_;
@@ -563,10 +578,9 @@ bool SudokuResponse::IsInitialized() const {
 
 void SudokuResponse::InternalSwap(SudokuResponse* other) {
   using std::swap;
-  _internal_metadata_.Swap(&other->_internal_metadata_);
+  _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
   swap(_has_bits_[0], other->_has_bits_[0]);
-  checkerboard_.Swap(&other->checkerboard_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
-    GetArenaNoVirtual());
+  checkerboard_.Swap(&other->checkerboard_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
   swap(solved_, other->solved_);
 }
 
@@ -666,10 +680,10 @@ void SudokuService_Stub::Solve(::PROTOBUF_NAMESPACE_ID::RpcController* controlle
 }  // namespace sudoku
 PROTOBUF_NAMESPACE_OPEN
 template<> PROTOBUF_NOINLINE ::sudoku::SudokuRequest* Arena::CreateMaybeMessage< ::sudoku::SudokuRequest >(Arena* arena) {
-  return Arena::CreateInternal< ::sudoku::SudokuRequest >(arena);
+  return Arena::CreateMessageInternal< ::sudoku::SudokuRequest >(arena);
 }
 template<> PROTOBUF_NOINLINE ::sudoku::SudokuResponse* Arena::CreateMaybeMessage< ::sudoku::SudokuResponse >(Arena* arena) {
-  return Arena::CreateInternal< ::sudoku::SudokuResponse >(arena);
+  return Arena::CreateMessageInternal< ::sudoku::SudokuResponse >(arena);
 }
 PROTOBUF_NAMESPACE_CLOSE
 

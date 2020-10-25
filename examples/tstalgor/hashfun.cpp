@@ -24,13 +24,13 @@ using namespace std;
 
 void tst_murmurhash_1() {
     char str[120];
-    sprintf(str, "%ld+p8fjde4-!", 123);
+    sprintf(str, "%d+p8fjde4-!", 123);
     uint64_t hash = base::MurmurHash64B(str, strlen(str), 82341);
     std::cout << "hash64=" << hash << std::endl;
 
     {
         char str[120];
-        sprintf(str, "%ld+p8fjde4-!", 123);
+        sprintf(str, "%d+p8fjde4-!", 123);
         uint32_t hash = base::MurmurHash2(str, strlen(str), 82341);
         std::cout << "hash32=" << hash << std::endl;
     }

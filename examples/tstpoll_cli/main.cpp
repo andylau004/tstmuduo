@@ -263,8 +263,6 @@ int main(int argc, char* argv[])
 //        //    TestClient client(&loop, serverAddr);
 //        //    client.connect();
 //        //    loop.loop();
-
-
 }
 
 

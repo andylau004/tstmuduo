@@ -21,7 +21,7 @@ add_executable(${PROJECT_NAME}
     main.cpp)
 
 
-target_link_libraries(${PROJECT_NAME} z protobuf gtest muduo_base muduo_net rt thriftnb thrift event ssl crypto)
+target_link_libraries(${PROJECT_NAME} z protobuf gtest muduo_base muduo_net rt thriftnb thrift event ssl crypto z)
 
 
 
