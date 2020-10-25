@@ -1,6 +1,6 @@
 
 add_library(protobuf_codec codec.h codec.cc)
-target_link_libraries(protobuf_codec protobuf muduo_net z)
+target_link_libraries(protobuf_codec protobuf muduo_net z ssl crypto)
 
 add_custom_command(OUTPUT query.pb.cc query.pb.h
   COMMAND protoc

@@ -57,8 +57,9 @@ aux_source_directory(cthrift/util CTHRIFT_UTIL)
 #aux_source_directory(cthrift/octoidl OCTOIDL_SRC)
 
 
+link_directories(/usr/local/lib/)
+#link_directories(/opt/gmssl/lib/)
 link_directories(${LIBRARY_OUTPUT_PATH})
-link_directories(/opt/gmssl/lib/)
 
 
 add_subdirectory(thirdpart/thrift)
@@ -66,7 +67,7 @@ add_subdirectory(thirdpart/thrift)
 #add_subdirectory(thirdpart/concurrentqueue-src)
 add_subdirectory(muduo/base)
 add_subdirectory(muduo/net)
-add_subdirectory(cthrift)
+#add_subdirectory(cthrift)
 
 add_subdirectory(examples)
 

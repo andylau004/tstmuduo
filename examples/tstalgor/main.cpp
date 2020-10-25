@@ -3417,7 +3417,6 @@ void Test_mergeTwoList() {
 //    PrintList(list_1);
 //    LOG_INFO << "print list node 222";
 
-
     std::vector <int> vecInts2{ 2000, 9700, 21000, 21999, 32000};
 
     auto list_2 = ConstructTestList(vecInts2);
@@ -3431,8 +3430,6 @@ void Test_mergeTwoList() {
     LOG_INFO << "print list node 111";
     PrintList(listNew);
     LOG_INFO << "print list node 222";
-
-
 }
 
 int main(int argc, char *argv[])

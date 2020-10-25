@@ -36,7 +36,6 @@ static void InitDefaultsscc_info_Answer_query_2eproto() {
     new (ptr) ::muduo::Answer();
     ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
   }
-  ::muduo::Answer::InitAsDefaultInstance();
 }
 
 ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_Answer_query_2eproto =
@@ -50,7 +49,6 @@ static void InitDefaultsscc_info_Empty_query_2eproto() {
     new (ptr) ::muduo::Empty();
     ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
   }
-  ::muduo::Empty::InitAsDefaultInstance();
 }
 
 ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_Empty_query_2eproto =
@@ -64,7 +62,6 @@ static void InitDefaultsscc_info_Query_query_2eproto() {
     new (ptr) ::muduo::Query();
     ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
   }
-  ::muduo::Query::InitAsDefaultInstance();
 }
 
 ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_Query_query_2eproto =
@@ -135,22 +132,19 @@ static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_que
   &scc_info_Query_query_2eproto.base,
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_query_2eproto_once;
-static bool descriptor_table_query_2eproto_initialized = false;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_query_2eproto = {
-  &descriptor_table_query_2eproto_initialized, descriptor_table_protodef_query_2eproto, "query.proto", 212,
+  false, false, descriptor_table_protodef_query_2eproto, "query.proto", 212,
   &descriptor_table_query_2eproto_once, descriptor_table_query_2eproto_sccs, descriptor_table_query_2eproto_deps, 3, 0,
   schemas, file_default_instances, TableStruct_query_2eproto::offsets,
   file_level_metadata_query_2eproto, 3, file_level_enum_descriptors_query_2eproto, file_level_service_descriptors_query_2eproto,
 };
 
 // Force running AddDescriptors() at dynamic initialization time.
-static bool dynamic_init_dummy_query_2eproto = (  ::PROTOBUF_NAMESPACE_ID::internal::AddDescriptors(&descriptor_table_query_2eproto), true);
+static bool dynamic_init_dummy_query_2eproto = (static_cast<void>(::PROTOBUF_NAMESPACE_ID::internal::AddDescriptors(&descriptor_table_query_2eproto)), true);
 namespace muduo {
 
 // ===================================================================
 
-void Query::InitAsDefaultInstance() {
-}
 class Query::_Internal {
  public:
   using HasBits = decltype(std::declval<Query>()._has_bits_);
@@ -160,22 +154,27 @@ class Query::_Internal {
   static void set_has_questioner(HasBits* has_bits) {
     (*has_bits)[0] |= 1u;
   }
+  static bool MissingRequiredFields(const HasBits& has_bits) {
+    return ((has_bits[0] & 0x00000003) ^ 0x00000003) != 0;
+  }
 };
 
-Query::Query()
-  : ::PROTOBUF_NAMESPACE_ID::Message(), _internal_metadata_(nullptr) {
+Query::Query(::PROTOBUF_NAMESPACE_ID::Arena* arena)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena),
+  question_(arena) {
   SharedCtor();
-  // @@protoc_insertion_point(constructor:muduo.Query)
+  RegisterArenaDtor(arena);
+  // @@protoc_insertion_point(arena_constructor:muduo.Query)
 }
 Query::Query(const Query& from)
   : ::PROTOBUF_NAMESPACE_ID::Message(),
-      _internal_metadata_(nullptr),
       _has_bits_(from._has_bits_),
       question_(from.question_) {
-  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   questioner_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   if (from._internal_has_questioner()) {
-    questioner_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.questioner_);
+    questioner_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from._internal_questioner(),
+      GetArena());
   }
   id_ = from.id_;
   // @@protoc_insertion_point(copy_constructor:muduo.Query)
@@ -190,12 +189,20 @@ void Query::SharedCtor() {
 Query::~Query() {
   // @@protoc_insertion_point(destructor:muduo.Query)
   SharedDtor();
+  _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
 void Query::SharedDtor() {
+  GOOGLE_DCHECK(GetArena() == nullptr);
   questioner_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 }
 
+void Query::ArenaDtor(void* object) {
+  Query* _this = reinterpret_cast< Query* >(object);
+  (void)_this;
+}
+void Query::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
+}
 void Query::SetCachedSize(int size) const {
   _cached_size_.Set(size);
 }
@@ -214,11 +221,11 @@ void Query::Clear() {
   question_.Clear();
   cached_has_bits = _has_bits_[0];
   if (cached_has_bits & 0x00000001u) {
-    questioner_.ClearNonDefaultToEmptyNoArena();
+    questioner_.ClearNonDefaultToEmpty();
   }
   id_ = PROTOBUF_LONGLONG(0);
   _has_bits_.Clear();
-  _internal_metadata_.Clear();
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
 const char* Query::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
@@ -233,7 +240,7 @@ const char* Query::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::inte
       case 1:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
           _Internal::set_has_id(&has_bits);
-          id_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint(&ptr);
+          id_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
@@ -270,7 +277,9 @@ const char* Query::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::inte
           ctx->SetLastTag(tag);
           goto success;
         }
-        ptr = UnknownFieldParse(tag, &_internal_metadata_, ptr, ctx);
+        ptr = UnknownFieldParse(tag,
+            _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+            ptr, ctx);
         CHK_(ptr != nullptr);
         continue;
       }
@@ -320,7 +329,7 @@ failure:
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
-        _internal_metadata_.unknown_fields(), target, stream);
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
   }
   // @@protoc_insertion_point(serialize_to_array_end:muduo.Query)
   return target;
@@ -403,7 +412,7 @@ void Query::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
 void Query::MergeFrom(const Query& from) {
 // @@protoc_insertion_point(class_specific_merge_from_start:muduo.Query)
   GOOGLE_DCHECK_NE(&from, this);
-  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
@@ -411,8 +420,7 @@ void Query::MergeFrom(const Query& from) {
   cached_has_bits = from._has_bits_[0];
   if (cached_has_bits & 0x00000003u) {
     if (cached_has_bits & 0x00000001u) {
-      _has_bits_[0] |= 0x00000001u;
-      questioner_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.questioner_);
+      _internal_set_questioner(from._internal_questioner());
     }
     if (cached_has_bits & 0x00000002u) {
       id_ = from.id_;
@@ -436,17 +444,16 @@ void Query::CopyFrom(const Query& from) {
 }
 
 bool Query::IsInitialized() const {
-  if ((_has_bits_[0] & 0x00000003) != 0x00000003) return false;
+  if (_Internal::MissingRequiredFields(_has_bits_)) return false;
   return true;
 }
 
 void Query::InternalSwap(Query* other) {
   using std::swap;
-  _internal_metadata_.Swap(&other->_internal_metadata_);
+  _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
   swap(_has_bits_[0], other->_has_bits_[0]);
   question_.InternalSwap(&other->question_);
-  questioner_.Swap(&other->questioner_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
-    GetArenaNoVirtual());
+  questioner_.Swap(&other->questioner_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
   swap(id_, other->id_);
 }
 
@@ -457,8 +464,6 @@ void Query::InternalSwap(Query* other) {
 
 // ===================================================================
 
-void Answer::InitAsDefaultInstance() {
-}
 class Answer::_Internal {
  public:
   using HasBits = decltype(std::declval<Answer>()._has_bits_);
@@ -471,26 +476,32 @@ class Answer::_Internal {
   static void set_has_answerer(HasBits* has_bits) {
     (*has_bits)[0] |= 2u;
   }
+  static bool MissingRequiredFields(const HasBits& has_bits) {
+    return ((has_bits[0] & 0x00000007) ^ 0x00000007) != 0;
+  }
 };
 
-Answer::Answer()
-  : ::PROTOBUF_NAMESPACE_ID::Message(), _internal_metadata_(nullptr) {
+Answer::Answer(::PROTOBUF_NAMESPACE_ID::Arena* arena)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena),
+  solution_(arena) {
   SharedCtor();
-  // @@protoc_insertion_point(constructor:muduo.Answer)
+  RegisterArenaDtor(arena);
+  // @@protoc_insertion_point(arena_constructor:muduo.Answer)
 }
 Answer::Answer(const Answer& from)
   : ::PROTOBUF_NAMESPACE_ID::Message(),
-      _internal_metadata_(nullptr),
       _has_bits_(from._has_bits_),
       solution_(from.solution_) {
-  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   questioner_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   if (from._internal_has_questioner()) {
-    questioner_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.questioner_);
+    questioner_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from._internal_questioner(),
+      GetArena());
   }
   answerer_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   if (from._internal_has_answerer()) {
-    answerer_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.answerer_);
+    answerer_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from._internal_answerer(),
+      GetArena());
   }
   id_ = from.id_;
   // @@protoc_insertion_point(copy_constructor:muduo.Answer)
@@ -506,13 +517,21 @@ void Answer::SharedCtor() {
 Answer::~Answer() {
   // @@protoc_insertion_point(destructor:muduo.Answer)
   SharedDtor();
+  _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
 void Answer::SharedDtor() {
+  GOOGLE_DCHECK(GetArena() == nullptr);
   questioner_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   answerer_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 }
 
+void Answer::ArenaDtor(void* object) {
+  Answer* _this = reinterpret_cast< Answer* >(object);
+  (void)_this;
+}
+void Answer::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
+}
 void Answer::SetCachedSize(int size) const {
   _cached_size_.Set(size);
 }
@@ -532,15 +551,15 @@ void Answer::Clear() {
   cached_has_bits = _has_bits_[0];
   if (cached_has_bits & 0x00000003u) {
     if (cached_has_bits & 0x00000001u) {
-      questioner_.ClearNonDefaultToEmptyNoArena();
+      questioner_.ClearNonDefaultToEmpty();
     }
     if (cached_has_bits & 0x00000002u) {
-      answerer_.ClearNonDefaultToEmptyNoArena();
+      answerer_.ClearNonDefaultToEmpty();
     }
   }
   id_ = PROTOBUF_LONGLONG(0);
   _has_bits_.Clear();
-  _internal_metadata_.Clear();
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
 const char* Answer::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
@@ -555,7 +574,7 @@ const char* Answer::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::int
       case 1:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
           _Internal::set_has_id(&has_bits);
-          id_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint(&ptr);
+          id_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
@@ -603,7 +622,9 @@ const char* Answer::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::int
           ctx->SetLastTag(tag);
           goto success;
         }
-        ptr = UnknownFieldParse(tag, &_internal_metadata_, ptr, ctx);
+        ptr = UnknownFieldParse(tag,
+            _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+            ptr, ctx);
         CHK_(ptr != nullptr);
         continue;
       }
@@ -663,7 +684,7 @@ failure:
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
-        _internal_metadata_.unknown_fields(), target, stream);
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
   }
   // @@protoc_insertion_point(serialize_to_array_end:muduo.Answer)
   return target;
@@ -758,7 +779,7 @@ void Answer::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
 void Answer::MergeFrom(const Answer& from) {
 // @@protoc_insertion_point(class_specific_merge_from_start:muduo.Answer)
   GOOGLE_DCHECK_NE(&from, this);
-  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
@@ -766,12 +787,10 @@ void Answer::MergeFrom(const Answer& from) {
   cached_has_bits = from._has_bits_[0];
   if (cached_has_bits & 0x00000007u) {
     if (cached_has_bits & 0x00000001u) {
-      _has_bits_[0] |= 0x00000001u;
-      questioner_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.questioner_);
+      _internal_set_questioner(from._internal_questioner());
     }
     if (cached_has_bits & 0x00000002u) {
-      _has_bits_[0] |= 0x00000002u;
-      answerer_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.answerer_);
+      _internal_set_answerer(from._internal_answerer());
     }
     if (cached_has_bits & 0x00000004u) {
       id_ = from.id_;
@@ -795,19 +814,17 @@ void Answer::CopyFrom(const Answer& from) {
 }
 
 bool Answer::IsInitialized() const {
-  if ((_has_bits_[0] & 0x00000007) != 0x00000007) return false;
+  if (_Internal::MissingRequiredFields(_has_bits_)) return false;
   return true;
 }
 
 void Answer::InternalSwap(Answer* other) {
   using std::swap;
-  _internal_metadata_.Swap(&other->_internal_metadata_);
+  _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
   swap(_has_bits_[0], other->_has_bits_[0]);
   solution_.InternalSwap(&other->solution_);
-  questioner_.Swap(&other->questioner_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
-    GetArenaNoVirtual());
-  answerer_.Swap(&other->answerer_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
-    GetArenaNoVirtual());
+  questioner_.Swap(&other->questioner_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  answerer_.Swap(&other->answerer_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
   swap(id_, other->id_);
 }
 
@@ -818,8 +835,6 @@ void Answer::InternalSwap(Answer* other) {
 
 // ===================================================================
 
-void Empty::InitAsDefaultInstance() {
-}
 class Empty::_Internal {
  public:
   using HasBits = decltype(std::declval<Empty>()._has_bits_);
@@ -828,16 +843,16 @@ class Empty::_Internal {
   }
 };
 
-Empty::Empty()
-  : ::PROTOBUF_NAMESPACE_ID::Message(), _internal_metadata_(nullptr) {
+Empty::Empty(::PROTOBUF_NAMESPACE_ID::Arena* arena)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena) {
   SharedCtor();
-  // @@protoc_insertion_point(constructor:muduo.Empty)
+  RegisterArenaDtor(arena);
+  // @@protoc_insertion_point(arena_constructor:muduo.Empty)
 }
 Empty::Empty(const Empty& from)
   : ::PROTOBUF_NAMESPACE_ID::Message(),
-      _internal_metadata_(nullptr),
       _has_bits_(from._has_bits_) {
-  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   id_ = from.id_;
   // @@protoc_insertion_point(copy_constructor:muduo.Empty)
 }
@@ -849,11 +864,19 @@ void Empty::SharedCtor() {
 Empty::~Empty() {
   // @@protoc_insertion_point(destructor:muduo.Empty)
   SharedDtor();
+  _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
 void Empty::SharedDtor() {
+  GOOGLE_DCHECK(GetArena() == nullptr);
 }
 
+void Empty::ArenaDtor(void* object) {
+  Empty* _this = reinterpret_cast< Empty* >(object);
+  (void)_this;
+}
+void Empty::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
+}
 void Empty::SetCachedSize(int size) const {
   _cached_size_.Set(size);
 }
@@ -871,7 +894,7 @@ void Empty::Clear() {
 
   id_ = 0;
   _has_bits_.Clear();
-  _internal_metadata_.Clear();
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
 const char* Empty::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
@@ -886,7 +909,7 @@ const char* Empty::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::inte
       case 1:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
           _Internal::set_has_id(&has_bits);
-          id_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint(&ptr);
+          id_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
@@ -896,7 +919,9 @@ const char* Empty::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::inte
           ctx->SetLastTag(tag);
           goto success;
         }
-        ptr = UnknownFieldParse(tag, &_internal_metadata_, ptr, ctx);
+        ptr = UnknownFieldParse(tag,
+            _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+            ptr, ctx);
         CHK_(ptr != nullptr);
         continue;
       }
@@ -926,7 +951,7 @@ failure:
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
-        _internal_metadata_.unknown_fields(), target, stream);
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
   }
   // @@protoc_insertion_point(serialize_to_array_end:muduo.Empty)
   return target;
@@ -975,7 +1000,7 @@ void Empty::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
 void Empty::MergeFrom(const Empty& from) {
 // @@protoc_insertion_point(class_specific_merge_from_start:muduo.Empty)
   GOOGLE_DCHECK_NE(&from, this);
-  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
@@ -1004,7 +1029,7 @@ bool Empty::IsInitialized() const {
 
 void Empty::InternalSwap(Empty* other) {
   using std::swap;
-  _internal_metadata_.Swap(&other->_internal_metadata_);
+  _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
   swap(_has_bits_[0], other->_has_bits_[0]);
   swap(id_, other->id_);
 }
@@ -1018,13 +1043,13 @@ void Empty::InternalSwap(Empty* other) {
 }  // namespace muduo
 PROTOBUF_NAMESPACE_OPEN
 template<> PROTOBUF_NOINLINE ::muduo::Query* Arena::CreateMaybeMessage< ::muduo::Query >(Arena* arena) {
-  return Arena::CreateInternal< ::muduo::Query >(arena);
+  return Arena::CreateMessageInternal< ::muduo::Query >(arena);
 }
 template<> PROTOBUF_NOINLINE ::muduo::Answer* Arena::CreateMaybeMessage< ::muduo::Answer >(Arena* arena) {
-  return Arena::CreateInternal< ::muduo::Answer >(arena);
+  return Arena::CreateMessageInternal< ::muduo::Answer >(arena);
 }
 template<> PROTOBUF_NOINLINE ::muduo::Empty* Arena::CreateMaybeMessage< ::muduo::Empty >(Arena* arena) {
-  return Arena::CreateInternal< ::muduo::Empty >(arena);
+  return Arena::CreateMessageInternal< ::muduo::Empty >(arena);
 }
 PROTOBUF_NAMESPACE_CLOSE
 
