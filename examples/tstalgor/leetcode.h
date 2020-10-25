@@ -47,6 +47,8 @@ extern ListNode* ConstructTestList();
 
 extern ListNode* ConstructTestList(const std::vector<int>& vecInts);
 
+struct TreeNode;
+extern TreeNode* generateBST(int left, int right, std::vector<int>& vec);
 
 
 

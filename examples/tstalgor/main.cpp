@@ -2111,19 +2111,20 @@ void binary_search_wrap() {
 BstNode* g_pBstTree = nullptr;
 
 void mockAddBstNode(BstNode*& root, BstNode* pNewNode) {
+
     {
         BstNode* parent = nullptr;
         BstNode* tmp = root;
-        while (tmp) {
+
+        while ( tmp ) {
             parent = tmp;
-            if (pNewNode->key_ > tmp->key_) {
+            if ( pNewNode->key_ > tmp->key_ ) {
                 tmp = tmp->rchild_;
             } else {
                 tmp = tmp->lchild_;
             }
         }
         pNewNode->parent_ = parent;
-
         if (!parent) {
             root = pNewNode;
         } else if (pNewNode->key_ > parent->key_) {
@@ -2133,45 +2134,23 @@ void mockAddBstNode(BstNode*& root, BstNode* pNewNode) {
         }
         return ;
     }
-    BstNode* parent = nullptr;
-    BstNode* tmp = root;
-
-    while (tmp) {
-        parent = tmp;
-        if (pNewNode->key_ > tmp->key_) {
-            tmp = tmp->rchild_;
-        } else {
-            tmp = tmp->lchild_;
-        }
-    }
-    pNewNode->parent_ = parent;
-
-    if (!parent) {
-        root = pNewNode;
-    } else if (pNewNode->key_ > parent->key_) {
-        parent->rchild_ = pNewNode;
-    } else {
-        parent->lchild_ = pNewNode;
-    }
 }
 
 void AddNewNode(BstNode*& root, BstNode* pNewNode) {
-
-    return mockAddBstNode(root, pNewNode);
 
     {
         BstNode* parent = nullptr;
         BstNode* tmp = root;
 
-        while (tmp) {
+        while ( tmp ) {
             parent = tmp;
-            if (pNewNode->key_ > tmp->key_)
+            if ( pNewNode->key_ > tmp->key_ ) {
                 tmp = tmp->rchild_;
-            else
+            } else {
                 tmp = tmp->lchild_;
+            }
         }
         pNewNode->parent_ = parent;
-
         if (!parent) {
             root = pNewNode;
         } else if (pNewNode->key_ > parent->key_) {
@@ -2180,52 +2159,6 @@ void AddNewNode(BstNode*& root, BstNode* pNewNode) {
             parent->lchild_ = pNewNode;
         }
         return;
-    }
-
-    {
-        BstNode* parent = nullptr;
-        BstNode* temp = root;
-
-        while (temp) {
-            parent = temp;
-            if (pNewNode->key_ > temp->key_)
-                temp = temp->rchild_;
-            else
-                temp = temp->lchild_;
-        }
-        pNewNode->parent_ = parent;
-
-        if (!parent)
-            root = pNewNode;
-        else if (pNewNode->key_ > parent->key_)
-            parent->rchild_ = pNewNode;
-        else
-            parent->lchild_ = pNewNode;
-        return;
-    }
-
-
-    {
-        BstNode* parent = nullptr;
-        BstNode* ptemp  = root;
-        if (!ptemp) {
-            std::cout << " fisrt root node " << std::endl;
-        }
-        while (ptemp) {
-            parent = ptemp;
-            if (pNewNode->key_ > ptemp->key_)
-                ptemp = ptemp->rchild_;
-            else
-                ptemp = ptemp->lchild_;
-        }
-        pNewNode->parent_ = parent;
-
-        if (parent == nullptr)
-            root = pNewNode;
-        else if (pNewNode->key_ > parent->key_)
-            parent->rchild_ = pNewNode;
-        else
-            parent->lchild_ = pNewNode;
     }
 
 }
@@ -2390,9 +2323,9 @@ void CreateBstTree() {// 构建二叉树；
 //    std::cout << "Maximum value for int: " << std::numeric_limits<int>::max() << std::endl;
 
     {
-        ::srand(time(NULL));
+        ::srand(time(nullptr));
 
-        std::cout << "-------------------------------beg random val-------------------------------" << std::endl;
+//        std::cout << "-------------------------------beg random val-------------------------------" << std::endl;
         for ( int i = 0; i < 10; i++ ) {
             int randVal = rand() % 200;
 
@@ -2401,20 +2334,23 @@ void CreateBstTree() {// 构建二叉树；
         }
         return;
     }
-    srand(time(NULL));
 
-    int count = 20;
-    std::cout << "-------------------------------beg random val-------------------------------" << std::endl;
-    for (int i = 0; i < count; ++i) {
-        int randVal = rand() % (300);
-        std::cout << randVal << "  ";
+    {
+        ::srand(time(nullptr));
 
-        BstNode* pNewNode = new BstNode(randVal);
-        AddNewNode(g_pBstTree, pNewNode);
+        int count = 20;
+//        std::cout << "-------------------------------beg random val-------------------------------" << std::endl;
+        for (int i = 0; i < count; ++i) {
+            int randVal = rand() % (300);
+            std::cout << randVal << "  ";
+
+            BstNode* pNewNode = new BstNode(randVal);
+            AddNewNode(g_pBstTree, pNewNode);
+        }
+        std::cout << std::endl;
+//        std::cout << "-------------------------------end random val-------------------------------" << std::endl;
+        return;
     }
-    std::cout << std::endl;
-    std::cout << "-------------------------------end random val-------------------------------" << std::endl;
-    return;
 
     BstNode* p1 = new BstNode(127);
     AddNewNode(g_pBstTree, p1);
@@ -2436,6 +2372,32 @@ void CreateBstTree() {// 构建二叉树；
 
     BstNode* p7 = new BstNode(1997);
     AddNewNode(g_pBstTree, p7);
+}
+
+std::vector< std::vector<int> > levelOrder_new(BstNode* root) {
+    std::vector< std::vector<int> > result;
+    if (!root) return result;
+
+    std::vector < BstNode* > nodeStack;
+    nodeStack.push_back( root );
+
+    while (nodeStack.size()) {
+        std::vector<int> values;
+        std::vector< BstNode* > nextLevel;
+
+        for ( auto node : nodeStack ) {
+            values.push_back(node->key_);
+        }
+
+        for ( auto node : nodeStack ) {
+            if (node->lchild_) nextLevel.push_back(node->lchild_);
+            if (node->rchild_) nextLevel.push_back(node->rchild_);
+        }
+
+        nodeStack = nextLevel;
+        result.push_back(values);
+    }
+    return result;
 }
 
 void tst_my_bst_tree() {
@@ -2581,16 +2543,15 @@ void LevelTraverseBstTree(BstNode* root) {
 vector<vector<int>> levelOrder(BstNode* root)
 {
     vector<vector<int>> result;
-    if (!root)
-        return result;
+    if (!root) return result;
 
     queue<BstNode*> Q;
     Q.push(root);
     while (!Q.empty())
     {
         vector<int> tmp_v;
-        int s = Q.size();
-        for (int i = 0; i < s; i++)
+        size_t sizeLen = Q.size();
+        for (size_t i = 0; i < sizeLen; i++)
         {
             BstNode* tmp_node = Q.front();
             Q.pop();
@@ -3408,7 +3369,6 @@ ListNode* mergeTwoList(ListNode* l1, ListNode* l2) {
     return h;
 }
 void Test_mergeTwoList() {
-
     std::vector <int> vecInts1{ 10, 97, 113, 269, 398, 10000};
 
     auto list_1 = ConstructTestList(vecInts1);
@@ -3431,11 +3391,27 @@ void Test_mergeTwoList() {
     PrintList(listNew);
     LOG_INFO << "print list node 222";
 }
+void tst1() {
+//    std::vector<int> vecArr{ 10,-3,0,5,9};
+//    TreeNode* root = sortedArrayToBst(vecArr);
+//    std::cout << std::endl;
+//    someInOrder(root);
+//    std::cout << std::endl;
+}
 
 int main(int argc, char *argv[])
 {
     Logger::setLogLevel(Logger::DEBUG);
-    LOG_INFO << "pid = " << getpid() << ", tid levelOrder= " << CurrentThread::tid();
+    LOG_INFO << "pid = " << getpid() << ", tid=" << CurrentThread::tid();
+
+    CreateBstTree();
+//    std::cout << "serial ret=" << Serialize(g_pBstTree) << std::endl;
+//    return 1;
+
+    tst_my_bst_tree();
+    std::cout << "res=" << kthSmallest(g_pBstTree, 3) << std::endl;
+    return 1;
+
 
     Test_mergeTwoList();
     return 1;
@@ -3443,12 +3419,6 @@ int main(int argc, char *argv[])
     removeNthFromEnd(3);
     return 1;
 
-    CreateBstTree();
-//    std::cout << "serial ret=" << Serialize(g_pBstTree) << std::endl;
-
-    tst_my_bst_tree();
-    std::cout << "res=" << kthSmallest(g_pBstTree, 3) << std::endl;
-    return 1;
 
     check_cyclelist(); return 1;
 
@@ -3464,9 +3434,6 @@ int main(int argc, char *argv[])
 //    int data[16] = {1,0,0,1,0,0,0,1,1,1,1,1,0,0,0,0}; //明文
 //    std::cout << "sizeof(data)=" << sizeof(data) << std::endl;
 //    return 1;
-
-
-
 
     uint tmpval = 0x10;
     LOG_INFO << "tmpval=" << tmpval;

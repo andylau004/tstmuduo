@@ -55,7 +55,7 @@ void InOrtderPtrint(TreeNode* root);
             return new TreeNode(vec[left]);
         } else {
             int mid1 = (left + right) >> 1;
-            printf("mid1=%d\n", mid1);
+//            printf("mid1=%d\n", mid1);
 
             TreeNode* newnode = new TreeNode(vec[mid1]);
             newnode->left  = generateBST(0, mid1 - 1, vec);
@@ -90,7 +90,7 @@ void InOrtderPtrint(TreeNode* root);
             vecNodes.push_back(CreateListNode(ii));
         }
 
-        for ( int i = 0; i < vecNodes.size(); i ++ ) {
+        for ( size_t i = 0; i < vecNodes.size(); i ++ ) {
             auto next = i + 1;
             if ( next != vecNodes.size() ) {
                 ConnectListNodes(vecNodes[i], vecNodes[next]);
