@@ -29,7 +29,7 @@ void PrintListNode(ListNode* pNode) {
 
 void PrintList(ListNode* pHead)
 {
-    printf("PrintList starts.\n");
+//    printf("PrintList starts.\n");
 
     ListNode* pNode = pHead;
     while (pNode) {
@@ -37,7 +37,7 @@ void PrintList(ListNode* pHead)
         pNode = pNode->m_pNext;
     }
 
-    printf("\nPrintList ends.\n");
+//    printf("\nPrintList ends.\n");
 }
 
 void DestroyList(ListNode* pHead)
