@@ -530,12 +530,12 @@ public:
 
 int Depth(BstNode* root) {
     if (!root) return 0;
-    return std::max(Depth(root->lchild_), Depth(root->rchild_)) + 1;
+    return std::max(Depth(root->left), Depth(root->right)) + 1;
 }
 bool isBalanced(BstNode* root) {
     if (!root) return true;
-    int d = abs( Depth(root->lchild_) - Depth(root->rchild_) );
-    return d <= 1 && isBalanced(root->lchild_) && isBalanced(root->rchild_);
+    int d = abs( Depth(root->left) - Depth(root->right) );
+    return d <= 1 && isBalanced(root->left) && isBalanced(root->right);
 }
 
 // Leetcode 98. 验证二叉搜索树
@@ -569,13 +569,13 @@ class CheckIfBst {
 public:
 //    bool IsValidBst(BstNode* root) {
 //        if (!root) return true;
-//        return IsLeftBst(root->lchild_, root->key_) && IsRightBst(root->rchild_, root->key_);
+//        return IsLeftBst(root->left, root->val) && IsRightBst(root->right, root->val);
 //    }
 //    bool IsLeftBst(BstNode* root, int val) {
 //        if (IsValidBst(root)) {
 //            while (root) {
-//                if (root->key_ >= val) return fasle;
-//                root = root->rchild_;
+//                if (root->val >= val) return fasle;
+//                root = root->right;
 //            }
 //            return true;
 //        } else {
@@ -598,9 +598,9 @@ public:
     }
     void inorder(BstNode* root, std::vector<int>& arrVal) {
 //        if (!root) return;
-//        inorder(root->lchild_, arrVal);
-//        arrVal.push_back(root->key_);
-//        inorder(root->rchild_, arrVal);
+//        inorder(root->left, arrVal);
+//        arrVal.push_back(root->val);
+//        inorder(root->right, arrVal);
     }
 
 };

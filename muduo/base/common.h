@@ -648,28 +648,28 @@ struct shared_use_st
 
 
 struct BstNode {
-    BstNode* rchild_;
-    BstNode* lchild_;
+    BstNode* right;
+    BstNode* left;
     BstNode* parent_;
-    int      key_;
+    int      val;
 public:
     BstNode(int key, BstNode* lchild, BstNode* rchild, BstNode* parent) :
-        rchild_(rchild),
-        lchild_(lchild),
+        right(rchild),
+        left(lchild),
         parent_(parent),
-        key_(key)
+        val(key)
     {}
     BstNode(int key) :
-        rchild_(nullptr),
-        lchild_(nullptr),
+        right(nullptr),
+        left(nullptr),
         parent_(nullptr),
-        key_(key)
+        val(key)
     {}
     BstNode() :
-        rchild_(nullptr),
-        lchild_(nullptr),
+        right(nullptr),
+        left(nullptr),
         parent_(nullptr),
-        key_(0) {
+        val(0) {
 
     }
 

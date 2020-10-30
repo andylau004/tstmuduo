@@ -429,7 +429,7 @@ void tst_sort_3() {
     arr.push_back(7);arr.push_back(0);
 
     Mysort(arr);
-    for (int i = 0; i < arr.size(); i ++)
+    for (size_t i = 0; i < arr.size(); i ++)
         cout << arr[i] << " ";
     std::cout << std::endl;
 }
@@ -886,7 +886,7 @@ void tst_systemHelp_use_2() {
 //    for ( int i = 0; i < vec_Task.size(); ++i ) {
 //        vec_Task[i].id += 1000;
 //    }
-    for ( int i = 0; i < vec_Task.size(); ++i ) {
+    for ( size_t i = 0; i < vec_Task.size(); ++i ) {
         std::cout << "i=" << 0 << ", val=" << vec_Task[i].id << std::endl;
     }
 }
@@ -956,6 +956,7 @@ public:
 public:
     int TestPrint(int param1, const std::string strParam2, int ival3) {
         std::cout << "param1=" << param1 << ", strParam2=" << strParam2 << ", ival3=" << ival3 << std::endl;
+        return 1;
     }
 };
 
@@ -1162,7 +1163,7 @@ void GetInOut( const std::vector< int >& vstocks, int& inBuy, int& outBuy) {
     int maxProfit = 0;
     int curProfit = 0;
 
-    for ( int i = 1; i < vstocks.size(); ++i ) {
+    for ( size_t i = 1; i < vstocks.size(); ++i ) {
 
         curProfit = vstocks[i] - vstocks[min];
 
@@ -2118,19 +2119,19 @@ void mockAddBstNode(BstNode*& root, BstNode* pNewNode) {
 
         while ( tmp ) {
             parent = tmp;
-            if ( pNewNode->key_ > tmp->key_ ) {
-                tmp = tmp->rchild_;
+            if ( pNewNode->val > tmp->val ) {
+                tmp = tmp->right;
             } else {
-                tmp = tmp->lchild_;
+                tmp = tmp->left;
             }
         }
         pNewNode->parent_ = parent;
         if (!parent) {
             root = pNewNode;
-        } else if (pNewNode->key_ > parent->key_) {
-            parent->rchild_ = pNewNode;
+        } else if (pNewNode->val > parent->val) {
+            parent->right = pNewNode;
         } else {
-            parent->lchild_ = pNewNode;
+            parent->left = pNewNode;
         }
         return ;
     }
@@ -2144,19 +2145,19 @@ void AddNewNode(BstNode*& root, BstNode* pNewNode) {
 
         while ( tmp ) {
             parent = tmp;
-            if ( pNewNode->key_ > tmp->key_ ) {
-                tmp = tmp->rchild_;
+            if ( pNewNode->val > tmp->val ) {
+                tmp = tmp->right;
             } else {
-                tmp = tmp->lchild_;
+                tmp = tmp->left;
             }
         }
         pNewNode->parent_ = parent;
         if (!parent) {
             root = pNewNode;
-        } else if (pNewNode->key_ > parent->key_) {
-            parent->rchild_ = pNewNode;
+        } else if (pNewNode->val > parent->val) {
+            parent->right = pNewNode;
         } else {
-            parent->lchild_ = pNewNode;
+            parent->left = pNewNode;
         }
         return;
     }
@@ -2164,44 +2165,53 @@ void AddNewNode(BstNode*& root, BstNode* pNewNode) {
 }
 
 void preOrder(BstNode* root) {
-    std::cout << " " << root->key_;
-    if (root->lchild_) {
-        preOrder(root->lchild_);
+    std::cout << " " << root->val;
+    if (root->left) {
+        preOrder(root->left);
     }
-    if (root->rchild_) {
-        preOrder(root->rchild_);
+    if (root->right) {
+        preOrder(root->right);
     }
 }
 
 
 // 递归中序遍历二叉树；
 void inOrder(BstNode* root) {
-    if (root->lchild_) {
-        inOrder(root->lchild_);
+    if (root->left) {
+        inOrder(root->left);
     }
-    std::cout << " " << root->key_;
-    if (root->rchild_) {
-        inOrder(root->rchild_);
+    std::cout << " " << root->val;
+    if (root->right) {
+        inOrder(root->right);
     }
 }
 // 非递归中序遍历二叉树；
 void inOrderNonRecru(BstNode* root) {
 
-    BstNode* tmp = root;
-    std::stack< BstNode* > stackNodes;
+    {
+//        if (root->left)
+//            inOrderNonRecru(root->left);
+//        std::cout << root->val << " ";
+//        if (root->right)
+//            inOrderNonRecru(root->right);
+    }
+    {
+        //    BstNode* tmp = root;
+        //    std::stack< BstNode* > stackNodes;
 
-    while (tmp || !stackNodes.empty()) {
+        //    while (tmp || !stackNodes.empty()) {
 
-        if (tmp) {
-            stackNodes.push(tmp);
-            tmp = tmp->lchild_;
-        } else {
-            tmp = stackNodes.top();
-            std::cout << " " << tmp->key_;
-            stackNodes.pop();
-            tmp = tmp->rchild_;
-        }
+        //        if (tmp) {
+        //            stackNodes.push(tmp);
+        //            tmp = tmp->left;
+        //        } else {
+        //            tmp = stackNodes.top();
+        //            std::cout << " " << tmp->val;
+        //            stackNodes.pop();
+        //            tmp = tmp->right;
+        //        }
 
+        //    }
     }
 
 }
@@ -2210,8 +2220,8 @@ void inOrderNonRecru(BstNode* root) {
 BstNode* GetKthNode(BstNode* root, int& K) {
     BstNode* target = nullptr;
 
-    if (root->lchild_) {
-        target = GetKthNode(root->lchild_, K);
+    if (root->left) {
+        target = GetKthNode(root->left, K);
     }
 
     if (target == nullptr) {
@@ -2220,36 +2230,36 @@ BstNode* GetKthNode(BstNode* root, int& K) {
         K --;
     }
 
-    if (target == nullptr && root->rchild_) {
-        target = GetKthNode(root->rchild_, K);
+    if (target == nullptr && root->right) {
+        target = GetKthNode(root->right, K);
     }
     return target;
 }
 
 // 二叉搜索树 最接近值 查找
 int ClosestValueInBst_1( BstNode* root, const int& target ) {
-    int res = root->key_;
+    int res = root->val;
     while (root) {
-        if (abs(res - target) >= abs(root->key_ - target)) {
-            res = root->key_;
+        if (abs(res - target) >= abs(root->val - target)) {
+            res = root->val;
         }
-        root = target < root->key_ ? root->lchild_ : root->rchild_;
+        root = target < root->val ? root->left : root->right;
     }
     return res;
 }
 int ClosestValueInBst_2( BstNode* root, const int& target ) {
-    int ret = root->key_;
+    int ret = root->val;
 
-    if (target < root->key_ && root->lchild_) {
+    if (target < root->val && root->left) {
 
-        int lVal = ClosestValueInBst_2(root->lchild_, target);
+        int lVal = ClosestValueInBst_2(root->left, target);
         if (abs(ret - target) >= abs(lVal - target))
             ret = lVal;
 
     }
-    if (target > root->key_ && root->rchild_) {
+    if (target > root->val && root->right) {
 
-        int rVal = ClosestValueInBst_2( root->rchild_, target );
+        int rVal = ClosestValueInBst_2( root->right, target );
         if (abs(ret - target) >= abs(rVal - target))
             ret = rVal;
 
@@ -2271,10 +2281,10 @@ BstNode* GetNextBstNode(BstNode* pNode) {
     BstNode* pNext = nullptr;
 
     // 如果当前结点有右子树，那么当前结点的下一个结点为其右子树中最左结点
-    if ( pNode->rchild_ ) {
-        BstNode* pRight = pNode->rchild_;
-        while (pRight->lchild_) { //沿右结点的指向左子结点指针一直找下去
-            pRight = pRight->lchild_;
+    if ( pNode->right ) {
+        BstNode* pRight = pNode->right;
+        while (pRight->left) { //沿右结点的指向左子结点指针一直找下去
+            pRight = pRight->left;
         }
         pNext = pRight;
     } else if ( pNode->parent_ ) {//节点没有右子树
@@ -2282,7 +2292,7 @@ BstNode* GetNextBstNode(BstNode* pNode) {
         BstNode* pCurrent = pNode;                       //始终指向当前遍历的结点
         BstNode* pParent  = pNode->parent_;              //始终指向父节点
 
-        while ( pParent && pParent->rchild_ == pCurrent )//沿着父指针一直向上遍历
+        while ( pParent && pParent->right == pCurrent )//沿着父指针一直向上遍历
         {
             pCurrent = pParent;
             pParent = pParent->parent_;
@@ -2374,6 +2384,12 @@ void CreateBstTree() {// 构建二叉树；
     AddNewNode(g_pBstTree, p7);
 }
 
+
+
+/**
+ * 给定一个二叉树，返回该二叉树层序遍历的结果，（从左到右，一层一层地遍历）
+ * @return
+ */
 std::vector< std::vector<int> > levelOrder_new(BstNode* root) {
     std::vector< std::vector<int> > result;
     if (!root) return result;
@@ -2386,12 +2402,12 @@ std::vector< std::vector<int> > levelOrder_new(BstNode* root) {
         std::vector< BstNode* > nextLevel;
 
         for ( auto node : nodeStack ) {
-            values.push_back(node->key_);
+            values.push_back(node->val);
         }
 
         for ( auto node : nodeStack ) {
-            if (node->lchild_) nextLevel.push_back(node->lchild_);
-            if (node->rchild_) nextLevel.push_back(node->rchild_);
+            if (node->left) nextLevel.push_back(node->left);
+            if (node->right) nextLevel.push_back(node->right);
         }
 
         nodeStack = nextLevel;
@@ -2409,6 +2425,17 @@ void tst_my_bst_tree() {
         std::cout << "-------------------------------inOrder end-------------------------------" << std::endl;
         std::cout << std::endl;
     }
+    return ;
+
+    auto ret = levelOrder_new(g_pBstTree);
+    for (std::vector< std::vector<int> >::iterator itLine = ret.begin(); itLine != ret.end(); itLine ++) {
+
+        for (std::vector<int>::iterator itVal = (*itLine).begin(); itVal != (*itLine).end(); itVal ++) {
+            std::cout << " " << *itVal;
+        }
+        std::cout << std::endl;
+    }
+    return ;
 
     std::cout << "ver1 find k=120 closest value= "
               << ClosestValueInBst_1(g_pBstTree, 120) << std::endl;
@@ -2421,7 +2448,7 @@ void tst_my_bst_tree() {
     int kVal = 3;
     BstNode* retNode = GetKthNode(g_pBstTree, kVal);
     if (retNode)
-        std::cout << "GetKthNode ret val = " << retNode->key_ << std::endl;
+        std::cout << "GetKthNode ret val = " << retNode->val << std::endl;
 }
 
 void tst_my_bst_1() {
@@ -2492,11 +2519,11 @@ void sortArrayOddEven() {
 int GetLeafNodeCountImpl(BstNode* root) {
     if (root == nullptr)
         return 0;
-    if (nullptr == root->lchild_ && nullptr == root->rchild_)
+    if (nullptr == root->left && nullptr == root->right)
         return 1;
 
-    int leftCount  = GetLeafNodeCountImpl(root->lchild_);
-    int rightCount = GetLeafNodeCountImpl(root->rchild_);
+    int leftCount  = GetLeafNodeCountImpl(root->left);
+    int rightCount = GetLeafNodeCountImpl(root->right);
 
     int ret = leftCount + rightCount;
     return ret;
@@ -2505,7 +2532,7 @@ int GetLeafNodeCountImpl(BstNode* root) {
 int GetBstTreeNodeCount(BstNode* root/*, int* pCount*/) {
     if (root == nullptr)
         return 0;
-    int count = 1 + GetBstTreeNodeCount(root->lchild_/*, pCount*/) + GetBstTreeNodeCount(root->rchild_/*, pCount*/);
+    int count = 1 + GetBstTreeNodeCount(root->left/*, pCount*/) + GetBstTreeNodeCount(root->right/*, pCount*/);
     return count;
 }
 /*
@@ -2516,8 +2543,8 @@ int GetBstTreeNodeCount(BstNode* root/*, int* pCount*/) {
 */
 int GetBstTreeDepth(BstNode* root) {
     if (!root) return 0;
-    int leftDepth = GetBstTreeDepth(root->lchild_);
-    int rightDepth = GetBstTreeDepth(root->rchild_);
+    int leftDepth = GetBstTreeDepth(root->left);
+    int rightDepth = GetBstTreeDepth(root->right);
     return (1 + std::max(leftDepth, rightDepth));
 }
 void LevelTraverseBstTree(BstNode* root) {
@@ -2529,13 +2556,13 @@ void LevelTraverseBstTree(BstNode* root) {
     while (!q.empty()) {
         BstNode* pNode = q.front();
         q.pop();
-        std::cout << " " << pNode->key_ << std::endl;
+        std::cout << " " << pNode->val << std::endl;
 
-        if (pNode->lchild_) {
-            LevelTraverseBstTree(pNode->lchild_);
+        if (pNode->left) {
+            LevelTraverseBstTree(pNode->left);
         }
-        if (pNode->rchild_)
-            LevelTraverseBstTree(pNode->rchild_);
+        if (pNode->right)
+            LevelTraverseBstTree(pNode->right);
     }
     std::cout << " " << std::endl;
 }
@@ -2555,14 +2582,14 @@ vector<vector<int>> levelOrder(BstNode* root)
         {
             BstNode* tmp_node = Q.front();
             Q.pop();
-            tmp_v.push_back(tmp_node->key_);
-            if (tmp_node->lchild_)
+            tmp_v.push_back(tmp_node->val);
+            if (tmp_node->left)
             {
-                Q.push(tmp_node->lchild_);
+                Q.push(tmp_node->left);
             }
-            if (tmp_node->rchild_)
+            if (tmp_node->right)
             {
-                Q.push(tmp_node->rchild_);
+                Q.push(tmp_node->right);
             }
         }
 //        for (auto it : tmp_v) {
@@ -2588,10 +2615,10 @@ std::vector < std::vector <int> > levelPrintBst(BstNode* root) {
             std::vector < int > v_level;
             for (int i = 0; i < curSize; i++) {
                 BstNode* tmp = q.front(); q.pop();
-                v_level.push_back(tmp->key_);
+                v_level.push_back(tmp->val);
 
-                if (tmp->lchild_) q.push(tmp->lchild_);
-                if (tmp->rchild_) q.push(tmp->rchild_);
+                if (tmp->left) q.push(tmp->left);
+                if (tmp->right) q.push(tmp->right);
             }
             vvInt.push_back(v_level);
             return vvInt;
@@ -2609,10 +2636,10 @@ std::vector < std::vector <int> > levelPrintBst(BstNode* root) {
             q.pop();
 
             // 若当前层节点有孩子，则孩子进队
-            if (tmp->lchild_) q.push(tmp->lchild_);
-            if (tmp->rchild_) q.push(tmp->rchild_);
+            if (tmp->left) q.push(tmp->left);
+            if (tmp->right) q.push(tmp->right);
 
-            v_level.push_back(tmp->key_);
+            v_level.push_back(tmp->val);
         }
 
         vvInt.push_back(v_level);
@@ -2623,15 +2650,15 @@ std::vector < std::vector <int> > levelPrintBst(BstNode* root) {
 
 void mirrorBst(BstNode* root) {
     if (!root) return;
-    if (!root->lchild_ && !root->rchild_) return;
+    if (!root->left && !root->right) return;
 
     BstNode* tmp;
-    tmp = root->lchild_;
-    root->lchild_ = root->rchild_;
-    root->rchild_ = tmp;
+    tmp = root->left;
+    root->left = root->right;
+    root->right = tmp;
 
-    mirrorBst(root->lchild_);
-    mirrorBst(root->rchild_);
+    mirrorBst(root->left);
+    mirrorBst(root->right);
 }
 
 // 题目：从扑克牌中随机抽5张牌，判断是不是一个顺子，即这5张牌是不是连续的。
@@ -2871,10 +2898,10 @@ void serializeImpl(BstNode *root, std::string& str) {
         str += "$,";
         return;
     }
-    str += to_string(root->key_);
+    str += to_string(root->val);
     str += ",";
-    serializeImpl(root->lchild_, str);
-    serializeImpl(root->rchild_, str);
+    serializeImpl(root->left, str);
+    serializeImpl(root->right, str);
 }
 /*=========================二叉树序列化==============================*/
 char* Serialize(BstNode *root) {
@@ -2917,9 +2944,9 @@ char* Serialize(BstNode *root) {
 
 //    //递归求解
 //    //这里取前序和后序遍历的左右子树可能有点绕，可以好好思考一下
-//    newNode->lchild_ = reConstructBinaryTree(vector<int>(pre.begin() + 1, pre.begin() + 1 + leftSize),
+//    newNode->left = reConstructBinaryTree(vector<int>(pre.begin() + 1, pre.begin() + 1 + leftSize),
 //                                             vector<int>(vin.begin(), vin.begin() + leftSize));
-//    newNode->rchild_ = reConstructBinaryTree(vector<int>(pre.begin() + 1 + leftSize, pre.end()),
+//    newNode->right = reConstructBinaryTree(vector<int>(pre.begin() + 1 + leftSize, pre.end()),
 //                                             vector<int>(vin.begin() + 1 + leftSize, vin.end()));
 //    return nullptr;
 //}
@@ -3302,13 +3329,13 @@ int kthSmallest(BstNode* root, int k) {
     while ( p || !s.empty() ) {
         while (p) {
             s.push(p);
-            p = p->lchild_;
+            p = p->left;
         }
         p = s.top();
         s.pop();
         ++ cnt;
-        if (cnt == k) return p->key_;
-        p = p->rchild_;
+        if (cnt == k) return p->val;
+        p = p->right;
     }
     return 1;
 }
@@ -3399,10 +3426,389 @@ void tst1() {
 //    std::cout << std::endl;
 }
 
+// 
+
+    /**
+     * @Author: ZwZ
+     * @Description: 输入n个整数，找出其中最小的K个数。例如输入4,5,1,6,2,7,3,8这8个数字，则最小的4个数字是1,2,3,4。
+     * @Param: [arr, k, length]
+     * @return: 
+     * @Date: 2020/1/30-21:55
+     */
+
+
+int quick_st_aesc( std::vector<int>& a, int start, int end, int k) {
+    int pivot = a[start];
+    int i = start;
+    int j = end;
+    int res = 0;
+
+    while (i < j) {
+        while (i < j && a[j] >= pivot) -- j;
+        while (i < j && a[i] <= pivot) ++ i;
+        if (i < j) swap(a[i], a[j]);
+    }
+    swap(a[start], a[i]);
+
+//    if ( i+1 == k ) return a[i];
+//    else if ( i+1 > k ) res = quick_st(a, start, i-1, k);
+//    else if ( i+1 < k ) res = quick_st(a, i+1, end, k);
+    return res;
+}
+int quick_st_desc( std::vector<int>& a, int start, int end, int k) {
+    int pivot = a[start];
+    int i = start;
+    int j = end;
+    int res = 0;
+
+    while (i < j) {
+        while (i < j && a[j] <= pivot) -- j;
+        while (i < j && a[i] >= pivot) ++ i;
+        if (i < j) swap(a[i], a[j]);
+    }
+    swap(a[start], a[i]);
+
+    if ( i+1 == k ) return a[i];
+    else if ( i+1 > k ) res = quick_st_desc(a, start, i-1, k);
+    else if ( i+1 < k ) res = quick_st_desc(a, i+1, end, k);
+    return res;
+}
+/**
+ * @Description: 有一个整数数组，请你根据快速排序的思路，找出数组中第K大的数。
+ * @Param: [arr, k, length]
+ * @return: 
+ * @Date: 2020/1/30-21:55
+ */
+int findKth() {
+    std::vector<int> abc{ 4, 5, 1, 6, 2, 7, 8, 123, 456 };
+    auto res = quick_st_desc(abc, 0, abc.size() - 1, 3);
+    std::cout << "res=" << res << std::endl;
+
+    quick_st_aesc(abc, 0, abc.size() - 1, 4);
+    return 1;
+}
+
+
+//
+
+/**
+   * @Description: 给定一个链表，删除链表的倒数第k个节点, 并返回链表的头指针
+                例如:
+                给出的链表为:1->2->3->4->5, n=2.
+                删除了链表的倒数第k个节点之后,链表变为1->2->3->5.
+                备注：
+                题目保证n一定是有效的
+                请给出请给出时间复杂度为\ O(n) O(n)的算法
+   * @Param: [arr, k, length]
+   * @return:
+   * @Date: 2020/1/30-21:55
+ */
+ListNode* RemoveNthFromEnd(ListNode* head, int k) {
+    if (!head) return nullptr;
+
+    ListNode* fast = head;
+    ListNode* slow = head;
+    ListNode* temp = head;
+
+    for ( int i = 0; i < k; i ++ ) {
+        if (fast) {
+            fast = fast->m_pNext;
+        }
+    }
+    if (fast == nullptr) {
+        temp = head->m_pNext;
+        delete head;
+        return temp;
+    }
+
+    while (fast->m_pNext) {
+        fast = fast->m_pNext;
+        slow = slow->m_pNext;
+    }
+
+    temp = slow->m_pNext;
+    slow->m_pNext = slow->m_pNext->m_pNext;
+    delete temp;
+
+    return head;
+}
+void TestRemoveNthListNode() {
+    std::vector <int> vecInts{ 10, 97, 21, 16, 2, 0};
+
+    auto head = ConstructTestList(vecInts);
+
+    LOG_INFO << "before remove list";
+    PrintList(head);
+
+    LOG_INFO << "remove reverse idx=" << 3;
+    auto newhead = RemoveNthFromEnd(head, 3);
+
+    LOG_INFO << "after remove list";
+    PrintList(head);
+}
+
+// 输入n个整数，找出其中最小的K个数。例如输入4,5,1,6,2,7,3,8这8个数字，则最小的4个数字是1,2,3,4。
+std::vector<int> GetLeastNumbers(std::vector<int> a, size_t k) {
+    std::vector<int> result;
+    if (!a.size() || k <= 0) return result;
+
+    std::priority_queue<int, std::vector<int>, less<int>> pa;
+    for ( size_t i = 0 ; i < a.size(); i ++ ) {
+        if (pa.size() < k) {
+            pa.push(a[i]);
+        } else if (a[i] < pa.top()){
+            pa.pop();
+            pa.push(a[i]);
+        }
+    }
+    while (!pa.empty()) {
+        result.push_back(pa.top());
+        pa.pop();
+    }
+    std::sort(result.begin(), result.end());
+    return result;
+}
+void Test_GetLeastNumbers() {
+    std::vector<int> vecInts{ 4,5,1,6,2,7,3,8 };
+    auto retVector = GetLeastNumbers(vecInts, 4);
+    PrintInContainer(retVector);
+}
+
+
+//
+/**
+ * @Description: 一只青蛙一次可以跳上1级台阶，也可以跳上2级。
+ *               求该青蛙跳上一个n级的台阶总共有多少种跳法（先后次序不同算不同的结果）。
+ * @param number int整型
+ * @return int整型
+ */
+int jumpFloor(int number) {
+    // write code here
+    int a[number + 1];
+    a[1] = 1;
+    a[2] = 2;
+    for(int i = 3; i <= number; i++){
+        a[i] = a[i - 1] + a[i - 2];
+    }
+    return a[number];
+}
+void Test_JumpFloor() {
+
+}
+
+// 用两个栈来实现一个队列，完成队列的Push和Pop操作。 队列中的元素为int类型。
+class CStackToQueue {
+public:
+    void push( int val ) {
+        stack1.push(val);
+    }
+    int pop() {
+        if (stack1.empty()) return -1;
+
+        while (!stack1.empty()) {
+            stack2.push(stack1.top());
+            stack1.pop();
+        }
+        int res = stack2.top();
+        while (!stack2.empty()) {
+            stack1.push(stack2.top());
+            stack2.pop();
+        }
+        return res;
+    }
+
+private:
+    std::stack<int> stack1;
+    std::stack<int> stack2;
+};
+
+void Test_stackToQueue() {
+
+}
+
+
+/*
+    给定一棵二叉树以及这棵树上的两个节点 o1 和 o2，请找到 o1 和 o2 的最近公共祖先节点。
+    当我们用递归去做这个题时不要被题目误导，应该要明确一点
+    这个函数的功能有三个：给定两个节点 pp 和 qq
+
+    如果 pp 和 qq 都存在，则返回它们的公共祖先；
+    如果只存在一个，则返回存在的一个；
+    如果 pp 和 qq 都不存在，则返回NULL
+    本题说给定的两个节点都存在，那自然还是能用上面的函数来解决
+
+    具体思路：
+    （1） 如果当前结点 root 等于 NULL，则直接返回 NULL
+    （2） 如果 root 等于 pp 或者 qq ，那这棵树一定返回 pp 或者 qq
+    （3） 然后递归左右子树，因为是递归，使用函数后可认为左右子树已经算出结果，用 left 和 right 表示
+    （4） 此时若 left 为空，那最终结果只要看 right; 若 right 为空，那最终结果只要看 left
+    （5） 如果 left 和 right 都非空，因为只给了 pp 和 qq 两个结点，都非空，说明一边一个，因此 root 是他们的最近公共祖先
+    （6） 如果 left 和 right 都为空，则返回空（其实已经包含在前面的情况中了）
+
+    时间复杂度是 O(n)：每个结点最多遍历一次或用主定理，空间复杂度是 O(n)：需要系统栈空间
+*/
+int lowestCommonAncestor(BstNode* root, int o1, int o2) {
+    if (!root) return -1;
+    if (root->val == o1 || root->val == o2) return root->val;
+
+    int left  = lowestCommonAncestor(root->left, o1, o2);
+    int right = lowestCommonAncestor(root->right, o1, o2);
+
+    if (left != -1 && right != -1) {
+        return root->val;
+    } else if (left != -1) {
+        return left ;
+    } else if (right != -1) {
+        return right;
+    } else {
+        return -1;
+    }
+}
+// 二叉搜索树 版本，跟二叉树版本实现逻辑不太一样；
+//int lowestCommonAncestor_Bst(TreeNode* root, int o1, int o2) {
+//    if (root == nullptr) return -1;
+//    if (root->val == o1 || root->val == o2) return root->val;
+
+//    if ( (root->val - o1) * ( root->val - o2 ) <= 0 ) {
+//        return root->val;
+//    } else if ( (root->val < o1)  &&  ( root->val < o2 ) ) {
+//        return lowestCommonAncestor_Bst( root->right, o1, o2  );
+//    } else {
+//        return lowestCommonAncestor_Bst( root->left, o1, o2  );
+//    }
+//}
+
+void Test_lowestCommonAncestor() {
+}
+
+// 给定一个数组arr，返回arr的最长无重复子串的长度(无重复指的是所有数字都不相同)。
+int maxLength(const std::vector<int>& arr) {
+    size_t n = arr.size();
+    size_t l = 0, r = 0;
+    std::set<int> s;
+    size_t res = 0;
+
+    while ( r < n ) {
+        if (!s.count(arr[r])) {
+            s.insert(arr[r]);
+            r ++;
+        } else {
+            s.erase(arr[l]);
+            l ++;
+        }
+        res = res > s.size() ? res : s.size();
+    }
+    return res;
+}
+void Test_maxLength() {
+}
+
+// 对于一个给定的链表，返回环的入口节点，如果没有环，返回null. 拓展：你能给出不利用额外空间的解法么？
+// // 破坏链表节点连接 方式
+ListNode* DetectListCycle(ListNode* head) {
+    ListNode* marknode = new ListNode(-1024);
+    ListNode* p = head;
+    ListNode* temp = nullptr;
+    while (p) {
+        if (p->m_pNext == marknode)
+            return p;
+        temp = p->m_pNext;
+        p->m_pNext = marknode;
+        p = temp;
+    }
+    return nullptr;
+}
+void Test_DetectListCycle() {
+    std::vector <int> vecInts{ 10, 97, 21, 16, 2, 0};
+    auto listHead = ConstructTestList(vecInts);
+    PrintList(listHead);
+
+    // make list cycle --- --- ---
+    ListNode* tmp = listHead;
+    while (1) {
+        if ( tmp->m_nValue == 16 ) {
+            tmp->m_pNext = listHead;
+            break;
+        }
+        tmp = tmp->m_pNext;
+    }
+//    PrintList(listHead);
+    //  --- --- --- --- --- ---
+
+    auto retNode = DetectListCycle(listHead);
+    std::cout << "retnod=" << retNode->m_nValue << std::endl;
+}
+
+
+// 给出两个有序整数数组 A和B，请将数组 B合并到数组 A中，变成一个有序的数组
+// 注意：假设 A数组有足够的空间存放 B数组的元素， A和 B中初始的元素数目分别为 m和n
+void merge(int* A, int m, int* B, int n) {
+
+    int i = m - 1, j = n - 1, k = m + n - 1;
+    while (i >= 0 && j >= 0) {
+
+        if (A[i] > B[j]) {
+            A[k--] = A[i--];
+        }
+        else {
+            A[k--] = B[j--];
+        }
+
+    }
+    while(j >= 0) {
+        A[k--] = B[j--];
+    }
+}
+void Test_mergeTwoArray() {
+    int A[128] = { 11, 12, 13, 16 };
+    int B[6]   = { 1, 2, 3, 6 };
+
+    std::cout << "len1=" << array_size(A) << std::endl;
+    std::cout << "len2=" << array_size(B) << std::endl;
+
+    merge( A, 4, B, 4 );
+
+    std::cout << std::endl;
+    for ( int i = 0; i < 128; i ++ ) {
+        std::cout << " " << A[i];
+    }
+    std::cout << std::endl;
+}
+
+// 给定一个数组arr，返回子数组的最大累加和
+int maxsumofSubarray(vector<int>& arr) {
+
+}
+void Test_maxsumofSubarray() {
+    std::vector<int> arr{ 0, -1, -9, 126, 1, -987, 5 };
+    std::cout << "maxsum=" << maxsumofSubarray(arr) << std::endl;
+}
+
+
 int main(int argc, char *argv[])
 {
     Logger::setLogLevel(Logger::DEBUG);
     LOG_INFO << "pid = " << getpid() << ", tid=" << CurrentThread::tid();
+
+    Test_mergeTwoArray();
+    return 1;
+
+    Test_DetectListCycle();
+    return 1;
+
+    Test_lowestCommonAncestor();
+    return 1;
+
+    Test_stackToQueue();
+    return 1;
+
+    Test_GetLeastNumbers();
+    return 1;
+
+    TestRemoveNthListNode();
+    return 1;
+//    findKth();
+//    return 1;
 
     CreateBstTree();
 //    std::cout << "serial ret=" << Serialize(g_pBstTree) << std::endl;
