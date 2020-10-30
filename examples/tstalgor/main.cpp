@@ -3704,11 +3704,12 @@ void Test_maxLength() {
 }
 
 // 对于一个给定的链表，返回环的入口节点，如果没有环，返回null. 拓展：你能给出不利用额外空间的解法么？
-// // 破坏链表节点连接 方式
+// 破坏链表节点连接 方式
 ListNode* DetectListCycle(ListNode* head) {
     ListNode* marknode = new ListNode(-1024);
     ListNode* p = head;
     ListNode* temp = nullptr;
+
     while (p) {
         if (p->m_pNext == marknode)
             return p;
@@ -3776,22 +3777,88 @@ void Test_mergeTwoArray() {
 }
 
 // 给定一个数组arr，返回子数组的最大累加和
+// 例如，arr = [1, -2, 3, 5, -2, 6, -1]，所有子数组中，[3, 5, -2, 6]可以累加出最大的和12，所以返回12.
+// [要求] 时间复杂度为O(n)，空间复杂度为O(1)
 int maxsumofSubarray(vector<int>& arr) {
+    int max = 0;
+    int sum = 0;
 
+    for ( size_t i = 0; i < arr.size(); i ++ ) {
+        if (arr[i] >= 0) {
+            sum += arr[i];
+        } else {
+            sum = 0;
+        }
+        if (sum > max) {
+            max = sum;
+        }
+    }
+    return max;
 }
 void Test_maxsumofSubarray() {
-    std::vector<int> arr{ 0, -1, -9, 126, 1, -987, 5 };
+    std::vector<int> arr{ 0, -1, -9, 126, 1, 0, 5 };
     std::cout << "maxsum=" << maxsumofSubarray(arr) << std::endl;
 }
 
+void Test_ReverseString() {
+    std::string str = "12345";
+
+    size_t i = 0;
+    int nsize = str.size();
+    for ( size_t j = nsize - 1; i <= j; j --, i ++ ) {
+        std::swap(str[i], str[j]);
+    }
+    std::cout << "str=" << str << std::endl;
+}
+
+
+
+
+/*
+    实现 int sqrt(int x) 函数。
+    计算并返回 x 的平方根，其中 x 是非负整数。
+    由于返回类型是整数，结果只保留整数的部分，小数部分将被舍去。
+    示例 1:
+    输入: 4
+    输出: 2
+
+    示例 2:
+    输入: 8
+    输出: 2
+    说明: 8 的平方根是 2.82842..., 由于返回类型是整数，小数部分将被舍去。
+ * */
+int Sqrt__1() {
+    int x = 144;
+    int l = 0, r = x, ans = -1;
+
+    while ( l <= r ) {
+        int mid = l + ((r-l) >> 1);
+
+        if ( (long long)(mid * mid) <= x ) {
+            ans = mid;
+            l = mid + 1;
+        } else {
+            r = mid - 1;
+        }
+    }
+    return ans;
+}
+void Test_Sqrt() {
+    std::cout << "ret=" << Sqrt__1() << std::endl;
+}
 
 int main(int argc, char *argv[])
 {
     Logger::setLogLevel(Logger::DEBUG);
     LOG_INFO << "pid = " << getpid() << ", tid=" << CurrentThread::tid();
 
-    Test_mergeTwoArray();
-    return 1;
+    Test_Sqrt(); return 1;
+
+    Test_ReverseString(); return 1;
+
+    Test_maxsumofSubarray(); return 1;
+
+    Test_mergeTwoArray(); return 1;
 
     Test_DetectListCycle();
     return 1;
