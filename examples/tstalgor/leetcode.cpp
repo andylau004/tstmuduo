@@ -365,9 +365,19 @@ public:
              { 9, 1, 123, 6613, 31, 25, 123, -333,  72,  19, 9981, 33812, -17 };
         int idx = 3;
 
+{// -333 -17 1 9 19 25 31 72 123 123 6613 9981 33812
+        std::priority_queue<int, std::vector<int>, greater<int>> que(vRandom.begin(), vRandom.end());
+        for (size_t i = 0; i < vRandom.size(); ++i) {
+            std::cout << " " << que.top() ;
+            que.pop();
+        }
+        std::cout << std::endl;
+        return;
+}
 { // the newest work code ----
+// 33812 9981 6613 123 123 72 31 25 19 9 1 -17 -333
         priority_queue<int> q(vRandom.begin(), vRandom.end());
-        for (int i = 0; i < idx - 1; ++i) {
+        for (size_t i = 0; i < idx - 1; ++i) {
             std::cout << " pop=" << q.top() ;
             q.pop();
         }
@@ -377,22 +387,19 @@ public:
 }
 
         // auto retVect = findKthLargest( vRandom, idx );
-
         // PrintInContainer(retVect);
         // std::cout << "idx=" << idx << ", Max Val Kth=" << retVect[ idx - 1 ] << std::endl;
     }
 
 // 
 void Test_KthLeastNumbers() {
-
     int k = 5;
     std::vector<int> arr { 1, 7, 123, -333, -4236, -33391,  72,  19, 9981, 33812, -17 };
-
 {
         priority_queue<int, vector<int>, greater<int>> smallqueue;
         vector<int> result;
 
-        for (int i = 0; i < arr.size(); i++) {
+        for (size_t i = 0; i < arr.size(); i++) {
             smallqueue.push(arr[i]);
         }
         
