@@ -3829,19 +3829,21 @@ void Test_ReverseString() {
  * */
 int Sqrt__1() {
     int x = 144;
+    if ( x <= 1 ) return x;
     int l = 0, r = x, ans = -1;
 
     while ( l <= r ) {
         int mid = l + ((r-l) >> 1);
-
-        if ( (long long)(mid * mid) <= x ) {
-            ans = mid;
+        if  ( mid == x / mid ) {
+            return mid;
+        }
+        if ( x / mid  > mid ) {
             l = mid + 1;
         } else {
             r = mid - 1;
         }
     }
-    return ans;
+    return r;
 }
 void Test_Sqrt() {
     std::cout << "ret=" << Sqrt__1() << std::endl;
@@ -3852,6 +3854,7 @@ int main(int argc, char *argv[])
     Logger::setLogLevel(Logger::DEBUG);
     LOG_INFO << "pid = " << getpid() << ", tid=" << CurrentThread::tid();
 
+    
     Test_Sqrt(); return 1;
 
     Test_ReverseString(); return 1;
