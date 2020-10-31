@@ -3575,7 +3575,6 @@ void Test_GetLeastNumbers() {
 }
 
 
-//
 /**
  * @Description: 一只青蛙一次可以跳上1级台阶，也可以跳上2级。
  *               求该青蛙跳上一个n级的台阶总共有多少种跳法（先后次序不同算不同的结果）。
@@ -3830,7 +3829,7 @@ void Test_ReverseString() {
 int Sqrt__1() {
     int x = 144;
     if ( x <= 1 ) return x;
-    int l = 0, r = x, ans = -1;
+    int l = 0, r = x;
 
     while ( l <= r ) {
         int mid = l + ((r-l) >> 1);
@@ -3849,11 +3848,93 @@ void Test_Sqrt() {
     std::cout << "ret=" << Sqrt__1() << std::endl;
 }
 
+
+
+
+/**
+ * @Description: 给定一个只包括 '('，')'，'{'，'}'，'['，']' 的字符串，判断字符串是否有效。
+
+                有效字符串需满足：
+                左括号必须用相同类型的右括号闭合。
+                左括号必须以正确的顺序闭合。
+                注意空字符串可被认为是有效字符串。
+ * @param
+ * @return
+ */
+bool CheckBracket() {
+    bool isTrue = true;
+    std::stack < char > st;
+
+    boost::unordered_map < char, int > m { {'(', 1}, {'{', 2}, {'[', 3}, {')', 4}, {'}', 5}, {']', 6} };
+    std::string str = "()[]{}";
+    str = "([)]";
+    str = "{[abcdefg]}";
+
+    for ( char ch : str ) {
+        // 如果为开括号,将其入栈
+        int flag = m[ ch ];
+
+        if ( flag <= 3 && flag >= 1) st.push( ch );
+        else if ( !st.empty() && m[ st.top() ] == (flag - 3) ) st.pop();
+        else {
+            isTrue = false;
+            break;
+        }
+
+    }
+    if (!st.empty()) isTrue = false;
+
+    std::cout << "check kuohao=" << isTrue << std::endl;
+    return isTrue;
+}
+
+
+// 一个整型数组里除了两个数字之外，其他的数字都出现了两次。请写程序找出这两个只出现一次的数字。
+// void Test_FindNumsAppearOnce(const vector<int>& data,int* num1,int *num2) {
+void FindNumsAppearOnce(vector<int> data,int* num1,int *num2) {
+
+    int x = 0;//x保存所有元素异或的结果
+
+    for ( auto iVal : data ) {
+        x ^= iVal;
+    }
+    // std::cout << "s=" << s << std::endl;
+
+    int n = 1;
+    while ( (x & n)  == 0 ) {//找出最右边第1个不为0的位置
+        n = n << 1;
+    }
+
+    for ( auto itmp : data ) {
+        if (itmp & n) {//根据第一个不为0的位置重新将数组进行划分
+            *num1 ^=  itmp;
+        } else {
+            *num2 ^=  itmp;
+        }
+    }
+
+}
+void Test_FindNumsAppearOnce() {
+    int n1 = 0 , n2 = 0 ;
+
+    std::vector<int> arr { -333, 1, 1, 7, 19, 123, -333, 72, 72, 7, 19, 9981 };
+
+    FindNumsAppearOnce( arr, &n1, &n2 );
+
+    std::cout << "n1=" << n1 << " n2=" << n2 << std::endl;
+}
+
+
 int main(int argc, char *argv[])
 {
     Logger::setLogLevel(Logger::DEBUG);
     LOG_INFO << "pid = " << getpid() << ", tid=" << CurrentThread::tid();
 
+    LeetCodeEntry(); return 1;
+
+    Test_FindNumsAppearOnce(); return 1;
+
+    CheckBracket(); return 1;
     
     Test_Sqrt(); return 1;
 

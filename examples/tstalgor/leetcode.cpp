@@ -332,28 +332,105 @@ public:
 
 
 
-// LeetCode 215. Kth Largest Element in an Array--数字第K大的元素--最大堆或优先队列--C++,Python解法
+// LeetCode 215. Kth Largest Element in an Array--数字第K大的元素--最大堆或优先队列
+    // std::vector<int> findKthLargest(vector<int> nums, int k) {
 
-    int findKthLargest(vector<int>& nums, int k) {
+    //     std::priority_queue < int, vector< int > > p;
 
-        std::priority_queue < int, vector< int > > p;
+    //     for (size_t i = 0; i < nums.size(); ++ i) {
 
-        for (size_t i = 0; i < nums.size(); ++ i) {
+    //         if (p.size() < k) {
+    //             p.push(nums[i]);
+    //         } else if (p.top() < nums[i]) {
+    //             p.pop();
+    //             p.push(nums[i]);
+    //         }
 
-            if (p.size() < k) p.push(nums[i]);
-            else if (p.top() < nums[i]) {
-                p.pop();
-                p.push(nums[i]);
-            }
+    //     }
+
+    //     std::vector <int> ret;
+    //     while (!p.empty()) {
+    //         ret.push_back(p.top());
+    //         p.pop();
+    //         k --;
+    //         if (0 == k) {
+    //             break;
+    //         }
+    //     }
+    //     std::cout << "len=ret=" << ret.size() << std::endl;
+    //     return ret;
+    // }
+    void tst_KthBig() {
+        std::vector < int > vRandom =
+             { 9, 1, 123, 6613, 31, 25, 123, -333,  72,  19, 9981, 33812, -17 };
+        int idx = 3;
+
+{ // the newest work code ----
+        priority_queue<int> q(vRandom.begin(), vRandom.end());
+        for (int i = 0; i < idx - 1; ++i) {
+            std::cout << " pop=" << q.top() ;
+            q.pop();
+        }
+        std::cout << std::endl;
+        std::cout << "idx=" << idx << ", Max Val Kth=" << q.top() << std::endl;
+        return;
+}
+
+        // auto retVect = findKthLargest( vRandom, idx );
+
+        // PrintInContainer(retVect);
+        // std::cout << "idx=" << idx << ", Max Val Kth=" << retVect[ idx - 1 ] << std::endl;
+    }
+
+// 
+void Test_KthLeastNumbers() {
+
+    int k = 5;
+    std::vector<int> arr { 1, 7, 123, -333, -4236, -33391,  72,  19, 9981, 33812, -17 };
+
+{
+        priority_queue<int, vector<int>, greater<int>> smallqueue;
+        vector<int> result;
+
+        for (int i = 0; i < arr.size(); i++) {
+            smallqueue.push(arr[i]);
+        }
+        
+    // PrintInPriorQue(smallqueue);
+    //     return;
+
+        int n = 0;
+        while (n < k && !smallqueue.empty()) {
+            result.push_back(smallqueue.top());
+            smallqueue.pop();
+            n++;
         }
 
-        return p.top();
-    }
-    void tst_KthBig() {
-        std::vector < int > vRandom = { 9, 1, 123, 6613, 31, 25 };
-        std::cout << "Kth=" << findKthLargest( vRandom, 1 ) << std::endl;
+        PrintInContainer(result);
+        return;
+}
+    std::priority_queue<int, std::vector<int>> que;
+    // std::priority_queue<int, vector<int>, greater<int>> smallqueue;
+
+    for ( auto ele : arr ) {
+
+        if (que.size() < k) {
+            que.push(ele);
+        } else {
+            que.push(ele);
+            que.pop();
+        }
+
     }
 
+    while ( !que.empty() ) {
+        auto ele = que.top();
+        que.pop();
+        std::cout << " " << ele;
+    }
+        std::cout << std::endl;
+
+}
 
 
 /*
@@ -671,6 +748,11 @@ void tstupper_bound() {
 
 void LeetCodeEntry() {
 
+    // Test_KthLeastNumbers();
+    tst_KthBig();
+
+    return ;
+
     std::vector<int> a{11, 23, 35, 47, 51, 53, 198, 2739, 31798};
 
     ListNode* retnode = ConstructTestList(a);
@@ -812,11 +894,10 @@ void LeetCodeEntry() {
     checkHuiwen.IsHuiWen();
     return;
 
-    tst_KthBig();
-    return;
 
     int i1 = 4;
     int i2 = 12;
+    UNUSED(i2);
     int ret = i1 & (-i1) ;
     std::cout << "-i1=" << -i1 << std::endl;
     std::cout << "ret=" << ret << std::endl;

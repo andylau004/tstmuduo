@@ -228,6 +228,19 @@ void PrintInContainer( CONTAINER& container ) {
     printf( "\n" );
 }
 
+template<class CONTAINER>
+void PrintInPriorQue( CONTAINER& que ) {
+    if ( que.empty() ) {
+        return;
+    }
+    while ( !que.empty() ) {
+        auto ele = que.top();
+        que.pop();
+        std::cout << " " << ele;
+    }
+    printf( "\n" );
+}
+
 /*!
  * \brief The Align enum
  */
