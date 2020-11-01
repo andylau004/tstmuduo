@@ -331,50 +331,78 @@ public:
     }
 
 
+    int sort_desc(vector<int>& nums, int left, int right, int k) {
+        int pivot = nums[ left ];
+        int i = left;
+        int j = right;
+        int res = 0;
 
-// LeetCode 215. Kth Largest Element in an Array--数字第K大的元素--最大堆或优先队列
-    // std::vector<int> findKthLargest(vector<int> nums, int k) {
+        while ( i < j ) {
+            while ( i < j && nums[ j ] <= pivot ) j --;
+            while ( i < j && nums[ i ] >= pivot ) i ++;
+            if ( i < j ) swap(nums[i], nums[j]);
+        }
+        std::swap(nums[left], nums[i]);
 
-    //     std::priority_queue < int, vector< int > > p;
+        if ( i + 1 == k ) return nums[ i ];
+        else if ( i + 1 > k ) res = sort_desc(nums, left, i - 1, k);
+        else if ( i + 1 < k ) res = sort_desc(nums, i + 1, right, k);
+        return res;
+    }
 
-    //     for (size_t i = 0; i < nums.size(); ++ i) {
+    // LeetCode 215. Kth Largest Element in an Array--数字第K大的元素
+    // 从大到小排列；
+    int findKthLargest(vector<int>& nums, int k) {
 
-    //         if (p.size() < k) {
-    //             p.push(nums[i]);
-    //         } else if (p.top() < nums[i]) {
-    //             p.pop();
-    //             p.push(nums[i]);
-    //         }
+        // int l = 0, r = nums.size() - 1;
+        // while (1) {
+        //     int pos = partition(nums, l, r);
+            
+        //     if ( pos == k-1 ) return nums[ k - 1 ];
 
-    //     }
+        //     if ( pos > k-1 ) {
+        //         r = pos - 1;
+        //     }
+        //     else {
+        //         l = pos + 1;
+        //     }
+        // }
+        return 1;
+    }
 
-    //     std::vector <int> ret;
-    //     while (!p.empty()) {
-    //         ret.push_back(p.top());
-    //         p.pop();
-    //         k --;
-    //         if (0 == k) {
-    //             break;
-    //         }
-    //     }
-    //     std::cout << "len=ret=" << ret.size() << std::endl;
-    //     return ret;
-    // }
-    void tst_KthBig() {
+    /*
+        上面两种方法虽然简洁，但是确不是本题真正想考察的东西，可以说有一定的偷懒嫌疑。
+        这道题最好的解法应该是下面这种做法，用到了快速排序 Quick Sort 的思想，
+        这里排序的方向是从大往小排。
+        核心思想是每次都要先找一个中枢点 Pivot，然后遍历其他所有的数字，像这道题从大往小排的话，
+        就把大于中枢点的数字放到左半边，把小于中枢点的放在右半边，这样中枢点是整个数组中第几大的数字就确定了，
+        虽然左右两部分各自不一定是完全有序的，但是并不影响本题要求的结果，
+        因为左半部分的所有值都大于右半部分的任意值，所以我们求出中枢点的位置，
+        如果正好是 k-1，那么直接返回该位置上的数字；
+        如果大于 k-1，说明要求的数字在左半部分，更新右边界，再求新的中枢点位置；
+        反之则更新右半部分，求中枢点的位置；
+    */
+    void tst_KthBig() { // 数组中第k大的数字
         std::vector < int > vRandom =
              { 9, 1, 123, 6613, 31, 25, 123, -333,  72,  19, 9981, 33812, -17 };
         int idx = 3;
 
-{// -333 -17 1 9 19 25 31 72 123 123 6613 9981 33812
-        std::priority_queue<int, std::vector<int>, greater<int>> que(vRandom.begin(), vRandom.end());
-        for (size_t i = 0; i < vRandom.size(); ++i) {
-            std::cout << " " << que.top() ;
-            que.pop();
-        }
-        std::cout << std::endl;
+        auto retVal = sort_desc(vRandom, 0, vRandom.size() - 1, idx);
+        // auto retVect = findKthLargest( vRandom, idx );
+        // PrintInContainer(retVect);
+        std::cout << "idx=" << idx << ", Max Val Kth=" << retVal << std::endl;
         return;
+
+{// -333 -17 1 9 19 25 31 72 123 123 6613 9981 33812
+        // std::priority_queue<int, std::vector<int>, greater<int>> que(vRandom.begin(), vRandom.end());
+        // for (size_t i = 0; i < vRandom.size(); ++i) {
+        //     std::cout << " " << que.top() ;
+        //     que.pop();
+        // }
+        // std::cout << std::endl;
+        // return;
 }
-{ // the newest work code ----
+{ // the newest work code ---- 大顶堆方式
 // 33812 9981 6613 123 123 72 31 25 19 9 1 -17 -333
         priority_queue<int> q(vRandom.begin(), vRandom.end());
         for (size_t i = 0; i < idx - 1; ++i) {
@@ -386,9 +414,6 @@ public:
         return;
 }
 
-        // auto retVect = findKthLargest( vRandom, idx );
-        // PrintInContainer(retVect);
-        // std::cout << "idx=" << idx << ", Max Val Kth=" << retVect[ idx - 1 ] << std::endl;
     }
 
 // 

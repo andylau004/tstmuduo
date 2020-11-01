@@ -2416,6 +2416,44 @@ std::vector< std::vector<int> > levelOrder_new(BstNode* root) {
     return result;
 }
 
+
+
+void zhiZiPrintBstTree(BstNode* root) {
+    std::vector< std::vector<int> > result;
+    if (!root) return result;
+
+    bool flag = true; //从左向右打印为true，从右向左打印为false
+
+    std::deque < BstNode* > q;
+    q.push_back( root );
+
+    while ( !q.empty() ) {
+        
+        int n = q.size();
+        std::vector<int> out;
+        BstNode* node;
+
+        while ( n > 0 ) {
+
+            if (flag) { // 前取后放：从左向右打印，所以从前边取，后边放入
+
+            } else {
+
+            }
+
+        }
+
+    }
+
+}
+void Test_zhiZiPrintBstTree() {
+    CreateBstTree();
+
+    zhiZiPrintBstTree(g_pBstTree);
+
+}
+
+
 void tst_my_bst_tree() {
     {
         std::cout << std::endl;
@@ -3481,6 +3519,7 @@ int quick_st_desc( std::vector<int>& a, int start, int end, int k) {
  */
 int findKth() {
     std::vector<int> abc{ 4, 5, 1, 6, 2, 7, 8, 123, 456 };
+
     auto res = quick_st_desc(abc, 0, abc.size() - 1, 3);
     std::cout << "res=" << res << std::endl;
 
@@ -3880,14 +3919,12 @@ bool CheckBracket() {
             isTrue = false;
             break;
         }
-
     }
     if (!st.empty()) isTrue = false;
 
     std::cout << "check kuohao=" << isTrue << std::endl;
     return isTrue;
 }
-
 
 // 一个整型数组里除了两个数字之外，其他的数字都出现了两次。请写程序找出这两个只出现一次的数字。
 // void Test_FindNumsAppearOnce(const vector<int>& data,int* num1,int *num2) {
@@ -3912,7 +3949,6 @@ void FindNumsAppearOnce(vector<int> data,int* num1,int *num2) {
             *num2 ^=  itmp;
         }
     }
-
 }
 void Test_FindNumsAppearOnce() {
     int n1 = 0 , n2 = 0 ;
@@ -3930,6 +3966,8 @@ int main(int argc, char *argv[])
     Logger::setLogLevel(Logger::DEBUG);
     LOG_INFO << "pid = " << getpid() << ", tid=" << CurrentThread::tid();
 
+    findKth(); return 1;
+
     LeetCodeEntry(); return 1;
 
     Test_FindNumsAppearOnce(); return 1;
@@ -3944,22 +3982,16 @@ int main(int argc, char *argv[])
 
     Test_mergeTwoArray(); return 1;
 
-    Test_DetectListCycle();
-    return 1;
+    Test_DetectListCycle(); return 1;
 
-    Test_lowestCommonAncestor();
-    return 1;
+    Test_lowestCommonAncestor(); return 1;
 
-    Test_stackToQueue();
-    return 1;
+    Test_stackToQueue(); return 1;
 
-    Test_GetLeastNumbers();
-    return 1;
+    Test_GetLeastNumbers(); return 1;
 
-    TestRemoveNthListNode();
-    return 1;
-//    findKth();
-//    return 1;
+    TestRemoveNthListNode(); return 1;
+
 
     CreateBstTree();
 //    std::cout << "serial ret=" << Serialize(g_pBstTree) << std::endl;
@@ -3975,7 +4007,6 @@ int main(int argc, char *argv[])
 
     removeNthFromEnd(3);
     return 1;
-
 
     check_cyclelist(); return 1;
 
@@ -4044,8 +4075,6 @@ int main(int argc, char *argv[])
 
     tst_format_str();   return 1;
 
-//    return 1;
-
 //    vector<vector<int>> asd = levelPrintBst/*levelOrder*/(g_pBstTree);
 //    for ( std::vector<vector<int>>::iterator itV = asd.begin(); itV != asd.end(); itV ++ ) {
 //        for ( auto it : *itV ) {
@@ -4065,8 +4094,8 @@ int main(int argc, char *argv[])
     std::cout << std::endl;
     std::cout << "preorder print bst 1----" << std::endl;
     return 1;
-    LevelTraverseBstTree(g_pBstTree);
-    return 1;
+
+    LevelTraverseBstTree(g_pBstTree); return 1;
 
     std::cout << " tree depth = " << GetBstTreeDepth(g_pBstTree) << std::endl; // return 1;
     std::cout << " tree count = " << GetBstTreeNodeCount(g_pBstTree) << std::endl;// return 1;
@@ -4135,7 +4164,6 @@ int main(int argc, char *argv[])
     call_find_max_in_array(); return 1;
     call_Max_array_Sum(); return 1;
 
-
     call_rever_KthNode(); return 1;
 
     tst_findmin_inrotatearrry();return 1;
@@ -4167,19 +4195,15 @@ std::cout << "c" << std::endl;
             tst_MergeSortEntry_(); return 1;
             return 1;
         }
-
     }
 
     tst_bitmap_entry(); return 1;
 
     tst_stack_entry(); return 1;
 
-    tst_linkedlist_entry();
-    return 1;
+    tst_linkedlist_entry(); return 1;
 
-//    return 1;
-    tst_Extern_MergeSortEntry_();
-    return 1;
+    tst_Extern_MergeSortEntry_(); return 1;
 
 //    CopyFileEx("template-openssl.cnf", "123.cnf");
 //    return 1;
@@ -4190,12 +4214,10 @@ std::cout << "c" << std::endl;
 
     tst_struct_fun(); return 1;
 
-    tst_vec_quchong();
-    return 1;
+    tst_vec_quchong(); return 1;
 
 //    tst_catFile();
-    tst_catFileEx();
-    return 1;
+    tst_catFileEx(); return 1;
 
     tst_maxheap_sort(); return 1;
 
