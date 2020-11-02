@@ -254,7 +254,7 @@ void tst_max_array() {
     int arr[] = { 9, 12, 3, 889, 71, 63, 29, 367,1023 };
     int max = arr[0];
 
-    for (int index = 1; index < array_size(arr); ++index) {
+    for (size_t index = 1; index < array_size(arr); ++index) {
         if (max < arr[index])
             max = arr[index];
     }

@@ -423,7 +423,7 @@ void Mysort(vector<int> & arr) {
 }
 
 void tst_sort_3() {
-    std:vector<int> arr;
+    std::vector<int> arr;
     arr.push_back(4);arr.push_back(6);arr.push_back(3);
     arr.push_back(1);arr.push_back(5);arr.push_back(2);
     arr.push_back(7);arr.push_back(0);
@@ -2419,32 +2419,41 @@ std::vector< std::vector<int> > levelOrder_new(BstNode* root) {
 
 
 void zhiZiPrintBstTree(BstNode* root) {
+
     std::vector< std::vector<int> > result;
-    if (!root) return result;
+    if (!root) return;
 
     bool flag = true; //从左向右打印为true，从右向左打印为false
-
     std::deque < BstNode* > q;
     q.push_back( root );
 
     while ( !q.empty() ) {
         
-        int n = q.size();
+        int              n = q.size();
         std::vector<int> out;
-        BstNode* node;
+        BstNode*         node;
 
         while ( n > 0 ) {
-
-            if (flag) { // 前取后放：从左向右打印，所以从前边取，后边放入
-
-            } else {
-
+            if (flag) { // 前取后放: 从左向右打印，所以从前边取，后边放入
+                node = q.front();
+                q.pop_front();
+                if ( node->left )  q.push_back( node->left );
+                if ( node->right ) q.push_back( node->right );
+            } else { // 后取前放: 从右向左，从后边取，前边放入
+                node = q.back();
+                q.pop_back();
+                if ( node->right )  q.push_back( node->right );
+                if ( node->left )   q.push_back( node->left );
             }
-
+            out.push_back(node->val);
+            n --;
         }
 
-    }
+        flag = !flag;
+        result.push_back(out);
+    }// while end ----
 
+    // return result;
 }
 void Test_zhiZiPrintBstTree() {
     CreateBstTree();
@@ -2737,16 +2746,16 @@ void wrap_IsContinuous() {
 
 //给定 "pwwkew" ，最长子串是 "wke" ，长度是3。请注意答案必须是一个子串，"pwke" 是 子序列  而不是子串。
 int lengthOfLongestSubstring(string s) {
-    int n=0,left=0;
-    map<char,int> m;
-    for(int i=0;i<s.length();i++)  //每次遍历都会判断左边界限，当有重复时，更新left
+    size_t n=0,left=0;
+    map<char, size_t> m;
+    for(size_t i=0;i<s.length();i++)  //每次遍历都会判断左边界限，当有重复时，更新left
     {
         left=max(left,m[s[i]]);    //更新左边界限
         m[s[i]]=i+1;               //更新哈希表的值
         n=max(n,i-left+1);         //更新n的值
     }
 
-    for ( map<char,int>::iterator it = m.begin(); it != m.end(); it ++ ) {
+    for ( map<char,size_t>::iterator it = m.begin(); it != m.end(); it ++ ) {
         std::cout << " " << it->first ;
     }
     std::cout << std::endl;
@@ -2879,7 +2888,7 @@ int FindGreatestSumOfSubArray(vector<int> array) {
     }
 
     int res = array[0], mx = array[0];
-    for (int i=1; i < array.size(); ++i)
+    for (size_t i=1; i < array.size(); ++i)
     {
         mx = max(array[i],mx + array[i]);
         res = max(res, mx);
@@ -3039,7 +3048,7 @@ void tst_kuohao_pipei() {
     std::map < char, char > map_s { {'(', ')'}, {'{', '}'}, {'[',']'} };
     std::stack < char > temp;
 
-    for (int i = 0; i < str.size(); i++) {
+    for (size_t i = 0; i < str.size(); i++) {
 
         if ( map_s.find(str[i]) != map_s.end() ) {
             temp.push( map_s[str[i]] );//将s[i]在map中的值，放到栈中
@@ -3092,7 +3101,7 @@ std::vector<int> maxInWindow(std::vector<int>& nums, unsigned int size) {
 void tst_maxinwindows() {
     std::vector<int> vNums{2,3,4,2,6,2,5,1};
     auto retV = maxInWindow(vNums, 3);
-    for (int i = 0; i < retV.size(); i ++) {
+    for (size_t i = 0; i < retV.size(); i ++) {
         std::cout << " " << retV[i] ;
     }
     std::cout << std::endl;
@@ -3476,6 +3485,7 @@ void tst1() {
 
 
 int quick_st_aesc( std::vector<int>& a, int start, int end, int k) {
+    UNUSED(k);
     int pivot = a[start];
     int i = start;
     int j = end;
@@ -3581,6 +3591,7 @@ void TestRemoveNthListNode() {
 
     LOG_INFO << "remove reverse idx=" << 3;
     auto newhead = RemoveNthFromEnd(head, 3);
+    UNUSED(newhead);
 
     LOG_INFO << "after remove list";
     PrintList(head);

@@ -37,7 +37,7 @@ struct ListNodeEx
 {
     int val;
     ListNodeEx* next;
-    ListNodeEx() : next(NULL), val(-1) {
+    ListNodeEx() : val(-1), next(nullptr) {
     }
 };
 
