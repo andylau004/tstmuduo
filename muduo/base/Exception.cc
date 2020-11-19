@@ -3,7 +3,9 @@
 //
 // Author: Shuo Chen (chenshuo at chenshuo dot com)
 
-#include <muduo/base/exception.h>
+// #include <muduo/base/exception.h>
+
+#include "Exception.h"
 
 //#include <cxxabi.h>
 #include <execinfo.h>

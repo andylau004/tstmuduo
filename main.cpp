@@ -85,7 +85,7 @@ void tst_elPool_1() {
     loopthreadPool.setThreadNum(2);
     loopthreadPool.start(some_callback);
 
-    for ( int i = 0 ; i < 5; ++ i ) {
+    for ( size_t i = 0 ; i < 5; ++ i ) {
         EventLoop* tmploop = loopthreadPool.getNextLoop();
         tmploop->runInLoop( runInThread );
         printf( "for tmploop=%p\n", tmploop );
@@ -236,12 +236,12 @@ void tst_left_move() {
 }
 
 void tst_del_it() {
-    std::vector<int>  my_container;
-    for (int i = 0; i < 100; ++i) {
+    std::vector<size_t>  my_container;
+    for (size_t i = 0; i < 100; ++i) {
         my_container.push_back(i);
     }
 
-    std::vector<int>::iterator it = my_container.begin();
+    std::vector<size_t>::iterator it = my_container.begin();
     for ( ;it != my_container.end(); ) {
         if (*it % 2 == 1) {
             it = my_container.erase(it);

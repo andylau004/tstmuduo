@@ -37,7 +37,7 @@ bool ConnctionPool::init(const DBSourceInfo& info) {
         }
 
 //        LOG_INFO("conn maxCount_:"<<maxCount_);
-        for (int i = 0; i < maxCount_; ++i) {
+        for (size_t i = 0; i < maxCount_; ++i) {
             sql::Connection* conn = createConnection();
             if (!conn) {
 //                LOG_ERROR("createConnection faild.user:"<<info.user<<",sqlAddr:"<<info.sqlAddr);

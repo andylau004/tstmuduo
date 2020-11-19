@@ -7,7 +7,7 @@ ListNode* CreateListNode(int value)
 {
     ListNode* pNode = new ListNode();
     pNode->m_nValue = value;
-    pNode->m_pNext = NULL;
+    pNode->next_ = NULL;
 
     return pNode;
 }
@@ -17,7 +17,7 @@ void ConnectListNodes(ListNode* pCurrent, ListNode* pNext) {
         printf("Error to connect two nodes.\n");
         exit(1);
     }
-    pCurrent->m_pNext = pNext;
+    pCurrent->next_ = pNext;
 }
 void PrintListNode(ListNode* pNode) {
     if (pNode == NULL) {
@@ -33,7 +33,7 @@ void PrintList(ListNode* pHead)
     printf("\n");
     while (pHead) {
         printf("%d\t", pHead->m_nValue);
-        pHead = pHead->m_pNext;
+        pHead = pHead->next_;
     }
     printf("\n");
 //    printf("\nPrintList ends.\n");
@@ -43,7 +43,7 @@ void DestroyList(ListNode* pHead)
 {
     ListNode* pNode = pHead;
     while (pNode) {
-        pHead = pHead->m_pNext;
+        pHead = pHead->next_;
         delete pNode;
         pNode = pHead;
     }
@@ -56,9 +56,9 @@ void AddToTail(ListNode** pHead, int value)
         *pHead = pNew;
     } else {
         ListNode* pNode = *pHead;
-        while (pNode->m_pNext)
-            pNode = pNode->m_pNext;
-        pNode->m_pNext = pNew;
+        while (pNode->next_)
+            pNode = pNode->next_;
+        pNode->next_ = pNew;
     }
 }
 
@@ -70,15 +70,15 @@ void RemoveNode(ListNode** pHead, int delVal)
     ListNode* pToBeDel = NULL;
     if ( (*pHead)->m_nValue == delVal ) {
         pToBeDel = *pHead;
-        *pHead = (*pHead)->m_pNext;
+        *pHead = (*pHead)->next_;
     } else {// 运行到此处，pHead的值必然不等于查找值, 只能比较next的值跟查找值
         ListNode* pNode = *pHead;
-        while (pNode && pNode->m_pNext->m_nValue != delVal)
-            pNode = pNode->m_pNext;
+        while (pNode && pNode->next_->m_nValue != delVal)
+            pNode = pNode->next_;
 
-        if (pNode && pNode->m_pNext->m_nValue == delVal) {
-            pToBeDel = pNode->m_pNext;
-            pNode->m_pNext = pNode->m_pNext->m_pNext;
+        if (pNode && pNode->next_->m_nValue == delVal) {
+            pToBeDel = pNode->next_;
+            pNode->next_ = pNode->next_->next_;
         }
     }
     if (pToBeDel) {

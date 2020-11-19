@@ -17,6 +17,8 @@
 //#define GDLOG_TRACEEX LOG(INFO) << __PRETTY_FUNCTION__ << " this=" << this << " "
 //#else
 
+extern int tst_rand();
+extern int tst_rand(int low, int high);
 
 
 extern BstNode* g_pBstTree;
@@ -99,6 +101,36 @@ void InOrtderPtrint(TreeNode* root);
         return *vecNodes.begin();
     }
 
+    // std::vector<int> createRandomIntVector(int start, int end, int numCount) {
+    //         time_t t;
+    //         srand(time(&t));
+
+    //     std::vector<int> ret;
+    //     for (int i = 0; i < numCount; ++i) {
+    //         ret.push_back(tst_rand(start, end));
+    //     }
+        
+    //     return ret;
+    // }
+
+    std::vector< ListNode* > ConstructTestListByParam(int start, int end, int numCount, int listCount) {
+        std::vector< ListNode* > arrays;
+        // ----------------
+        time_t t;
+        srand(time(&t));
+        for ( int i = 0; i < listCount; i ++ ) {
+
+            std::vector<int> tmpArr;
+            for ( int j = 0; j < numCount; j ++ ) {
+                tmpArr.push_back(tst_rand(start, end));
+            }
+            arrays.push_back( ConstructTestList(tmpArr) );
+        }
+        // ----------------
+        return arrays;
+    }
+
+
 // Convert Sorted List to Binary Search Tree -- LeetCode 将有序链表转为二叉搜索树
 class CSortedListToBst {
 public:
@@ -106,27 +138,27 @@ public:
     ListNode* reverseList( ListNode* pHead ) {
         if (!pHead) return nullptr;
         {
-            ListNode* prePtr = nullptr, *curPtr = pHead, *nextPtr = curPtr->m_pNext;
+            ListNode* prePtr = nullptr, *curPtr = pHead, *nextPtr = curPtr->next_;
             while (nextPtr) {
-                curPtr->m_pNext = prePtr;
+                curPtr->next_ = prePtr;
                 prePtr = curPtr;
 
                 curPtr = nextPtr;
-                nextPtr = nextPtr->m_pNext;
+                nextPtr = nextPtr->next_;
             }
-            curPtr->m_pNext = prePtr;
+            curPtr->next_ = prePtr;
             return curPtr;
         }
 
-        ListNode* prePtr = nullptr, *curPtr = pHead, *nextPtr = curPtr->m_pNext;
+        ListNode* prePtr = nullptr, *curPtr = pHead, *nextPtr = curPtr->next_;
         while (nextPtr) {
-            curPtr->m_pNext = prePtr;
+            curPtr->next_ = prePtr;
             prePtr = curPtr;
 
             curPtr = nextPtr;
-            nextPtr = nextPtr->m_pNext;
+            nextPtr = nextPtr->next_;
         }
-        curPtr->m_pNext = prePtr;
+        curPtr->next_ = prePtr;
         return curPtr;
     }
 
@@ -221,9 +253,9 @@ public:
 //        std::cout << "slow=" << slow <<std::endl;
 //        std::cout << "fast=" << fast <<std::endl;
 
-        while (fast != tail && fast->m_pNext != tail) {
-            slow = slow->m_pNext;
-            fast = fast->m_pNext->m_pNext;
+        while (fast != tail && fast->next_ != tail) {
+            slow = slow->next_;
+            fast = fast->next_->next_;
         }
 
 //        std::cout << "slow->val=" << slow->m_nValue << std::endl;
@@ -232,7 +264,7 @@ public:
 
         TreeNode* root = new TreeNode(slow->m_nValue);
         root->left = helper(head, slow);
-        root->right = helper(slow->m_pNext, tail);
+        root->right = helper(slow->next_, tail);
         return root;
     }
 
@@ -644,7 +676,9 @@ int Depth(BstNode* root) {
 bool isBalanced(BstNode* root) {
     if (!root) return true;
     int d = abs( Depth(root->left) - Depth(root->right) );
-    return d <= 1 && isBalanced(root->left) && isBalanced(root->right);
+    bool bCheck = (d <= 1 && isBalanced(root->left) && isBalanced(root->right));
+    std::cout << "d=" << d << std::endl;
+    return bCheck;
 }
 
 // Leetcode 98. 验证二叉搜索树

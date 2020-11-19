@@ -47,6 +47,7 @@ add_subdirectory(netty/echo)
 #add_subdirectory(cthrift_cli)
 #add_subdirectory(cthrift_srv)
 add_subdirectory(tstlog)
+add_subdirectory(tst_sslconnmysql)
 
 
 #add_subdirectory(${CMAKE_SOURCE_DIR}/thirdpart/rapidjson)

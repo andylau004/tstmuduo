@@ -36,6 +36,8 @@ option( _debug "Debug option" ON )
 
 #include_directories(/usr/local/include/c++/4.8.5/)
 include_directories(/usr/local/include)
+include_directories(/usr/include/mysql)
+
 include_directories("${CMAKE_SOURCE_DIR}")
 include_directories(${CMAKE_SOURCE_DIR}/thirdpart/rapidjson)
 include_directories(${CMAKE_SOURCE_DIR}/thirdpart/thrift/thrift-0.9.3)
@@ -57,6 +59,7 @@ aux_source_directory(cthrift/util CTHRIFT_UTIL)
 #aux_source_directory(cthrift/octoidl OCTOIDL_SRC)
 
 
+link_directories(/usr/lib64/mysql)
 link_directories(/usr/local/lib/)
 #link_directories(/opt/gmssl/lib/)
 link_directories(${LIBRARY_OUTPUT_PATH})

@@ -141,8 +141,8 @@ void tst_thrift_threadmanager_fun() {
         tasks.insert( boost::shared_ptr<MyTask>(new MyTask(monitor, m)));
     }
     std::cout << "222222222222222" << std::endl;
-    for ( auto it = tasks.begin(); it != tasks.end(); ++it ) {
-        threadManager->add(*it, 50, 50);
+    for ( auto it : tasks ) {
+        threadManager->add(it, 50, 50);
     }
     std::cout << "3333333" << std::endl;
     {

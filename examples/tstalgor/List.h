@@ -6,13 +6,13 @@
 struct ListNode {
 public:
     int       m_nValue;
-    ListNode* m_pNext;
+    ListNode* next_;
 
 public:
-    ListNode() : m_nValue( -1 ), m_pNext(nullptr) {
+    ListNode() : m_nValue( -1 ), next_(nullptr) {
 
     }
-    ListNode(int val) : m_nValue( val ), m_pNext(nullptr) {
+    ListNode(int val) : m_nValue( val ), next_(nullptr) {
 
     }
 };
