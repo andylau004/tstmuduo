@@ -4308,10 +4308,10 @@ public:
         if (k > 0) dfs(root->left, k);
     }
     int KthLargest_FromBstTree() {
-
         CreateBstTree();
         printInorder(g_pBstTree);
         std::cout << std::endl;
+        
         int k = 3;
         dfs(g_pBstTree, k);
 
@@ -4761,29 +4761,34 @@ public:
 };
 
 /*
-    我们希望将二叉搜索树转化为双向循环链表。
+    将二叉搜索树转化为双向循环链表。
     链表中的每个节点都有一个前驱和后继指针。
     对于双向循环链表，第一个节点的前驱是最后一个节点，最后一个节点的后继是第一个节点。
 */
 class CBstTreeToDoubleList {
-    DoubleListNode* head, *tail;
+    BstNode* head, *tail;
+    CBstTreeToDoubleList() : head(nullptr), tail(nullptr) {
+    }
+    void inorder(BstNode* cur) {
+        if (!cur) return;
 
-    void transfer(BstNode* root) {
-        if (!root) return;
-        transfer(root->left);
-        if (!head) {
-            head = root;
-        } else {
+        inorder(cur->left);// 构造出链表的所有结构，除了头连尾和尾连头的两个指针
 
+        if (!head) {//当前前驱节点为空，说明这是双向链表的头节点（树中最左节点）
+            head = cur;// 当tail还不存在，也就是cur此时在整个BST的最左边的节点，这个节点就是head
+        } else { //此时已有前驱，说明这是链表中的某个中间节点，将前驱的右指针指向cur
+            tail->right = cur;
+            cur->left = tail;
         }
+        tail = cur;// 将前一个节点更新为当前节点（所以到最后，tail就会挪到整个BST的最右边的节点，这个节点就是链表的尾节点）
 
+        inorder(cur->right);
     }
 public:
     void TreeToDoubleList(BstNode* root) {
-        DoubleListNode* tmp;
-
-        transfer(root);
-
+        inorder(root);
+        head->left = tail;// 补上头连尾
+        tail->right = head;// 补上尾连头
     }
 };
 
