@@ -11,7 +11,7 @@
 BinaryTreeNode* CreateBinaryTreeNode(int value)
 {
     BinaryTreeNode* pNode = new BinaryTreeNode();
-    pNode->m_nValue = value;
+    pNode->val = value;
     pNode->m_pLeft  = NULL;
     pNode->m_pRight = NULL;
     return pNode;
@@ -27,15 +27,15 @@ void PrintTreeNode(const BinaryTreeNode* pNode)
 {
     if(pNode != NULL)
     {
-        printf("value of this node is: %d\n", pNode->m_nValue);
+        printf("value of this node is: %d\n", pNode->val);
 
         if(pNode->m_pLeft != NULL)
-            printf("value of its left child is: %d.\n", pNode->m_pLeft->m_nValue);
+            printf("value of its left child is: %d.\n", pNode->m_pLeft->val);
         else
             printf("left child is NULL.\n");
 
         if(pNode->m_pRight != NULL)
-            printf("value of its right child is: %d.\n", pNode->m_pRight->m_nValue);
+            printf("value of its right child is: %d.\n", pNode->m_pRight->val);
         else
             printf("right child is NULL.\n");
     }
