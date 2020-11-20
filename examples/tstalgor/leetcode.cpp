@@ -258,11 +258,11 @@ public:
             fast = fast->next_->next_;
         }
 
-//        std::cout << "slow->val=" << slow->m_nValue << std::endl;
-//        std::cout << "fast->val=" << fast->m_nValue << std::endl;
+//        std::cout << "slow->val=" << slow->val << std::endl;
+//        std::cout << "fast->val=" << fast->val << std::endl;
 //        return nullptr;
 
-        TreeNode* root = new TreeNode(slow->m_nValue);
+        TreeNode* root = new TreeNode(slow->val);
         root->left = helper(head, slow);
         root->right = helper(slow->next_, tail);
         return root;

@@ -5,29 +5,29 @@
 
 struct ListNode {
 public:
-    int       m_nValue;
+    int       val;
     ListNode* next_;
 
 public:
-    ListNode() : m_nValue( -1 ), next_(nullptr) {
+    ListNode() : val( -1 ), next_(nullptr) {
 
     }
-    ListNode(int val) : m_nValue( val ), next_(nullptr) {
+    ListNode(int val) : val( val ), next_(nullptr) {
 
     }
 };
 
 struct DoubleListNode {
 public:
-    int       m_nValue;
+    int       val;
     DoubleListNode* left;
     DoubleListNode* right;
 
 public:
-    DoubleListNode() : m_nValue( -1 ), left(nullptr), right(nullptr) {
+    DoubleListNode() : val( -1 ), left(nullptr), right(nullptr) {
 
     }
-    DoubleListNode(int val) : m_nValue( val ), left(nullptr), right(nullptr) {
+    DoubleListNode(int val) : val( val ), left(nullptr), right(nullptr) {
 
     }
 };

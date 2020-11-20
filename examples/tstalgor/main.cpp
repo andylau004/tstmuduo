@@ -1334,10 +1334,10 @@ ListNode* IsCycle(ListNode *pHead) {
 //        int iPos = setNodes.insert(pnode).second;
 //        if ( iPos ) {
 //            pnode = pnode->next_;
-//            std::cout << "" << iPos << " insert success! nodeval=" << pnode->m_nValue << std::endl;
+//            std::cout << "" << iPos << " insert success! nodeval=" << pnode->val << std::endl;
 //        }
 //        else {
-//            std::cout << "" << iPos << " insert duplicate! nodeval=" << pnode->m_nValue << std::endl;
+//            std::cout << "" << iPos << " insert duplicate! nodeval=" << pnode->val << std::endl;
 //            return pnode;
 //        }
 //    }
@@ -1392,7 +1392,7 @@ void check_cyclelist() {
     if (!pNode) {
         std::cout << "pNode is null" << std::endl;
     } else {
-        std::cout << "val=" << pNode->m_nValue << std::endl;
+        std::cout << "val=" << pNode->val << std::endl;
     }
 }
 
@@ -3137,7 +3137,7 @@ void tst_multimap( ) {
         m_map.insert(make_pair(s1,50));
 
         //方式1
-        int k = 0;
+        // int k = 0;
         multimap<string,int>::iterator m, beg, end;
 //        m = m_map.find(s1);
 
@@ -3449,7 +3449,7 @@ ListNode* mergeTwoList(ListNode* l1, ListNode* l2) {
     if (!l1) return l2;
     if (!l2) return l1;
     ListNode* h;
-    if (l1->m_nValue <= l2->m_nValue) {
+    if (l1->val <= l2->val) {
         h = l1;
         l1->next_ = mergeTwoList(l1->next_, l2);
     } else {
@@ -3792,7 +3792,7 @@ void Test_DetectListCycle() {
     // make list cycle --- --- ---
     ListNode* tmp = listHead;
     while (1) {
-        if ( tmp->m_nValue == 16 ) {
+        if ( tmp->val == 16 ) {
             tmp->next_ = listHead;
             break;
         }
@@ -3802,7 +3802,7 @@ void Test_DetectListCycle() {
     //  --- --- --- --- --- ---
 
     auto retNode = DetectListCycle(listHead);
-    std::cout << "retnod=" << retNode->m_nValue << std::endl;
+    std::cout << "retnod=" << retNode->val << std::endl;
 }
 
 
@@ -3996,7 +3996,7 @@ ListNode* mergeKLists_pri_que(vector<ListNode*>& lists)  {
 
     struct cmp {
         bool operator() (ListNode* a, ListNode* b) {
-            return a->m_nValue > b->m_nValue;
+            return a->val > b->val;
         }
     };
 
@@ -4311,7 +4311,7 @@ public:
         CreateBstTree();
         printInorder(g_pBstTree);
         std::cout << std::endl;
-        
+
         int k = 3;
         dfs(g_pBstTree, k);
 
@@ -4321,7 +4321,7 @@ public:
 };
 
 /*
-    给定一棵二叉搜索树，请找出其中第k小的结点。
+    给定一棵二叉搜索树，请找出其中第k小的结点
 */
 class CKthLeaest_FromBstTree {
 public:
@@ -4350,7 +4350,7 @@ public:
 
         auto ret = KthNode(g_pBstTree, 3);
         std::cout << "Kth least node=" << ret->val << std::endl;
-        std::cout << std::endl;
+        // std::cout << std::endl;
     }
 };
 
@@ -4428,6 +4428,8 @@ public:
         path.pop_back(); // 递归回溯退回父节点，在路径上要删除当前节点
     }
     std::vector< std::vector<int> > pathSum(BstNode* root, int sum) {
+        std::vector< std::vector<int> > a;
+        return a;
     }
 };
 
@@ -4608,7 +4610,6 @@ public:
     void Test_mirrorTree() {
         std::vector<int> vecData{4, 2, 7, 1, 3, 6, 9};
         CreateBstTree(vecData);
-        // CreateBstTree();
     
 std::cout << "before mirror ..." << std::endl;
         printInorder(g_pBstTree);
@@ -4792,12 +4793,143 @@ public:
     }
 };
 
+class CKthSmallest_FromBstTree {
+public:
+    int ans;
+    CKthSmallest_FromBstTree() : ans(-1) {}
+public:
+    void dfs(BstNode* root, int& k) {
+        if (!root) return;
+        {
+            dfs(root->left, k);
+            k --;
+            if (k == 0) ans = root->val;
+            if (k > 0) dfs(root->right, k);
+            return ;
+        }
+    }
+    int CKthSmallest() {
+        CreateBstTree();
+        printInorder(g_pBstTree);
+        std::cout << std::endl;
+        
+        int k = 3;
+        dfs(g_pBstTree, k);
+
+        std::cout << "CKthSmallest=" << ans << std::endl;
+        return 1;
+    }
+};
+void Test_CKthSmallest() {
+    CKthSmallest_FromBstTree cskt;
+    cskt.CKthSmallest();
+    // return;
+    {
+        CKthLeaest_FromBstTree klnode;
+        klnode.Test_KthNode();
+    }
+}
+
+/*
+给出两个 非空 的链表用来表示两个非负的整数。
+其中，它们各自的位数是按照 逆序 的方式存储的，并且它们的每个节点只能存储 一位 数字。
+
+如果，我们将这两个数相加起来，则会返回一个新的链表来表示它们的和。
+
+您可以假设除了数字 0 之外，这两个数都不会以 0 开头。
+
+示例：
+输入：(2 -> 4 -> 3) + (5 -> 6 -> 4)
+输出：7 -> 0 -> 8
+原因：342 + 465 = 807
+*/
+class Solution_addTwoNumbers {
+public:
+    ListNode* addTwoNumbers(ListNode* l1, ListNode* l2) {
+        ListNode* head = new ListNode(-1);
+        ListNode* h = head;
+        int  sum   = 0;
+        bool carry = false;
+
+        while (l1 || l2) {
+            sum = 0;
+            if (l1) {
+                sum += l1->val;
+                l1 = l1->next_;
+            }
+            if (l2) {
+                sum += l2->val;
+                l2 = l2->next_;
+            }
+            if (carry) {
+                sum ++;
+            }
+            h->next_ = new ListNode(sum % 10);
+            h = h->next_;
+            carry = sum > 10 ? true : false;
+        } // end --- while
+        if (carry) {
+            h->next_ = new ListNode(1);
+        }
+        return head->next_;
+    }
+    void Test_addTwoNumber() {
+        std::vector<int> v1{9, 1, 3};
+        std::vector<int> v2{8, 2, 9};
+
+        auto l1 = ConstructTestList(v1);
+        auto l2 = ConstructTestList(v2);
+        auto ret = addTwoNumbers(l1, l2);
+        PrintList(ret);
+    }
+};
+void Test_addTwoNumber() {
+    Solution_addTwoNumbers sa;
+    sa.Test_addTwoNumber();
+}
+
+/* 
+    寻找两个正序数组的中位数
+给定两个大小为 m 和 n 的正序（从小到大）数组 nums1 和 nums2。请你找出并返回这两个正序数组的中位数。
+
+进阶：你能设计一个时间复杂度为 O(log (m+n)) 的算法解决此问题吗？
+
+示例 1：
+输入：nums1 = [1,3], nums2 = [2]
+输出：2.00000
+解释：合并数组 = [1,2,3] ，中位数 2
+
+示例 2：
+输入：nums1 = [1,2], nums2 = [3,4]
+输出：2.50000
+解释：合并数组 = [1,2,3,4] ，中位数 (2 + 3) / 2 = 2.5
+
+示例 3：
+输入：nums1 = [0,0], nums2 = [0,0]
+输出：0.00000
+
+示例 4：
+输入：nums1 = [], nums2 = [1]
+输出：1.00000
+
+示例 5：
+输入：nums1 = [2], nums2 = []
+输出：2.00000
+*/
+double findMedianSortedArrays(vector<int>& nums1, vector<int>& nums2) {
+    double ret = 0;
+
+    return ret;
+}
+
+
 int main(int argc, char *argv[])
 {
     Logger::setLogLevel(Logger::DEBUG);
     LOG_INFO << "pid = " << getpid() << ", tid=" << CurrentThread::tid();
 
-    
+    Test_addTwoNumber(); return 1;
+    Test_CKthSmallest(); return 1;
     Test_levelOrder_1(); return 1;
 
     Test_maxDepth(); return 1;
@@ -4808,12 +4940,7 @@ int main(int argc, char *argv[])
     Test_isBalanced(); return 1;
     Test_isValidBst(); return 1;
 
-    CKthLeaest_FromBstTree klnode;
-    klnode.Test_KthNode();
-    return 1;
-
-    CPathSum pathsum;
-    return 1;
+    CPathSum pathsum; return 1;
 
     CEncDecBstTree cEnDeTree;
     cEnDeTree.TestSerial();
@@ -4825,7 +4952,6 @@ int main(int argc, char *argv[])
 
     Test_oddEvenList(); return 1;
 //  tst_randEx();    return 1;
-
 
     findKth(); return 1;
 
@@ -4981,7 +5107,6 @@ int main(int argc, char *argv[])
 
 //    tst_my_bst_1(); return 1;
 
-
     binary_search_wrap(); return 1;
 
     tst_qs_new(); return 1;
@@ -4991,8 +5116,6 @@ int main(int argc, char *argv[])
     tst_lower_upper(); return 1;
 
     tst_O1_age(); return 1;
-
-    Opr_Bst(); return 1;
 
     tst_reverse_str(); return 1;
 
@@ -5086,8 +5209,6 @@ std::cout << "c" << std::endl;
     tstMemoryLeak(); return 1;
 
     // std::cout << "s_val=" << ++ s_val << std::endl;
-    
-
 
     tst_rand(); return 1;
     tst_cpy_data();  return 1;
@@ -5132,14 +5253,10 @@ std::cout << "c" << std::endl;
 
     tst_pri_queue_1(); return 1;
     tst_class_1(); return 1;
-    return 1;
-
 
     tst_host_net_shunxu(); return 1;
-//
 
     tst_int64_1(); return 1;
-
 
 //     std::string addFile_      = "insert into @table 
 // (fileId,pid,ownerId,fileName,fileType,fileSuffix,filePath,fileSize,encryptFileSize,secretKey,
@@ -5151,11 +5268,8 @@ std::cout << "c" << std::endl;
 // return 1;
 
     tst_sort_3(); return 1;
-
-//    tst_sort_2();
-//    return 1;
-    tst_sort_1();
-    return 1;
+//    tst_sort_2(); return 1;
+    tst_sort_1(); return 1;
 }
 
 

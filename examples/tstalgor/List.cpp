@@ -6,7 +6,7 @@
 ListNode* CreateListNode(int value)
 {
     ListNode* pNode = new ListNode();
-    pNode->m_nValue = value;
+    pNode->val = value;
     pNode->next_ = NULL;
 
     return pNode;
@@ -23,7 +23,7 @@ void PrintListNode(ListNode* pNode) {
     if (pNode == NULL) {
         printf("The node is NULL\n");
     } else {
-        printf("The key in node is %d.\n", pNode->m_nValue);
+        printf("The key in node is %d.\n", pNode->val);
     }
 }
 
@@ -32,7 +32,7 @@ void PrintList(ListNode* pHead)
 //    printf("PrintList starts.\n");
     printf("\n");
     while (pHead) {
-        printf("%d\t", pHead->m_nValue);
+        printf("%d\t", pHead->val);
         pHead = pHead->next_;
     }
     printf("\n");
@@ -68,15 +68,15 @@ void RemoveNode(ListNode** pHead, int delVal)
         return;
 
     ListNode* pToBeDel = NULL;
-    if ( (*pHead)->m_nValue == delVal ) {
+    if ( (*pHead)->val == delVal ) {
         pToBeDel = *pHead;
         *pHead = (*pHead)->next_;
     } else {// 运行到此处，pHead的值必然不等于查找值, 只能比较next的值跟查找值
         ListNode* pNode = *pHead;
-        while (pNode && pNode->next_->m_nValue != delVal)
+        while (pNode && pNode->next_->val != delVal)
             pNode = pNode->next_;
 
-        if (pNode && pNode->next_->m_nValue == delVal) {
+        if (pNode && pNode->next_->val == delVal) {
             pToBeDel = pNode->next_;
             pNode->next_ = pNode->next_->next_;
         }

@@ -36,7 +36,7 @@ void print_my_ex(BinaryTreeNode* pRoot) {
 
     while (!nodes.empty()) {
         BinaryTreeNode* pNode = nodes.front();
-        printf("%d ", pNode->m_nValue);
+        printf("%d ", pNode->val);
 
         if (pNode->m_pLeft) {
             nodes.push(pNode->m_pLeft);
@@ -72,7 +72,7 @@ void Print(BinaryTreeNode* pRoot)
     while(!nodes.empty())
     {
         BinaryTreeNode* pNode = nodes.front();
-        printf("%d ", pNode->m_nValue);
+        printf("%d ", pNode->val);
 
         if(pNode->m_pLeft != NULL)
         {
@@ -104,7 +104,7 @@ void PrintEx(BinaryTreeNode* pRoot) {
     q.push(pRoot);
 
     while (!q.empty()) {
-        p = q.front(); q.pop(); printf("%d ", p->m_nValue);
+        p = q.front(); q.pop(); printf("%d ", p->val);
         if (p->m_pLeft)
             q.push(p->m_pLeft);
         if (p->m_pRight)
@@ -124,7 +124,7 @@ void PrintMy(BinaryTreeNode* pRoot) {
     do {
         node = q.front(); q.pop();
         if (node) {
-            printf("%d ", node->m_nValue);
+            printf("%d ", node->val);
 
             if (node->m_pLeft)
                 q.push(node->m_pLeft);
@@ -148,7 +148,7 @@ void PrintMy(BinaryTreeNode* pRoot) {
 //        rear = 0;
 //        while (front < rear) {
 //            p = queue[++front];
-//            printf("%d ", p->m_nValue);
+//            printf("%d ", p->val);
 
 //            if (p->m_pLeft)
 //                queue[++rear] = p->m_pLeft;
