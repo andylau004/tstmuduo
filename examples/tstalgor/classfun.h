@@ -10,7 +10,7 @@
 extern int tst_class_a();
 
 
-static int s_val = 1024;
+// static int s_val = 1024;
 
 
 

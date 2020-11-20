@@ -17,6 +17,22 @@ public:
     }
 };
 
+struct DoubleListNode {
+public:
+    int       m_nValue;
+    DoubleListNode* left;
+    DoubleListNode* right;
+
+public:
+    DoubleListNode() : m_nValue( -1 ), left(nullptr), right(nullptr) {
+
+    }
+    DoubleListNode(int val) : m_nValue( val ), left(nullptr), right(nullptr) {
+
+    }
+};
+
+
 //#define open TRUE
 
 #ifdef open

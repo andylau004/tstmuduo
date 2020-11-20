@@ -1608,7 +1608,7 @@ void tst_some_one_1()
 
 //     char* s = returnstr();
 //     printf("%s\n",s);
-// }
+}
 
 //#define f(a,b) a##b
 
@@ -1626,7 +1626,8 @@ void tst_some_one_1()
 //#define _CONS(a, b) int(a##+##b)
 //#define _STRI(s) #s
 
-void tst_111() {
+void tst_111()
+{
 //    std::cout << "a###b=" << f(1, 2) << std::endl;
 //    printf( "a###b=%d\n", f(1,2) );
 
@@ -1642,7 +1643,6 @@ void tst_111() {
 //    std::cout << _CONS(1+2, 2) << std::endl;  //输出: 3
 //    std::cout << _STRI(INT_MAX) << std::endl; //输出: INT_MAX
 //    std::cout << STRI(INT_MAX) << std::endl; // prints : 2147483647
-
 }
 
 class CSomeStatic {
@@ -4481,13 +4481,11 @@ void Test_isValidBst() {
     long long pre = LONG_MIN;
     pre = 0;
     std::cout << "pre=" << pre << std::endl;
-
     std::cout << "valid res=" << isValidBst(g_pBstTree, pre) << std::endl;
     std::cout << std::endl;
 
     std::cout << "isBalanced=" << isBalanced(g_pBstTree) << std::endl;
     std::cout << std::endl;
-
 }
 
 // 卖股票的最好时机
@@ -4735,9 +4733,59 @@ void Test_levelOrder_1() {
 示例 2：
 输入: [1,3,2,6,5]
 输出: true
-*/
-// 
 
+解题思路
+1.最后一个节点为根节点
+2.左边的节点全部要小于根，右边的节点全部要大于根，因此数组可以分成两个区间，前半部分全部小于根，后半部分全部大于根
+3.找到两个区间的分割点，判断分割后的两个区间是否也符合
+*/
+class CheckPostOrder {
+    bool Dfs(int start, int end, vector<int>& postorder) {
+        if (start >= end) return true;
+        
+        int rootval = postorder[end];//最后一个为根节点，前半段小于根，后半段大于根
+        int pos = start;
+        while (postorder[pos] < rootval) pos ++;
+
+        for ( ; pos < end; pos ++ ) {// 右子树内，所有节点必须大于根节点值
+            if ( postorder[pos] <= rootval ) return false;
+        }
+
+        return Dfs(start, pos - 1, postorder) && Dfs(pos, end - 1, postorder);
+    }
+public:
+    bool verifyPostorder(vector<int>& postorder) {
+        if (postorder.size() < 2) return true;
+        return Dfs(0, postorder.size() - 1, postorder);      
+    }
+};
+
+/*
+    我们希望将二叉搜索树转化为双向循环链表。
+    链表中的每个节点都有一个前驱和后继指针。
+    对于双向循环链表，第一个节点的前驱是最后一个节点，最后一个节点的后继是第一个节点。
+*/
+class CBstTreeToDoubleList {
+    DoubleListNode* head, *tail;
+
+    void transfer(BstNode* root) {
+        if (!root) return;
+        transfer(root->left);
+        if (!head) {
+            head = root;
+        } else {
+
+        }
+
+    }
+public:
+    void TreeToDoubleList(BstNode* root) {
+        DoubleListNode* tmp;
+
+        transfer(root);
+
+    }
+};
 
 int main(int argc, char *argv[])
 {
@@ -5032,7 +5080,7 @@ std::cout << "c" << std::endl;
     tst_boostBind_1(); return 1;
     tstMemoryLeak(); return 1;
 
-    std::cout << "s_val=" << ++ s_val << std::endl;
+    // std::cout << "s_val=" << ++ s_val << std::endl;
     
 
 
@@ -5088,10 +5136,10 @@ std::cout << "c" << std::endl;
     tst_int64_1(); return 1;
 
 
-//     std::string addFile_      = "insert into @table \
-// (fileId,pid,ownerId,fileName,fileType,fileSuffix,filePath,fileSize,encryptFileSize,secretKey,\
-// uploaderId,uploaderName,md5Hash,sha1Hash,createdAt,updatedAt,deletedAt,fileCode,orderNum,\
-// roleId,members,fileReMark,pdfPath,validity,fileClass) \
+//     std::string addFile_      = "insert into @table 
+// (fileId,pid,ownerId,fileName,fileType,fileSuffix,filePath,fileSize,encryptFileSize,secretKey,
+// uploaderId,uploaderName,md5Hash,sha1Hash,createdAt,updatedAt,deletedAt,fileCode,orderNum,
+// roleId,members,fileReMark,pdfPath,validity,fileClass) 
 // values (?,?,?,?,?,?,?)";
 //     std::cout << "addFile_=" <<  addFile_ << std::endl;
 //     ConstructInsertSql( addFile_ );
