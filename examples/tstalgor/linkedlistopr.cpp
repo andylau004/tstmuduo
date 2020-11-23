@@ -13,12 +13,13 @@
 #include <boost/scoped_ptr.hpp>
 //#include <Windows.h>
 
+#include "leetcode.h"
+
 #include "boost_use_1.h"
 
-#include "muduo/base/Timestamp.h"
-//#include <muduo/base/Timestamp.h>
-
 #include "muduo/base/common.h"
+#include "muduo/base/Timestamp.h"
+
 
 
 
@@ -26,7 +27,7 @@ using namespace std;
 using namespace muduo;
 //using namespace muduo::net;
 
-struct TreeNode;
+// struct TreeNode;
 void PrintDoubleLinkedList(TreeNode* pHeadOfList);
 
 
@@ -155,12 +156,12 @@ void reverse_linjin_node() {
 
 
 //二叉树的树结构
-struct TreeNode{
-    int val;
-    TreeNode* left;
-    TreeNode* right;
-    TreeNode(int t) : val(t), left(NULL), right(NULL) {}
-};
+// struct TreeNode{
+//     int val;
+//     TreeNode* left;
+//     TreeNode* right;
+//     TreeNode(int t) : val(t), left(NULL), right(NULL) {}
+// };
 
 //有序数组转成平衡二叉树
 //也是一个递归的过程，每次都把数组分为两个部分，

@@ -36,14 +36,6 @@ extern BstNode* g_pBstTree;
 // 思路：
 // 给定一个区间[left, right]，取其中值mid=(left+right)/2对应的元素作为二叉树的根。二叉树的左子树根的值为对[left, mid-1]继续操作的结果，右子树类似。
 
-struct TreeNode {
-    int val;
-    TreeNode* left;
-    TreeNode* right;
-    TreeNode(int x) : val(x), left(nullptr), right(nullptr) {
-    }
-};
-
 void someInOrder(TreeNode* root);
 void InOrtderPtrint(TreeNode* root);
 

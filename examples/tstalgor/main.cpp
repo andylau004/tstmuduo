@@ -2419,23 +2419,23 @@ std::vector< std::vector<int> > levelOrder_new(BstNode* root) {
     std::vector< std::vector<int> > result;
     if (!root) return result;
 
-    std::vector < BstNode* > nodeStack;
-    nodeStack.push_back( root );
+    std::vector < BstNode* > vecNodes;
+    vecNodes.push_back( root );
 
-    while (nodeStack.size()) {
+    while (vecNodes.size()) {
         std::vector<int> values;
         std::vector< BstNode* > nextLevel;
 
-        for ( auto node : nodeStack ) {
+        for ( auto node : vecNodes ) {
             values.push_back(node->val);
         }
 
-        for ( auto node : nodeStack ) {
+        for ( auto node : vecNodes ) {
             if (node->left) nextLevel.push_back(node->left);
             if (node->right) nextLevel.push_back(node->right);
         }
 
-        nodeStack = nextLevel;
+        vecNodes = nextLevel;
         result.push_back(values);
     }
     return result;
@@ -3700,9 +3700,8 @@ void Test_stackToQueue() {
     如果 pp 和 qq 都存在，则返回它们的公共祖先；
     如果只存在一个，则返回存在的一个；
     如果 pp 和 qq 都不存在，则返回NULL
-    本题说给定的两个节点都存在，那自然还是能用上面的函数来解决
 
-    具体思路：
+    思路：
     （1） 如果当前结点 root 等于 NULL，则直接返回 NULL
     （2） 如果 root 等于 pp 或者 qq ，那这棵树一定返回 pp 或者 qq
     （3） 然后递归左右子树，因为是递归，使用函数后可认为左右子树已经算出结果，用 left 和 right 表示
@@ -3712,28 +3711,28 @@ void Test_stackToQueue() {
 
     时间复杂度是 O(n)：每个结点最多遍历一次或用主定理，空间复杂度是 O(n)：需要系统栈空间
 */
-int lowestCommonAncestor(BstNode* root, int o1, int o2) {
-    if (!root) return -1;
-    if (root->val == o1 || root->val == o2) return root->val;
+TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q) {
+    if (!root || root == p || root == q) return root;
 
-    int left  = lowestCommonAncestor(root->left, o1, o2);
-    int right = lowestCommonAncestor(root->right, o1, o2);
-
-    if (left != -1 && right != -1) {
-        return root->val;
-    } else if (left != -1) {
-        return left ;
-    } else if (right != -1) {
-        return right;
-    } else {
-        return -1;
-    }
+    auto leftNode  = lowestCommonAncestor(root->left, p, q);
+    auto rightNode = lowestCommonAncestor(root->right, p, q);
+    if (leftNode && rightNode) { return root; }
+    return leftNode ? leftNode : rightNode;
 }
 // 二叉搜索树 版本，跟二叉树版本实现逻辑不太一样；
-//int lowestCommonAncestor_Bst(TreeNode* root, int o1, int o2) {
-//    if (root == nullptr) return -1;
-//    if (root->val == o1 || root->val == o2) return root->val;
+BstNode* lowestCommonAncestor_Bst(BstNode* root, BstNode* p, BstNode* q) {
+    if ( root == nullptr ) return nullptr;
 
+    if ( p->val > root->val && q->val > root->val ) {
+        return lowestCommonAncestor_Bst(root->right, p, q);
+    }
+    else if ( p->val < root->val && q->val < root->val ) {
+        return lowestCommonAncestor_Bst(root->left, p, q);
+    }
+    else {
+        return root;
+    }
+        
 //    if ( (root->val - o1) * ( root->val - o2 ) <= 0 ) {
 //        return root->val;
 //    } else if ( (root->val < o1)  &&  ( root->val < o2 ) ) {
@@ -3741,7 +3740,7 @@ int lowestCommonAncestor(BstNode* root, int o1, int o2) {
 //    } else {
 //        return lowestCommonAncestor_Bst( root->left, o1, o2  );
 //    }
-//}
+}
 
 void Test_lowestCommonAncestor() {
 }
@@ -4039,7 +4038,7 @@ ListNode* merge(vector<ListNode*>& lists, int start, int end){
 1->1->2->3->4->4->5->6
 */
 void Test_mergeKLists() {
-    int listcount = 3;
+    // int listcount = 3;
     // vector<ListNode*> lists = ConstructTestListByParam(1, 3000, 4, listcount);
 
     vector<ListNode*> lists;
@@ -4116,21 +4115,21 @@ public:
 
     }
     
-    void push(int x) {
+    // void push(int x) {
 
-    }
+    // }
     
-    void pop() {
+    // void pop() {
 
-    }
+    // }
     
-    int top() {
+    // int top() {
 
-    }
+    // }
     
-    int min() {
+    // int min() {
 
-    }
+    // }
 };
 
 
@@ -4184,7 +4183,7 @@ int numIslands(vector<vector<char>>& grid) {
     返回它的最大深度=3
 */
 int maxDepth_Recur(BstNode* root) {
-    if ( nullptr == root ) return 0;
+    if (!root) return 0;
     int lDepth = maxDepth_Recur(root->left);
     int rDepth = maxDepth_Recur(root->right);
     int ret = 1 + std::max(lDepth, rDepth);
@@ -4196,36 +4195,18 @@ int maxDepth_NoRecur(BstNode* root) {
         int depth = 0;
         std::queue<BstNode*> que;
         que.push(root);
-
         while (!que.empty()) {
+            depth ++;
             size_t sz = que.size();
             while (sz > 0) {
                 BstNode* tmp = que.front(); que.pop();
-                if (tmp->left)  que.push(tmp->left);
-                if (tmp->right) que.push(tmp->right);
+                if (tmp->left) que.push(tmp->left);
+                if (tmp->right)que.push(tmp->right);
                 sz --;
             }
-            depth ++;
         }
         return depth;
     }
-    if (nullptr == root) return 0;
-    
-    int ans = 0;
-    std::queue < BstNode* > que;
-    que.push(root);
-    
-    while (!que.empty()) {
-        int sz = que.size();
-        while ( sz > 0 ) {
-            BstNode* tmp = que.front(); que.pop();
-            if (tmp->left) que.push(tmp->left);
-            if (tmp->right) que.push(tmp->right);
-            sz -= 1;
-        }
-        ans += 1;
-    }
-    return ans;
 }
 void Test_maxDepth() {
         // std::vector<int> vecData{4, 2, 7, 1, 3, 6, 9};
@@ -4261,11 +4242,15 @@ void Test_oddEvenList() {
     PrintList(ret);
 }
 
-    void printInorder(BstNode* root) {
+    void impl_prinInorder(BstNode* root) {
         if (!root) return;
-        if (root->left) printInorder(root->left);
+        if (root->left) impl_prinInorder(root->left);
         std::cout << " " << root->val;
-        if (root->right) printInorder(root->right);
+        if (root->right) impl_prinInorder(root->right);
+    }
+    void printInorder(BstNode* root) {
+        impl_prinInorder(root);
+        std::cout << std::endl;
     }
     void extractNodeInorder(BstNode* root, std::vector<BstNode*>& retVec) {
         if (!root) return;
@@ -4386,6 +4371,7 @@ public:
         //     std::cout << "out=" << out.str().c_str() << std::endl;
         // }
         // return out.str();
+        return "";
     }
 };
 
@@ -4601,29 +4587,29 @@ class CMirrorBst {
     }
 public:
     BstNode* mirrorTree(BstNode* root) {
-        if ( !root || (!root->left && !root->right) ) return nullptr;
+        if (!root || (!root->left && !root->right)) return nullptr;
         swapNode(root);
         mirrorTree(root->left);
         mirrorTree(root->right);
         return root;
     }
-    void Test_mirrorTree() {
+    void impl_mirrorTree() {
         std::vector<int> vecData{4, 2, 7, 1, 3, 6, 9};
         CreateBstTree(vecData);
     
-std::cout << "before mirror ..." << std::endl;
+        std::cout << "before mirror ..." << std::endl;
         printInorder(g_pBstTree);
         std::cout << std::endl;
 
-std::cout << "after mirror ..." << std::endl;
-auto mirror = mirrorTree(g_pBstTree);
+        std::cout << "after mirror ..." << std::endl;
+        auto mirror = mirrorTree(g_pBstTree);
         printInorder(mirror);
         std::cout << std::endl;
     }
 };
 void Test_mirrorTree() {
     CMirrorBst cm;
-    cm.Test_mirrorTree();
+    cm.impl_mirrorTree();
 }
 
 /*
@@ -4922,20 +4908,198 @@ double findMedianSortedArrays(vector<int>& nums1, vector<int>& nums2) {
     return ret;
 }
 
+/*
+7. 整数反转
+给出一个 32 位的有符号整数，你需要将这个整数中每位上的数字进行反转。
+
+示例 1:
+输入: 123
+输出: 321
+ 
+ 示例 2:
+输入: -123
+输出: -321
+
+ 示例 3:
+输入: 120
+输出: 21
+注意:假设我们的环境只能存储得下 32 位的有符号整数，则其数值范围为 [−231,  231 − 1]。
+请根据这个假设，如果反转后整数溢出那么就返回 0。
+*/
+int reverseInt(int x) {
+    int res = 0;
+    do {
+        if (res > INT_MAX / 10 || res  < INT_MIN / 10)  return 0; //溢出判定
+        res = res * 10 + x % 10;   
+    } while (x /= 10);
+    return res;
+}
+void Test_reverseInt() {
+    std::cout << "ret=" << reverseInt(-1998) << std::endl;
+    std::cout << "ret=" << reverseInt(INT_MAX) << std::endl;
+}
+
+/*
+938. 二叉搜索树的范围和
+给定二叉搜索树的根结点 root，返回值位于范围 [low, high] 之间的所有结点的值的和。
+
+示例 1：
+输入：root = [10,5,15,3,7,null,18], low = 7, high = 15
+输出：32
+示例 2：
+
+输入：root = [10,5,15,3,7,13,18,1,null,6], low = 6, high = 10
+输出：23
+*/
+int rangeSumBST(BstNode* root, int low, int high) {
+    if (!root) return 0;
+    if (root->val < low) {
+        return rangeSumBST(root->right, low, high);
+    } else if ( root->val > high ) {
+        return rangeSumBST(root->left, low, high);
+    }
+    return root->val + rangeSumBST(root->left, low, high) + rangeSumBST(root->right, low, high);
+}
+void Test_rangeSumBST() {
+    CreateBstTree();
+    
+    std::cout << "before handle ..." << std::endl;
+    printInorder(g_pBstTree);
+    std::cout << std::endl;
+}
+
+
+/*
+给定二叉搜索树（BST）的根节点和一个值。
+你需要在BST中找到节点值等于给定值的节点, 返回以该节点为根的子树。
+如果节点不存在，则返回 NULL。
+
+例如: 给定二叉搜索树:
+        4
+       / \
+      2   7
+     / \
+    1   3
+和值: 2
+
+你应该返回如下子树:
+
+      2     
+     / \   
+    1   3
+在上述示例中，如果要找的值是 5，但因为没有节点值为 5，我们应该返回 NULL。
+*/
+class CSearchBst {
+    int kthVal;
+
+    void getKthVal(BstNode* root, int& k) {
+        if (!root) return;
+        if (root->left) getKthVal(root->left, k);
+        k --;
+        if (k == 0) {
+            kthVal = root->val; return ;
+        }
+        if (root->right) getKthVal(root->right, k);
+    }
+
+    BstNode* searchBST(BstNode* root, int val) {
+        if (!root || root->val == val) return root;
+        if (root->val > val) return searchBST(root->left, val);
+        if (root->val < val) return searchBST(root->right, val);
+        return nullptr;
+    }
+
+public:
+    void Test_searchBst() {
+        CreateBstTree();
+        std::cout << "before handle ..." << std::endl;
+        printInorder(g_pBstTree);
+
+        int idx = 0;
+        while (idx == 0) {
+            idx = rand() % 10;
+        } 
+        std::cout << "idx=" << idx << std::endl;
+        getKthVal(g_pBstTree, idx);
+
+        std::cout << std::endl;
+        auto node = searchBST(g_pBstTree, kthVal);
+        std::cout << node->val << std::endl;
+    }
+};
+
+void levelOrderPrint(BstNode* root) {
+    if (!root) return;
+    
+    std::vector< std::vector<int> > res;
+
+    std::queue< BstNode* > qNodes;
+    qNodes.push(root);
+
+    while (qNodes.size()) {
+        
+        std::vector<int> vecLevel;
+        size_t sz = qNodes.size();
+
+        for ( size_t i = 0; i < sz; i ++ ) {
+            BstNode* t = qNodes.front(); qNodes.pop();
+            if (!t) continue;
+
+            vecLevel.push_back( t->val );
+            if (t->left)  vecLevel.push_back( t->left->val );
+            if (t->right) vecLevel.push_back( t->right->val );
+        }
+
+        res.push_back(vecLevel);
+    }
+
+    // res is result ...
+}
+
+/*
+    剑指 Offer 52. 两个链表的第一个公共节点
+
+*/
+ListNode *getIntersectionNode(ListNode *headA, ListNode *headB) {
+
+    return nullptr;        
+}
+
+
+/*
+给定一个二叉树，计算整个树的坡度
+
+一个树的 节点的坡度 定义为:
+该节点左子树的节点之和 和 右子树节点之和的 差的绝对值。
+如果没有左子树的话，左子树的节点之和为0；
+没有右子树的话也是一样。空结点的坡度是0。
+
+整个树的坡度: 是其所有节点的坡度之和。
+*/
+int findTilt(TreeNode* root) {
+
+    return 1;
+}
 
 int main(int argc, char *argv[])
 {
     Logger::setLogLevel(Logger::DEBUG);
     LOG_INFO << "pid = " << getpid() << ", tid=" << CurrentThread::tid();
 
+{
+    CSearchBst csb;
+    csb.Test_searchBst(); return 1;
+}
+    Test_rangeSumBST(); return 1;
+    Test_mirrorTree(); return 1;
+    Test_maxDepth(); return 1;
+
+    Test_reverseInt(); return 1;
     Test_addTwoNumber(); return 1;
     Test_CKthSmallest(); return 1;
     Test_levelOrder_1(); return 1;
 
-    Test_maxDepth(); return 1;
     Test_mergeKLists(); return 1;
-
-    Test_mirrorTree(); return 1;
 
     Test_isBalanced(); return 1;
     Test_isValidBst(); return 1;
