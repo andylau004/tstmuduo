@@ -102,3 +102,13 @@ void RemoveNode(ListNode** pHead, int delVal)
         return *vecNodes.begin();
     }
 
+    int GetListLength(ListNode* listHead) {
+        if (!listHead) return 0;
+        int len = 0;;
+        while (listHead) {
+            len ++;
+            listHead = listHead->next;
+        }
+        return len;
+    }
+

@@ -54,7 +54,7 @@ isdllexport void AddToTail(ListNode** pHead, int value);
 isdllexport void RemoveNode(ListNode** pHead, int value);
 
 
-
+extern int GetListLength(ListNode* listHead);
 extern ListNode* ConstructList(std::vector<int>& vecInts);
 
 extern std::vector< ListNode* > ConstructTestListByParam(int start, int end, int numCount, int listCount);

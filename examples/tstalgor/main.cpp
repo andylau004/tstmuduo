@@ -261,6 +261,7 @@ HTTP 协议的 get 和 post 方法的区别，问得比较深的会让你画出 
 因为个人经验能力有限，而且限于篇幅，很多地方也不便详细展开，读者如果有什么想法或者指教，欢迎交流探讨。
 
 */
+ListNode* g_pListHead;
 
 
 class TestClient
@@ -2514,7 +2515,6 @@ void zhiZiPrintBstTree(BstNode* root) {
     // return result;
 }
 void Test_zhiZiPrintBstTree() {
-    CreateBstTree();
 
     zhiZiPrintBstTree(g_pBstTree);
 
@@ -4244,7 +4244,6 @@ int maxDepth_NoRecur(BstNode* root) {
 void Test_maxDepth() {
         // std::vector<int> vecData{4, 2, 7, 1, 3, 6, 9};
         // CreateBstTree(vecData);
-        CreateBstTree();
     
 std::cout << "before handle ..." << std::endl;
         printInorder(g_pBstTree);
@@ -4326,7 +4325,6 @@ public:
         if (k > 0) dfs(root->left, k);
     }
     int KthLargest_FromBstTree() {
-        CreateBstTree();
         printInorder(g_pBstTree);
         std::cout << std::endl;
 
@@ -4361,7 +4359,6 @@ public:
         return nullptr;
     }
     void Test_KthNode() {
-        CreateBstTree();
 
         printInorder(g_pBstTree);
         std::cout << std::endl;
@@ -4376,7 +4373,6 @@ public:
 class CEncDecBstTree {
 public:
     void TestSerial() {
-        CreateBstTree();
 
         printInorder(g_pBstTree);
         std::cout << std::endl;
@@ -4490,7 +4486,6 @@ bool isValidBst(BstNode* root, long long pre) {
     return isValidBst(root->right, pre);
 }
 void Test_isValidBst() {
-    CreateBstTree();
 
     // std::vector<BstNode *> retVec;
     // extractNodeInorder(g_pBstTree, retVec);
@@ -4551,9 +4546,7 @@ bool isBalancedEx(BstNode* root) {
 
     return isBalancedEx(root->left) && isBalancedEx(root->right);
 }
-void Test_isBalanced() {
-    CreateBstTree();
-    
+void Test_isBalanced() {    
     printInorder(g_pBstTree);
     std::cout << std::endl;
 
@@ -4708,7 +4701,6 @@ vector<vector<int>> levelOrder_1(BstNode* root) {
 }
 
 void Test_levelOrder_1() {
-    CreateBstTree();
 
     {
         std::cout << std::endl;
@@ -4828,7 +4820,6 @@ public:
         }
     }
     int CKthSmallest() {
-        CreateBstTree();
         printInorder(g_pBstTree);
         std::cout << std::endl;
         
@@ -4993,9 +4984,7 @@ int rangeSumBST(BstNode* root, int low, int high) {
     }
     return root->val + rangeSumBST(root->left, low, high) + rangeSumBST(root->right, low, high);
 }
-void Test_rangeSumBST() {
-    CreateBstTree();
-    
+void Test_rangeSumBST() {    
     std::cout << "before handle ..." << std::endl;
     printInorder(g_pBstTree);
     std::cout << std::endl;
@@ -5044,7 +5033,6 @@ class CSearchBst {
 
 public:
     void Test_searchBst() {
-        CreateBstTree();
         std::cout << "before handle ..." << std::endl;
         printInorder(g_pBstTree);
 
@@ -5153,7 +5141,6 @@ bool check_isSysmmetric(BstNode* p, BstNode* q) {
     return (p->val == q->val) && check_isSysmmetric(p->left, q->right) && check_isSysmmetric(p->right, q->left);
 }
 void isSymmetric() {
-    CreateBstTree();
 
 std::cout << "before check ..." << std::endl;
         printInorder(g_pBstTree);
@@ -5391,7 +5378,6 @@ public:
     CMinDiffInBst() : pre(nullptr), minVal(INT_MAX) {}
 
     void minDiffInBST() {
-        CreateBstTree();
 
 std::cout << "before handle ..." << std::endl;
         printInorder(g_pBstTree);
@@ -5504,6 +5490,7 @@ void Test_arraySum() {
  -10  5
 */
 class CSortedListToBst {
+private:
 
     ListNode* getMidNode(ListNode* left, ListNode* right) {
         ListNode* fast = left;
@@ -5527,29 +5514,98 @@ class CSortedListToBst {
         return root;
     }
 public:
+    CSortedListToBst() {
+    }
     void sortedListToBST() {
-        std::vector<int> l{ 13, 21, 98, 100, 518, 10000, 77612};
-
-        auto head = ConstructList(l);
-        g_pBstTree = buildBstTree(head, nullptr);
+        g_pBstTree = buildBstTree(g_pListHead, nullptr);
         printInorder();
     }
+
+
+
 };
 
+void initList() {
+    std::vector<int> l{ 13, 21, 98, 100, 518, 10000, 77612};
+    g_pListHead = ConstructList(l);
+}
+
+
+/*
+    61. 旋转链表
+    给定一个链表，旋转链表，将链表每个节点向右移动 k 个位置，其中 k 是非负数。
+
+    示例 1:
+
+    输入: 1->2->3->4->5->NULL, k = 2
+    输出: 4->5->1->2->3->NULL
+    解释:
+    向右旋转 1 步: 5->1->2->3->4->NULL
+    向右旋转 2 步: 4->5->1->2->3->NULL
+    示例 2:
+
+    输入: 0->1->2->NULL, k = 4
+    输出: 2->0->1->NULL
+    解释:
+    向右旋转 1 步: 2->0->1->NULL
+    向右旋转 2 步: 1->2->0->NULL
+    向右旋转 3 步: 0->1->2->NULL
+    向右旋转 4 步: 2->0->1->NULL
+*/
+ListNode* rotateRight(ListNode* head, int k) {
+    auto tmp = head;
+    int len = GetListLength(head);// 第 1 步：先要知道链表有多少个结点
+
+    k = k%len;
+    if (k == 0) {
+        return head;
+    }
+    ListNode* fast = head, *slow = head;
+    for ( int i = 0; i < k; i ++ ) {
+        fast = fast->next;
+    }
+    // std::cout << "fast=" << fast->val << std::endl;
+    while (fast->next) {
+        fast = fast->next;
+        slow = slow->next;
+    }
+    ListNode* newHead = slow->next;
+    slow->next = nullptr;
+    fast->next = head;
+    // std::cout << "fast=" << fast->val << std::endl;
+    // std::cout << "slow=" << slow->val << std::endl;
+    return newHead;
+}
+void Test_rotateRight() {
+    PrintList(g_pListHead);
+    std::cout << "before handle list -----" << std::endl;
+    auto newlist = rotateRight(g_pListHead, 3);
+    PrintList(newlist);
+    // PrintList(g_pListHead);
+}
 
 int main(int argc, char *argv[])
 {
+    initList();
+    CreateBstTree();
+
     Logger::setLogLevel(Logger::DEBUG);
     LOG_INFO << "pid = " << getpid() << ", tid=" << CurrentThread::tid();
 
-    // std::cout << "10%7=" << (10%7) << std::endl;
-    LeetCodeEntry(); return 1;
+    // printInorder(g_pBstTree);
+    // std::cout << std::endl;
+
+    isSymmetric();      return 1;
+
+    Test_rotateRight(); return 1;
 
 {
     CSortedListToBst c1;
     c1.sortedListToBST();
     return 1;
 }
+    LeetCodeEntry(); return 1;
+
     Test_CFindModeNum(); return 1;
 
     std::cout << "INT_MIN=" << INT_MIN << std::endl;
@@ -5617,7 +5673,6 @@ int main(int argc, char *argv[])
 
     TestRemoveNthListNode(); return 1;
 
-    CreateBstTree();
 //    std::cout << "serial ret=" << Serialize(g_pBstTree) << std::endl;
 //    return 1;
 
