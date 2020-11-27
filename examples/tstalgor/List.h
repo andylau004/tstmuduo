@@ -1,18 +1,22 @@
 #pragma once
 
 #include <stdio.h>
+#include <vector>
+
+
+
 
 
 struct ListNode {
 public:
     int       val;
-    ListNode* next_;
+    ListNode* next;
 
 public:
-    ListNode() : val( -1 ), next_(nullptr) {
+    ListNode() : val( -1 ), next(nullptr) {
 
     }
-    ListNode(int val) : val( val ), next_(nullptr) {
+    ListNode(int val) : val( val ), next(nullptr) {
 
     }
 };
@@ -48,3 +52,10 @@ isdllexport void PrintList(ListNode* pHead);
 isdllexport void DestroyList(ListNode* pHead);
 isdllexport void AddToTail(ListNode** pHead, int value);
 isdllexport void RemoveNode(ListNode** pHead, int value);
+
+
+
+extern ListNode* ConstructList(std::vector<int>& vecInts);
+
+extern std::vector< ListNode* > ConstructTestListByParam(int start, int end, int numCount, int listCount);
+

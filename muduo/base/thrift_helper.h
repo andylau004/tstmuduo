@@ -274,6 +274,7 @@ inline void write_thrift_debug_log(const char* log)
 
 inline void write_thrift_info_log(const char* log)
 {
+    UNUSED(log);
     //    if (::mooon::sys::g_logger != NULL)
     //    {
     //        MYLOG_INFO("%s", log);

@@ -77,11 +77,11 @@ void vec_qsort( std::vector< int >& v, int head, int tail ) {
     vec_qsort( v, j + 1, tail );
 }
 
-struct ListNode {
-    int val;
-    ListNode *next;
-    ListNode(int x) : val(x), next(NULL) {}
-};
+// struct ListNode {
+//     int val;
+//     ListNode *next;
+//     ListNode(int x) : val(x), next(NULL) {}
+// };
 
 
 ListNode* swapPairs(ListNode* head) {
@@ -324,23 +324,7 @@ void PrintDoubleLinkedList(TreeNode* pHeadOfList)
     printf("\n");
 }
 
-void insert_treenode( TreeNode* pTree, int iVal ) {
-    TreeNode* pNew = new TreeNode(iVal);
 
-    TreeNode* parent = NULL;
-    TreeNode* temp   = pTree;
-
-    while (temp) {
-        parent = temp;
-        if (pNew->val > temp->val) {
-            temp = temp->right;
-        } else {
-            temp = temp->left;
-        }
-    }
-
-
-}
 void tst_link_1() {
 
     // 先对数组容器排序，把数组转换为二叉树，二叉树转换为双向链表

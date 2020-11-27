@@ -30,6 +30,8 @@
 #include <limits>
 #include <iostream>
 
+#include <unordered_map>
+
 
 #include "muduo/base/common.h"
 
@@ -494,8 +496,9 @@ void tst_int64_1() {
 
     int index = 0;
     int i = 0;
-    for(i=0; i<10; i++){
-      printf("%d, %d\n", index, index++);
+    for(i=0; i<10; i++) {
+        index++;
+        printf("%d, %d\n", index, index);
     }
 
     return;
@@ -572,12 +575,14 @@ void tst_int64_1() {
 // 最大连续子数组
 
 /*
+    最大连续子数组
+
     常规方法,时间复杂度O（n*n）
     先从第一个元素开始向后累加，
     每次累加后与之前的和比较，保留最大值，
     再从第二个元素开始向后累加，以此类推。
 */
-int tst_MaxSubArray(int* array, int length) {
+int Test_MaxSubArray(int* array, int length) {
     int maxSum = 0;
     int curSum = 0;
 
@@ -799,11 +804,11 @@ void tst_pri_queue_1() {
     }
     std::cout << std::endl;
 
-    typedef struct  _tagNode
-    {
-        int m_val;
-         _tagNode() : m_val(-1) {}
-    }Node;
+    // typedef struct  _tagNode
+    // {
+    //     int m_val;
+    //      _tagNode() : m_val(-1) {}
+    // } Node;
 
 }
 
@@ -919,33 +924,33 @@ int foo(int in) { return 32; }
 
 //extern static int s_val;
 void tstMemoryLeak() {
-    boost::function<int(int)> func;
-    func = foo;
-    std::cout << func.empty() << std::endl;
+//     boost::function<int(int)> func;
+//     func = foo;
+//     std::cout << func.empty() << std::endl;
 
-//    func = NULL;
-    func.clear();
-    std::cout << func.empty() << std::endl;
+// //    func = NULL;
+//     func.clear();
+//     std::cout << func.empty() << std::endl;
 
-    func = boost::function<int(int)>();
-    std::cout << func.empty() << std::endl;
-    return ;
+//     func = boost::function<int(int)>();
+//     std::cout << func.empty() << std::endl;
+//     return ;
 
-    char *p = (char*)malloc(1024);
-    sprintf(p, "%s", "abcde");
-    printf("%s\n", p);
-    int *p1 = (int*)malloc(4);
-    *p1 = 100;
-    void *p2 = malloc(256);
-//    free(p1);
-    int a = 2;
-    printf("%d\n", a);
-//    free(p);
-    void *p3 = malloc(124);
-//    free(p2);
-    void *p4 = malloc(23);
-//    free(p4);
-    //    getchar();
+//     char *p = (char*)malloc(1024);
+//     sprintf(p, "%s", "abcde");
+//     printf("%s\n", p);
+//     int *p1 = (int*)malloc(4);
+//     *p1 = 100;
+//     void *p2 = malloc(256);
+// //    free(p1);
+//     int a = 2;
+//     printf("%d\n", a);
+// //    free(p);
+//     void *p3 = malloc(124);
+// //    free(p2);
+//     void *p4 = malloc(23);
+// //    free(p4);
+//     //    getchar();
 }
 
 class CTestBind {
@@ -1226,7 +1231,7 @@ void tst_lixi() {
 
     double lixi = 0;
     double tmpBenjin = g_iBenJin;
-    double sum = 0;
+    // double sum = 0;
     for ( int i = 1; i < 365; ++ i ) {
         lixi += (tmpBenjin * yuebao) / 365;
         tmpBenjin = tmpBenjin + lixi;
@@ -1274,15 +1279,15 @@ ListNode* FindKthToTail(ListNode* pListHead, unsigned int k) {
     ListNode* pFront = pListHead;
     // 倒数第k个结点与倒数第一个结点相隔k-1个位置
     for (unsigned int i = 0; i < k - 1; i ++) {
-        if (pFront->next_)
-            pFront = pFront->next_;
+        if (pFront->next)
+            pFront = pFront->next;
         else
             return NULL;
     }
     ListNode* pBehind = pListHead;
-    while (pFront->next_) {
-        pFront = pFront->next_;
-        pBehind = pBehind->next_;
+    while (pFront->next) {
+        pFront = pFront->next;
+        pBehind = pBehind->next;
     }
     return pBehind;
 }
@@ -1294,9 +1299,9 @@ ListNode* FindMidNode(ListNode* pHead) {
     ListNode* pMid  = NULL;
     ListNode* ptemp = pHead;
 
-    while (pHead && pHead->next_ && pHead->next_->next_) {
-        pHead = pHead->next_->next_;
-        ptemp = ptemp->next_;
+    while (pHead && pHead->next && pHead->next->next) {
+        pHead = pHead->next->next;
+        ptemp = ptemp->next;
         pMid = ptemp;
     }
     return pMid;
@@ -1325,7 +1330,7 @@ void call_rever_KthNode() {
 }
 
 ListNode* IsCycle(ListNode *pHead) {
-//    if (nullptr == pHead || nullptr == pHead->next_)
+//    if (nullptr == pHead || nullptr == pHead->next)
 //        return nullptr;
 
 //    std::set<ListNode*> setNodes;
@@ -1333,7 +1338,7 @@ ListNode* IsCycle(ListNode *pHead) {
 //    while (pnode) {
 //        int iPos = setNodes.insert(pnode).second;
 //        if ( iPos ) {
-//            pnode = pnode->next_;
+//            pnode = pnode->next;
 //            std::cout << "" << iPos << " insert success! nodeval=" << pnode->val << std::endl;
 //        }
 //        else {
@@ -1349,21 +1354,21 @@ ListNode* IsCycle(ListNode *pHead) {
     ListNode* pFast = pHead;
     ListNode* pSlow = pHead;
 
-    while (pFast && pFast->next_) {
+    while (pFast && pFast->next) {
 
-        pSlow = pSlow->next_;
+        pSlow = pSlow->next;
 
-        if (pFast->next_)
-            pFast = pFast->next_->next_;
+        if (pFast->next)
+            pFast = pFast->next->next;
 
         if (pSlow == pFast)
             return pFast;
     }
     return nullptr;
 
-    while (pFast && pFast->next_) {
-        pFast = pFast->next_->next_;
-        pSlow = pSlow->next_;
+    while (pFast && pFast->next) {
+        pFast = pFast->next->next;
+        pSlow = pSlow->next;
         if (pFast == pSlow) {
             return pFast;
         }
@@ -1485,12 +1490,12 @@ ListNode* reverse_list(ListNode* pHead) {
         //做循环，如果当前节点不为空的话，始终执行此循环，此循环的目的就是让当前节点从指向next到指向pre
         //如此就可以做到反转链表的效果
         //先用next保存head的下一个节点的信息，保证单链表不会因为失去head节点的原next节点而就此断裂
-        pNext = pCur->next_;
+        pNext = pCur->next;
         if (pNext == NULL)
             pReverseHead = pCur;
 
         //保存完next，就可以让head从指向next变成指向pre了，代码如下
-        pCur->next_ = pPrev;
+        pCur->next = pPrev;
 
         pPrev = pCur;
         pCur  = pNext;
@@ -1522,7 +1527,7 @@ void swap2node_list(ListNode* listHead) {
 
         }
         stackNodes.push(cur);
-        cur = cur->next_;
+        cur = cur->next;
     }
 
 }
@@ -1842,17 +1847,16 @@ void Opr_Bst() {
 
 
 void showArr(int ages[], size_t length) {
-
-    for(int i=0;i<length;i++)
+    for(size_t i=0;i<length;i++)
         std::cout << "i=" << ages[i]<<" "<<std::endl;
-
 }
+
 void SortAges(int ages[], size_t length) {
 
     const int OldAges = 99;
     int tempArr[ OldAges + 1 ] = {0};
 
-    for (int i = 0; i < length; ++i ) {
+    for (size_t i = 0; i < length; ++i ) {
         std::cout << "i=" << ages[i] << " " << std::endl;
         tempArr[ ages[i] ] ++;
     }
@@ -2140,30 +2144,41 @@ void mockAddBstNode(BstNode*& root, BstNode* pNewNode) {
     }
 }
 
-void AddNewNode(BstNode*& root, BstNode* pNewNode) {
+bool insertNewBstNode(BstNode*& root, int val) {
+    {
+        if (!root) {
+            root = new BstNode(val);
+            return true;
+        }
+        if ( val < root->val ) {
+            return insertNewBstNode(root->left, val);
+        }
+        return insertNewBstNode(root->right, val);
+    }
+}
 
+void AddNewNode(BstNode*& root, BstNode* newNode) {
     {
         BstNode* parent = nullptr;
         BstNode* tmp = root;
 
         while ( tmp ) {
             parent = tmp;
-            if ( pNewNode->val > tmp->val ) {
+            if ( newNode->val > tmp->val ) {
                 tmp = tmp->right;
             } else {
                 tmp = tmp->left;
             }
         }
-        pNewNode->parent_ = parent;
+        newNode->parent_ = parent;
         if (!parent) {
-            root = pNewNode;
-        } else if (pNewNode->val > parent->val) {
-            parent->right = pNewNode;
+            root = newNode;
+        } else if (newNode->val > parent->val) {
+            parent->right = newNode;
         } else {
-            parent->left = pNewNode;
+            parent->left = newNode;
         }
-        return;
-    }
+    } // end bracket
 
 }
 
@@ -2349,6 +2364,24 @@ void CreateBstTree(const std::vector<int>& inVec) {// 构建二叉树；
         BstNode* node = new BstNode(val);
         AddNewNode(g_pBstTree, node);
     }
+}
+
+void printInorder() {
+    std::cout << std::endl;
+    std::cout << "-------------------------------inOrder beg-------------------------------" << std::endl;
+    inOrderNonRecru(g_pBstTree);
+    std::cout << std::endl;
+    std::cout << "-------------------------------inOrder end-------------------------------" << std::endl;
+    std::cout << std::endl;
+}
+void CreateBstTreeEx() {
+    ::srand(time(nullptr));
+    
+    for ( int i = 0; i < 10; i++ ) {
+        insertNewBstNode(g_pBstTree, rand() % 200);
+    }
+
+    printInorder();
 }
 
 void CreateBstTree() {// 构建二叉树；
@@ -3251,7 +3284,7 @@ void tst_multimap( ) {
         std::cout << "it->first=" << it->first << " second=" << it->second << std::endl;
     }
 
-    auto find = mltIds.find ( 3018 );
+    // auto find = mltIds.find ( 3018 );
 }
 
 class Base1 {
@@ -3271,7 +3304,7 @@ public:
     BaseA() {
         std::cout << "construct BaseA" << std::endl;
     }
-    ~BaseA() {
+   virtual ~BaseA() {
         std::cout << "destroy   BaseA" << std::endl;
     }
     virtual void release() {
@@ -3284,7 +3317,7 @@ public:
     BaseB() {
         std::cout << "construct BaseB" << std::endl;
     }
-    ~BaseB() {
+    virtual ~BaseB() {
         std::cout << "destroy   BaseB" << std::endl;
     }
     virtual void release() {
@@ -3293,18 +3326,18 @@ public:
     }
 };
 void tst_base_derive() {
-    BaseA* aobj = new BaseA;
-    BaseB* bobj = new BaseB;
-    void* v_aaa = aobj;
-    void* v_bbb = bobj;
+//     BaseA* aobj = new BaseA;
+//     BaseB* bobj = new BaseB;
+//     void* v_aaa = aobj;
+//     void* v_bbb = bobj;
 
-    Base1* pBase = aobj;
-    aobj->release();
+//     Base1* pBase = aobj;
+//     aobj->release();
 
-    pBase = bobj;
-    bobj->release();
-//    delete v_aaa;
-//    delete v_bbb;
+//     pBase = bobj;
+//     bobj->release();
+// //    delete v_aaa;
+// //    delete v_bbb;
 }
 
 void tst_tuple_1() {
@@ -3419,7 +3452,7 @@ void tstC11() {
 void removeNthFromEnd(int k) {
     std::vector <int> vecInts{ 10, 97, 21, 16, 2, 0};
 
-    auto head = ConstructTestList(vecInts);
+    auto head = ConstructList(vecInts);
 
     LOG_INFO << "print list node 111";
     PrintList(head);
@@ -3429,17 +3462,17 @@ void removeNthFromEnd(int k) {
     ListNode* p2 = head;
 
     for ( int i = 0; i < k; i ++ ) {
-        p1 = p1->next_;
+        p1 = p1->next;
     }
     if (p1 == nullptr) {
-        head = head->next_;
+        head = head->next;
         return;
     }
-    while (p1->next_) {
-        p1 = p1->next_;
-        p2 = p2->next_;
+    while (p1->next) {
+        p1 = p1->next;
+        p2 = p2->next;
     }
-    p2->next_ = p2->next_->next_;
+    p2->next = p2->next->next;
 
     PrintList(head);
 }
@@ -3451,17 +3484,17 @@ ListNode* mergeTwoList(ListNode* l1, ListNode* l2) {
     ListNode* h;
     if (l1->val <= l2->val) {
         h = l1;
-        l1->next_ = mergeTwoList(l1->next_, l2);
+        l1->next = mergeTwoList(l1->next, l2);
     } else {
         h = l2;
-        l2->next_ = mergeTwoList(l1, l2->next_);
+        l2->next = mergeTwoList(l1, l2->next);
     }
     return h;
 }
 void Test_mergeTwoList() {
     std::vector <int> vecInts1{ 10, 97, 113, 269, 398, 10000};
 
-    auto list_1 = ConstructTestList(vecInts1);
+    auto list_1 = ConstructList(vecInts1);
 
 //    LOG_INFO << "print list node 111";
 //    PrintList(list_1);
@@ -3469,7 +3502,7 @@ void Test_mergeTwoList() {
 
     std::vector <int> vecInts2{ 2000, 9700, 21000, 21999, 32000};
 
-    auto list_2 = ConstructTestList(vecInts2);
+    auto list_2 = ConstructList(vecInts2);
 
 //    LOG_INFO << "print list node 111";
 //    PrintList(list_1);
@@ -3577,22 +3610,22 @@ ListNode* RemoveNthFromEnd(ListNode* head, int k) {
 
     for ( int i = 0; i < k; i ++ ) {
         if (fast) {
-            fast = fast->next_;
+            fast = fast->next;
         }
     }
     if (fast == nullptr) {
-        temp = head->next_;
+        temp = head->next;
         delete head;
         return temp;
     }
 
-    while (fast->next_) {
-        fast = fast->next_;
-        slow = slow->next_;
+    while (fast->next) {
+        fast = fast->next;
+        slow = slow->next;
     }
 
-    temp = slow->next_;
-    slow->next_ = slow->next_->next_;
+    temp = slow->next;
+    slow->next = slow->next->next;
     delete temp;
 
     return head;
@@ -3600,7 +3633,7 @@ ListNode* RemoveNthFromEnd(ListNode* head, int k) {
 void TestRemoveNthListNode() {
     std::vector <int> vecInts{ 10, 97, 21, 16, 2, 0};
 
-    auto head = ConstructTestList(vecInts);
+    auto head = ConstructList(vecInts);
 
     LOG_INFO << "before remove list";
     PrintList(head);
@@ -3775,27 +3808,27 @@ ListNode* DetectListCycle(ListNode* head) {
     ListNode* temp = nullptr;
 
     while (p) {
-        if (p->next_ == marknode)
+        if (p->next == marknode)
             return p;
-        temp = p->next_;
-        p->next_ = marknode;
+        temp = p->next;
+        p->next = marknode;
         p = temp;
     }
     return nullptr;
 }
 void Test_DetectListCycle() {
     std::vector <int> vecInts{ 10, 97, 21, 16, 2, 0};
-    auto listHead = ConstructTestList(vecInts);
+    auto listHead = ConstructList(vecInts);
     PrintList(listHead);
 
     // make list cycle --- --- ---
     ListNode* tmp = listHead;
     while (1) {
         if ( tmp->val == 16 ) {
-            tmp->next_ = listHead;
+            tmp->next = listHead;
             break;
         }
-        tmp = tmp->next_;
+        tmp = tmp->next;
     }
 //    PrintList(listHead);
     //  --- --- --- --- --- ---
@@ -4009,11 +4042,11 @@ ListNode* mergeKLists_pri_que(vector<ListNode*>& lists)  {
     ListNode* cur = &dummy;
     while ( !pri_que.empty() ) {
         ListNode* top = pri_que.top(); pri_que.pop();
-        cur->next_ = top;
-        cur = cur->next_;
-        if (top->next_) pri_que.push(top->next_);
+        cur->next = top;
+        cur = cur->next;
+        if (top->next) pri_que.push(top->next);
     }
-    return dummy.next_;
+    return dummy.next;
 }
 
 ListNode* merge(vector<ListNode*>& lists, int start, int end){
@@ -4043,11 +4076,11 @@ void Test_mergeKLists() {
 
     vector<ListNode*> lists;
     std::vector< int > a1{ 1, 2, 3, 4, 6};
-    auto l1 = ConstructTestList(a1);
+    auto l1 = ConstructList(a1);
     std::vector< int > a2{ 123, 987, 3000, 4213, 98886};
-    auto l2 = ConstructTestList(a2);
+    auto l2 = ConstructList(a2);
     std::vector< int > a3{ 5678, 20009, 376654};
-    auto l3 = ConstructTestList(a3);
+    auto l3 = ConstructList(a3);
     // for ( int i = 0; i < listcount; i ++ ) {
     //      PrintList(lists[i]);
     // }
@@ -4225,19 +4258,19 @@ std::cout << "maxDepth_NoRecur=" << maxDepth_NoRecur(g_pBstTree) << std::endl;
 // 链表-奇偶重排
 ListNode* oddEvenList(ListNode* head) {
     if ( !head ) return nullptr;    
-    ListNode* odd = head, *even = odd->next_, *evenStart = even;
-    while (even && even->next_) {
-        odd->next_ = even->next_;
-        odd = odd->next_;
-        even->next_ = odd->next_;
-        even = even->next_;
+    ListNode* odd = head, *even = odd->next, *evenStart = even;
+    while (even && even->next) {
+        odd->next = even->next;
+        odd = odd->next;
+        even->next = odd->next;
+        even = even->next;
     }
-    odd->next_ = evenStart;
+    odd->next = evenStart;
     return head;
 }
 void Test_oddEvenList() {
     std::vector<int> arr{ 1, 2, 3 , 4, 5, 6, 7, 8, 9, 10};
-    auto head = ConstructTestList(arr);
+    auto head = ConstructList(arr);
     auto ret = oddEvenList(head);
     PrintList(ret);
 }
@@ -4841,30 +4874,30 @@ public:
             sum = 0;
             if (l1) {
                 sum += l1->val;
-                l1 = l1->next_;
+                l1 = l1->next;
             }
             if (l2) {
                 sum += l2->val;
-                l2 = l2->next_;
+                l2 = l2->next;
             }
             if (carry) {
                 sum ++;
             }
-            h->next_ = new ListNode(sum % 10);
-            h = h->next_;
+            h->next = new ListNode(sum % 10);
+            h = h->next;
             carry = sum > 10 ? true : false;
         } // end --- while
         if (carry) {
-            h->next_ = new ListNode(1);
+            h->next = new ListNode(1);
         }
-        return head->next_;
+        return head->next;
     }
     void Test_addTwoNumber() {
         std::vector<int> v1{9, 1, 3};
         std::vector<int> v2{8, 2, 9};
 
-        auto l1 = ConstructTestList(v1);
-        auto l2 = ConstructTestList(v2);
+        auto l1 = ConstructList(v1);
+        auto l2 = ConstructList(v2);
         auto ret = addTwoNumbers(l1, l2);
         PrintList(ret);
     }
@@ -5058,11 +5091,17 @@ void levelOrderPrint(BstNode* root) {
 
 /*
     剑指 Offer 52. 两个链表的第一个公共节点
-
 */
 ListNode *getIntersectionNode(ListNode *headA, ListNode *headB) {
+    ListNode* node1 = headA;
+    ListNode* node2 = headB;
+    if ( node1 == nullptr || node2 == nullptr ) return nullptr;
 
-    return nullptr;        
+    while ( node1 != node2 ) {
+        node1 = (node1 != nullptr) ? node1->next : headB;
+        node2 = (node2 != nullptr) ? node2->next : headA;
+    }
+    return node1;
 }
 
 
@@ -5081,11 +5120,448 @@ int findTilt(TreeNode* root) {
     return 1;
 }
 
+
+/*
+    剑指 Offer 28. 对称的二叉树
+请实现一个函数，用来判断一棵二叉树是不是对称的。如果一棵二叉树和它的镜像一样，那么它是对称的。
+
+例如: 二叉树 [1,2,2,3,4,4,3] 是对称的。
+    1
+   / \
+  2   2
+ / \ / \
+3  4 4  3
+
+但是下面这个 [1,2,2,null,3,null,3] 则不是镜像对称的:
+    1
+   / \
+  2   2
+   \   \
+   3    3
+
+示例 1：
+输入：root = [1,2,2,3,4,4,3]
+输出：true
+
+示例 2：
+输入：root = [1,2,2,null,3,null,3]
+输出：false
+*/
+bool check_isSysmmetric(BstNode* p, BstNode* q) {
+    if ( !p && !q ) return true;
+    if ( !p || !q ) return false;
+    return (p->val == q->val) && check_isSysmmetric(p->left, q->right) && check_isSysmmetric(p->right, q->left);
+}
+void isSymmetric() {
+    CreateBstTree();
+
+std::cout << "before check ..." << std::endl;
+        printInorder(g_pBstTree);
+std::cout << std::endl;
+
+    std::cout << "check sysmmetric=" << check_isSysmmetric(g_pBstTree, g_pBstTree) << std::endl;
+}
+
+/*
+    543. 二叉树的直径
+    给定一棵二叉树，你需要计算它的直径长度。
+    一棵二叉树的直径长度是任意两个结点路径长度中的最大值。这条路径可能穿过也可能不穿过根结点。
+
+示例: 给定二叉树
+          1
+         / \
+        2   3
+       / \     
+      4   5    
+返回 3, 它的长度是路径 [4,2,1,3] 或者 [5,2,1,3]。
+
+注意：两结点之间的路径长度是以它们之间边的数目表示。
+*/
+
+
+/*
+    1367. 二叉树中的列表
+给你一棵以 root 为根的二叉树和一个 head 为第一个节点的链表。
+
+如果在二叉树中，存在一条一直向下的路径，且每个点的数值恰好一一对应以 head 为首的链表中每个节点的值，那么请你返回 True，否则返回 False 。
+
+一直向下的路径的意思是：从树中某个节点开始，一直连续向下的路径。
+*/
+class CCheckTreeSubList {
+    bool dfs(ListNode* head, TreeNode* root) {
+        if (!head) return true;
+        if (!root) return false;
+        if (root->val != head->val) return false;
+        return (dfs(head, root->left) || dfs(head, root->right));
+    }
+public:
+    bool isSubPath(ListNode* head, TreeNode* root) {
+        {
+            std::queue<TreeNode*> que;
+            que.push(root);
+            while ( que.size() ) {
+                TreeNode* q = que.front();
+                que.pop();
+                
+                if ( q->val == head->val ) {
+                    if ( dfs(head, root) ) return true;
+                }
+                if (q->left) que.push(q->left);
+                if (q->right)que.push(q->right);
+            }
+            return false;
+        }
+
+        std::queue <TreeNode*> que;
+        que.push(root);
+
+        while (que.size()) {
+            auto q = que.front(); que.pop();
+            if (!q) continue;
+            if (q->val == head->val) {
+                if (dfs(head, q)) return true;
+            }
+            que.push(q->left);
+            que.push(q->right);
+        }
+        return false;
+    }
+};
+void Test_CheckTreeSubList() {
+    CCheckTreeSubList cts;
+    cts.isSubPath(nullptr, nullptr);
+}
+
+
+/*
+    654. 最大二叉树
+    给定一个不含重复元素的整数数组。
+    一个以此数组构建的最大二叉树定义如下：
+
+    二叉树的根是数组中的最大元素。
+    左子树是通过数组中最大值左边部分构造出的最大二叉树。
+    右子树是通过数组中最大值右边部分构造出的最大二叉树。
+    通过给定的数组构建最大二叉树，并且输出这个树的根节点。
+
+    示例：
+    输入：[3,2,1,6,0,5]
+    输出：返回下面这棵树的根节点：
+      6
+    /   \
+   3     5
+    \    / 
+     2  0   
+       \
+        1
+*/
+class CConstructMaxBst {
+    TreeNode* dfs(vector<int>& nums, int l, int r) {
+        if (l > r) return nullptr;
+
+        int idx = l;
+        for (int i = l + 1; i < r; i ++) {
+            if (nums[i] > nums[idx]) idx = i;
+        }
+
+        TreeNode* node = new TreeNode( nums[idx] );
+        node->left  = dfs(nums, l, idx - 1);
+        node->right = dfs(nums, idx + 1, r);
+        return node;
+    }
+public:
+    TreeNode* constructMaximumBinaryTree(vector<int>& nums) {
+        return dfs(nums, 0, nums.size() - 1);
+    }
+};
+void Test_ConstuctMaxBst() {
+        
+}
+
+
+/*
+    617. 合并二叉树
+
+给定两个二叉树，想象当你将它们中的一个覆盖到另一个上时，两个二叉树的一些节点便会重叠。
+
+需要将他们合并为一个新的二叉树。
+合并规则: 如果两个节点重叠，那么将他们的值相加作为节点合并后的新值，
+否则不为 NULL 的节点将直接作为新二叉树的节点。
+
+示例 1:
+输入:
+	Tree 1                     Tree 2
+          1                         2
+         / \                       / \
+        3   2                     1   3
+       /                           \   \
+      5                             4   7
+输出:
+合并后的树:
+	     3
+	    / \
+	   4   5
+	  / \   \ 
+	 5   4   7
+注意: 合并必须从两个树的根节点开始。
+*/
+TreeNode* mergeTrees(TreeNode* t1, TreeNode* t2) {
+    if (t1 == nullptr) return t2;
+    if (t2 == nullptr) return t1;
+    t1->val += t2->val;
+    t1->left = mergeTrees(t1->left, t2->left);
+    t1->right = mergeTrees(t1->right, t2->right);
+    return t1;
+}
+
+
+/*
+    两数之和
+给定一个整数数组 nums 和一个目标值 target，
+请你在该数组中找出和为目标值的那 两个 整数，并返回他们的数组下标。
+可以假设每种输入只会对应一个答案。但是，数组中同一个元素不能使用两遍。
+
+示例:
+给定 nums = [2, 7, 11, 15], target = 9
+
+因为 nums[0] + nums[1] = 2 + 7 = 9
+所以返回 [0, 1]
+*/
+vector<int> twoSum(const vector<int>& nums, int target) {
+    {
+        std::vector<int> ret;
+        std::unordered_map <int, int> map;
+        
+        for (size_t i = 0; i < nums.size(); i ++) {
+            auto it = map.find(target - nums[i]);
+            if (it != map.end()) {
+                ret.push_back(it->second);
+                ret.push_back(i);
+                break;
+            } else {
+                map[ nums[i] ] = i;
+            }
+        }
+        return ret;
+    }
+}
+void Test_twoSum() {
+    std::vector<int> v1{ 1, 9, 8, 7, 3};
+    auto ves = twoSum(v1, 10);
+    // auto ves = twoSum(v1, 17);
+    for ( auto ele : ves ) {
+        std::cout << " " << ele;
+    }
+    std::cout << std::endl;
+}
+
+/*
+    783. 二叉搜索树节点最小距离
+给定一个二叉搜索树的根节点 root，返回树中任意两节点的差的最小值。
+
+示例：
+输入: root = [4,2,6,1,3,null,null]
+输出: 1
+解释: 注意，root是树节点对象(TreeNode object)，而不是数组。
+
+给定的树 [4,2,6,1,3,null,null] 可表示为下图:
+         4
+       /   \
+      2     6
+     / \
+    1   3
+最小的差值是 1, 它是节点1和节点2的差值, 也是节点3和节点2的差值。
+*/
+class CMinDiffInBst {
+    BstNode* pre;
+    int      minVal;
+
+    void minDiff(BstNode* root) {
+        if (!root) return;
+        if (root->left) {
+            minDiff(root->left);
+        }
+        if (pre) {
+            minVal = std::min(minVal, std::abs(pre->val - root->val));
+        }
+        pre = root;
+        if (root->right)
+            minDiff(root->right);
+    }
+public:
+    CMinDiffInBst() : pre(nullptr), minVal(INT_MAX) {}
+
+    void minDiffInBST() {
+        CreateBstTree();
+
+std::cout << "before handle ..." << std::endl;
+        printInorder(g_pBstTree);
+std::cout << std::endl;
+    minDiff(g_pBstTree);
+std::cout << "res=" << minVal << std::endl;
+    }
+};
+void Test_minDiffInBST() {
+    CMinDiffInBst cm;
+    cm.minDiffInBST();
+}
+
+/*
+    501. 二叉搜索树中的众数
+给定一个有相同值的二叉搜索树（BST），找出 BST 中的所有众数（出现频率最高的元素）。
+
+例如： 给定 BST [1,null,2,2],
+   1
+    \
+     2
+    /
+   2
+返回[2].
+
+提示：如果众数超过1个，不需考虑输出顺序
+
+进阶：你可以不使用额外的空间吗？（假设由递归产生的隐式调用栈的开销不被计算在内）
+*/
+class CFindModeNum {
+    std::vector<int> res;
+    int maxTimes = 0;
+    int curTimes = 0;
+    BstNode *pre = nullptr; // 指向当前节点的前一个节点
+public:
+    void inorder(BstNode* cur) {
+        if (!cur) return ;
+        inorder(cur->left);
+
+        if (pre) {
+            curTimes = (cur->val == pre->val) ? curTimes + 1 : 1;
+        }
+        if (curTimes == maxTimes) {
+            res.push_back(cur->val);
+        } else if (curTimes > maxTimes) {
+            res.clear(); res.push_back(cur->val);
+            maxTimes = curTimes;
+        }
+        pre = cur;// 将前一个节点更新为当前节点
+        inorder(cur->right);
+    }
+    void findMode() {
+        CreateBstTreeEx();
+
+        inorder(g_pBstTree);
+        
+        PrintInContainer(res);
+    }
+};
+void Test_CFindModeNum() {
+    CFindModeNum cf;
+    cf.findMode();
+}
+
+// 递归计算，数组和
+int arrSum(const vector<int>& v1, size_t len) {
+    if (len == v1.size()) return 0;
+    return v1[len] + arrSum(v1, len + 1);
+}
+void Test_arraySum() {
+    std::vector<int> v1{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+    std::cout << "last ret=" << arrSum(v1, 0) << std::endl;
+}
+
+/*
+    1038. 把二叉搜索树转换为累加树
+    给出二叉 搜索 树的根节点，该树的节点值各不相同，请你将其转换为累加树（Greater Sum Tree），
+    使每个节点 node 的新值等于原树中大于或等于 node.val 的值之和。
+
+示例 1：
+输入：[4,1,6,0,2,5,7,null,null,null,3,null,null,null,8]
+输出：[30,36,21,36,35,26,15,null,null,null,33,null,null,null,8]
+
+示例 2：
+输入：root = [0,null,1]
+输出：[1,null,1]
+
+示例 3：
+输入：root = [1,0,2]
+输出：[3,3,2]
+
+示例 4：
+输入：root = [3,2,4,1]
+输出：[7,9,4,10]
+*/
+
+/*
+    109. 有序链表转换二叉搜索树
+给定一个单链表，其中的元素按升序排序，将其转换为高度平衡的二叉搜索树。
+
+本题中，一个高度平衡二叉树是指一个二叉树每个节点 的左右两个子树的高度差的绝对值不超过 1。
+
+示例: 给定有序链表： [-10, -3, 0, 5, 9]
+
+一个可能的答案是：[0, -3, 9, -10, null, 5], 它可以表示下面这个高度平衡二叉搜索树：
+      0
+     / \
+   -3   9
+   /   /
+ -10  5
+*/
+class CSortedListToBst {
+
+    ListNode* getMidNode(ListNode* left, ListNode* right) {
+        ListNode* fast = left;
+        ListNode* slow = left;
+        while (fast != right && fast->next != right) {
+            fast = fast->next->next;
+            slow = slow->next;
+        }
+        return slow;
+    }
+    BstNode* buildBstTree(ListNode* l, ListNode* r) {
+        if (l == r) return nullptr;
+
+        ListNode* mid = getMidNode(l, r);
+
+        BstNode* root = new BstNode(mid->val);
+        if (!root) return nullptr;
+
+        root->left  = buildBstTree(l, mid);
+        root->right = buildBstTree(mid->next, r);
+        return root;
+    }
+public:
+    void sortedListToBST() {
+        std::vector<int> l{ 13, 21, 98, 100, 518, 10000, 77612};
+
+        auto head = ConstructList(l);
+        g_pBstTree = buildBstTree(head, nullptr);
+        printInorder();
+    }
+};
+
+
 int main(int argc, char *argv[])
 {
     Logger::setLogLevel(Logger::DEBUG);
     LOG_INFO << "pid = " << getpid() << ", tid=" << CurrentThread::tid();
 
+    // std::cout << "10%7=" << (10%7) << std::endl;
+    LeetCodeEntry(); return 1;
+
+{
+    CSortedListToBst c1;
+    c1.sortedListToBST();
+    return 1;
+}
+    Test_CFindModeNum(); return 1;
+
+    std::cout << "INT_MIN=" << INT_MIN << std::endl;
+
+    Test_arraySum();   return 1; 
+    CreateBstTreeEx(); return 1;
+
+    Test_minDiffInBST(); return 1;
+
+    Test_twoSum(); return 1;
+
+    isSymmetric(); return 1;
 {
     CSearchBst csb;
     csb.Test_searchBst(); return 1;
@@ -5118,8 +5594,6 @@ int main(int argc, char *argv[])
 //  tst_randEx();    return 1;
 
     findKth(); return 1;
-
-    LeetCodeEntry(); return 1;
 
     Test_FindNumsAppearOnce(); return 1;
 
@@ -5157,14 +5631,9 @@ int main(int argc, char *argv[])
 
     check_cyclelist(); return 1;
 
-    LeetCodeEntry(); return 1;
 
     tstC11();  return 1;
 
-//    {
-//        LeetCodeEntry();
-//        return 1;
-//    }
 
 //    int data[16] = {1,0,0,1,0,0,0,1,1,1,1,1,0,0,0,0}; //明文
 //    std::cout << "sizeof(data)=" << sizeof(data) << std::endl;
@@ -5435,16 +5904,3 @@ std::cout << "c" << std::endl;
 //    tst_sort_2(); return 1;
     tst_sort_1(); return 1;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-

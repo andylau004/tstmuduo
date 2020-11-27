@@ -77,33 +77,6 @@ void InOrtderPtrint(TreeNode* root);
             someInOrder(root->right);
     }
 
-    ListNode* ConstructTestList(const std::vector<int>& vecInts) {
-        std::vector< ListNode* > vecNodes;
-
-        for ( auto ii : vecInts ) {
-            vecNodes.push_back(CreateListNode(ii));
-        }
-
-        for ( size_t i = 0; i < vecNodes.size(); i ++ ) {
-            auto next = i + 1;
-            if ( next != vecNodes.size() ) {
-                ConnectListNodes(vecNodes[i], vecNodes[next]);
-            }
-        }
-        return *vecNodes.begin();
-    }
-
-    // std::vector<int> createRandomIntVector(int start, int end, int numCount) {
-    //         time_t t;
-    //         srand(time(&t));
-
-    //     std::vector<int> ret;
-    //     for (int i = 0; i < numCount; ++i) {
-    //         ret.push_back(tst_rand(start, end));
-    //     }
-        
-    //     return ret;
-    // }
 
     std::vector< ListNode* > ConstructTestListByParam(int start, int end, int numCount, int listCount) {
         std::vector< ListNode* > arrays;
@@ -116,7 +89,7 @@ void InOrtderPtrint(TreeNode* root);
             for ( int j = 0; j < numCount; j ++ ) {
                 tmpArr.push_back(tst_rand(start, end));
             }
-            arrays.push_back( ConstructTestList(tmpArr) );
+            arrays.push_back( ConstructList(tmpArr) );
         }
         // ----------------
         return arrays;
@@ -130,109 +103,44 @@ public:
     ListNode* reverseList( ListNode* pHead ) {
         if (!pHead) return nullptr;
         {
-            ListNode* prePtr = nullptr, *curPtr = pHead, *nextPtr = curPtr->next_;
+            ListNode* prePtr = nullptr, *curPtr = pHead, *nextPtr = curPtr->next;
             while (nextPtr) {
-                curPtr->next_ = prePtr;
+                curPtr->next = prePtr;
                 prePtr = curPtr;
 
                 curPtr = nextPtr;
-                nextPtr = nextPtr->next_;
+                nextPtr = nextPtr->next;
             }
-            curPtr->next_ = prePtr;
+            curPtr->next = prePtr;
             return curPtr;
         }
 
-        ListNode* prePtr = nullptr, *curPtr = pHead, *nextPtr = curPtr->next_;
+        ListNode* prePtr = nullptr, *curPtr = pHead, *nextPtr = curPtr->next;
         while (nextPtr) {
-            curPtr->next_ = prePtr;
+            curPtr->next = prePtr;
             prePtr = curPtr;
 
             curPtr = nextPtr;
-            nextPtr = nextPtr->next_;
+            nextPtr = nextPtr->next;
         }
-        curPtr->next_ = prePtr;
+        curPtr->next = prePtr;
         return curPtr;
     }
 
-    void TstList1() {
-        ListNode* pNode1 = CreateListNode(11);
-        ListNode* pNode2 = CreateListNode(23);
-        ListNode* pNode3 = CreateListNode(35);
-        ListNode* pNode4 = CreateListNode(47);
-        ListNode* pNode5 = CreateListNode(51);
-        ListNode* pNode6 = CreateListNode(53);
-        ListNode* pNode7 = CreateListNode(198);
-        ListNode* pNode8 = CreateListNode(2739);
-        ListNode* pNode9 = CreateListNode(31798);
 
-        ConnectListNodes(pNode1, pNode2);
-        ConnectListNodes(pNode2, pNode3);
-        ConnectListNodes(pNode3, pNode4);
-        ConnectListNodes(pNode4, pNode5);
-        ConnectListNodes(pNode5, pNode6);
-        ConnectListNodes(pNode6, pNode7);
-        ConnectListNodes(pNode7, pNode8);
-        ConnectListNodes(pNode8, pNode9);
-
-        PrintList(pNode1);
-
-        ListNode* pReverseList = reverseList( pNode1 );
-        PrintList(pReverseList);
-    }
-
-
-
-    ListNode* ConstructTestList() {
-        ListNode* pNode1 = CreateListNode(11);
-        ListNode* pNode2 = CreateListNode(23);
-        ListNode* pNode3 = CreateListNode(35);
-        ListNode* pNode4 = CreateListNode(47);
-        ListNode* pNode5 = CreateListNode(51);
-        ListNode* pNode6 = CreateListNode(53);
-        ListNode* pNode7 = CreateListNode(198);
-        ListNode* pNode8 = CreateListNode(2739);
-        ListNode* pNode9 = CreateListNode(31798);
-
-        ConnectListNodes(pNode1, pNode2);
-        ConnectListNodes(pNode2, pNode3);
-        ConnectListNodes(pNode3, pNode4);
-        ConnectListNodes(pNode4, pNode5);
-        ConnectListNodes(pNode5, pNode6);
-        ConnectListNodes(pNode6, pNode7);
-        ConnectListNodes(pNode7, pNode8);
-        ConnectListNodes(pNode8, pNode9);
-        return pNode1;
-    }
 
     void TstEntry() {
-        ListNode* pNode1 = CreateListNode(11);
-        ListNode* pNode2 = CreateListNode(23);
-        ListNode* pNode3 = CreateListNode(35);
-        ListNode* pNode4 = CreateListNode(47);
-        ListNode* pNode5 = CreateListNode(51);
-        ListNode* pNode6 = CreateListNode(53);
-        ListNode* pNode7 = CreateListNode(198);
-        ListNode* pNode8 = CreateListNode(2739);
-        ListNode* pNode9 = CreateListNode(31798);
+        std::vector<int> l{11, 23, 36, 47, 51, 53, 198, 2739, 31798};
+        auto headList = ConstructList(l);
 
-        ConnectListNodes(pNode1, pNode2);
-        ConnectListNodes(pNode2, pNode3);
-        ConnectListNodes(pNode3, pNode4);
-        ConnectListNodes(pNode4, pNode5);
-        ConnectListNodes(pNode5, pNode6);
-        ConnectListNodes(pNode6, pNode7);
-        ConnectListNodes(pNode7, pNode8);
-        ConnectListNodes(pNode8, pNode9);
-
-        TreeNode* root = SortedListToBst(pNode1);
-        PrintList(pNode1);
+        TreeNode* root = SortedListToBst(headList);
+        PrintList(headList);
 
         std::cout << std::endl << std::endl
                   << " in order print tree beg---------" << std::endl;
         someInOrder(root);
         std::cout << std::endl
                   << " in order print tree end---------" << std::endl;
-
     }
     TreeNode* SortedListToBst(ListNode* head) {
         if (!head) return nullptr;
@@ -245,24 +153,34 @@ public:
 //        std::cout << "slow=" << slow <<std::endl;
 //        std::cout << "fast=" << fast <<std::endl;
 
-        while (fast != tail && fast->next_ != tail) {
-            slow = slow->next_;
-            fast = fast->next_->next_;
+        while (fast != tail && fast->next != tail) {
+            slow = slow->next;
+            fast = fast->next->next;
         }
-
 //        std::cout << "slow->val=" << slow->val << std::endl;
 //        std::cout << "fast->val=" << fast->val << std::endl;
 //        return nullptr;
 
         TreeNode* root = new TreeNode(slow->val);
         root->left = helper(head, slow);
-        root->right = helper(slow->next_, tail);
+        root->right = helper(slow->next, tail);
         return root;
     }
 
 };
 
 
+    void TstList1() {
+        std::vector<int> l{ 11, 23, 35, 47, 51, 53, 198, 2739, 31798};
+        ListNode* headL = ConstructList(l);
+        PrintList(headL);
+
+        // CSortedListToBst listObj;
+        // listObj.TstList1();
+
+        // ListNode* pReverseList = reverseList( pNode1 );
+        // PrintList(pReverseList);
+    }
 
 
 
@@ -292,12 +210,13 @@ public:
 
 // Return the following binary tree:
 
-//    3
-//   / \
-//  9  20
-//    /  \
-//   15   7
-
+/*
+    3
+   / \
+    9  20
+    /  \
+   15   7
+*/
 /*
  *
  *  首先要知道一个结论，前序/后序+中序序列可以唯一确定一棵二叉树，所以自然而然可以用来建树。
@@ -489,49 +408,6 @@ void Test_KthLeastNumbers() {
 }
 
 
-/*
-    给定两个二叉树，想象当你将它们中的一个覆盖到另一个上时，两个二叉树的一些节点便会重叠。
-
-    你需要将他们合并为一个新的二叉树。合并的规则是如果两个节点重叠，那么将他们的值相加作为节点合并后的新值，否则不为 NULL 的节点将直接作为新二叉树的节点。
-
-    示例 1:
-
-    输入:
-        Tree 1                     Tree 2
-              1                         2
-             / \                       / \
-            3   2                     1   3
-           /                           \   \
-          5                             4   7
-    输出:
-    合并后的树:
-             3
-            / \
-           4   5
-          / \   \
-         5   4   7
-    注意: 合并必须从两个树的根节点开始。
-*/
-
-    struct TreeNode* mergeTrees(struct TreeNode* t1, struct TreeNode* t2){
-        if (!t1 && !t2) {
-            return nullptr;
-        }
-        if (!t1 && t2) {
-            return t2;
-        }
-        if (t1 && !t2) {
-            return t1;
-        }
-        if (t1 && t2) {
-            t1->val = t1->val + t2->val;
-        }
-        t1->left=mergeTrees(t1->left,t2->left);
-        t1->right=mergeTrees(t1->right,t2->right);
-        return t1;
-    }
-
-
 
 /*
  * 根据每日 气温 列表，请重新生成一个列表，对应位置的输入是你需要再等待多久温度才会升高超过该日的天数。如果之后都不会升高，请在该位置用 0 来代替。
@@ -667,21 +543,19 @@ int Depth(BstNode* root) {
 }
 bool isBalanced(BstNode* root) {
     if (!root) return true;
-    int d = abs( Depth(root->left) - Depth(root->right) );
-    bool bCheck = (d <= 1 && isBalanced(root->left) && isBalanced(root->right));
-    std::cout << "d=" << d << std::endl;
-    return bCheck;
+    int gap = std::abs(Depth(root->left) - Depth(root->right));
+    return (gap <= 1 && isBalanced(root->left) && isBalanced(root->right));
 }
 
-// Leetcode 98. 验证二叉搜索树
 /*
+        Leetcode 98. 验证二叉搜索树
         给定一个二叉树，判断其是否是一个有效的二叉搜索树。
 
-        假设一个二叉搜索树具有如下特征：
-
+        二叉搜索树具有如下特征：
         节点的左子树只包含小于当前节点的数。
         节点的右子树只包含大于当前节点的数。
         所有左子树和右子树自身必须也是二叉搜索树。
+
         示例 1:
         输入:
             2
@@ -804,16 +678,43 @@ void tstupper_bound() {
     std::cout << upper_bound_(a.size(), 4, a) << std::endl;
 }
 
+
+
+/*
+    61. 旋转链表
+    给定一个链表，旋转链表，将链表每个节点向右移动 k 个位置，其中 k 是非负数。
+
+    示例 1:
+
+    输入: 1->2->3->4->5->NULL, k = 2
+    输出: 4->5->1->2->3->NULL
+    解释:
+    向右旋转 1 步: 5->1->2->3->4->NULL
+    向右旋转 2 步: 4->5->1->2->3->NULL
+    示例 2:
+
+    输入: 0->1->2->NULL, k = 4
+    输出: 2->0->1->NULL
+    解释:
+    向右旋转 1 步: 2->0->1->NULL
+    向右旋转 2 步: 1->2->0->NULL
+    向右旋转 3 步: 0->1->2->NULL
+    向右旋转 4 步: 2->0->1->NULL
+*/
 void LeetCodeEntry() {
+    CSortedListToBst sortl2bst;
+    sortl2bst.TstEntry();
+    return;
+
+    {
+        TstList1(); return;
+    }
 
     // Test_KthLeastNumbers();
-    tst_KthBig();
-
-    return ;
+    tst_KthBig(); return;
 
     std::vector<int> a{11, 23, 35, 47, 51, 53, 198, 2739, 31798};
-
-    ListNode* retnode = ConstructTestList(a);
+    ListNode* retnode = ConstructList(a);
     PrintList(retnode);
     return;
 
@@ -883,11 +784,6 @@ void LeetCodeEntry() {
         return;
     }
 
-    {
-        CSortedListToBst listObj;
-        listObj.TstList1();
-        return;
-    }
     {
         ObjA* oa = ObjA::GetInstance();
         oa->PrintSomeInfo();
@@ -965,9 +861,6 @@ void LeetCodeEntry() {
     buildBst.WorkEntry();
     return;
 
-    CSortedListToBst sortl2bst;
-    sortl2bst.TstEntry();
-    return;
 
     tst_1_lc();
 

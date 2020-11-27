@@ -186,7 +186,7 @@ typedef struct node		// 队列结点
     int id;			// 哈希文件的编号
     bool operator < (const node &a) const
     { return data < a.data; }
-}node;
+};
 
 // 将 300 个有序文件合并成一个文件, K 路归并排序
 int reduceData(void)

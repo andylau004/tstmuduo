@@ -7,7 +7,7 @@ ListNode* CreateListNode(int value)
 {
     ListNode* pNode = new ListNode();
     pNode->val = value;
-    pNode->next_ = NULL;
+    pNode->next = NULL;
 
     return pNode;
 }
@@ -17,7 +17,7 @@ void ConnectListNodes(ListNode* pCurrent, ListNode* pNext) {
         printf("Error to connect two nodes.\n");
         exit(1);
     }
-    pCurrent->next_ = pNext;
+    pCurrent->next = pNext;
 }
 void PrintListNode(ListNode* pNode) {
     if (pNode == NULL) {
@@ -33,7 +33,7 @@ void PrintList(ListNode* pHead)
     printf("\n");
     while (pHead) {
         printf("%d\t", pHead->val);
-        pHead = pHead->next_;
+        pHead = pHead->next;
     }
     printf("\n");
 //    printf("\nPrintList ends.\n");
@@ -43,7 +43,7 @@ void DestroyList(ListNode* pHead)
 {
     ListNode* pNode = pHead;
     while (pNode) {
-        pHead = pHead->next_;
+        pHead = pHead->next;
         delete pNode;
         pNode = pHead;
     }
@@ -56,9 +56,9 @@ void AddToTail(ListNode** pHead, int value)
         *pHead = pNew;
     } else {
         ListNode* pNode = *pHead;
-        while (pNode->next_)
-            pNode = pNode->next_;
-        pNode->next_ = pNew;
+        while (pNode->next)
+            pNode = pNode->next;
+        pNode->next = pNew;
     }
 }
 
@@ -70,19 +70,35 @@ void RemoveNode(ListNode** pHead, int delVal)
     ListNode* pToBeDel = NULL;
     if ( (*pHead)->val == delVal ) {
         pToBeDel = *pHead;
-        *pHead = (*pHead)->next_;
+        *pHead = (*pHead)->next;
     } else {// 运行到此处，pHead的值必然不等于查找值, 只能比较next的值跟查找值
         ListNode* pNode = *pHead;
-        while (pNode && pNode->next_->val != delVal)
-            pNode = pNode->next_;
+        while (pNode && pNode->next->val != delVal)
+            pNode = pNode->next;
 
-        if (pNode && pNode->next_->val == delVal) {
-            pToBeDel = pNode->next_;
-            pNode->next_ = pNode->next_->next_;
+        if (pNode && pNode->next->val == delVal) {
+            pToBeDel = pNode->next;
+            pNode->next = pNode->next->next;
         }
     }
     if (pToBeDel) {
         delete pToBeDel; pToBeDel = NULL;
     }
 }
+
+    ListNode* ConstructList(std::vector<int>& vecInts) {
+        std::vector< ListNode* > vecNodes;
+
+        for ( auto ii : vecInts ) {
+            vecNodes.push_back(CreateListNode(ii));
+        }
+
+        for ( size_t i = 0; i < vecNodes.size(); i ++ ) {
+            auto next = i + 1;
+            if ( next != vecNodes.size() ) {
+                ConnectListNodes(vecNodes[i], vecNodes[next]);
+            }
+        }
+        return *vecNodes.begin();
+    }
 
