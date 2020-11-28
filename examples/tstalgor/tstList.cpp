@@ -72,7 +72,7 @@ void CreateList(ListNodeEx*& pIn, int newVal) {
 void tst_reverse_list_1() {
     ListNodeEx* phead = NULL;
 
-    for (int i = 0 ; i < 9 ; ++ i ) {
+    for (int i = 0 ; i < 9 ; ++ i) {
         CreateList(phead, i);
     }
 

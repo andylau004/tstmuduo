@@ -4055,20 +4055,20 @@ ListNode* merge(vector<ListNode*>& lists, int start, int end){
 }
 
 /*                  合并k个已排序链表
-给你一个链表数组，每个链表都已经按升序排列。
-请你将所有链表合并到一个升序链表中，返回合并后的链表。
+    给你一个链表数组，每个链表都已经按升序排列。
+    请你将所有链表合并到一个升序链表中，返回合并后的链表。
 
-示例 1：
-输入：lists = [[1,4,5],[1,3,4],[2,6]]
-输出：[1,1,2,3,4,4,5,6]
-解释：链表数组如下：
-[
-  1->4->5,
-  1->3->4,
-  2->6
-]
-将它们合并到一个有序链表中得到。
-1->1->2->3->4->4->5->6
+    示例 1：
+    输入：lists = [[1,4,5],[1,3,4],[2,6]]
+    输出：[1,1,2,3,4,4,5,6]
+    解释：链表数组如下：
+    [
+        1->4->5,
+        1->3->4,
+        2->6
+    ]
+    将它们合并到一个有序链表中得到。
+    1->1->2->3->4->4->5->6
 */
 void Test_mergeKLists() {
     // int listcount = 3;
@@ -5137,7 +5137,8 @@ int findTilt(TreeNode* root) {
 */
 bool check_isSysmmetric(BstNode* p, BstNode* q) {
     if ( !p && !q ) return true;
-    if ( !p || !q ) return false;
+    if ( p == nullptr && q ) return false;
+    if ( p && q == nullptr) return false;
     return (p->val == q->val) && check_isSysmmetric(p->left, q->right) && check_isSysmmetric(p->right, q->left);
 }
 void isSymmetric() {
@@ -5584,6 +5585,28 @@ void Test_rotateRight() {
     // PrintList(g_pListHead);
 }
 
+ListNode* reverselist(ListNode* head) {
+
+    ListNode* pre = head, *cur = nullptr;
+    while (pre) {
+
+        ListNode* t = pre->next;
+        pre->next = cur;
+
+        cur = pre;
+        pre = t;
+    }
+    return cur;
+}
+void Test_reverselist() {
+    PrintList(g_pListHead);
+    std::cout << "before handle list -----" << std::endl;
+
+    auto retlist = reverselist(g_pListHead);
+    std::cout << "after  handle list -----" << std::endl;
+    PrintList(retlist);
+}
+
 int main(int argc, char *argv[])
 {
     initList();
@@ -5592,6 +5615,7 @@ int main(int argc, char *argv[])
     Logger::setLogLevel(Logger::DEBUG);
     LOG_INFO << "pid = " << getpid() << ", tid=" << CurrentThread::tid();
 
+    Test_reverselist(); return 1;
     // printInorder(g_pBstTree);
     // std::cout << std::endl;
 
