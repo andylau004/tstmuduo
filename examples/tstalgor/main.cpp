@@ -5114,7 +5114,7 @@ ListNode *getIntersectionNode(ListNode *headA, ListNode *headB) {
         // node1 = (node1 != nullptr) ? node1->next : headB;
         // node2 = (node2 != nullptr) ? node2->next : headA;
     }
-    return p11;
+    return p1;
 }
 
 
@@ -5679,9 +5679,13 @@ int main(int argc, char *argv[])
     Logger::setLogLevel(Logger::DEBUG);
     LOG_INFO << "pid = " << getpid() << ", tid=" << CurrentThread::tid();
 
-    Test_middleNode(); return 1;
+
+    // --------------------test--------------------
 
     tst_ListEntry(); return 1;
+
+    Test_middleNode(); return 1;
+
 
     Test_reverselist(); return 1;
     // printInorder(g_pBstTree);

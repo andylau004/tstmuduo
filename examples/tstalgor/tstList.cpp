@@ -485,8 +485,50 @@ void Test_hasCycle() {
 }
 
 
+/*
+    面试题 02.06. 回文链表
+    编写一个函数，检查输入的链表是否是回文的。
+
+示例 1：
+输入： 1->2
+输出： false
+
+示例 2：
+输入： 1->2->2->1
+输出： true
+*/
+bool isPalindrome(ListNode* head) {
+
+    ListNode* fast = head, *slow = head;
+    while (fast && fast->next) { // 寻找中间节点
+        fast = fast->next->next;
+        slow = slow->next;
+    }
+
+    std::cout << "slow val=" << slow->val << std::endl;
+    // while (slow) { // 
+    //     ListNode* tmp = slow->next;
+    // }
+
+    return true;
+}
+void Test_isPalindrome() {
+    // std::vector < int > v1{ 1, 2, 3, 3, 2, 1};
+    std::vector<int> v1{1, 2, 3, 4, 5, 6, 7, 8, 9};
+
+    auto l1 = ConstructList(v1);
+    PrintList(l1);
+
+    std::string str = isPalindrome(l1) ? "is palin":("not palin");
+    std::cout << "res=" << str << std::endl;
+}
+
+
 
 int tst_ListEntry() { // 测试list操作总入口
+    
+    Test_isPalindrome(); return 1;
+
     Test_reversePrint(); return 1;
 
     Test_getKthFromEnd(); return 1;
@@ -506,7 +548,6 @@ int tst_ListEntry() { // 测试list操作总入口
     tst_shuffle(); return 1;
 
     tst_CircleList(); return 1;
-
 
     tst_RPrintList_fun(); return 1;
 
