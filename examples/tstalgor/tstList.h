@@ -33,6 +33,7 @@ using namespace std;
 
 
 
+
 struct ListNodeEx
 {
     int val;
@@ -41,12 +42,16 @@ struct ListNodeEx
     }
 };
 
+extern ListNode* g_pListHead;
+
+
+
 extern void tst_reverse_list_1();
 
 extern void tst_RGetKthNode_fun();
 
 
-extern int tst_ListEntry_();
+extern int tst_ListEntry();
 
 
 

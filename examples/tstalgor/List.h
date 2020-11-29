@@ -7,19 +7,21 @@
 
 
 
-struct ListNode {
+
+typedef struct _tag_ListNode {
 public:
     int       val;
-    ListNode* next;
+    _tag_ListNode* next;
 
 public:
-    ListNode() : val( -1 ), next(nullptr) {
+    _tag_ListNode() : val( -1 ), next(nullptr) {
 
     }
-    ListNode(int val) : val( val ), next(nullptr) {
+    _tag_ListNode(int val) : val( val ), next(nullptr) {
 
     }
-};
+}ListNode;
+
 
 struct DoubleListNode {
 public:

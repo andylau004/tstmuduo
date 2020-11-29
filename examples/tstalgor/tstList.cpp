@@ -4,14 +4,12 @@
 
 #include "tstList.h"
 
-#include <stack>
-
 
 using namespace std;
 
 
 
-
+extern ListNode* mergeTwoList(ListNode* l1, ListNode* l2);
 
 
 
@@ -181,21 +179,17 @@ ListNodeEx* MergeTwoList(ListNodeEx* pHead1, ListNodeEx* pHead2) {
     }
     return pMerged;
 }
-void tst_MergeTwoList() {
-    ListNodeEx* phead1 = NULL;
-//    for (int i = 0 ; i < 9; ++ i )
-    CreateList(phead1, 12);CreateList(phead1, 8);CreateList(phead1, 6);
-    PrintList(phead1);
+void Test_MergeTwoList() {
+    std::vector<int> v1{6, 8, 12};
+    auto l1 = ConstructList(v1);
+    PrintList(l1);
 
-    ListNodeEx* phead2 = NULL;
-//    for (int j = 31; j < 40; ++ j )
-//        CreateList(phead2, j);
-    CreateList(phead2, 198);CreateList(phead2, 89);CreateList(phead2, 13);
-    PrintList(phead2);
+    std::vector<int> v2{13, 88, 137};
+    auto l2 = ConstructList(v2);
+    PrintList(l2);
 
-    std::cout << "11111111111111" << std::endl;
-    PrintList( MergeTwoList(phead1, phead2) );
-    std::cout << "22222222222222" << std::endl;
+    std::cout << "merge result -------------------" << std::endl;
+    PrintList( mergeTwoList(l1, l2) );
 }
 
 
@@ -361,8 +355,146 @@ void insert_sort_1( ) {
 }
 
 
-// 测试list操作算法总入口
-int tst_ListEntry_() {
+/*
+    237. 删除链表中的节点
+    请编写一个函数，使其可以删除某个链表中给定的（非末尾）节点。传入函数的唯一参数为 要被删除的节点。
+
+    现有一个链表 -- head = [4,5,1,9]，它可以表示为:
+
+    示例 1：
+    输入：head = [4,5,1,9], node = 5
+    输出：[4,1,9]
+    解释：给定你链表中值为 5 的第二个节点，那么在调用了你的函数之后，该链表应变为 4 -> 1 -> 9.
+
+    示例 2：
+    输入：head = [4,5,1,9], node = 1
+    输出：[4,5,9]
+    解释：给定你链表中值为 1 的第三个节点，那么在调用了你的函数之后，该链表应变为 4 -> 5 -> 9.
+*/
+void deleteNode(ListNode* node) {
+    node->val = node->next->val;
+    node->next = node->next->next;
+}
+void Test_deleteNode() {
+    std::vector<int> v1{ 4, 5, 1, 9 };
+    auto l1 = ConstructList(v1);
+    PrintList(l1);
+    std::cout << std::endl << std::endl;
+
+    deleteNode(l1);
+    PrintList(l1);
+}
+
+/*
+    剑指 Offer 22. 链表中倒数第k个节点
+    输入一个链表，输出该链表中倒数第k个节点。
+    为了符合大多数人的习惯，本题从1开始计数，即链表的尾节点是倒数第1个节点。
+    例如: 一个链表有6个节点，从头节点开始，它们的值依次是1、2、3、4、5、6。
+         这个链表的倒数第3个节点是值为4的节点。
+    示例：
+    给定一个链表: 1->2->3->4->5, 和 k = 2.
+    返回链表 4->5.
+*/
+ListNode* getKthFromEnd(ListNode* head, int k) {
+    ListNode* node = nullptr;
+
+    ListNode* fast = head, *slow = head;
+
+    while (k) {
+        if (!fast) return nullptr;
+
+        fast = fast->next;
+        k --;
+    }
+
+    while (fast) {
+        fast = fast->next;
+        slow = slow->next;
+    }
+
+    return slow;
+}
+void Test_getKthFromEnd() {
+    PrintList(g_pListHead);
+    std::cout << std::endl << std::endl;
+
+    auto retNode = getKthFromEnd(g_pListHead, 2);
+    PrintList(retNode);
+}
+
+
+/*
+    剑指 Offer 06. 从尾到头打印链表
+    输入一个链表的头节点，从尾到头反过来返回每个节点的值（用数组返回）。
+示例 1：
+输入：head = [1,3,2]
+输出：[2,3,1]
+*/
+std::vector<int> reversePrint(ListNode* head) {
+    std::vector<int> res;
+    std::stack<int> st;
+    while (head) {
+        st.push(head->val);
+        head = head->next;
+    }
+    while (st.size()) {
+        // std::cout << " " << st.top();
+        res.push_back(st.top());
+        st.pop();
+    }
+    return res;
+}
+void Test_reversePrint() {
+    // auto list = ConstructList(g_pListHead);
+    auto vec = reversePrint(g_pListHead);
+    PrintInContainer(vec);
+}
+
+
+
+/*
+141. 环形链表
+    给定一个链表，判断链表中是否有环。
+    如果链表中有某个节点，可以通过连续跟踪 next 指针再次到达，则链表中存在环。
+    为了表示给定链表中的环，我们使用整数 pos 来表示链表尾连接到链表中的位置（索引从 0 开始）。
+    如果链表中存在环，则返回 true 。否则，返回 false 。
+
+    进阶： 你能用 O(1)（即，常量）内存解决此问题吗？ 
+
+    示例 1：
+    输入：head = [3,2,0,-4], pos = 1
+    输出：true
+    解释：链表中有一个环，其尾部连接到第二个节点。
+
+    示例 2：
+    输入：head = [1,2], pos = 0
+    输出：true
+    解释：链表中有一个环，其尾部连接到第一个节点。
+
+    示例 3：
+    输入：head = [1], pos = -1
+    输出：false
+    解释：链表中没有环。
+*/
+bool hasCycle(ListNode *head) {
+
+    return false;        
+}
+void Test_hasCycle() {
+
+}
+
+
+
+int tst_ListEntry() { // 测试list操作总入口
+    Test_reversePrint(); return 1;
+
+    Test_getKthFromEnd(); return 1;
+
+    Test_deleteNode(); return 1;
+
+    Test_MergeTwoList(); return 1;
+
     insert_sort_1(); return 1;
 
     fast_slow_ptr(); return 1;
@@ -375,7 +507,6 @@ int tst_ListEntry_() {
 
     tst_CircleList(); return 1;
 
-    tst_MergeTwoList(); return 1;
 
     tst_RPrintList_fun(); return 1;
 

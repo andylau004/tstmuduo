@@ -3479,21 +3479,22 @@ void removeNthFromEnd(int k) {
 
 // 将两个有序的链表合并为一个新链表，要求新的链表是通过拼接两个链表的节点来生成的。
 ListNode* mergeTwoList(ListNode* l1, ListNode* l2) {
-    if (!l1) return l2;
-    if (!l2) return l1;
-    ListNode* h;
-    if (l1->val <= l2->val) {
-        h = l1;
-        l1->next = mergeTwoList(l1->next, l2);
+    if (l1 == nullptr && l2) { return l2;}
+    if (l2 == nullptr && l1) { return l1;}
+    if (l2 == nullptr && l1 == nullptr) { return nullptr;}
+
+    ListNode* newHead = nullptr;
+    if (l1->val < l2->val) {
+        newHead = l1;
+        newHead->next = mergeTwoList(l1->next, l2);
     } else {
-        h = l2;
-        l2->next = mergeTwoList(l1, l2->next);
+        newHead = l2;
+        newHead->next = mergeTwoList(l1, l2->next);
     }
-    return h;
+    return newHead;
 }
 void Test_mergeTwoList() {
     std::vector <int> vecInts1{ 10, 97, 113, 269, 398, 10000};
-
     auto list_1 = ConstructList(vecInts1);
 
 //    LOG_INFO << "print list node 111";
@@ -3501,7 +3502,6 @@ void Test_mergeTwoList() {
 //    LOG_INFO << "print list node 222";
 
     std::vector <int> vecInts2{ 2000, 9700, 21000, 21999, 32000};
-
     auto list_2 = ConstructList(vecInts2);
 
 //    LOG_INFO << "print list node 111";
@@ -3510,9 +3510,9 @@ void Test_mergeTwoList() {
 
     auto listNew = mergeTwoList(list_1, list_2);
 
-    LOG_INFO << "print list node 111";
+    LOG_INFO << "print list node before -------------------";
     PrintList(listNew);
-    LOG_INFO << "print list node 222";
+    LOG_INFO << "print list node after  -------------------";
 }
 void tst1() {
 //    std::vector<int> vecArr{ 10,-3,0,5,9};
@@ -3585,9 +3585,6 @@ int findKth() {
     quick_st_aesc(abc, 0, abc.size() - 1, 4);
     return 1;
 }
-
-
-//
 
 /**
    * @Description: 给定一个链表，删除链表的倒数第k个节点, 并返回链表的头指针
@@ -5079,17 +5076,45 @@ void levelOrderPrint(BstNode* root) {
 
 /*
     剑指 Offer 52. 两个链表的第一个公共节点
+给定两个（单向）链表，判定它们是否相交并返回交点。
+请注意相交的定义基于节点的引用，而不是基于节点的值。换句话说，如果一个链表的第k个节点与另一个链表的第j个节点是同一节点（引用完全相同），则这两个链表相交。
+
+示例 1：
+输入：intersectVal = 8, listA = [4,1,8,4,5], listB = [5,0,1,8,4,5], skipA = 2, skipB = 3
+输出：Reference of the node with value = 8
+输入解释：相交节点的值为 8 （注意，如果两个列表相交则不能为 0）。从各自的表头开始算起，链表 A 为 [4,1,8,4,5]，链表 B 为 [5,0,1,8,4,5]。在 A 中，相交节点前有 2 个节点；在 B 中，相交节点前有 3 个节点。
+
+示例 2：
+输入：intersectVal = 2, listA = [0,9,1,2,4], listB = [3,2,4], skipA = 3, skipB = 1
+输出：Reference of the node with value = 2
+输入解释：相交节点的值为 2 （注意，如果两个列表相交则不能为 0）。从各自的表头开始算起，链表 A 为 [0,9,1,2,4]，链表 B 为 [3,2,4]。在 A 中，相交节点前有 3 个节点；在 B 中，相交节点前有 1 个节点。
+
+示例 3：
+输入：intersectVal = 0, listA = [2,6,4], listB = [1,5], skipA = 3, skipB = 2
+输出：null
+输入解释：从各自的表头开始算起，链表 A 为 [2,6,4]，链表 B 为 [1,5]。由于这两个链表不相交，所以 intersectVal 必须为 0，而 skipA 和 skipB 可以是任意值。
+解释：这两个链表不相交，因此返回 null。
 */
 ListNode *getIntersectionNode(ListNode *headA, ListNode *headB) {
-    ListNode* node1 = headA;
-    ListNode* node2 = headB;
-    if ( node1 == nullptr || node2 == nullptr ) return nullptr;
+    if ( headA == nullptr || headA == nullptr ) return nullptr;
+    ListNode* p1 = headA;
+    ListNode* p2 = headB;
 
-    while ( node1 != node2 ) {
-        node1 = (node1 != nullptr) ? node1->next : headB;
-        node2 = (node2 != nullptr) ? node2->next : headA;
+    while ( p1 != p2 ) {
+        if (p1) {
+            p1 = p1->next;
+        } else {
+            p1 = headB;
+        }
+        if (p2) {
+            p2 = p2->next;
+        } else {
+            p2 = headA;
+        }
+        // node1 = (node1 != nullptr) ? node1->next : headB;
+        // node2 = (node2 != nullptr) ? node2->next : headA;
     }
-    return node1;
+    return p11;
 }
 
 
@@ -5492,7 +5517,6 @@ void Test_arraySum() {
 */
 class CSortedListToBst {
 private:
-
     ListNode* getMidNode(ListNode* left, ListNode* right) {
         ListNode* fast = left;
         ListNode* slow = left;
@@ -5521,9 +5545,6 @@ public:
         g_pBstTree = buildBstTree(g_pListHead, nullptr);
         printInorder();
     }
-
-
-
 };
 
 void initList() {
@@ -5537,14 +5558,13 @@ void initList() {
     给定一个链表，旋转链表，将链表每个节点向右移动 k 个位置，其中 k 是非负数。
 
     示例 1:
-
     输入: 1->2->3->4->5->NULL, k = 2
     输出: 4->5->1->2->3->NULL
     解释:
     向右旋转 1 步: 5->1->2->3->4->NULL
     向右旋转 2 步: 4->5->1->2->3->NULL
-    示例 2:
 
+    示例 2:
     输入: 0->1->2->NULL, k = 4
     输出: 2->0->1->NULL
     解释:
@@ -5585,6 +5605,13 @@ void Test_rotateRight() {
     // PrintList(g_pListHead);
 }
 
+/*
+    剑指 Offer 24. 反转链表
+    定义一个函数，输入一个链表的头节点，反转该链表并输出反转后链表的头节点。
+    示例:
+    输入: 1->2->3->4->5->NULL
+    输出: 5->4->3->2->1->NULL
+*/
 ListNode* reverselist(ListNode* head) {
 
     ListNode* pre = head, *cur = nullptr;
@@ -5607,6 +5634,43 @@ void Test_reverselist() {
     PrintList(retlist);
 }
 
+/*
+    876. 链表的中间结点
+    给定一个头结点为 head 的非空单链表，返回链表的中间结点。
+    如果有两个中间结点，则返回第二个中间结点。
+
+    示例 1：
+    输入：[1,2,3,4,5]
+    输出：此列表中的结点 3 (序列化形式：[3,4,5])
+    返回的结点值为 3 。 (测评系统对该结点序列化表述是 [3,4,5])。
+    注意，我们返回了一个 ListNode 类型的对象 ans，这样：
+    ans.val = 3, ans.next.val = 4, ans.next.next.val = 5, 以及 ans.next.next.next = NULL.
+
+    示例 2：
+    输入：[1,2,3,4,5,6]
+    输出：此列表中的结点 4 (序列化形式：[4,5,6])
+    由于该列表有两个中间结点，值分别为 3 和 4，我们返回第二个结点。
+*/
+ListNode* middleNode(ListNode* head) {
+
+    ListNode* fast = head, *slow = head;
+    
+    while (fast && fast->next) {
+        fast = fast->next->next;
+        slow = slow->next;
+    }
+
+    return slow;
+}
+void Test_middleNode() {
+    std::vector<int> v1{1, 2, 3, 4, 5, 6, 7, 8};
+    auto l1 = ConstructList(v1);
+    PrintList(l1);
+
+    std::cout << "val=" << middleNode(l1)->val << std::endl;
+}
+
+
 int main(int argc, char *argv[])
 {
     initList();
@@ -5614,6 +5678,10 @@ int main(int argc, char *argv[])
 
     Logger::setLogLevel(Logger::DEBUG);
     LOG_INFO << "pid = " << getpid() << ", tid=" << CurrentThread::tid();
+
+    Test_middleNode(); return 1;
+
+    tst_ListEntry(); return 1;
 
     Test_reverselist(); return 1;
     // printInorder(g_pBstTree);
@@ -5867,7 +5935,6 @@ int main(int argc, char *argv[])
 //    tst_ptr_vec(); return 1;
     tst_MergeSortEntry_(); return 1;
 
-    tst_ListEntry_(); return 1;
 
 #ifdef __cplusplus//C++编译器定义了-cplusplus
 std::cout << "c++" << std::endl;
