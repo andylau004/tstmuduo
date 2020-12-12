@@ -108,7 +108,7 @@ using namespace muduo::net;
 
 
 extern void tst_link_1();
-extern void printInorder(BstNode* root);
+extern void PrintInorder(BstNode* root);
 
 /*
 
@@ -1163,45 +1163,6 @@ void tst_print_time() {
 }
 
 
-void GetInOut( const std::vector< int >& vstocks, int& inBuy, int& outBuy) {
-    int min = 0;
-
-    int buyin  = 0;
-    int buyout = 0;
-
-    int maxProfit = 0;
-    int curProfit = 0;
-
-    for ( size_t i = 1; i < vstocks.size(); ++i ) {
-
-        curProfit = vstocks[i] - vstocks[min];
-
-        if (maxProfit < curProfit) {
-            maxProfit = curProfit;
-            buyin  = min;
-            buyout = i;
-        }
-        if (vstocks[i] < vstocks[min]) {
-            min = i;
-        }
-    }
-
-    inBuy  = buyin;
-    outBuy = buyout;
-}
-// N天内,一次交易
-// 获取股票买卖利润最大值
-void tst_GetInout() {
-    std::vector<int> vStocks;
-    vStocks.push_back( 5 );  vStocks.push_back( 2 );
-    vStocks.push_back( 12 ); vStocks.push_back( 6 );
-    vStocks.push_back( 1 );  vStocks.push_back( 19 );
-
-    int byIn, byOut = 0;
-    LOG_INFO << "byIn=" << byIn << ", byOut=" << byOut;
-    GetInOut( vStocks, byIn, byOut );
-    LOG_INFO << "byIn=" << byIn << ", byOut=" << byOut;
-}
 
 void tst_ptr_vec () {
 
@@ -1481,73 +1442,6 @@ void call_find_max_in_array() {
     }
 }
 
-// 翻转list链表
-ListNode* reverse_list(ListNode* pHead) {
-    if (!pHead) return NULL;
-
-    ListNode* pReverseHead = NULL;
-    ListNode* pCur = pHead, *pPrev = NULL, *pNext;
-    while (pCur) {
-        //做循环，如果当前节点不为空的话，始终执行此循环，此循环的目的就是让当前节点从指向next到指向pre
-        //如此就可以做到反转链表的效果
-        //先用next保存head的下一个节点的信息，保证单链表不会因为失去head节点的原next节点而就此断裂
-        pNext = pCur->next;
-        if (pNext == NULL)
-            pReverseHead = pCur;
-
-        //保存完next，就可以让head从指向next变成指向pre了，代码如下
-        pCur->next = pPrev;
-
-        pPrev = pCur;
-        pCur  = pNext;
-    }
-    return pReverseHead;
-}
-void call_reverse_list() {
-    ListNode* pNode1 = CreateListNode(1);
-    ListNode* pNode2 = CreateListNode(2);
-    ListNode* pNode3 = CreateListNode(3);
-    ListNode* pNode4 = CreateListNode(4);
-    ListNode* pNode5 = CreateListNode(5);
-    ConnectListNodes(pNode1, pNode2);
-    ConnectListNodes(pNode2, pNode3);
-    ConnectListNodes(pNode3, pNode4);
-    ConnectListNodes(pNode4, pNode5);
-
-    PrintList(pNode1);
-    ListNode* pRHead = reverse_list(pNode1);
-    PrintList(pRHead);
-}
-
-void swap2node_list(ListNode* listHead) {
-    std::stack<ListNode*> stackNodes;
-
-    ListNode* cur = listHead;
-    while (cur) {
-        while (stackNodes.size() == 2) {
-
-        }
-        stackNodes.push(cur);
-        cur = cur->next;
-    }
-
-}
-// 给定一个链表，两两交换其中相邻的节点，并返回交换后的链表。
-void tst_swap2Node_list() {
-    ListNode* pNode1 = CreateListNode(1);
-    ListNode* pNode2 = CreateListNode(2);
-    ListNode* pNode3 = CreateListNode(3);
-    ListNode* pNode4 = CreateListNode(4);
-//    ListNode* pNode5 = CreateListNode(5);
-    ConnectListNodes(pNode1, pNode2);
-    ConnectListNodes(pNode2, pNode3);
-    ConnectListNodes(pNode3, pNode4);
-//    ConnectListNodes(pNode4, pNode5);
-
-//    PrintList(pNode1);
-//    ListNode* pRetHead = swap2node_list(pNode1);
-//    PrintList(pRetHead);
-}
 
 void MakeX7() {
     int iVal = 8;
@@ -2367,7 +2261,7 @@ void CreateBstTree(const std::vector<int>& inVec) {// 构建二叉树；
     }
 }
 
-void printInorder() {
+void PrintInorder() {
     std::cout << std::endl;
     std::cout << "-------------------------------inOrder beg-------------------------------" << std::endl;
     inOrderNonRecru(g_pBstTree);
@@ -2382,7 +2276,7 @@ void CreateBstTreeEx() {
         insertNewBstNode(g_pBstTree, rand() % 200);
     }
 
-    printInorder();
+    PrintInorder();
 }
 
 void CreateBstTree() {// 构建二叉树；
@@ -2420,27 +2314,6 @@ void CreateBstTree() {// 构建二叉树；
 //        std::cout << "-------------------------------end random val-------------------------------" << std::endl;
         return;
     }
-
-    BstNode* p1 = new BstNode(127);
-    AddNewNode(g_pBstTree, p1);
-
-    BstNode* p2 = new BstNode(119);
-    AddNewNode(g_pBstTree, p2);
-
-    BstNode* p3 = new BstNode(6684);
-    AddNewNode(g_pBstTree, p3);
-
-    BstNode* p4 = new BstNode(217);
-    AddNewNode(g_pBstTree, p4);
-
-    BstNode* p5 = new BstNode(16);
-    AddNewNode(g_pBstTree, p5);
-
-    BstNode* p6 = new BstNode(31);
-    AddNewNode(g_pBstTree, p6);
-
-    BstNode* p7 = new BstNode(1997);
-    AddNewNode(g_pBstTree, p7);
 }
 
 
@@ -3522,17 +3395,13 @@ void tst1() {
 //    std::cout << std::endl;
 }
 
-// 
-
-    /**
+/**
      * @Author: ZwZ
      * @Description: 输入n个整数，找出其中最小的K个数。例如输入4,5,1,6,2,7,3,8这8个数字，则最小的4个数字是1,2,3,4。
      * @Param: [arr, k, length]
      * @return: 
      * @Date: 2020/1/30-21:55
-     */
-
-
+*/
 int quick_st_aesc( std::vector<int>& a, int start, int end, int k) {
     UNUSED(k);
     int pivot = a[start];
@@ -4125,42 +3994,6 @@ BstNode* mirrorTree(BstNode* root) {
 
 
 
-/*
-    定义栈的数据结构，请在该类型中实现一个能够得到栈的最小元素的 min 函数在该栈中，
-    调用 min、push 及 pop 的时间复杂度都是 O(1)。
-    示例:
-    MinStack minStack = new MinStack();
-    minStack.push(-2);
-    minStack.push(0);
-    minStack.push(-3);
-    minStack.min();   --> 返回 -3.
-    minStack.pop();
-    minStack.top();      --> 返回 0.
-    minStack.min();   --> 返回 -2.
-*/
-class MinStack {
-public:
-    /** initialize your data structure here. */
-    MinStack() {
-
-    }
-    
-    // void push(int x) {
-
-    // }
-    
-    // void pop() {
-
-    // }
-    
-    // int top() {
-
-    // }
-    
-    // int min() {
-
-    // }
-};
 
 
 /*
@@ -4243,7 +4076,7 @@ void Test_maxDepth() {
         // CreateBstTree(vecData);
     
 std::cout << "before handle ..." << std::endl;
-        printInorder(g_pBstTree);
+        PrintInorder(g_pBstTree);
 std::cout << std::endl;
 
 std::cout << "maxDepth_Recur=" << maxDepth_Recur(g_pBstTree) << std::endl;
@@ -4265,28 +4098,45 @@ ListNode* oddEvenList(ListNode* head) {
     return head;
 }
 void Test_oddEvenList() {
-    std::vector<int> arr{ 1, 2, 3 , 4, 5, 6, 7, 8, 9, 10};
+    std::vector<int> arr{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
     auto head = ConstructList(arr);
     auto ret = oddEvenList(head);
     PrintList(ret);
 }
 
-    void impl_prinInorder(BstNode* root) {
-        if (!root) return;
-        if (root->left) impl_prinInorder(root->left);
-        std::cout << " " << root->val;
-        if (root->right) impl_prinInorder(root->right);
-    }
-    void printInorder(BstNode* root) {
-        impl_prinInorder(root);
-        std::cout << std::endl;
-    }
-    void extractNodeInorder(BstNode* root, std::vector<BstNode*>& retVec) {
-        if (!root) return;
-        if (root->left) extractNodeInorder(root->left, retVec);
-        retVec.push_back(root);
-        if (root->right) extractNodeInorder(root->right, retVec);
-    }
+void impl_prinInorder(BstNode *root)
+{
+    if (!root)
+        return;
+    if (root->left)
+        impl_prinInorder(root->left);
+    std::cout << " " << root->val;
+    if (root->right)
+        impl_prinInorder(root->right);
+}
+/*
+-----------------------------------------------------------------------
+    复杂度分析
+
+    时间复杂度： O(n)，其中 n 为二叉树节点的个数。二叉树的遍历中每个节点会被访问一次且只会被访问一次。
+    空间复杂度： O(n)。空间复杂度取决于递归的栈深度，而栈深度在二叉树为一条链的情况下会达到 O(n) 的级别。
+-----------------------------------------------------------------------
+*/
+void PrintInorder(BstNode *root)
+{
+    impl_prinInorder(root);
+    std::cout << std::endl;
+}
+void extractNodeInorder(BstNode *root, std::vector<BstNode *> &retVec)
+{
+    if (!root)
+        return;
+    if (root->left)
+        extractNodeInorder(root->left, retVec);
+    retVec.push_back(root);
+    if (root->right)
+        extractNodeInorder(root->right, retVec);
+}
 /*
     给定一棵二叉搜索树，请找出其中第k大的节点。
     示例 1:
@@ -4322,7 +4172,7 @@ public:
         if (k > 0) dfs(root->left, k);
     }
     int KthLargest_FromBstTree() {
-        printInorder(g_pBstTree);
+        PrintInorder(g_pBstTree);
         std::cout << std::endl;
 
         int k = 3;
@@ -4357,47 +4207,12 @@ public:
     }
     void Test_KthNode() {
 
-        printInorder(g_pBstTree);
+        PrintInorder(g_pBstTree);
         std::cout << std::endl;
 
         auto ret = KthNode(g_pBstTree, 3);
         std::cout << "Kth least node=" << ret->val << std::endl;
         // std::cout << std::endl;
-    }
-};
-
-// 序列化二叉树
-class CEncDecBstTree {
-public:
-    void TestSerial() {
-
-        printInorder(g_pBstTree);
-        std::cout << std::endl;
-
-        std::cout << "serial res=" << SerialTree(g_pBstTree) << std::endl;
-        std::cout << std::endl;
-    }
-    std::string SerialTree(BstNode* root) {
-
-        // if (!root) return "";
-
-        // std::ostringstream out;
-        // std::queue<BstNode*> qNodes;
-        
-        // while (!qNodes.empty()) {
-        //     BstNode* temp = qNodes.front();
-        //     qNodes.pop();
-        //     if (temp) {
-        //         out << temp->val << " ";
-        //         qNodes.push(temp->left);
-        //         qNodes.push(temp->right);
-        //     } else {
-        //         out << "null ";
-        //     }
-        //     std::cout << "out=" << out.str().c_str() << std::endl;
-        // }
-        // return out.str();
-        return "";
     }
 };
 
@@ -4488,7 +4303,7 @@ void Test_isValidBst() {
     // extractNodeInorder(g_pBstTree, retVec);
     // retVec[retVec.size() - 1 ]->val = 2;
 
-    printInorder(g_pBstTree);
+    PrintInorder(g_pBstTree);
     std::cout << std::endl;
     
     long long pre = LONG_MIN;
@@ -4500,39 +4315,16 @@ void Test_isValidBst() {
     std::cout << "isBalanced=" << isBalanced(g_pBstTree) << std::endl;
     std::cout << std::endl;
 }
+ 
 
-// 卖股票的最好时机
-
-
-/*
-输入一棵二叉树的根节点，判断该树是不是平衡二叉树。
-如果某二叉树中任意节点的左右子树的深度相差不超过1，那么它就是一棵平衡二叉树。
-
-示例 1:
-给定二叉树 [3,9,20,null,null,15,7]
-
-    3
-   / \
-  9  20
-    /  \
+/*    棵二叉树的根节点，判断    叉树。
+如果   意节点的    的深        
+    :
+给定二叉树 [3,9,20nullnll        /  \
    15   7
-返回 true 。
-
-示例 2:
-给定二叉树 [1,2,2,3,3,null,null,4,4]
-
-       1
-      / \
-     2   2
-    / \
-   3   3
-  / \
- 4   4
-返回 false 。
-*/
-int maxDepthEx(BstNode* root) {
-    if (!root) return 0;
-    return std::max(maxDepthEx(root->left), maxDepthEx(root->right)) + 1;
+返回             [1                                                     
+                           
+   returns td::m        x(    ft    pthEx(root->right)) + 1;
 }
 bool isBalancedEx(BstNode* root) {
     if ( !root ) return true;
@@ -4544,7 +4336,7 @@ bool isBalancedEx(BstNode* root) {
     return isBalancedEx(root->left) && isBalancedEx(root->right);
 }
 void Test_isBalanced() {    
-    printInorder(g_pBstTree);
+    PrintInorder(g_pBstTree);
     std::cout << std::endl;
 
 std::cout << std::endl;
@@ -4621,12 +4413,12 @@ public:
         CreateBstTree(vecData);
     
         std::cout << "before mirror ..." << std::endl;
-        printInorder(g_pBstTree);
+        PrintInorder(g_pBstTree);
         std::cout << std::endl;
 
         std::cout << "after mirror ..." << std::endl;
         auto mirror = mirrorTree(g_pBstTree);
-        printInorder(mirror);
+        PrintInorder(mirror);
         std::cout << std::endl;
     }
 };
@@ -4771,8 +4563,7 @@ public:
 
 /*
     将二叉搜索树转化为双向循环链表。
-    链表中的每个节点都有一个前驱和后继指针。
-    对于双向循环链表，第一个节点的前驱是最后一个节点，最后一个节点的后继是第一个节点。
+    链表中的每    都有环链个节点的前驱是最后一个节点，最后一个节点的后继是第一个节点。
 */
 class CBstTreeToDoubleList {
     BstNode* head, *tail;
@@ -4817,7 +4608,7 @@ public:
         }
     }
     int CKthSmallest() {
-        printInorder(g_pBstTree);
+        PrintInorder(g_pBstTree);
         std::cout << std::endl;
         
         int k = 3;
@@ -4961,16 +4752,16 @@ void Test_reverseInt() {
 }
 
 /*
-938. 二叉搜索树的范围和
-给定二叉搜索树的根结点 root，返回值位于范围 [low, high] 之间的所有结点的值的和。
+    938. 二叉搜索树的范围和
+    给定二叉搜索树的根结点 root，返回值位于范围 [low, high] 之间的所有结点的值的和。
 
-示例 1：
-输入：root = [10,5,15,3,7,null,18], low = 7, high = 15
-输出：32
-示例 2：
+    示例 1：
+    输入：root = [10,5,15,3,7,null,18], low = 7, high = 15
+    输出：32
 
-输入：root = [10,5,15,3,7,13,18,1,null,6], low = 6, high = 10
-输出：23
+    示例 2：
+    输入：root = [10,5,15,3,7,13,18,1,null,6], low = 6, high = 10
+    输出：23
 */
 int rangeSumBST(BstNode* root, int low, int high) {
     if (!root) return 0;
@@ -4983,7 +4774,7 @@ int rangeSumBST(BstNode* root, int low, int high) {
 }
 void Test_rangeSumBST() {    
     std::cout << "before handle ..." << std::endl;
-    printInorder(g_pBstTree);
+    PrintInorder(g_pBstTree);
     std::cout << std::endl;
 }
 
@@ -5002,7 +4793,6 @@ void Test_rangeSumBST() {
 和值: 2
 
 你应该返回如下子树:
-
       2     
      / \   
     1   3
@@ -5031,7 +4821,7 @@ class CSearchBst {
 public:
     void Test_searchBst() {
         std::cout << "before handle ..." << std::endl;
-        printInorder(g_pBstTree);
+        PrintInorder(g_pBstTree);
 
         int idx = 0;
         while (idx == 0) {
@@ -5076,27 +4866,28 @@ void levelOrderPrint(BstNode* root) {
 
 /*
     剑指 Offer 52. 两个链表的第一个公共节点
-给定两个（单向）链表，判定它们是否相交并返回交点。
-请注意相交的定义基于节点的引用，而不是基于节点的值。换句话说，如果一个链表的第k个节点与另一个链表的第j个节点是同一节点（引用完全相同），则这两个链表相交。
+    给定两个（单向）链表，判定它们是否相交并返回交点。
+    请注意相交的定义基于节点的引用，而不是基于节点的值。换句话说，如果一个链表的第k个节点与另一个链表的第j个节点是同一节点（引用完全相同），则这两个链表相交。
 
-示例 1：
-输入：intersectVal = 8, listA = [4,1,8,4,5], listB = [5,0,1,8,4,5], skipA = 2, skipB = 3
-输出：Reference of the node with value = 8
-输入解释：相交节点的值为 8 （注意，如果两个列表相交则不能为 0）。从各自的表头开始算起，链表 A 为 [4,1,8,4,5]，链表 B 为 [5,0,1,8,4,5]。在 A 中，相交节点前有 2 个节点；在 B 中，相交节点前有 3 个节点。
+    示例 1：
+    输入：intersectVal = 8, listA = [4,1,8,4,5], listB = [5,0,1,8,4,5], skipA = 2, skipB = 3
+    输出：Reference of the node with value = 8
+    输入解释：相交节点的值为 8 （注意，如果两个列表相交则不能为 0）。从各自的表头开始算起，链表 A 为 [4,1,8,4,5]，链表 B 为 [5,0,1,8,4,5]。在 A 中，相交节点前有 2 个节点；在 B 中，相交节点前有 3 个节点。
 
-示例 2：
-输入：intersectVal = 2, listA = [0,9,1,2,4], listB = [3,2,4], skipA = 3, skipB = 1
-输出：Reference of the node with value = 2
-输入解释：相交节点的值为 2 （注意，如果两个列表相交则不能为 0）。从各自的表头开始算起，链表 A 为 [0,9,1,2,4]，链表 B 为 [3,2,4]。在 A 中，相交节点前有 3 个节点；在 B 中，相交节点前有 1 个节点。
+    示例 2：
+    输入：intersectVal = 2, listA = [0,9,1,2,4], listB = [3,2,4], skipA = 3, skipB = 1
+    输出：Reference of the node with value = 2
+    输入解释：相交节点的值为 2 （注意，如果两个列表相交则不能为 0）。从各自的表头开始算起，链表 A 为 [0,9,1,2,4]，链表 B 为 [3,2,4]。在 A 中，相交节点前有 3 个节点；在 B 中，相交节点前有 1 个节点。
 
-示例 3：
-输入：intersectVal = 0, listA = [2,6,4], listB = [1,5], skipA = 3, skipB = 2
-输出：null
-输入解释：从各自的表头开始算起，链表 A 为 [2,6,4]，链表 B 为 [1,5]。由于这两个链表不相交，所以 intersectVal 必须为 0，而 skipA 和 skipB 可以是任意值。
-解释：这两个链表不相交，因此返回 null。
+    示例 3：
+    输入：intersectVal = 0, listA = [2,6,4], listB = [1,5], skipA = 3, skipB = 2
+    输出：null
+    输入解释：从各自的表头开始算起，链表 A 为 [2,6,4]，链表 B 为 [1,5]。由于这两个链表不相交，所以 intersectVal 必须为 0，而 skipA 和 skipB 可以是任意值。
+    解释：这两个链表不相交，因此返回 null。
 */
 ListNode *getIntersectionNode(ListNode *headA, ListNode *headB) {
     if ( headA == nullptr || headA == nullptr ) return nullptr;
+
     ListNode* p1 = headA;
     ListNode* p2 = headB;
 
@@ -5111,24 +4902,22 @@ ListNode *getIntersectionNode(ListNode *headA, ListNode *headB) {
         } else {
             p2 = headA;
         }
-        // node1 = (node1 != nullptr) ? node1->next : headB;
-        // node2 = (node2 != nullptr) ? node2->next : headA;
     }
     return p1;
 }
 
 
 /*
-给定一个二叉树，计算整个树的坡度
+    给定一个二叉树，计算整个树的坡度
 
-一个树的 节点的坡度 定义为:
-该节点左子树的节点之和 和 右子树节点之和的 差的绝对值。
-如果没有左子树的话，左子树的节点之和为0；
-没有右子树的话也是一样。空结点的坡度是0。
+    节点坡度 定义: 该节点 左子树节点之和 和 右子树节点之和 的差的绝对值。
 
-整个树的坡度: 是其所有节点的坡度之和。
+    如果没有左子树，左子树的节点之和为0；
+    没有右子树也是一样。空结点的坡度是0。
+
+    整个树的坡度: 是其所有节点的坡度之和。
 */
-int findTilt(TreeNode* root) {
+int findTilt(BstNode* root) {
 
     return 1;
 }
@@ -5161,15 +4950,15 @@ int findTilt(TreeNode* root) {
 输出：false
 */
 bool check_isSysmmetric(BstNode* p, BstNode* q) {
-    if ( !p && !q ) return true;
+    if ( !p && !q )          return true;
     if ( p == nullptr && q ) return false;
-    if ( p && q == nullptr) return false;
+    if ( p && q == nullptr)  return false;
     return (p->val == q->val) && check_isSysmmetric(p->left, q->right) && check_isSysmmetric(p->right, q->left);
 }
 void isSymmetric() {
 
 std::cout << "before check ..." << std::endl;
-        printInorder(g_pBstTree);
+        PrintInorder(g_pBstTree);
 std::cout << std::endl;
 
     std::cout << "check sysmmetric=" << check_isSysmmetric(g_pBstTree, g_pBstTree) << std::endl;
@@ -5178,7 +4967,7 @@ std::cout << std::endl;
 /*
     543. 二叉树的直径
     给定一棵二叉树，你需要计算它的直径长度。
-    一棵二叉树的直径长度是任意两个结点路径长度中的最大值。这条路径可能穿过也可能不穿过根结点。
+    一棵二叉树的直径长度是任意两个结点路径长度中的最大值。这条路径可能穿过，也可能不穿过根结点。
 
 示例: 给定二叉树
           1
@@ -5188,9 +4977,18 @@ std::cout << std::endl;
       4   5    
 返回 3, 它的长度是路径 [4,2,1,3] 或者 [5,2,1,3]。
 
-注意：两结点之间的路径长度是以它们之间边的数目表示。
-*/
+注意: 两结点之间的路径长度 是以它们之间边的数目表示。
+-----------------------------------------------------------------------
 
+-----------------------------------------------------------------------
+*/
+int diameterOfBinaryTree(BstNode *root) {
+
+    return 1;
+}
+void Test_diameterOfBinaryTree() {
+
+}
 
 /*
     1367. 二叉树中的列表
@@ -5205,37 +5003,25 @@ class CCheckTreeSubList {
         if (!head) return true;
         if (!root) return false;
         if (root->val != head->val) return false;
-        return (dfs(head, root->left) || dfs(head, root->right));
+        return (dfs(head->next, root->left) || dfs(head->next, root->right));
     }
 public:
-    bool isSubPath(ListNode* head, TreeNode* root) {
-        {
-            std::queue<TreeNode*> que;
-            que.push(root);
-            while ( que.size() ) {
-                TreeNode* q = que.front();
-                que.pop();
-                
-                if ( q->val == head->val ) {
-                    if ( dfs(head, root) ) return true;
-                }
-                if (q->left) que.push(q->left);
-                if (q->right)que.push(q->right);
-            }
-            return false;
-        }
-
-        std::queue <TreeNode*> que;
+    bool isSubPath(ListNode *head, TreeNode *root) {
+        std::queue<TreeNode *> que;
         que.push(root);
-
         while (que.size()) {
-            auto q = que.front(); que.pop();
-            if (!q) continue;
-            if (q->val == head->val) {
-                if (dfs(head, q)) return true;
+            TreeNode *tmp = que.front();
+            que.pop();
+
+            if (tmp->val == head->val)
+            {
+                if (dfs(head, tmp))
+                    return true;
             }
-            que.push(q->left);
-            que.push(q->right);
+            if (tmp->left)
+                que.push(tmp->left);
+            if (tmp->right)
+                que.push(tmp->right);
         }
         return false;
     }
@@ -5252,7 +5038,7 @@ void Test_CheckTreeSubList() {
     一个以此数组构建的最大二叉树定义如下：
 
     二叉树的根是数组中的最大元素。
-    左子树是通过数组中最大值左边部分构造出的最大二叉树。
+    左子树是通过数    最大值左边部分构造出的最大二叉树。
     右子树是通过数组中最大值右边部分构造出的最大二叉树。
     通过给定的数组构建最大二叉树，并且输出这个树的根节点。
 
@@ -5290,7 +5076,6 @@ void Test_ConstuctMaxBst() {
         
 }
 
-
 /*
     617. 合并二叉树
 
@@ -5326,36 +5111,30 @@ TreeNode* mergeTrees(TreeNode* t1, TreeNode* t2) {
     return t1;
 }
 
-
 /*
     两数之和
 给定一个整数数组 nums 和一个目标值 target，
 请你在该数组中找出和为目标值的那 两个 整数，并返回他们的数组下标。
 可以假设每种输入只会对应一个答案。但是，数组中同一个元素不能使用两遍。
 
-示例:
-给定 nums = [2, 7, 11, 15], target = 9
+示例: 给定 nums = [2, 7, 11, 15], target = 9
 
-因为 nums[0] + nums[1] = 2 + 7 = 9
-所以返回 [0, 1]
+因为 nums[0] + nums[1] = 2 + 7 = 9, 所以返回 [0, 1]
 */
 vector<int> twoSum(const vector<int>& nums, int target) {
-    {
-        std::vector<int> ret;
-        std::unordered_map <int, int> map;
+    std::vector<int> ret;
+    std::unordered_map <int, int> um;
         
-        for (size_t i = 0; i < nums.size(); i ++) {
-            auto it = map.find(target - nums[i]);
-            if (it != map.end()) {
-                ret.push_back(it->second);
-                ret.push_back(i);
-                break;
-            } else {
-                map[ nums[i] ] = i;
-            }
+    for (size_t i = 0; i < nums.size(); i ++) {
+        auto it = um.find(target - nums[i]);
+        if (it != um.end()) {
+            ret.push_back(it->second);
+            break;
+        } else {
+            um[nums[i]] = i;
         }
-        return ret;
     }
+    return ret;
 }
 void Test_twoSum() {
     std::vector<int> v1{ 1, 9, 8, 7, 3};
@@ -5406,7 +5185,7 @@ public:
     void minDiffInBST() {
 
 std::cout << "before handle ..." << std::endl;
-        printInorder(g_pBstTree);
+        PrintInorder(g_pBstTree);
 std::cout << std::endl;
     minDiff(g_pBstTree);
 std::cout << "res=" << minVal << std::endl;
@@ -5543,7 +5322,7 @@ public:
     }
     void sortedListToBST() {
         g_pBstTree = buildBstTree(g_pListHead, nullptr);
-        printInorder();
+        PrintInorder();
     }
 };
 
@@ -5606,35 +5385,6 @@ void Test_rotateRight() {
 }
 
 /*
-    剑指 Offer 24. 反转链表
-    定义一个函数，输入一个链表的头节点，反转该链表并输出反转后链表的头节点。
-    示例:
-    输入: 1->2->3->4->5->NULL
-    输出: 5->4->3->2->1->NULL
-*/
-ListNode* reverselist(ListNode* head) {
-
-    ListNode* pre = head, *cur = nullptr;
-    while (pre) {
-
-        ListNode* t = pre->next;
-        pre->next = cur;
-
-        cur = pre;
-        pre = t;
-    }
-    return cur;
-}
-void Test_reverselist() {
-    PrintList(g_pListHead);
-    std::cout << "before handle list -----" << std::endl;
-
-    auto retlist = reverselist(g_pListHead);
-    std::cout << "after  handle list -----" << std::endl;
-    PrintList(retlist);
-}
-
-/*
     876. 链表的中间结点
     给定一个头结点为 head 的非空单链表，返回链表的中间结点。
     如果有两个中间结点，则返回第二个中间结点。
@@ -5671,6 +5421,47 @@ void Test_middleNode() {
 }
 
 
+/*
+    100. 相同的树
+给定两个二叉树，编写一个函数来检验它们是否相同。
+如果两个树在结构上相同，并且节点具有相同的值，则认为它们是相同的。
+
+示例 1:
+输入:       1         1
+          / \       / \
+         2   3     2   3
+
+        [1,2,3],   [1,2,3]
+
+输出: true
+
+示例 2:
+输入:      1          1
+          /           \
+         2             2
+
+        [1,2],     [1,null,2]
+
+输出: false
+示例 3:
+
+输入:       1         1
+          / \       / \
+         2   1     1   2
+
+        [1,2,1],   [1,1,2]
+
+输出: false
+*/
+bool isSameTree(TreeNode* p, TreeNode* q) {
+    if (!p && !q) return true;
+    else if (!p || !q) return false;
+    else if (p->val != q->val)
+        return false;
+    else 
+        return isSameTree(p->left, q->right) && isSameTree(p->right, q->right);
+}
+
 int main(int argc, char *argv[])
 {
     initList();
@@ -5679,16 +5470,16 @@ int main(int argc, char *argv[])
     Logger::setLogLevel(Logger::DEBUG);
     LOG_INFO << "pid = " << getpid() << ", tid=" << CurrentThread::tid();
 
-
     // --------------------test--------------------
+    LeetCodeEntry(); return 1;
 
-    tst_ListEntry(); return 1;
+    Test_ListEntry(); return 1;
+
 
     Test_middleNode(); return 1;
 
 
-    Test_reverselist(); return 1;
-    // printInorder(g_pBstTree);
+    // PrintInorder(g_pBstTree);
     // std::cout << std::endl;
 
     isSymmetric();      return 1;
@@ -5700,7 +5491,6 @@ int main(int argc, char *argv[])
     c1.sortedListToBST();
     return 1;
 }
-    LeetCodeEntry(); return 1;
 
     Test_CFindModeNum(); return 1;
 
@@ -5713,7 +5503,6 @@ int main(int argc, char *argv[])
 
     Test_twoSum(); return 1;
 
-    isSymmetric(); return 1;
 {
     CSearchBst csb;
     csb.Test_searchBst(); return 1;
@@ -5729,14 +5518,14 @@ int main(int argc, char *argv[])
 
     Test_mergeKLists(); return 1;
 
-    Test_isBalanced(); return 1;
+    // Test_isBalanced(); return 1;
     Test_isValidBst(); return 1;
 
     CPathSum pathsum; return 1;
 
-    CEncDecBstTree cEnDeTree;
-    cEnDeTree.TestSerial();
-    return 1;
+    // CEncDecBstTree cEnDeTree;
+    // cEnDeTree.TestSerial();
+    // return 1;
 
     CKthLargest_FromBstTree ctt1;
     ctt1.KthLargest_FromBstTree();
@@ -5914,8 +5703,6 @@ int main(int argc, char *argv[])
 
     MakeX7(); return 1;
 
-    tst_GetInout(); return 1;
-
     tst_reverse_list_1(); return 1;
 
     tst_hash_fun_entry(); return 1;
@@ -5923,7 +5710,6 @@ int main(int argc, char *argv[])
     tst_HeapSortEntry_(); return 1;
     tst_dpfun_entry(); return 1;
 
-    call_reverse_list(); return 1;
 
     call_find_max_in_array(); return 1;
     call_Max_array_Sum(); return 1;

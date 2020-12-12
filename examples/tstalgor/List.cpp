@@ -86,29 +86,29 @@ void RemoveNode(ListNode** pHead, int delVal)
     }
 }
 
-    ListNode* ConstructList(std::vector<int>& vecInts) {
-        std::vector< ListNode* > vecNodes;
+ListNode* ConstructList(std::vector<int>& vecInts) {
+    std::vector< ListNode* > vecNodes;
 
-        for ( auto ii : vecInts ) {
-            vecNodes.push_back(CreateListNode(ii));
-        }
-
-        for ( size_t i = 0; i < vecNodes.size(); i ++ ) {
-            auto next = i + 1;
-            if ( next != vecNodes.size() ) {
-                ConnectListNodes(vecNodes[i], vecNodes[next]);
-            }
-        }
-        return *vecNodes.begin();
+    for (auto ii : vecInts) {
+        vecNodes.push_back(CreateListNode(ii));
     }
 
-    int GetListLength(ListNode* listHead) {
-        if (!listHead) return 0;
-        int len = 0;;
-        while (listHead) {
-            len ++;
-            listHead = listHead->next;
+    for (size_t i = 0; i < vecNodes.size(); i++) {
+        auto next = i + 1;
+        if (next != vecNodes.size()) {
+            ConnectListNodes(vecNodes[i], vecNodes[next]);
         }
-        return len;
     }
+    return *vecNodes.begin();
+}
+
+int GetListLength(ListNode* listHead) {
+    if (!listHead) return 0;
+    int len = 0;;
+    while (listHead) {
+        len++;
+        listHead = listHead->next;
+    }
+    return len;
+}
 

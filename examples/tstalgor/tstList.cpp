@@ -4,14 +4,13 @@
 
 #include "tstList.h"
 
+#include "muduo/base/common.h"
 
 using namespace std;
 
 
 
 extern ListNode* mergeTwoList(ListNode* l1, ListNode* l2);
-
-
 
 
 
@@ -220,7 +219,7 @@ void tst_CircleList() {
 void shufferImpl(int arr[], int length) {
 
     srand(time(NULL));
-    int index = 0;
+    // int index = 0;
 
     for (int i = length-1; i > 0; -- i) {
         int index = rand()%(length);
@@ -396,7 +395,7 @@ void Test_deleteNode() {
     返回链表 4->5.
 */
 ListNode* getKthFromEnd(ListNode* head, int k) {
-    ListNode* node = nullptr;
+    // ListNode* node = nullptr;
 
     ListNode* fast = head, *slow = head;
 
@@ -475,13 +474,61 @@ void Test_reversePrint() {
     输入：head = [1], pos = -1
     输出：false
     解释：链表中没有环。
+
+
+-----------------------------------------------------------------------
+复杂度分析
+
+时间复杂度： O(N)，其中 N 是链表的节点数。
+当链表中不存在环时，快指针将先于慢指针到达链表尾部，链表中每个节点至多被访问两次。
+当链表中存在环时，每一轮移动后，快慢指针的距离将减小一。而初始距离为环的长度，因此至多移动 NN 轮。
+空间复杂度： O(1)。我们只使用了两个指针的额外空间。
+-----------------------------------------------------------------------
 */
 bool hasCycle(ListNode *head) {
+    if (!head) return true;
 
-    return false;        
+    ListNode* fast = head, * slow = head;
+    while ( fast && fast->next ) {
+        fast = fast->next->next;
+        slow = slow->next;
+        if (slow == fast) return true;
+    }
+    return false;
 }
 void Test_hasCycle() {
+    hasCycle(nullptr);
+}
 
+/*
+第142题.环形链表II
+题意：给定一个链表，返回链表开始入环的第一个节点。 如果链表无环，则返回 null。
+
+为了表示给定链表中的环，使用整数 pos 来表示链表尾连接到链表中的位置（索引从 0 开始）。
+
+如果 pos 是 -1，则在该链表中没有环。
+*/
+ListNode* detectCycle(ListNode* head) {
+    if (!head) return nullptr;
+
+    ListNode* fast = head, * slow = head;
+    while ( fast && fast->next ) {
+        fast = fast->next->next;
+        slow = slow->next;
+        if (slow == fast) {
+            ListNode* idx1 = fast;
+            ListNode* idx2 = head;
+            while ( idx1 != idx2 ) {
+                idx1 = idx1->next;
+                idx2 = idx2->next;
+            }
+            return idx2;
+        }
+    }
+    return nullptr;
+}
+void Test_detectCycle() {
+    
 }
 
 
@@ -506,15 +553,31 @@ bool isPalindrome(ListNode* head) {
     }
 
     std::cout << "slow val=" << slow->val << std::endl;
-    // while (slow) { // 
-    //     ListNode* tmp = slow->next;
-    // }
+    ListNode* pre = nullptr;
+    while (slow) { // 
+        ListNode* nxtNode = slow->next;
+        slow->next = pre;
 
+        pre = slow;
+        slow = nxtNode;
+    }
+    PrintList( head );
+    PrintList( pre );
+
+    while (head && pre) {
+        if (head->val != pre->val) {
+            return false;
+        }
+        head = head->next;
+        pre = pre->next;
+    }
     return true;
 }
 void Test_isPalindrome() {
-    // std::vector < int > v1{ 1, 2, 3, 3, 2, 1};
-    std::vector<int> v1{1, 2, 3, 4, 5, 6, 7, 8, 9};
+    // std::vector < int > v1{ 1, 2, 3, 5, 4, 3, 2, 1};
+    std::vector < int > v1{ 1, 2, 3, 5, 3, 2, 1};
+    // std::vector<int> v1{1, 2, 3, 4, 5, 6, 7, 8, 9};
+    // std::vector<int> v1{1, 2, 3, 4, 5, 6, 7};
 
     auto l1 = ConstructList(v1);
     PrintList(l1);
@@ -524,9 +587,493 @@ void Test_isPalindrome() {
 }
 
 
+/*
+    面试题 04.03. 特定深度节点链表
+给定一棵二叉树，设计一个算法，创建含有某一深度上所有节点的链表（比如: 若一棵树的深度为 D，则会创建出 D 个链表）。
+返回一个包含所有深度的链表的数组。
 
-int tst_ListEntry() { // 测试list操作总入口
+示例： 输入：[1,2,3,4,5,null,7,8]
+
+        1
+       /  \
+      2    3
+     / \    \
+    4   5    7
+   /
+  8
+
+输出：[[1],[2,3],[4,5,7],[8]]
+*/
+vector<ListNode*> listOfDepth(BstNode* tree) {
+    vector<ListNode*> res;
+
+    std::queue<BstNode*> que;
+    que.push(tree);
+
+    while (que.size()) {
+        int sz = que.size();
+
+        auto head = new ListNode(-1);
+        ListNode* p = head;
+        while (sz--) {
+
+            BstNode* tmp = que.front();
+            que.pop();
+
+            if (tmp->left) {
+                que.push(tmp->left);
+            }
+            if (tmp->right) {
+                que.push(tmp->right);
+            }
+
+            p->next = new ListNode(tmp->val);
+            p = p->next;
+        }
+        res.push_back(head->next);
+        delete head;
+    }
+    return res;
+}
+void Test_listOfDepth() {
+    // PrintTree(g_pBstTree);
+    PrintInorder(g_pBstTree);
+    std::cout << std::endl;
+
+    auto ret = listOfDepth(g_pBstTree);
+    for ( auto l : ret ) {
+
+        while ( l ) {
+            std::cout << " " << l->val;
+            l = l->next;
+        }
+
+        std::cout << std::endl;
+    }
+}
+
+/*
+    5558. 合并两个链表
+
+    给你两个链表 list1 和 list2 ，它们包含的元素分别为 n 个和 m 个。
+    请你将 list1 中第 a 个节点到第 b 个节点删除，并将list2 接在被删除节点的位置。
+
+示例 1：
+输入：list1 = [0,1,2,3,4,5], a = 3, b = 4, list2 = [1000000,1000001,1000002]
+输出：[0,1,2,1000000,1000001,1000002,5]
+
+示例 2：
+输入：list1 = [0,1,2,3,4,5,6], a = 2, b = 5, list2 = [1000000,1000001,1000002,1000003,1000004]
+输出：[0,1,1000000,1000001,1000002,1000003,1000004,6]
+*/
+ListNode* mergeInBetween(ListNode* list1, int a, int b, ListNode* list2) {
+    ListNode *tmp = nullptr;
+    UNUSED(a);
+    UNUSED(b);
+    UNUSED(tmp);
+    UNUSED(list1);
+    UNUSED(list2);
+    return tmp;
+}
+
+/*
+    剑指 Offer 35. 复杂链表的复制
+
+    请实现 copyRandomList 函数，复制一个复杂链表。
+    在复杂链表中，每个节点除了有一个 next 指针指向下一个节点，还有一个 random 指针指向链表中的任意节点或者 null。
+*/
+void copyNodes(ListNode *head) {
+    if (!head) return;
+    ListNode *pos = head;
+    while (pos) {
+        ListNode *copy = new ListNode(pos->val);
+        ListNode *next = pos->next;
+        pos->next = copy;
+        copy->next = next;
+        pos = copy->next;
+    }
+}
+ListNode* copyRandomList(ListNode* head) {
+    ListNode *tmp = nullptr;
+
+    copyNodes(head);
+    return tmp;
+}
+void Test_copyRandomList() {
+    PrintList(g_pListHead);
+    std::cout << " ---------------------------------- " << std::endl;
+    copyRandomList(g_pListHead);
+    PrintList(g_pListHead);
+    // std::cout << " ---------------------------------- " << std::endl;
+}
+
+/*
+    148. 排序链表
+给你链表的头结点 head ，请将其按 升序 排列并返回 排序后的链表 。
+
+进阶：你可以在 O(nlogn) 时间复杂度和常数级空间复杂度下，对链表进行排序吗？
+*/
+ListNode* sortList(ListNode* head) {
+    ListNode *tmp = nullptr;
+    return tmp;
+}
+
+
+
+/*
+    剑指 Offer 24. 反转链表
+    定义一个函数，输入一个链表的头节点，反转该链表，并输出反转后链表头节点。
+    示例:
+    输入: 1->2->3->4->5->NULL
+    输出: 5->4->3->2->1->NULL
+*/
+ListNode* reverselist(ListNode* head) {
+
+    ListNode* pre = head, *cur = nullptr;
+    while (pre) {
+
+        ListNode* t = pre->next;
+        pre->next = cur;
+
+        cur = pre;
+        pre = t;
+    }
+    return cur;
+}
+void Test_reverselist() {
+    PrintList(g_pListHead);
+    std::cout << "before handle list -----" << std::endl;
+
+    auto retlist = reverselist(g_pListHead);
+    std::cout << "after  handle list -----" << std::endl;
+    PrintList(retlist);
+}
+
+/*
+    136. 只出现一次的数字
+    给定一个非空整数数组，除了某个元素只出现一次以外，其余每个元素均出现两次。
+    找出那个只出现了一次的元素。
+
+说明： 你的算法应该具有线性时间复杂度。 你可以不使用额外空间来实现吗？
+
+示例 1:
+输入: [2,2,1]
+输出: 1
+
+示例 2:
+输入: [4,1,2,1,2]
+输出: 4
+*/
+int singleNumber(vector<int>& nums) {
+    int res = nums[0];
+    for (size_t i = 1; i < nums.size(); i++) {
+        res ^= nums[i];
+    }
+    return res;
+}
+void Test_singleNumber() {
+    std::vector<int> v1{ 9102, 4, 4, 1, 2, 1, 2 };
+    auto retNum = singleNumber(v1);
+    std::cout << "retnum=" << retNum << std::endl;
+}
+
+/*
+    169. 多数元素
+给定一个大小为 n 的数组，找到其中的多数元素。
+多数元素是指在数组中出现次数大于 ⌊ n/2 ⌋ 的元素。
+
+示例 1:
+输入: [3,2,3]
+输出: 3
+
+示例 2:
+输入: [2,2,1,1,1,2,2]
+输出: 2
+*/
+int majorityElement(vector<int>& nums) {
+    int cand = 0, cnt = 0;
+    for ( auto e : nums ) {
+        if ( 0 == cnt ) {
+            cand = e;
+        }
+        if ( cand == e ) {
+            cnt++;
+        } else {
+            cnt--;
+        }
+    }
+    return cand;
+}
+void Test_majorityElement() {
+    std::vector<int> v1{ 2, 2, 1, 1, 1, 2, 2 };
+    std::cout << "maj ele=" << majorityElement(v1) << std::endl;
+}
+
+/*
+LeetCode 229 [Majority Element II]
+给定一个整型数组，找到所有主元素，它在数组中的出现次数严格大于数组元素个数的三分之一。
+
+算法：每次删除三个不相同的数，最后留下的一定是出现次数超过1/3的数，这个思想可以推广到出现次数超过1/k次的元素有哪些。
+
+因为出现次数大于n/3的元素最多只有两个，所以最开始可以维护两个数字(num1,num2)和两个计数器(counter1,counter2)；
+遍历数组，当数组中元素和num1或者num2相同，对应的counter1或者counter2加1；
+如果counter1或counter2为0，将遍历到的该元素赋给num1或者nums2；
+否则counter1和counter2都减1。
+*/
+std::vector<int>  majorityElement_3(vector<int>& nums) {
+    std::vector<int> ret;
+    int y = 0, cy = 0;
+    int z = 0, cz = 0;
+    for ( auto x : nums ) {
+        if (y == x) cy++;
+        else if (z == x) cz++;
+        else if (cy == 0) y = x, cy=1;
+        else if (cz == 0) z = x, cz=1;
+        else {
+            --cy,--cz;
+        }
+    }
+    cy = 0;
+    cz = 0;
+    for (auto x : nums) {
+        if (x == y) cy++;
+        if (x == z) cz++;
+    }
+    int tmp = nums.size() / 3;
+    if (cy > tmp) ret.push_back(y);
+    if (cz > tmp) ret.push_back(z);
+    return ret;
+}
+void Test_majorityElement_3() {
+    std::vector<int> v1{ 9, 9, 9,  13, 0, 9,  7, 7, 7 };
+    auto res = majorityElement_3(v1);
+    PrintInContainer(res);
+    // std::cout << "maj ele_3=" << majorityElement_3(v1) << std::endl;
+}
+
+/*
+    283. 移动零
+    给定一个数组 nums，编写一个函数将所有 0 移动到数组的末尾，同时保持非零元素的相对顺序。
+
+    示例: 输入: [0,1,0,3,12]
+         输出: [1,3,12,0,0]
+
+    说明: 必须在原数组上操作，不能拷贝额外的数组。尽量减少操作次数。
+*/
+void moveZeroes(vector<int>& nums) {
+        
+}
+void Test_moveZeroes() {
+    std::vector<int> v1{ 0, 1, 0, 3, 12 };
+    moveZeroes(v1);
     
+    PrintInContainer(v1);
+}
+
+
+/*
+    编号：27. 移除元素
+    给你一个数组 nums 和一个值 val，你需要 原地 移除所有数值等于 val 的元素，并返回移除后数组的新长度。
+
+    不要使用额外的数组空间，你必须仅使用 O(1) 额外空间并「原地」修改输入数组。
+
+    元素的顺序可以改变。你不需要考虑数组中超出新长度后面的元素。
+
+    示例 1:
+    给定 nums = [3,2,2,3], val = 3,
+    函数应该返回新的长度 2, 并且 nums 中的前两个元素均为 2。
+    你不需要考虑数组中超出新长度后面的元素。
+
+    示例 2:
+    给定 nums = [0,1,2,2,3,0,4,2], val = 2,
+    函数应该返回新的长度 5, 并且 nums 中的前五个元素为 0, 1, 3, 0, 4。
+
+    「你不需要考虑数组中超出新长度后面的元素。」
+*/
+size_t removeElement(vector<int>& nums, int checkVal) {
+    size_t slowIdx = 0;
+    for (size_t fastIdx = 0; fastIdx < nums.size(); fastIdx++) {
+        if (checkVal != nums[fastIdx]) {
+            nums[slowIdx++] = nums[fastIdx];
+        }
+    }
+    return slowIdx;
+}
+void Test_removeEle() {
+    size_t ret = 0;
+    
+    std::vector<int> v1{ 3,2,2,3 };
+    ret = removeElement(v1, 3);
+    std::cout << "ret=" << ret << std::endl;
+    PrintInContainer(v1);
+    
+    std::vector<int> v2{ 0,1,2,2,3,0,4,2 };
+    ret = removeElement(v2, 2);
+    std::cout << "ret=" << ret << std::endl;
+    PrintInContainer(v2);
+}
+
+/*
+    448. 找到所有数组中消失的数字
+    给定一个范围在 1 ≤ a[i] ≤ n ( n = 数组大小 ) 的 整型数组，数组中的元素一些出现了两次，另一些只出现一次。
+
+    找到所有在 [1, n] 范围之间没有出现在数组中的数字。
+
+    您能在不使用额外空间且时间复杂度为O(n)的情况下完成这个任务吗? 你可以假定返回的数组不算在额外空间内。
+
+    示例:
+    输入: [4,3,2,7,8,2,3,1]
+    输出: [5,6]
+*/
+vector<int> findDisappearedNumbers(vector<int>& nums) {
+    std::vector<int> res;
+    return res;
+}
+void Test_findDisappearedNumbers() {
+}
+
+
+/*
+    155. 最小栈
+    设计一个支持 push，pop，top 操作，并能在常数时间内检索到最小元素的栈。
+
+    push(x)  —— 将元素 x 推入栈中。
+    pop()    —— 删除栈顶的元素。
+    top()    —— 获取栈顶元素。
+    getMin() —— 检索栈中的最小元素。
+
+    示例:
+    输入：
+    ["MinStack","push","push","push","getMin","pop","top","getMin"]
+    [[],[-2],[0],[-3],[],[],[],[]]
+
+    输出：
+    [null,null,null,null,-3,null,0,-2]
+
+    解释：
+    MinStack minStack = new MinStack();
+    minStack.push(-2);
+    minStack.push(0);
+    minStack.push(-3);
+    minStack.getMin();   --> 返回 -3.
+    minStack.pop();
+    minStack.top();      --> 返回 0.
+    minStack.getMin();   --> 返回 -2.
+*/
+class MinStack {
+public:
+    MinStack() {
+    }
+    
+    // void push(int x) {
+    // }
+    
+    // void pop() {
+    // }
+    
+    // int top() {
+    // }
+    
+    // int min() {
+    // }
+};
+
+
+/*
+121. 买卖股票的最佳时机
+给定一个数组，它的第 i 个元素是一支给定股票第 i 天的价格。
+
+如果你最多只允许完成一笔交易（即买入和卖出一支股票一次），设计一个算法来计算你所能获取的最大利润。
+
+注意：你不能在买入股票前卖出股票。
+
+示例 1:
+输入: [7,1,5,3,6,4]
+输出: 5
+解释: 在第 2 天（股票价格 = 1）的时候买入，在第 5 天（股票价格 = 6）的时候卖出，最大利润 = 6-1 = 5 。
+     注意利润不能是 7-1 = 6, 因为卖出价格需要大于买入价格；同时，你不能在买入前卖出股票。
+    
+示例 2:
+输入: [7,6,4,3,1]
+输出: 0
+解释: 在这种情况下, 没有交易完成, 所以最大利润为 0。
+
+-----------------------------------------------------------------------
+复杂度分析
+
+时间复杂度：O(n)，只需要遍历一次。
+空间复杂度：O(1)，只使用了常数个变量。
+-----------------------------------------------------------------------
+*/
+int maxProfit(vector<int>& prices) {
+    int inf = 1e9;
+    int minprice = inf, maxprofit = 0;
+    for (int price : prices) {
+        maxprofit = max(maxprofit, price - minprice);
+        minprice = min(price, minprice);
+    }
+    return maxprofit;
+}
+void Test_maxProfit() {
+    std::vector<int> v1{ 7, 1, 5, 3, 6, 4 };
+    std::cout << "maxProfit=" << maxProfit(v1) << std::endl;
+}
+
+
+/*
+53. 最大子序和
+给定一个整数数组 nums ，找到一个具有最大和的连续子数组（子数组最少包含一个元素），返回其最大和。
+
+示例:
+输入: [-2,1,-3,4,-1,2,1,-5,4]
+输出: 6
+解释: 连续子数组 [4,-1,2,1] 的和最大，为 6。
+进阶: 如果你已经实现复杂度为 O(n) 的解法，尝试使用更为精妙的分治法求解。
+*/
+int maxSubArray(vector<int>& nums) {
+    int maxValue = INT_MIN;
+    int dp = 0, res = 0;
+    for (int i = 0; i < nums.size(); i++)
+    {
+        dp = std::max(dp + nums[i], nums[i]);
+        res = std::max(dp, res);
+    }
+    return res;
+}
+void Test_maxSubArray() {
+    // std::vector<int> v1{ 7, 1, 5, 3, 6, 4 };
+    std::vector<int> v1{ -2,1,-3,4,-1,2,1,-5,4 };
+    std::cout << "maxSubArray=" << maxSubArray(v1) << std::endl;
+}
+
+
+
+
+
+
+
+int Test_ListEntry() {
+
+
+    Test_maxSubArray(); return 1;
+
+    Test_maxProfit(); return 1;
+
+    Test_removeEle(); return 1;
+    
+    Test_moveZeroes(); return 1;
+    
+    Test_majorityElement_3(); return 1;
+    
+    Test_majorityElement(); return 1;
+    
+    Test_singleNumber(); return 1;
+    Test_reverselist(); return 1;
+
+    Test_copyRandomList(); return 1;
+
+    Test_listOfDepth(); return 1;
+
     Test_isPalindrome(); return 1;
 
     Test_reversePrint(); return 1;
@@ -558,7 +1105,6 @@ int tst_ListEntry() { // 测试list操作总入口
     tst_reverse_list_1(); return 1;
 
 }
-
 
 
 
