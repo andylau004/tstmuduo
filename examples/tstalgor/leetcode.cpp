@@ -1,5 +1,10 @@
 
 
+
+#include <stdio.h>
+#include <stdlib.h>
+
+
 #include "leetcode.h"
 
 #include "List.h"
@@ -99,25 +104,35 @@ void someInOrder(TreeNode *root)
         someInOrder(root->right);
 }
 
-std::vector<ListNode *> ConstructTestListByParam(int start, int end, int numCount, int listCount)
-{
-    std::vector<ListNode *> arrays;
-    // ----------------
-    time_t t;
-    srand(time(&t));
-    for (int i = 0; i < listCount; i++)
-    {
+    // std::vector<int> createRandomIntVector(int start, int end, int numCount) {
+    //         time_t t;
+    //         srand(time(&t));
 
-        std::vector<int> tmpArr;
-        for (int j = 0; j < numCount; j++)
-        {
-            tmpArr.push_back(tst_rand(start, end));
+    //     std::vector<int> ret;
+    //     for (int i = 0; i < numCount; ++i) {
+    //         ret.push_back(tst_rand(start, end));
+    //     }
+        
+    //     return ret;
+    // }
+
+    std::vector< ListNode* > ConstructTestListByParam(int start, int end, int numCount, int listCount) {
+        std::vector< ListNode* > arrays;
+        // ----------------
+        time_t t;
+        srand(time(&t));
+        for ( int i = 0; i < listCount; i ++ ) {
+            std::vector<int> tmpArr;
+            for ( int j = 0; j < numCount; j ++ ) {
+                tmpArr.push_back(tst_rand(start, end));
+            }
+            arrays.push_back( ConstructTestList(tmpArr) );
         }
-        arrays.push_back(ConstructList(tmpArr));
+        // ----------------
+        return arrays;
     }
-    // ----------------
-    return arrays;
-}
+
+
 
 // Convert Sorted List to Binary Search Tree -- LeetCode 将有序链表转为二叉搜索树
 class CSortedListToBst {
@@ -548,8 +563,11 @@ int Depth(BstNode* root) {
 }
 bool isBalanced(BstNode* root) {
     if (!root) return true;
-    int gap = std::abs(Depth(root->left) - Depth(root->right));
-    return (gap <= 1 && isBalanced(root->left) && isBalanced(root->right));
+
+    int d = abs( Depth(root->left) - Depth(root->right) );
+    bool bCheck = (d <= 1 && isBalanced(root->left) && isBalanced(root->right));
+    std::cout << "d=" << d << std::endl;
+    return bCheck;
 }
 
 /*
@@ -1032,7 +1050,7 @@ public:
 
 /*
     477. 汉明距离总和
-两个整数的 汉明距离 指的是这两个数字的二进制数对应位不同的数量。
+两个整数的 汉明距离 指的是这两个数字的二进制数对应位不同的数量。
 
 计算一个数组中，任意两个数之间汉明距离的总和。
 
@@ -1079,13 +1097,13 @@ void Test_totalHammingDistance() {
 输入：[1,2,3,1]
 输出：4
 解释：偷窃 1 号房屋 (金额 = 1) ，然后偷窃 3 号房屋 (金额 = 3)。
-     偷窃到的最高金额 = 1 + 3 = 4 。
+     偷窃到的最高金额 = 1 + 3 = 4 。
 
 示例 2：
 输入：[2,7,9,3,1]
 输出：12
 解释：偷窃 1 号房屋 (金额 = 2), 偷窃 3 号房屋 (金额 = 9)，接着偷窃 5 号房屋 (金额 = 1)。
-     偷窃到的最高金额 = 2 + 9 + 1 = 12 。
+     偷窃到的最高金额 = 2 + 9 + 1 = 12 。
 */
 int rob(vector<int> &nums) {
 
@@ -1192,7 +1210,7 @@ void Test_hanmingWeight() {
 /*
     70. 爬楼梯
 
-    假设你正在爬楼梯。需要 n 阶你才能到达楼顶。
+    假设你正在爬楼梯。需要 n 阶你才能到达楼顶。
     每次你可以爬 1 或 2 个台阶。你有多少种不同的方法可以爬到楼顶呢？
     注意：给定 n 是一个正整数。
 
@@ -1712,7 +1730,6 @@ void Test_numTrees() {
     说明:
     你可以假设所有的输入都是由小写字母 a-z 构成的。
     保证所有输入均为非空字符串。
-
 */
 class Trie {
     bool isEnd;
@@ -1740,8 +1757,108 @@ public:
     }
 };
 
+class CSomeNode {
+    int val_;
+public:
+    CSomeNode(int val) : val_(val){
+        std::cout << "cst CSomeNode, val=" << val_ << std::endl;
+    }
+    ~CSomeNode() {
+        std::cout << "~dst CSomeNode, val=" << val_ << std::endl;
+    }
+
+public:
+    std::shared_ptr<CSomeNode> leftPtr;
+    std::shared_ptr<CSomeNode> rightPtr;
+    std::weak_ptr<CSomeNode> parentPtr;
+};
+
+class CBase1 {
+public:
+    int b1;
+    CBase1() {
+        b1 = 1;
+    }
+    ~CBase1(){
+
+    }
+    virtual  void fun1() {}
+};
+
+class CD1 : public CBase1 {
+public:
+    int d1;
+    CD1() {
+        d1 = 11;
+    }
+    ~CD1(){
+
+    }
+    virtual  void fun1() {}
+};
+
+class Attt
+{
+public:
+    Attt(int v)// : var(v)
+    {
+        file = fopen("test", "r");
+    }
+    ~Attt()
+    {
+        fclose(file);
+    }
+
+private:
+//    int var;
+    FILE *file;
+};
+
+void tstsomeNode() {
+    {
+        Attt ao(123);
+        std::cout << "sizeof(ao)=" << sizeof(ao) << std::endl;
+        return ;
+    }
+    {
+        CD1 cd;
+        std::cout << "sizeof(cd)=" << sizeof(cd) << std::endl;
+        return ;
+    }
+    {
+            std::shared_ptr<CSomeNode> root = std::make_shared<CSomeNode>(3);
+
+            root->leftPtr = std::make_shared<CSomeNode>(2);
+            root->leftPtr->parentPtr = root;
+
+            root->rightPtr = std::make_shared<CSomeNode>(4);
+            root->rightPtr->parentPtr = root;
+
+            std::cout << "root use count=" << root.use_count() << std::endl;
+            std::cout << "left use count=" << root->leftPtr.use_count() << std::endl;
+            std::cout << "right use count=" << root->rightPtr.use_count() << std::endl;
+    }
+    std::cout << "---------------------------------------------" << std::endl;
+    {
+        std::shared_ptr<CSomeNode> node = std::make_shared<CSomeNode>(13);
+        std::weak_ptr<CSomeNode> wknode = node;
+
+        std::shared_ptr<CSomeNode> ptr_2 = wknode.lock();
+//        if (node2)
+//            std::cout << (*node2) << std::endl;
+
+        std::cout << "reference Count = " << ptr_2.use_count() << std::endl;
+
+        if (wknode.expired() == false) {
+            std::cout << "Not expired yet" << std::endl;
+        }
+    }
+}
 
 void LeetCodeEntry() {
+
+    tstsomeNode(); return;
+
     Trie* next[26];
 
     std::cout << "sizeof(Trie)=" << array_size(next) << std::endl;

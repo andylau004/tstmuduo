@@ -101,7 +101,21 @@ ListNode* ConstructList(std::vector<int>& vecInts) {
     }
     return *vecNodes.begin();
 }
+ListNode* ConstructTestList(std::vector<int>& vecInts) {
+    std::vector< ListNode* > vecNodes;
 
+    for (auto ii : vecInts) {
+        vecNodes.push_back(CreateListNode(ii));
+    }
+
+    for (size_t i = 0; i < vecNodes.size(); i++) {
+        auto next = i + 1;
+        if (next != vecNodes.size()) {
+            ConnectListNodes(vecNodes[i], vecNodes[next]);
+        }
+    }
+    return *vecNodes.begin();
+}
 int GetListLength(ListNode* listHead) {
     if (!listHead) return 0;
     int len = 0;;
