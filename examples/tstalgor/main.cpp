@@ -6055,11 +6055,11 @@ int main(int argc, char *argv[])
     // --------------------test--------------------
     LeetCodeEntry(); return 1;
 
+    tst_qs_new(); return 1;
+
     Test_ListEntry(); return 1;
 
-
     Test_middleNode(); return 1;
-
 
     // PrintInorder(g_pBstTree);
     // std::cout << std::endl;
@@ -6264,7 +6264,6 @@ int main(int argc, char *argv[])
 
     binary_search_wrap(); return 1;
 
-    tst_qs_new(); return 1;
 
     tst_class_x(); return 1;
 

@@ -377,11 +377,6 @@ void tst_merge_sort_1() {
 }
 
 
-#include <iostream>
-#include <algorithm>
-#include <string>
-#include <vector>
-#include <random>
 void mergeSort(vector<int>& nums, int l, int r)
 {
     if (l >= r)

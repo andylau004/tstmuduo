@@ -294,44 +294,98 @@ public:
     }
 
 
-    int sort_desc(vector<int>& nums, int left, int right, int k) {
-        int pivot = nums[ left ];
-        int i = left;
-        int j = right;
-        int res = 0;
-
-        while ( i < j ) {
-            while ( i < j && nums[ j ] <= pivot ) j --;
-            while ( i < j && nums[ i ] >= pivot ) i ++;
-            if ( i < j ) swap(nums[i], nums[j]);
-        }
-        std::swap(nums[left], nums[i]);
-
-        if ( i + 1 == k ) return nums[ i ];
-        else if ( i + 1 > k ) res = sort_desc(nums, left, i - 1, k);
-        else if ( i + 1 < k ) res = sort_desc(nums, i + 1, right, k);
-        return res;
-    }
-
     // LeetCode 215. Kth Largest Element in an Array--数字第K大的元素
     // 从大到小排列；
+class CFindKthBigest {
+
+public:
+
+
+    int sort_desc(vector<int>& nums, int l, int r, int k) {
+
+        {
+            if ( l > r ) return -1;
+
+            int i = l, j = r;
+            int tmp = nums [ i ];
+
+            while ( i < j ) {
+                while ( i < j &&  nums [ j ] >= tmp ) j --;
+                if ( i < j ) nums [ i ++ ]  = nums[ j ];
+
+                while ( i < j  &&  nums [ i ] <= tmp ) i ++;
+                if ( i < j ) nums [ j -- ] = nums[ i ];
+            }
+            nums[ i ] = tmp;
+
+            if ( i == k ) return nums[ i ];
+            else if ( i < k ) return sort_desc(nums, i + 1, r, k);
+            else return sort_desc( nums, l, i - 1, k );
+        }
+
+    }
+
     int findKthLargest(vector<int>& nums, int k) {
 
-        // int l = 0, r = nums.size() - 1;
-        // while (1) {
-        //     int pos = partition(nums, l, r);
-            
-        //     if ( pos == k-1 ) return nums[ k - 1 ];
+        int length = nums.size();
 
-        //     if ( pos > k-1 ) {
-        //         r = pos - 1;
-        //     }
-        //     else {
-        //         l = pos + 1;
-        //     }
-        // }
-        return 1;
+        if (k > length)
+            return 0;
+
+        return sort_desc(nums, 0, length-1, length-k);
     }
+
+
+
+    void sort_impl(vector<int>& nums, int l, int r) {
+        if ( l > r ) return;
+        int i = l, j = r;
+        int tmp = nums [ i ];
+
+        while ( i < j ) {
+            while ( i < j  && nums [ j ] >= tmp ) j --;
+            if ( i < j ) nums [ i ++ ] = nums [ j ];
+
+            while ( i < j &&  nums [ i ] <= tmp ) i ++;
+            if ( i < j ) nums [ j -- ] = nums [ i ];
+        }
+        nums [ i ] = tmp;
+
+        sort_impl( nums, l, i - 1 );
+        sort_impl( nums, j + 1, r );
+    }
+    void sortByQuickSort(vector<int>& nums) {
+        sort_impl( nums, 0, nums.size() - 1 );
+    }
+
+    void sortByPriQue(vector<int>& nums, int k) {
+
+//        std::priority_queue<int, vector<int>, less<int>> que(nums.begin(), nums.end());
+//        std::priority_queue<int, vector<int>, greater<int>> que(nums.begin(), nums.end());
+
+        std::priority_queue<int, vector<int>, greater<int>> que;
+        for ( int i = 0; i < nums.size(); i ++ ) {
+
+            if (i < k ) {
+                que.push(nums[i]);
+            } else if (nums[i] > que.top()) {
+                que.pop();
+                que.push(nums[i]);
+            }
+        }
+        std::cout << "size=" << que.size() << ", top=" << que.top() << "\n";
+//        return;
+
+        for ( int i = 0; i < 3; i ++ ) {
+            auto ele = que.top();
+            std::cout << ele << " ";
+            que.pop();
+        }
+        std::cout << "\n";
+//        PrintInContainer(que);
+    }
+};
+
 
     /*
         上面两种方法虽然简洁，但是确不是本题真正想考察的东西，可以说有一定的偷懒嫌疑。
@@ -346,12 +400,29 @@ public:
         反之则更新右半部分，求中枢点的位置；
     */
     void tst_KthBig() { // 数组中第k大的数字
+
+        int idx = 3;
         std::vector < int > vRandom =
              { 9, 1, 123, 6613, 31, 25, 123, -333,  72,  19, 9981, 33812, -17 };
-        int idx = 3;
 
-        auto retVal = sort_desc(vRandom, 0, vRandom.size() - 1, idx);
-        // auto retVect = findKthLargest( vRandom, idx );
+        {
+            auto cpy = vRandom;
+
+            CFindKthBigest cf;
+//            cf.sortByQuickSort(cpy);
+            cf.sortByPriQue(cpy, idx);
+
+//            PrintInContainer(cpy);
+            return ;
+        }
+//        auto retVal = sort_desc(vRandom, 0, vRandom.size() - 1, idx);
+
+        PrintInContainer(vRandom);
+
+        CFindKthBigest cf;
+        auto retVal = cf.findKthLargest(vRandom, idx);
+
+//        auto retVect = findKthLargest( vRandom, idx );
         // PrintInContainer(retVect);
         std::cout << "idx=" << idx << ", Max Val Kth=" << retVal << std::endl;
         return;
@@ -365,6 +436,7 @@ public:
         // std::cout << std::endl;
         // return;
 }
+
 { // the newest work code ---- 大顶堆方式
 // 33812 9981 6613 123 123 72 31 25 19 9 1 -17 -333
         priority_queue<int> q(vRandom.begin(), vRandom.end());
@@ -379,7 +451,7 @@ public:
 
     }
 
-// 
+
 void Test_KthLeastNumbers() {
     int k = 5;
     std::vector<int> arr { 1, 7, 123, -333, -4236, -33391,  72,  19, 9981, 33812, -17 };
@@ -415,7 +487,6 @@ void Test_KthLeastNumbers() {
             que.push(ele);
             que.pop();
         }
-
     }
 
     while ( !que.empty() ) {
@@ -423,8 +494,7 @@ void Test_KthLeastNumbers() {
         que.pop();
         std::cout << " " << ele;
     }
-        std::cout << std::endl;
-
+    std::cout << std::endl;
 }
 
 
@@ -1757,6 +1827,300 @@ public:
     }
 };
 
+/*
+    Trie树 可用于解决类似 以下面试题：
+    给你100000个长度不超过10的单词。对于每一个单词，我们要判断他出没出现过，如果出现了，求第一次出现在第几个位置。
+    有一个1G大小的文件，里面每一行是一个词，词的大小不超过16字节，内存限制大小是1M，求频数最高的100个词1000万字符串，其中有些是重复的，需要把重复的全部去掉，保留没有重复的字符串，请问怎么设计和实现？
+    一个文本文件，大约有一万行，每行一个词，要求统计出其中最频繁出现的前10个词，请给出思想，给出时间复杂度分析。
+*/
+
+/*
+    给你100000个长度不超过10的单词。对于每一个单词，我们要判断他出没出现过，如果出现了，求第一次出现在第几个位置
+
+    使用trie：因为当查询如字符串abc是否为某个字符串的前缀时，显然以b,c,d....等不是以a开头的字符串就不用查找了。
+    所以建立trie的复杂度为O(n*len)，而建立+查询在trie中是可以同时执行的，
+    建立的过程也就可以称为查询的过程，hash就不能实现这个功能。
+    所以总的复杂度为O(n*len)，实际查询的复杂度也只是O(len)。
+   （说白了，就是Trie树的平均高度h为len，所以Trie树的查询复杂度为O（h）=O（len）。
+    好比一棵二叉平衡树的高度为logN，则其查询，插入的平均时间复杂度亦为O（logN））。
+*/
+
+struct TrieNode {
+    bool flag;
+    TrieNode* children_[26];
+    TrieNode() {
+        flag = false;
+        for ( int i = 0; i < 26; i ++ ) {
+            children_[i] = nullptr;
+        }
+    }
+};
+
+class TrieTree {
+public:
+    TrieTree() {
+
+    }
+    ~TrieTree() {
+    }
+    void insert(std::string word) {// build the Trie
+        TrieNode* p = root_;
+        for ( auto cur : word ) {
+            int val = cur - 'a';
+            if (p->children_[val] == nullptr) {
+                p->children_[val] = new TrieNode();
+            }
+            p = p->children_[val];
+        }
+        p->flag = true;
+    }
+    bool search(std::string word) {// search in the Trie
+        TrieNode* p = root_;
+        for ( auto cur : word ) {
+            int val = cur - 'a';
+            if (p->children_[val] == nullptr) {
+                return false;
+            }
+            p = p->children_[val];
+        }
+        return p->flag;
+    }
+    bool startWith(std::string word) {
+
+        TrieNode* p = root_;
+        for ( size_t i = 0; i < word.size(); i ++ ) {
+
+            int val = (int)(word[i] - 'a');
+
+            if (p->children_[val] == nullptr) {
+                return false;
+            }
+            p = p->children_[val];
+        }
+        return true;
+    }
+public:
+/*
+    给定一个不含重复单词的列表，编写一个程序，返回给定单词列表中所有的连接词。
+    连接词定义: 一个字符串完全是由至少两个给定数组中的单词组成的。
+    示例:
+    输入: ["cat","cats","catsdogcats","dog","dogcatsdog","hippopotamuses","rat","ratcatdogcat"]
+    输出: ["catsdogcats","dogcatsdog","ratcatdogcat"]
+
+    解释: "catsdogcats"由"cats", "dog" 和 "cats"组成;
+         "dogcatsdog"由"dog", "cats"和"dog"组成;
+         "ratcatdogcat"由"rat", "cat", "dog"和"cat"组成。
+*/
+    std::vector<std::string> findAllConcatenatedWordsInADict(vector<string>& words) {
+
+        std::vector<string> res;
+        root_ = new TrieNode();
+
+        auto cmp = [](const std::string& a, const std::string& b) {
+            if (a.length() != b.length()) {
+                return a.length() < b.length();
+            }
+            return a < b;
+        };
+        std::sort(words.begin(), words.end(), cmp);
+
+        for(size_t i=0; i<words.size(); ++i) {
+            auto word = words[i];
+            if (dfs(word)) {
+                res.emplace_back(word);
+            }
+            insert(word);
+        }
+        return res;
+    }
+    bool dfs(std::string word) {
+        std::string before;
+        for (size_t i = 0; i < word.size(); i ++ ) {
+
+            before += word[i];
+            std::string after = word.substr(i+1);
+
+            if ( search(before) && after != "" ) {
+                if ( search(after) || dfs(after) ) {
+                    return true;
+                }
+            }
+
+        }// for --- end ---
+        return false;
+    }
+
+    void tst_str_v() {
+
+        {
+//            std::string str;
+//            std::string word = "12345";
+//            for (size_t i = 0; i < word.size(); i ++ ) {
+//                str += word[i];
+//                std::string after = word.substr(i+1);
+//                std::cout << "str=" << str << ", after=" << after << std::endl;
+//            }
+//            return;
+        }
+        std::vector<std::string> v_str{"cat","cats","catsdogcats", "dog","dogcatsdog","hippopotamuses","rat","ratcatdogcat"};
+//        std::vector<std::string> v_str{"vtx", "x-ray", "cat","cats","catsdogcats", "vvdy", "zxv", "dog","dogcatsdog","hippopotamuses","rat","ratcatdogcat"};
+        auto cmp = [](const std::string& a, const std::string& b) {
+//            return a < b;
+            return a.length() < b.length();
+        };
+
+        std::sort(v_str.begin(), v_str.end(), cmp);
+        for (auto str : v_str) {
+            std::cout << " " << str;
+        }
+        std::cout << std::endl;
+
+        auto res = findAllConcatenatedWordsInADict(v_str);
+        for (auto c : res) {
+            std::cout << " " << c;
+        }
+        std::cout << std::endl;
+    }
+private:
+    TrieNode* root_;
+};
+
+
+
+
+class CnTrieNode {
+public:
+    CnTrieNode() : count_(0) {
+    }
+    int count_;// 以当前节点结尾的字符串的个数
+    std::map<char16_t, CnTrieNode*> childs_;
+};
+
+class CnTrieTree {
+public:
+    CnTrieTree() { root_ = new CnTrieNode(); }
+    void insert_string(const u16string& str);
+    vector<u16string> get_str_pre(const u16string& str);
+
+private:// 辅助函数
+    void add_str(CnTrieNode* preNode, u16string str, vector<u16string>& ret);
+    CnTrieNode* search_str_pre(const u16string& str);
+
+private:
+    CnTrieNode* root_;
+};
+
+void CnTrieTree::insert_string(const u16string& str) {
+    if (str.empty()) {
+        return;
+    }
+
+    CnTrieNode* curNode = root_;
+    for (auto& chr : str) {
+//        std::cout << "chr=" << chr << std::endl;
+
+        auto iter = curNode->childs_.find(chr);
+        if (iter == curNode->childs_.end()) {
+            CnTrieNode* newNode = new CnTrieNode;
+            curNode->childs_.insert(make_pair(chr, newNode));
+            curNode = newNode;
+        } else {
+            curNode = iter->second; //如果当前字符在字典书中，则将当前节点指向它的孩子
+        }
+
+    } // end --- for...
+    if (curNode)
+        curNode->count_ ++;
+}
+
+//查找以str为前缀的节点
+CnTrieNode* CnTrieTree::search_str_pre(const u16string& str) {
+    if (str.empty()) {
+        return nullptr;
+    }
+
+    CnTrieNode* curNode = root_;
+    for (auto& chr : str) {
+
+        auto iter = curNode->childs_.find(chr);
+        if (iter != curNode->childs_.end()) {
+            curNode = iter->second;
+        } else {
+            return nullptr;
+        }
+
+    } // end --- for...
+
+    return curNode;
+}
+
+vector<u16string> CnTrieTree::get_str_pre(const u16string& str) {
+    vector<u16string> ret;
+
+    CnTrieNode* pre = search_str_pre(str);
+    if (pre)
+    {
+        add_str(pre, str, ret);
+    }
+    return ret;
+}
+
+void CnTrieTree::add_str(CnTrieNode* preNode, u16string str, vector<u16string>& ret) {
+    for (auto Iter = preNode->childs_.begin(); Iter != preNode->childs_.end(); ++Iter)
+    {
+        add_str(Iter->second, str + Iter->first, ret);
+    }
+    if (preNode->count_)
+        ret.push_back(str);
+}
+
+
+void Tst_TireTree() {
+
+    {
+        setlocale(LC_ALL, "");
+
+        std::vector<u16string> hotwords = { u"杨文婷",u"联系",u"杨洋洋",u"杨sir大警官",u"杨y文w婷t",u"杨文婷是小学生",
+            u"杨钰莹",u"杨文婷ywt是小学生",u"联系a群众",u"阳光么",u"阳光明媚",u"ywt是小学生",u"联系ywt",u"杨文t爱吃面",u"杨文婷妹妹",
+            u"杨光明眉",u"小学生",u"杨文婷爱吃面",u"我是小学生",u"我是中国人",u"ywt要吃面",u"y杨文婷",u"有问题" };
+
+        hotwords = { u"cat",u"dogs",u"cat dogs",u"dog cats",u"monkeycat",u"monkeydog" };
+
+        CnTrieTree ctt;
+        for (auto& word : hotwords) {
+            ctt.insert_string(word);
+        }
+
+//        vector<u16string> res = ctt.get_str_pre(u"杨");
+//        vector<u16string> res = ctt.get_str_pre(u"杨文婷");
+        vector<u16string> res = ctt.get_str_pre(u"cat");
+
+        for (auto& resString : res)
+        {
+            for (auto& chr : resString)
+            {
+                printf("%lc", chr);
+            }
+            printf("\n");
+        }
+
+//        getchar();
+        return;
+    }
+
+
+    TrieTree tt;
+    tt.tst_str_v();
+    return;
+
+    tt.insert("ji");
+    tt.insert("nanchi");
+    tt.insert("nanren");
+
+    std::cout << "search ji=" << tt.search("ji") << std::endl;
+    std::cout << "star with=" << tt.startWith("nan") << std::endl;
+}
+
 class CSomeNode {
     int val_;
 public:
@@ -1772,6 +2136,8 @@ public:
     std::shared_ptr<CSomeNode> rightPtr;
     std::weak_ptr<CSomeNode> parentPtr;
 };
+
+
 
 class CBase1 {
 public:
@@ -1814,7 +2180,10 @@ private:
     FILE *file;
 };
 
+
 void tstsomeNode() {
+    Tst_TireTree(); return;
+
     {
         Attt ao(123);
         std::cout << "sizeof(ao)=" << sizeof(ao) << std::endl;
@@ -1855,12 +2224,324 @@ void tstsomeNode() {
     }
 }
 
+void tstLingxingDerive() {
+
+    class A
+    {
+    public:
+        A():a(1){};
+        void printA(){cout<<a<<endl;}
+        int a;
+    };
+
+    class B : virtual public A
+    {
+    };
+
+    class C : virtual public A
+    {
+    };
+
+    class D:  public B ,  public C
+    {
+    };
+
+
+    D d;
+    std::cout << "sizeof(d)=" << sizeof(d) << std::endl;
+
+}
+
+
+bool fun1(const std::string& str, std::string::size_type l) {
+    return str.size() < l;
+}
+void tst_vector() {
+
+    std::vector<string> v{"11","2222222","3","44444444","555","66","777777"} ;
+
+    std::stable_sort(v.begin(), v.end(), [](const string &a ,const string &b) {
+        return a.size() < b.size();
+    });
+
+    for_each(v.begin(), v.end(), [](const std::string& str) {
+        std::cout << " " << str;
+    });
+    std::cout << std::endl;
+
+    int num1 = std::count_if(v.begin(), v.end(), std::bind(fun1, std::placeholders::_1, 6));
+    std::cout << "num1=" << num1 << std::endl;
+
+}
+
+class CHeapSort {
+public:
+    // 构造 大顶堆
+    // 每个节点堆化的时间复杂度是：O(logN)
+    void heapify(vector<int>& a, int n, int i) {
+
+        while (true) {
+            int maxPos = i;
+
+            if ( (i*2 + 1) <= n && a[i] < a[i*2 + 1] ) { // 左子节点，就是下标为 i∗2+1 的节点
+                maxPos = i*2 + 1;
+            }
+            if ( (i*2 + 2) <= n && a[maxPos] < a[i*2 + 2] ) {// 右子节点，就是下标为 i∗2+2 的节点
+                maxPos = i*2 + 2;
+            }
+
+            if (maxPos == i)
+                break;
+
+            std::swap(a[maxPos], a[i]);
+            i = maxPos;
+        }// end --- for
+    }
+    void buildHeap(std::vector<int>& arr, int n) {// 时间复杂度：O(N)
+
+        for ( int i = n/2 -1; i >= 0; i -- ) {// 从后向前，非叶子节点是：0 到 n/2-1
+            heapify(arr, n, i);
+        }
+    }
+
+    std::vector<int> sortArr(std::vector<int>& nums) {
+        if (nums.size() <= 0) return nums;
+
+//        PrintInContainer(nums);
+        buildHeap(nums, nums.size() - 1);
+
+        int k = nums.size() - 1;
+        while (k) {
+            std::swap(nums[k], nums[0]);
+            k--;
+            heapify(nums, k, 0);
+        }
+        return nums;
+    }
+//    以上下标是从0开始。如果是以1开始的话，那么左子树，右子树下标就不一样了
+//    堆排分为两步(建堆O(n)+排序(O(NlogN))),所以总的时间复杂度是O(NlogN)
+//    不稳定，空间复杂度是O(1)
+};
+
+void tst_heap_sort_1() {
+
+    std::vector<int> arr { 9816, 13, 4, 1, 21, -13 };
+
+    CHeapSort cs;
+    auto res = cs.sortArr(arr);
+
+    PrintInContainer(res);
+}
+
+class MergeSort {
+public:
+
+    void merge_two(vector<int>& nums, int left, int mid, int right, vector<int>& tmp) {
+
+        int k = 0;//临时数组下标
+        int i = left;//左边数组的起始
+        int j = mid + 1;//右边数组的起始
+
+        while (i <= mid && j <= right)
+        {
+//            std::cout << "i=" << i << ", j=" << j << ", mid=" << mid << ", right=" << right << std::endl;
+            if (nums[i] <= nums[j])
+                tmp[k++] = nums[i++];
+            else
+                tmp[k++] = nums[j++];
+        }
+        while (i <= mid) {
+            tmp[k++] = nums[i++];
+        }
+        while (j <= right) {
+            tmp[k++] = nums[j++];
+        }
+        std::copy_n(tmp.begin(), k, nums.begin() + left);
+    }
+    void merge_sort(std::vector<int>& nums, int left, int right, std::vector<int>& tmp) {
+
+        if (left >= right) return;
+
+        int mid = (left + right)>>1;
+        std::cout << mid << " " << std::endl;
+//        int mid = left + ((right - left) >> 1);
+        merge_sort(nums, left, mid, tmp);
+        merge_sort(nums, mid+1, right, tmp);
+
+        merge_two(nums, left, mid, right, tmp);
+    }
+    std::vector<int> sortArray(std::vector<int>& nums) {
+        if (nums.size() == 0) return nums;
+
+        std::vector<int> tmp(nums.size());
+        merge_sort(nums, 0, nums.size()-1, tmp);
+        return nums;
+    }
+};
+void tst_merge_sort_2() {
+    std::vector<int> arr { 9816, 13, 4, 1, 21, -13 };
+    std::cout << "size=" << array_size(arr) << std::endl;
+
+    MergeSort ms;
+    auto res = ms.sortArray(arr);
+
+    PrintInContainer(res);
+}
+
+
+class InsertSort {
+
+public:
+    void insertSort(vector<int>& nums) {
+
+        for (int i = 1; i < nums.size(); i ++ ) {
+
+            int key = nums[i];
+            int j = i - 1;
+
+            for (; j >= 0; j --) {// 查找插入位置
+
+                if (nums[j] > key) {
+                    nums[j + 1] = nums[j];
+                } else {
+                    break;
+                }
+
+            } // end --- for
+            nums[j + 1] = key;
+        }// end --- for
+    }
+};
+void tst_insert_sort_2() {
+    std::vector<int> arr { 9816, 13, 4, 1, 21, -13 };
+    std::cout << "size=" << array_size(arr) << std::endl;
+
+    InsertSort is;
+    is.insertSort(arr);
+
+    PrintInContainer(arr);
+}
+
+/*
+    剑指 Offer 11. 旋转数组的最小数字
+    把一个数组最开始的若干个元素搬到数组的末尾，我们称之为数组的旋转。输入一个递增排序的数组的一个旋转，输出旋转数组的最小元素。例如，数  组 [3,4,5,1,2] 为 [1,2,3,4,5] 的一个旋转，该数组的最小值为1。
+
+    示例 1：
+    输入：[3,4,5,1,2]
+    输出：1
+
+    示例 2：
+    输入：[2,2,2,0,1]
+    输出：0
+-----------------------------------------------------------------------
+复杂度分析：
+时间复杂度：平均时间复杂度为 O(\log n)O(logn)，其中 nn 是数组 \it numbersnumbers 的长度。如果数组是随机生成的，那么数组中包含相同元素的概率很低，在二分查找的过程中，大部分情况都会忽略一半的区间。而在最坏情况下，如果数组中的元素完全相同，那么 while 循环就需要执行 nn 次，每次忽略区间的右端点，时间复杂度为 O(n)O(n)。
+
+空间复杂度：O(1)
+-----------------------------------------------------------------------
+*/
+int minArray(vector<int>& arr) {
+    int low = 0;
+    int high = arr.size() - 1;
+
+    while ( low < high ) {
+
+        int pivot = low + ((high - low ) >> 1);
+
+        if ( arr [ pivot ] > arr [ high ] ) {
+            low = pivot + 1;
+        } else if (arr[ pivot ] < arr [ high ]) {
+            high = pivot;
+        } else {
+            high -= 1;
+        }
+    }
+    return arr[low];
+}
+void tst_minArray() {
+    std::vector<int> arr { 315, 455, 987, 2048, -13, 1 };
+    std::cout << "minVal=" << minArray(arr) << std::endl;
+}
+
+
+/*
+    剑指 Offer 53 - I. 在排序数组中查找数字 I
+
+    统计一个数字在 排序数组中 出现的次数。
+    示例 1:
+    输入: nums = [5,7,7,8,8,10], target = 8
+    输出: 2
+
+    示例 2:
+    输入: nums = [5,7,7,8,8,10], target = 6
+    输出: 0
+-----------------------------------------------------------------------
+复杂度分析：
+-----------------------------------------------------------------------
+*/
+int findNumCount(vector<int>& nums, int target) {
+
+    int i = 0 ;
+    int j = nums.size();
+
+    int left = 0, right = nums.size() - 1;
+
+    while (left < right) {
+
+        int mid = i + ((right - left) >> 1);
+
+        if ( nums[ mid ] >= target ) {
+            right = mid;
+        } else {
+            left = mid + 1;
+        }
+    }
+
+    return 1;
+}
+void tst_findNumCount() {
+    std::vector<int> arr { 315, 455, 987, 2048, 2048, 2048, 2048, 9981 };
+    std::cout << "findNumCount=" << findNumCount(arr, 2048) << std::endl;
+}
+
 void LeetCodeEntry() {
+
+    tst_findNumCount();return;
+    tst_minArray();return;
+
+    tst_KthBig(); return;
+
+    {
+//        int myints[]={10,20,30,40,50,60,70};
+//        std::vector<int> myvector (7);
+
+//        std::copy_n( myints, 4, myvector.begin() );
+
+//        std::cout << "myvector contains:";
+//        for (std::vector<int>::iterator it = myvector.begin(); it!=myvector.end(); ++it)
+//          std::cout << ' ' << *it;
+//        std::cout << '\n';
+//        return;
+    }
+
+//    std::vector<int> nums1 { 123, 91, 45, 5566, 9876 };
+//    std::vector<int> tmp(nums1.size());
+//    std::cout << "tmp size=" << tmp.size() << std::endl;
+//    return;
+
+    tst_insert_sort_2(); return;
+
+    tst_merge_sort_2();  return;
+
+    tst_heap_sort_1();   return;
+
+    tst_vector();  return;
 
     tstsomeNode(); return;
 
-    Trie* next[26];
+    tstLingxingDerive(); return;
 
+    Trie* next[26];
     std::cout << "sizeof(Trie)=" << array_size(next) << std::endl;
     return;
 
@@ -1898,7 +2579,6 @@ void LeetCodeEntry() {
     TstList1(); return;
 
     // Test_KthLeastNumbers();
-    tst_KthBig(); return;
 
     std::vector<int> a{11, 23, 35, 47, 51, 53, 198, 2739, 31798};
     ListNode* retnode = ConstructList(a);

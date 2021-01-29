@@ -346,28 +346,6 @@ void t_qsort(T lst[], int head, int tail) {
     t_qsort(lst, head, i - 1);    // 以基准数为界左右分治
     t_qsort(lst, j + 1, tail);
 }
-// 简洁靠谱 快排实现
-void my_qs(int arr[], int head, int tail) {
-    if (head >= tail) return;
-
-    int i = head, j = tail;
-    int piv = arr[i];
-    while (i < j) {
-        while (i < j && arr[j] > piv) j --;
-        if (i < j)
-            arr[i++] = arr[j];
-//            std::swap( arr[i++], arr[j] );
-
-        while (i < j && arr[i] <= piv) i ++;
-        if (i < j)
-            arr[j--] = arr[i];
-//            std::swap( arr[j--], arr[i] );
-    }
-    arr[ i ] = piv;
-
-    my_qs( arr, head, i - 1 );
-    my_qs( arr, j + 1, tail );
-}
 void f_1(int arr[], int head, int tail) {
     if (head >= tail) return;
 
@@ -453,12 +431,28 @@ int SelectPivotMedianOfThree(int arr[],int low, int high)
     //分割时可以直接使用low位置的元素作为枢轴，而不用改变分割函数了
 }
 
+void my_qs(int arr[], int head, int tail) {// 简洁靠谱 快排实现
+    {
+        if (head >= tail) return;
+        int i = head, j = tail;
+        int x = arr[i];
+        while (i < j) {
+            while ( i < j && arr[j] > x) j--;
+            if (i < j) arr[i++] = arr[j];
+            while ( i < j && arr[i] < x) i++;
+            if (i < j) arr[j--] = arr[i];
+        }
+        arr[i] = x;
+        my_qs(arr, head, i-1);
+        my_qs(arr, j+1, tail);
+        return;
+    }
+}
 void newfun(int* a, int head, int tail) {
-    if (!a || head >= tail) return;
+    if (head >= tail) return;
 
     {
-        int i = head;
-        int j = tail;
+        int i = head, j = tail;
         int x = a[i];
 //        int x = SelectPivotMedianOfThree(a, head, tail);
 //        std::cout << "x=" << x << std::endl;
@@ -472,11 +466,11 @@ void newfun(int* a, int head, int tail) {
             if ( i < j ) a[ j -- ] = a [ i ];
 
         }
-        std::cout << "i=" << i << " j=" << j << std::endl;
+//        std::cout << "i=" << i << " j=" << j << std::endl;
         a [ i ] = x;
 
         newfun ( a, head, i - 1 );
-        newfun ( a, i + 1, tail );
+        newfun ( a, j + 1, tail );
         return;
     }
 
@@ -499,23 +493,45 @@ void newfun(int* a, int head, int tail) {
     newfun( a, i + 1, tail );
 
 }
+
 void tst_qs_new() {
-//    int arr[] = {12, 45, 748, 3986, 15, 56, 3, 89, 4, 48, 2, 0, -1, 1024, };
+    struct AliMem {
+        int a1;
+        char b1;
+        char b2;
+    };
+    struct AliMemEx {
+        char b1;
+        int a1;
+        char b2;
+    };
+    struct AliMemExx {
+        char b1;
+        char b2;
+        int a1;
+    };
+    std::cout << "size=" << sizeof(AliMem) << std::endl;// 有效对齐值为4, output=8
+    std::cout << "size=" << sizeof(AliMemEx) << std::endl;// =12
+    std::cout << "size=" << sizeof(AliMemExx) << std::endl;// =8
+    return;
+
+    int arr[] = {12, 45, 748, 3986, 15, 56, 3, 89, 4, 48, 2, 0, -1, 1024, };
 //    int arr[] = { 10, 9, 8, 7, 6, 5, 4, 3, 2, 1 };
 //    int arr[] = { 1, 2, 3, 4, 5, 6 };
-    int arr[]  = { 6, 5, 4, 3, 2, 1 };
+//    int arr[]  = { 6, 5, 4, 3, 2, 1 };
     int length = sizeof(arr) / sizeof(int);
     std::cout << "length=" << length << std::endl;
 
-    justPrint( arr, length );
-
     newfun( arr, 0, length - 1 );
+    justPrint( arr, length );
+//    return ;
 //    f_2(arr, 0, length - 1);
-//    my_qs( arr, 0, length - 1 );
+    my_qs( arr, 0, length - 1 );
 //    t_qsort<int>( arr, 0, length - 1 );
 //    SolutionQS cqs;
 //    cqs.quickSort( arr, 0, length - 1 );
 
+    std::cout << "--------------------------------------------" << std::endl;
     justPrint( arr, length );
 }
 
