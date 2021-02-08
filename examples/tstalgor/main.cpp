@@ -573,8 +573,6 @@ void tst_int64_1() {
     }
 }
 
-// 最大连续子数组
-
 /*
     最大连续子数组
 
@@ -2609,8 +2607,8 @@ std::vector < std::vector <int> > levelPrintBst(BstNode* root) {
                 if (tmp->right) q.push(tmp->right);
             }
             vvInt.push_back(v_level);
-            return vvInt;
-        }
+        }// end --- for
+        return vvInt;
     }
 
     std::queue < BstNode* > q;
@@ -4363,8 +4361,8 @@ public:
         if (root->right) dfs(root->right, sum);
         path.pop_back(); // 递归回溯退回父节点，在路径上要删除当前节点
     }
-    std::vector< std::vector<int> > pathSum(BstNode* root, int sum) {
-    }
+//    std::vector< std::vector<int> > pathSum(BstNode* root, int sum) {
+//    }
 };
 
 
@@ -5658,40 +5656,6 @@ void Test_ConstuctMaxBst() {
         
 }
 
-/*
-    617. 合并二叉树
-
-给定两个二叉树，想象当你将它们中的一个覆盖到另一个上时，两个二叉树的一些节点便会重叠。
-
-需要将他们合并为一个新的二叉树。
-合并规则: 如果两个节点重叠，那么将他们的值相加作为节点合并后的新值，
-否则不为 NULL 的节点将直接作为新二叉树的节点。
-
-示例 1:
-输入:
-	Tree 1                     Tree 2
-          1                         2
-         / \                       / \
-        3   2                     1   3
-       /                           \   \
-      5                             4   7
-输出:
-合并后的树:
-	     3
-	    / \
-	   4   5
-	  / \   \ 
-	 5   4   7
-注意: 合并必须从两个树的根节点开始。
-*/
-TreeNode* mergeTrees(TreeNode* t1, TreeNode* t2) {
-    if (t1 == nullptr) return t2;
-    if (t2 == nullptr) return t1;
-    t1->val += t2->val;
-    t1->left = mergeTrees(t1->left, t2->left);
-    t1->right = mergeTrees(t1->right, t2->right);
-    return t1;
-}
 
 /*
     两数之和
@@ -6052,12 +6016,16 @@ int main(int argc, char *argv[])
     Logger::setLogLevel(Logger::DEBUG);
     LOG_INFO << "pid = " << getpid() << ", tid=" << CurrentThread::tid();
 
-    // --------------------test--------------------
+    // --------------------function entry--------------------
+
     LeetCodeEntry(); return 1;
+
+    Test_ListEntry(); return 1;
+
+
 
     tst_qs_new(); return 1;
 
-    Test_ListEntry(); return 1;
 
     Test_middleNode(); return 1;
 

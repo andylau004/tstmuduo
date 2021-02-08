@@ -481,7 +481,7 @@ void Test_reversePrint() {
 
 时间复杂度： O(N)，其中 N 是链表的节点数。
 当链表中不存在环时，快指针将先于慢指针到达链表尾部，链表中每个节点至多被访问两次。
-当链表中存在环时，每一轮移动后，快慢指针的距离将减小一。而初始距离为环的长度，因此至多移动 NN 轮。
+当链表中存在环时，每一轮移动后，快慢指针的距离将减小一。而初始距离为环的长度，因此至多移动 N 轮。
 空间复杂度： O(1)。我们只使用了两个指针的额外空间。
 -----------------------------------------------------------------------
 */
@@ -501,12 +501,12 @@ void Test_hasCycle() {
 }
 
 /*
-第142题.环形链表II
-题意：给定一个链表，返回链表开始入环的第一个节点。 如果链表无环，则返回 null。
+    第142题.环形链表II
+    题意：给定一个链表，返回链表开始入环的第一个节点。如果链表无环，则返回 null。
 
-为了表示给定链表中的环，使用整数 pos 来表示链表尾连接到链表中的位置（索引从 0 开始）。
+    为了表示给定链表中的环，使用整数 pos 来表示链表尾连接到链表中的位置（索引从 0 开始）。
 
-如果 pos 是 -1，则在该链表中没有环。
+    如果 pos 是 -1，则在该链表中没有环。
 */
 ListNode* detectCycle(ListNode* head) {
     if (!head) return nullptr;
@@ -536,13 +536,13 @@ void Test_detectCycle() {
     面试题 02.06. 回文链表
     编写一个函数，检查输入的链表是否是回文的。
 
-示例 1：
-输入： 1->2
-输出： false
+    示例 1：
+    输入： 1->2
+    输出： false
 
-示例 2：
-输入： 1->2->2->1
-输出： true
+    示例 2：
+    输入： 1->2->2->1
+    输出： true
 */
 bool isPalindrome(ListNode* head) {
 
@@ -551,8 +551,8 @@ bool isPalindrome(ListNode* head) {
         fast = fast->next->next;
         slow = slow->next;
     }
-
     std::cout << "slow val=" << slow->val << std::endl;
+
     ListNode* pre = nullptr;
     while (slow) { // 
         ListNode* nxtNode = slow->next;
@@ -655,8 +655,8 @@ void Test_listOfDepth() {
 /*
     5558. 合并两个链表
 
-    给你两个链表 list1 和 list2 ，它们包含的元素分别为 n 个和 m 个。
-    请你将 list1 中第 a 个节点到第 b 个节点删除，并将list2 接在被删除节点的位置。
+    给你两个链表 list1 和 list2 ，它们包含的元素分别为 n 个和 m 个。
+    请你将 list1 中第 a 个节点到第 b 个节点删除，并将list2 接在被删除节点的位置。
 
 示例 1：
 输入：list1 = [0,1,2,3,4,5], a = 3, b = 4, list2 = [1000000,1000001,1000002]
@@ -709,9 +709,9 @@ void Test_copyRandomList() {
 
 /*
     148. 排序链表
-给你链表的头结点 head ，请将其按 升序 排列并返回 排序后的链表 。
+给你链表的头结点 head ，请将其按 升序 排列并返回 排序后的链表 。
 
-进阶：你可以在 O(nlogn) 时间复杂度和常数级空间复杂度下，对链表进行排序吗？
+进阶：你可以在 O(nlogn) 时间复杂度和常数级空间复杂度下，对链表进行排序吗？
 */
 ListNode* sortList(ListNode* head) {
     ListNode *tmp = nullptr;
@@ -760,7 +760,7 @@ void Test_reverselist() {
 输入: [2,2,1]
 输出: 1
 
-示例 2:
+示例 2:
 输入: [4,1,2,1,2]
 输出: 4
 */
@@ -890,27 +890,48 @@ void Test_moveZeroes() {
 
     「你不需要考虑数组中超出新长度后面的元素。」
 */
-size_t removeElement(vector<int>& nums, int checkVal) {
+size_t removeElement(vector<int>& nums, int target) {
+    size_t slow = 0;
+    {
+        for ( size_t fast = 0; fast < nums.size(); fast ++ ) {
+            if ( target != nums[ fast ]) {
+                nums[ slow ] = nums[ fast ];
+                slow ++;
+            }
+        }
+        return slow;
+    }
     size_t slowIdx = 0;
     for (size_t fastIdx = 0; fastIdx < nums.size(); fastIdx++) {
-        if (checkVal != nums[fastIdx]) {
-            nums[slowIdx++] = nums[fastIdx];
+        if (target != nums[fastIdx]) {
+            nums[ slowIdx ] = nums[ fastIdx ];
+            slowIdx ++;
         }
     }
     return slowIdx;
 }
 void Test_removeEle() {
     size_t ret = 0;
-    
-    std::vector<int> v1{ 3,2,2,3 };
+
+    auto pfnPrint = [&](std::vector<int>& arr, int sz) {
+        for ( int i = 0; i < sz; i ++ ) {
+            std::cout << " " << arr[i];
+        }
+        std::cout << std::endl;
+    };
+
+    std::vector<int> v1{ 3, 2, 2, 3 };
     ret = removeElement(v1, 3);
     std::cout << "ret=" << ret << std::endl;
-    PrintInContainer(v1);
-    
+//    PrintInContainer(v1);
+    pfnPrint(v1, ret);
+//    return;
+
     std::vector<int> v2{ 0,1,2,2,3,0,4,2 };
     ret = removeElement(v2, 2);
     std::cout << "ret=" << ret << std::endl;
-    PrintInContainer(v2);
+    pfnPrint(v2, ret);
+//    PrintInContainer(v2);
 }
 
 /*
@@ -1021,14 +1042,14 @@ void Test_maxProfit() {
 
 
 /*
-53. 最大子序和
-给定一个整数数组 nums ，找到一个具有最大和的连续子数组（子数组最少包含一个元素），返回其最大和。
+    53. 最大子序和
+    给定一个整数数组 nums ，找到一个具有最大和的连续子数组（子数组最少包含一个元素），返回其最大和。
 
-示例:
-输入: [-2,1,-3,4,-1,2,1,-5,4]
-输出: 6
-解释: 连续子数组 [4,-1,2,1] 的和最大，为 6。
-进阶: 如果你已经实现复杂度为 O(n) 的解法，尝试使用更为精妙的分治法求解。
+    示例:
+    输入: [-2,1,-3,4,-1,2,1,-5,4]
+    输出: 6
+    解释: 连续子数组 [4,-1,2,1] 的和最大，为 6。
+    进阶: 如果你已经实现复杂度为 O(n) 的解法，尝试使用更为精妙的分治法求解。
 */
 int maxSubArray(vector<int>& nums) {
     int maxValue = INT_MIN;
@@ -1049,17 +1070,287 @@ void Test_maxSubArray() {
 
 
 
+/*
+    143. 重排链表
+    给定一个单链表 L：L0→L1→…→Ln-1→Ln ，
+    将其重新排列后变为： L0→Ln→L1→Ln-1→L2→Ln-2→…
+    你不能只是单纯的改变节点内部的值，而是需要实际的进行节点交换。
 
+    示例 1:
+    给定链表 1->2->3->4, 重新排列为 1->4->2->3.
+    示例 2:
+    给定链表 1->2->3->4->5, 重新排列为 1->5->2->4->3.
+
+复杂度分析
+
+时间复杂度：O(N)，其中 N 是链表中的节点数。
+空间复杂度：O(1)。
+*/
+class CReorderList {
+
+public:
+
+    ListNode* middleNode(ListNode* head) {
+        ListNode* fast = head;
+        ListNode* slow = head;
+
+        while ( fast && fast->next ) {
+            fast = fast->next->next;
+            slow = slow->next;
+        }
+        return slow;
+    }
+
+    ListNode* reverseList(ListNode* head) {
+        ListNode* pre = nullptr;
+        ListNode* cur = head;
+
+        while (cur) {
+            ListNode* tmp = cur->next;
+            cur->next = pre;
+
+            pre = cur;
+            cur = tmp;
+        }
+        return pre;
+    }
+
+    void mergeList(ListNode* l1, ListNode* l2) {
+        ListNode* l1_tmp;
+        ListNode* l2_tmp;
+
+        while (l1 && l2) {
+            l1_tmp = l1->next;
+            l2_tmp = l2->next;
+
+            l1->next = l2;
+            l1 = l1_tmp;
+
+            l2->next = l1;
+            l2 = l2_tmp;
+        }
+    }
+
+    void reorderList(ListNode* head) {
+
+        // 1、找到链表的中间位置，分成左右2个链表
+        ListNode* midNode = middleNode(head);
+        std::cout << "mid=" << midNode->val << std::endl;
+
+        // 2、翻转链表右边链表
+        // 这个时候slow、fast指针分别代表左右链表的头指针
+        ListNode* l1 = head;
+        ListNode* l2 = midNode->next;
+        l2->next = nullptr;
+
+        l2 = reverseList(l2);
+
+        // 3、处理143题的逻辑，重排链表
+        mergeList(l1, l2);
+    }
+
+};
+void tst_reorderList() {
+
+    PrintList(g_pListHead);
+
+    CReorderList cr;
+//    auto ret = cr.reverseList(g_pListHead);
+//    PrintList(ret);
+
+    cr.reorderList(g_pListHead);
+    PrintList(g_pListHead);
+//    return;
+}
+
+/*
+    88. 合并两个有序数组
+    给你两个有序整数数组 nums1 和 nums2，请你将 nums2 合并到 nums1 中，使 nums1 成为一个有序数组。
+    初始化 nums1 和 nums2 的元素数量分别为 m 和 n 。你可以假设 nums1 的空间大小等于 m + n，这样它就有足够的空间保存来自 nums2 的元素。
+
+    示例 1：
+    输入：nums1 = [1,2,3,0,0,0], m = 3, nums2 = [2,5,6], n = 3
+    输出：[1,2,2,3,5,6]
+
+    示例 2：
+    输入：nums1 = [1], m = 1, nums2 = [], n = 0
+    输出：[1]
+
+-----------------------------------------------------------------------
+复杂度分析
+
+-----------------------------------------------------------------------
+*/
+void mergeTwoArray(std::vector<int>& num1, int m, std::vector<int>& num2, int n) {
+    std::cout << "m=" << m << ", n=" << n << std::endl;
+    int k = m + n - 1;
+    int i = m - 1;
+    int j = n - 1;
+
+    while ( i >= 0 && j >= 0 ) {
+
+        std::cout << "k=" << k << std::endl;
+
+        if ( num1[ i ] > num2 [ j ] ) {
+            num1[ k -- ]  = num1[ i -- ];
+        } else {
+            num1[ k -- ]  = num2[ j -- ];
+        }
+
+    }// end --- for
+
+    while ( j >= 0 ) {
+        std::cout << "k=" << k << std::endl;
+
+        num1 [ k -- ] = num2[ j -- ];
+    }// end --- while
+}
+void tst_mergeTwoArray() {
+    std::vector<int> v1;
+
+    v1.reserve(10);
+    v1.push_back(1); v1.push_back(3); v1.push_back(4); v1.push_back(7); v1.push_back(9);
+    std::cout << "before print v1 ---" << std::endl;
+    PrintInContainer(v1);
+    std::cout << "v1 size=" << v1.size() << ", cap=" << v1.capacity() << std::endl;
+    std::cout << "after  print v1 ---" << std::endl;
+
+    std::vector<int> v2 { -11, 0, 987, 2456, 30099 };
+    mergeTwoArray(v1, v1.size(), v2, v2.size());
+    std::cout << std::endl;
+    std::cout << "v1 size=" << v1.size() << ", cap=" << v1.capacity() << std::endl;
+    std::cout << "after ,,,,,,, handle" << std::endl;
+//    PrintInContainer(v1);
+    for ( int i = v1.capacity() - 1; i >= 0; i -- )  {
+        std::cout << " " << v1[i] ;
+    }
+    std::cout << std::endl;
+}
+
+
+/*
+    剑指 Offer 57. 和为s的两个数字
+    输入一个递增排序的数组和一个数字s，在数组中查找两个数，使得它们的和正好是s。如果有多对数字的和等于s，则输出任意一对即可。
+
+    示例 1：
+    输入：nums = [2,7,11,15], target = 9
+    输出：[2,7] 或者 [7,2]
+
+    示例 2：
+    输入：nums = [10,26,30,31,47,60], target = 40
+    输出：[10,30] 或者 [30,10]
+-----------------------------------------------------------------------
+复杂度分析
+-----------------------------------------------------------------------
+*/
+std::vector<int> twoSum(std::vector<int>& nums, int target) {
+    std::vector<int> res;
+    int left = 0, right = nums.size() - 1;
+
+    while ( left < right ) {
+
+        int s = nums[ left ] + nums[ right ];
+        if ( s == target ) {
+            res.push_back(nums[ left ]);res. push_back(nums[ right ]);
+            return res;
+        } else if ( s > target ) {
+            right --;
+        } else {
+            left ++;
+        }
+    }
+
+    res.push_back(-1);
+    res.push_back(-1);
+    return res;
+}
+
+/*
+    剑指 Offer 03. 数组中重复的数字
+
+    在一个长度为 n 的数组 nums 里的所有数字都在 0～n-1 的范围内。
+    数组中某些数字是重复的，但不知道有几个数字重复了，也不知道每个数字重复了几次。请找出数组中任意一个重复的数字。
+
+    示例 1：
+    输入：
+    [2, 3, 1, 0, 2, 5, 3]
+    输出：2 或 3
+
+-----------------------------------------------------------------------
+复杂度分析
+-----------------------------------------------------------------------
+*/
+int findRepeatNumber(vector<int>& nums) {
+
+    int i  = 0;
+    while ( i < nums.size() ) {
+
+        if ( i == nums[ i ] ) {
+            i ++;
+            continue;
+        }
+
+        if ( nums[ nums[i] ] ==  nums[ i ] ) {
+            return nums[ i ];
+        }
+
+        std::swap( nums[ nums[i] ],  nums[ i ] ) ;
+    }
+
+    return -1;
+}
+void tst_findRepeatNumber() {
+
+    std::vector<int> v2 { 2, 0, 3, 3, 4 };
+
+    auto  ret = findRepeatNumber(v2);
+    std::cout << std::endl;
+    std::cout << "ret=" << ret << std::endl;
+    std::cout << "after ,,,,,,, handle" << std::endl;
+}
+
+
+/*
+    56. 合并区间
+    以数组 intervals 表示若干个区间的集合，其中单个区间为 intervals[i] = [starti, endi] 。
+    请你合并所有重叠的区间，并返回一个不重叠的区间数组，该数组需恰好覆盖输入中的所有区间。
+
+    示例 1：
+    输入：intervals = [[1,3],[2,6],[8,10],[15,18]]
+    输出：[[1,6],[8,10],[15,18]]
+    解释：区间 [1,3] 和 [2,6] 重叠, 将它们合并为 [1,6].
+
+    示例 2：
+    输入：intervals = [[1,4],[4,5]]
+    输出：[[1,5]]
+    解释：区间 [1,4] 和 [4,5] 可被视为重叠区间。
+
+-----------------------------------------------------------------------
+复杂度分析
+-----------------------------------------------------------------------
+*/
+vector<vector<int>> mergeRegion(vector<vector<int>>& intervals) {
+    vector<vector<int>> res;
+
+    return res;
+}
 
 
 int Test_ListEntry() {
+    Test_removeEle(); return 1;
 
+    tst_findRepeatNumber(); return 1;
+
+    tst_mergeTwoArray(); return 1;
+
+    Test_deleteNode(); return 1;
+
+    tst_reorderList(); return 1;
 
     Test_maxSubArray(); return 1;
 
     Test_maxProfit(); return 1;
 
-    Test_removeEle(); return 1;
     
     Test_moveZeroes(); return 1;
     
@@ -1080,7 +1371,6 @@ int Test_ListEntry() {
 
     Test_getKthFromEnd(); return 1;
 
-    Test_deleteNode(); return 1;
 
     Test_MergeTwoList(); return 1;
 

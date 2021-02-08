@@ -1435,7 +1435,7 @@ void Test_coinChange() {
 
 
 /*
-    编号35：搜索插入位置
+    搜索插入位置
     给定一个排序数组和一个目标值，在数组中找到目标值，并返回其索引。如果目标值不存在于数组中，返回它将会被按顺序插入的位置。
     你可以假设数组中无重复元素。
 
@@ -1456,6 +1456,26 @@ void Test_coinChange() {
     输出: 0
 */
 int searchInsert(vector<int>& nums, int target) {
+    {
+        int left = 0;
+        int right = nums.size() - 1;
+
+        while ( left < right )  {
+
+            int mid = left + ((right - left) >> 1);
+
+            if ( nums[ mid ] >= target ) {
+                right = mid;
+            } else { // < target
+                left = mid + 1;
+            }
+        }
+        return left;
+    }
+
+
+
+
     int left = 0;
     int right = nums.size() - 1;
 
@@ -1475,6 +1495,8 @@ int searchInsert(vector<int>& nums, int target) {
 }
 void Test_searchInsert() {
 
+    std::vector<int> a { 1,3,5,6 };
+    std::cout << "insert pos=" << searchInsert(a, 2) << std::endl;
 }
 
 /*
@@ -2481,14 +2503,12 @@ void tst_minArray() {
 */
 int findNumCount(vector<int>& nums, int target) {
 
-    int i = 0 ;
-    int j = nums.size();
-
+    int mid = 0;
     int left = 0, right = nums.size() - 1;
 
     while (left < right) {
 
-        int mid = i + ((right - left) >> 1);
+        mid = left + ((right - left) >> 1);
 
         if ( nums[ mid ] >= target ) {
             right = mid;
@@ -2496,17 +2516,716 @@ int findNumCount(vector<int>& nums, int target) {
             left = mid + 1;
         }
     }
+    if (nums[left] != target) return -1;
 
-    return 1;
+    int x = left;
+    right = nums.size() - 1;
+    while (left < right) {
+
+        mid = left + ((right - left) >> 1);
+
+        if ( nums[ mid ] <= target ) {
+            left = mid + 1;
+        } else {
+            right = mid;
+        }
+    }
+
+    return left - x;
 }
 void tst_findNumCount() {
-    std::vector<int> arr { 315, 455, 987, 2048, 2048, 2048, 2048, 9981 };
+    std::vector<int> arr { 315, 455, 987, 2048, 2048, 2048, 2048, 2048, 2048, 9981 };
     std::cout << "findNumCount=" << findNumCount(arr, 2048) << std::endl;
 }
 
+
+
+/*
+    剑指 Offer 53.2 —— 0~n-1中缺失的数字
+    一个长度为n-1的递增排序数组中的所有数字都是唯一的，并且每个数字都在范围0～n-1之内。
+    在范围0～n-1内的n个数字中有且只有一个数字不在该数组中，请找出这个数字。
+
+    示例 1:
+    输入: [0,1,3]
+    输出: 2
+
+    示例 2:
+    输入: [0,1,2,3,4,5,6,7,9]
+    输出: 8
+-----------------------------------------------------------------------
+复杂度分析：
+-----------------------------------------------------------------------
+*/
+int missingNum(vector<int>& nums, int sz) {
+    int left  = 0;
+    int right = sz;
+
+    while ( left <= right ) {
+        int mid = left + ((right - left) >> 1);
+
+        if (nums[ mid ] == mid) {
+            left = mid + 1;
+        }
+        else {
+            right = mid - 1;
+        }
+    }
+    return left;
+}
+void tst_missingNum() {
+    std::vector<int> arr { 0, 1, 2, 3, 4, 5, 7, 8, 9 };
+    std::cout << "missingNum=" << missingNum(arr, arr.size()) << std::endl;
+}
+
+
+
+/*
+    40. 组合总和 II
+    给定一个数组 candidates 和一个目标数 target ，找出 candidates 中所有可以使数字和为 target 的组合。
+    candidates 中的每个数字在每个组合中只能使用一次。
+    说明：所有数字（包括目标数）都是正整数。解集不能包含重复的组合。
+
+    示例 1:
+    输入: candidates = [10,1,2,7,6,1,5], target = 8,
+    所求解集为:
+    [
+      [1, 7],
+      [1, 2, 5],
+      [2, 6],
+      [1, 1, 6]
+    ]
+
+    示例 2:
+    输入: candidates = [2,5,2,1,2], target = 5,
+    所求解集为:
+    [
+      [1,2,2],
+      [5]
+    ]
+-----------------------------------------------------------------------
+复杂度分析：
+-----------------------------------------------------------------------
+*/
+vector<vector<int>> combinationSum2(vector<int>& candidates, int target) {
+
+    vector<vector<int>> res;
+
+    return res;
+}
+
+
+/*
+    102. 二叉树的层序遍历
+
+    给你一个二叉树，请你返回其按 层序遍历 得到的节点值。 （即逐层地，从左到右访问所有节点）。
+
+    示例：
+    二叉树：[3,9,20,null,null,15,7],
+        3
+       / \
+      9  20
+        /  \
+       15   7
+
+    返回其层序遍历结果：
+    [
+      [3],
+      [9,20],
+      [15,7]
+    ]
+-----------------------------------------------------------------------
+复杂度分析：
+-----------------------------------------------------------------------
+*/
+std::vector< std::vector<int> > levelOrderBst(BstNode* root) {
+
+    std::vector< std::vector<int> > res;
+    if (!root) return res;
+
+    std::queue< BstNode* > queNodes;
+    queNodes.push(root);
+
+    while (!queNodes.empty()) {
+
+        std::vector<int> vals;
+
+        int sz = queNodes.size();
+        for (int i = 0; i < sz; i ++) {
+
+            BstNode* tmpNode = queNodes.front();
+            queNodes.pop();
+
+            if ( tmpNode->left ) {
+                queNodes.push(tmpNode->left);
+            }
+            if ( tmpNode->right ) {
+                queNodes.push(tmpNode->right);
+            }
+
+            vals.push_back(tmpNode->val);
+        }
+
+        res.push_back(vals);
+    }
+
+    return res;
+}
+
+/*
+    LeetCode 题解 | 11. 盛最多水的容器
+
+    给你 n 个非负整数 a1，a2，...，an，每个数代表坐标中的一个点 (i, ai) 。
+    在坐标内画 n 条垂直线，垂直线 i 的两个端点分别为 (i, ai) 和 (i, 0) 。
+    找出其中的两条线，使得它们与 x 轴共同构成的容器可以容纳最多的水。
+
+    示例 1：
+    输入：[1,8,6,2,5,4,8,3,7]
+    输出：49
+    解释：图中垂直线代表输入数组 [1,8,6,2,5,4,8,3,7]。在此情况下，容器能够容纳水（表示为蓝色部分）的最大值为 49。
+
+    示例 2：
+    输入：height = [1,1]
+    输出：1
+
+    示例 3：
+    输入：height = [4,3,2,1,4]
+    输出：16
+
+    示例 4：
+    输入：height = [1,2,1]
+    输出：2
+
+-----------------------------------------------------------------------
+复杂度分析：
+-----------------------------------------------------------------------
+*/
+int maxArea(vector<int>& height) {
+    int l = 0, r = height.size() - 1;
+    int res = -1;
+
+    while ( l < r ) {
+        int ares = std::min( height[l], height[r] ) * (r - l);
+        res = std::max( ares, res );
+
+        if ( height [ l ] <= height[ r ] )
+            l ++;
+        else
+            r --;
+    }
+    return res;
+}
+void tst_maxArea() {
+    std::vector<int> height { 1,8,6,2,5,4,8,3,7 };
+    std::cout << "maxArea=" << maxArea(height) << std::endl;
+}
+
+
+/*
+    617. 合并二叉树
+
+    给定两个二叉树，想象当你将它们中的一个覆盖到另一个上时，两个二叉树的一些节点便会重叠。
+
+    需要将他们合并为一个新的二叉树。
+    合并规则: 如果两个节点重叠，那么将他们的值相加作为节点合并后的新值，
+    否则不为 NULL 的节点将直接作为新二叉树的节点。
+
+    示例 1:
+    输入:
+        Tree 1                     Tree 2
+              1                         2
+             / \                       / \
+            3   2                     1   3
+           /                           \   \
+          5                             4   7
+    输出:
+    合并后的树:
+             3
+            / \
+           4   5
+          / \   \
+         5   4   7
+    注意: 合并必须从两个树的根节点开始。
+*/
+TreeNode* mergeTrees(TreeNode* t1, TreeNode* t2) {
+    if (t1 == nullptr) return t2;
+    if (t2 == nullptr) return t1;
+    t1->val += t2->val;
+    t1->left = mergeTrees(t1->left, t2->left);
+    t1->right = mergeTrees(t1->right, t2->right);
+    return t1;
+}
+
+
+/*
+    3. 无重复字符的最长子串
+    给定一个字符串，请你找出其中不含有重复字符的 最长子串 的长度。
+
+    示例 1:
+    输入: s = "abcabcbb"
+    输出: 3
+    解释: 因为无重复字符的最长子串是 "abc"，所以其长度为 3。
+
+    示例 2:
+    输入: s = "bbbbb"
+    输出: 1
+    解释: 因为无重复字符的最长子串是 "b"，所以其长度为 1。
+
+    示例 3:
+    输入: s = "pwwkew"
+    输出: 3
+    解释: 因为无重复字符的最长子串是 "wke"，所以其长度为 3。
+         请注意，你的答案必须是 子串 的长度，"pwke" 是一个子序列，不是子串。
+
+    示例 4:
+    输入: s = ""
+    输出: 0
+
+-----------------------------------------------------------------------
+复杂度分析：
+                ----  滑动窗口
+-----------------------------------------------------------------------
+*/
+int lengthOfLongestSubstringEx(string s) {
+    if (s.empty()) return 0;
+
+    int left = 0;
+    int maxsize = 0;
+    std::unordered_set < char > us;
+
+    for (int i = 0; i < s.size(); i ++) {
+
+        while ( us.find( s[i] ) != us.end() ) { // find 'c' ---> exist in hashmap
+
+            us.erase(s[left]);
+            left ++;
+        }
+
+        maxsize = std::max( maxsize, i - left + 1 );
+        us.insert( s[i] );
+    }
+    return maxsize;
+}
+
+void tst_lengthOfLongestSubstringEx() {
+    std::unordered_set< std::string > us;
+    us.insert("998761");
+    us.insert("886541");
+
+    std::string str = "9987711";
+    str = "998711";
+    std::cout << "lenght_long_substr=" << lengthOfLongestSubstringEx(str) << std::endl;
+}
+
+
+/*
+    239. 滑动窗口最大值
+    给你一个整数数组 nums，有一个大小为 k 的滑动窗口从数组的最左侧移动到数组的最右侧。
+    你只可以看到在滑动窗口内的 k 个数字。滑动窗口每次只向右移动一位。
+    返回滑动窗口中的最大值。
+
+    示例 1：
+    输入：nums = [1,3,-1,-3,5,3,6,7], k = 3
+    输出：[3,3,5,5,6,7]
+    解释：
+    滑动窗口的位置                最大值
+    ---------------               -----
+    [1  3  -1] -3  5  3  6  7       3
+     1 [3  -1  -3] 5  3  6  7       3
+     1  3 [-1  -3  5] 3  6  7       5
+     1  3  -1 [-3  5  3] 6  7       5
+     1  3  -1  -3 [5  3  6] 7       6
+     1  3  -1  -3  5 [3  6  7]      7
+
+    示例 2：
+    输入：nums = [1], k = 1
+    输出：[1]
+
+    示例 3：
+    输入：nums = [1,-1], k = 1
+    输出：[1,-1]
+
+    示例 4：
+    输入：nums = [9,11], k = 2
+    输出：[11]
+
+    示例 5：
+    输入：nums = [4,-2], k = 2
+    输出：[4]
+*/
+vector<int> maxSlidingWindow(vector<int>& nums, int k) {
+
+    int n = nums.size();
+    std::priority_queue< pair<int, int> > pri_que;
+
+    for (int i = 0; i < k ; i ++ ) {
+        pri_que.emplace( nums[ i ], i );
+    }
+
+    std::vector<int> ans{pri_que.top().first};
+
+    for ( auto j = k; j < n; j ++ ) {
+
+        pri_que.emplace( nums[ j ], j );
+
+        while (pri_que.top().second <= j - k) {
+            pri_que.pop();
+        }
+
+        ans.push_back( pri_que.top().first );
+    }
+
+    return ans;
+}
+void tst_maxSlidingWindow() {
+
+    std::priority_queue< int > p_q;
+    p_q.emplace(-1);
+    p_q.emplace(123);
+    p_q.emplace(21);
+    p_q.emplace(2048);
+
+    std::vector<int> nums {1,3,-1,-3,5,3,6,7};
+
+//    auto res = maxSlidingWindow( nums, 3 );
+//    PrintInContainer(res);
+//    std::cout << "max=" << p_q.top() << ", sz=" << p_q.size() << std::endl;
+}
+/*
+    20. 有效的括号
+    给定一个只包括 '('，')'，'{'，'}'，'['，']' 的字符串 s ，判断字符串是否有效。
+
+    有效字符串需满足：
+    左括号必须用相同类型的右括号闭合。
+    左括号必须以正确的顺序闭合。
+
+    示例 1：
+    输入：s = "()"
+    输出：true
+
+    示例 2：
+    输入：s = "()[]{}"
+    输出：true
+
+    示例 3：
+    输入：s = "(]"
+    输出：false
+
+    示例 4：
+    输入：s = "([)]"
+    输出：false
+
+    示例 5：
+    输入：s = "{[]}"
+    输出：true
+*/
+bool IsValidString(std::string s) {
+    {
+//        unordered_map<char, char> pairs = {
+//            {')', '('},
+//            {']', '['},
+//            {'}', '{'}
+//        };
+//        stack<char> stk;
+//        for (char ch: s) {
+//            if (pairs.count(ch)) {
+//                if (stk.empty() || stk.top() != pairs[ch]) {
+//                    std::cout << "ret false, ch=" << ch << std::endl;
+//                    return false;
+//                }
+//                stk.pop();
+//            }
+//            else {
+//                stk.push(ch);
+//            }
+//        }
+//        return stk.empty();
+    }
+    {
+        if (s.size() % 2 == 1) return false;
+
+        std::unordered_map < char, char > pairs = {
+            {')', '('},
+            {']', '['},
+            {'}', '{'}
+        };
+        std::stack < char > stk;
+
+        for ( char ch : s ) {
+
+            if ( pairs.count(ch) ) {
+
+                if ( stk.empty() || stk.top() != pairs[ch] ) {
+                    std::cout << "ret false, ch=" << ch << std::endl;
+                    return false;
+                }
+                std::cout << "pop=" << stk.top() << ", ch=" << ch << std::endl;
+                stk.pop();
+            } else {
+                stk.push(ch);
+                std::cout << "push=" << ch << std::endl;
+            }
+        }
+        return stk.empty();
+
+//        for ( std::unordered_map < char, char >::iterator it = um.begin(); it != um.end(); it ++ ) {
+//            std::cout << " key=" << it->first << ", val=" << it->second;
+//        }
+//        std::cout << std::endl;
+    }
+    return true;
+}
+void tst_IsValidString() {
+    std::string str = "()[]{}";
+    std::cout << "ret=" << IsValidString(str) << std::endl;
+}
+
+/*
+    225. 用队列实现栈
+    请你仅使用两个队列实现一个后入先出（LIFO）的栈，并支持普通队列的全部四种操作（push、top、pop 和 empty）。
+
+    实现 MyStack 类：
+    void push(int x) 将元素 x 压入栈顶。
+    int pop() 移除并返回栈顶元素。
+    int top() 返回栈顶元素。
+    boolean empty() 如果栈是空的，返回 true；否则，返回 false；
+
+    示例：
+    输入：
+        ["MyStack", "push", "push", "top", "pop", "empty"]
+        [[], [1], [2], [], [], []]
+    输出：
+        [null, null, null, 2, 2, false]
+
+    解释：
+        MyStack myStack = new MyStack();
+        myStack.push(1);
+        myStack.push(2);
+        myStack.top(); // 返回 2
+        myStack.pop(); // 返回 2
+        myStack.empty(); // 返回 False
+*/
+
+class MyStack {
+public:
+    void push( int val ) {
+        que1.push(val);
+    }
+    int top() {
+
+        return 1;
+    }
+    int pop() {
+       int sz = que1.size();
+       sz --;
+       while ( sz -- ) {
+           que2.push(que1.front());
+           que1.pop();
+       }
+
+       int res = que1.front();
+       que1.pop();
+
+       que1 = que2;
+       while ( !que2.empty() ) {
+           que2.pop();
+       }
+       return res;
+    }
+    bool empyt() {
+        return que1.empty();
+    }
+private:
+    std::queue<int> que1;
+    std::queue<int> que2;
+};
+void tst_MyStack() {
+
+    MyStack ms;
+
+}
+
+/*
+    209. 长度最小的子数组
+    给定一个含有 n 个正整数的数组和一个正整数 s ，
+    找出该数组中满足其和 ≥ s 的长度最小的 连续子数组，并返回其长度。如果不存在符合条件的子数组，返回 0。
+
+    示例：
+    输入：s = 7, nums = [2,3,1,2,4,3]
+    输出：2
+    解释：子数组 [4,3] 是该条件下的长度最小的子数组。
+
+-----------------------------------------------------------------------
+复杂度分析：
+-----------------------------------------------------------------------
+*/
+int minSubArrayLen(int target, vector<int>& nums) {
+    int start = 0, end = 0;
+    int ans = INT_MAX;
+    int sum = 0;
+
+    int n = nums.size();
+
+    while ( end  <  n ) {
+
+        sum += nums[ end ];
+
+        while ( sum > target ) {
+            ans = std::min(ans, end - start + 1);
+            sum -= nums[ start ];
+            start ++;
+        }
+        end ++;
+    }
+
+    return ans == INT_MAX ? 0 : ans;
+}
+void tst_minSubArrayLen() {
+    int target = 7;
+    std::vector<int> nums{2,3,1,2,4,3};
+
+    std::cout << "ret=" << minSubArrayLen(target, nums) << std::endl;
+//    std::cout << "max=" << INT_MAX << ", min=" << INT_MIN << std::endl;
+}
+
+
+/*
+    187. 重复的DNA序列
+    所有 DNA 都由一系列缩写为 'A'，'C'，'G' 和 'T' 的核苷酸组成，例如："ACGAATTCCG"。
+    在研究 DNA 时，识别 DNA 中的重复序列有时会对研究非常有帮助。
+    编写一个函数来找出所有目标子串，目标子串的长度为 10，且在 DNA 字符串 s 中出现次数超过一次。
+
+    示例 1：
+    输入：s = "AAAAACCCCCAAAAACCCCCCAAAAAGGGTTT"
+    输出：["AAAAACCCCC","CCCCCAAAAA"]
+
+    示例 2：
+    输入：s = "AAAAAAAAAAAAA"
+    输出：["AAAAAAAAAA"]
+
+*/
+vector<string> findRepeatedDNASequences(string s) {
+    vector<string> ans;
+
+    return ans;
+}
+void tst_findRepeatedDNASequences() {
+
+}
+
+
+/*
+    面试题 16.25. LRU 缓存
+    设计和构建一个"最近最少使用"缓存，该缓存会删除最近最少使用的项目。
+    缓存应该从键映射到值(允许你插入和检索特定键对应的值)，并在初始化时指定最大容量。当缓存被填满时，它应该删除最近最少使用的项目。
+
+    它应该支持以下操作： 获取数据 get 和 写入数据 put 。
+
+    获取数据 get(key) - 如果密钥 (key) 存在于缓存中，则获取密钥的值（总是正数），否则返回 -1。
+    写入数据 put(key, value) - 如果密钥不存在，则写入其数据值。当缓存容量达到上限时，它应该在写入新数据之前删除最近最少使用的数据值，从而为新的数据值留出空间。
+
+示例:
+    LRUCache cache = new LRUCache( 2 );
+
+    cache.put(1, 1);
+    cache.put(2, 2);
+    cache.get(1);       // 返回  1
+    cache.put(3, 3);    // 该操作会使得密钥 2 作废
+    cache.get(2);       // 返回 -1 (未找到)
+    cache.put(4, 4);    // 该操作会使得密钥 1 作废
+    cache.get(1);       // 返回 -1 (未找到)
+    cache.get(3);       // 返回  3
+    cache.get(4);       // 返回  4
+
+*/
+class LRUCache {
+public:
+    LRUCache(int capacity) : cap_(capacity) {
+
+    }
+
+    int get(int key) {
+
+        auto it = um_.find(key);
+        if ( it == um_.end() ) {// no found key,,,
+            return -1024;
+        }
+
+        auto target_it = it->second;// found input query: key
+
+        std::pair<int, int> newobj{ key, target_it->second };
+        lru_.push_front(newobj);
+        lru_.erase(it->second);
+
+        um_.erase(key);
+        um_.emplace(key, lru_.begin());
+
+        return newobj.second;
+    }
+
+    void put(int key, int value) {
+
+        auto it = um_.find(key);
+        if ( it != um_.end() ) {
+            lru_.erase(it->second);
+            um_.erase(key);
+        }
+
+        std::pair<int, int> newEle{key, value};
+
+        lru_.push_front(newEle);
+        um_.emplace( key, lru_.begin() );
+
+        if ( lru_.size() > cap_ ) {
+            um_.erase( lru_.back().first );
+            lru_.pop_back();
+        }
+
+    }
+
+private:
+    std::list < std::pair<int, int> > lru_;
+    std::unordered_map< int, std::list<std::pair<int,int>>::iterator > um_;
+
+    int cap_;
+};
+
+bool hasCycle_1(ListNode* head) {
+
+    if ( !head ) return false;
+
+    ListNode* fast = head;
+    ListNode* slow = head;
+
+    while ( fast && fast->next )  {
+
+        fast = fast->next ->next;
+        slow = slow ->next;
+
+        if ( fast == slow ) return true;
+    }
+
+    return false;
+}
+
+
 void LeetCodeEntry() {
 
+    tst_minSubArrayLen(); return;
+
+    Test_searchInsert(); return;
+
+    tst_IsValidString(); return;
+
+    tst_maxSlidingWindow(); return;
+
+    tst_lengthOfLongestSubstringEx(); return;
+
+    tst_maxArea(); return;
+
+    tst_missingNum();return;
+
     tst_findNumCount();return;
+
     tst_minArray();return;
 
     tst_KthBig(); return;
