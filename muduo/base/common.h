@@ -94,7 +94,7 @@
 #include "errcode.h"
 //#include "configs.h"
 //#include "rw_lock.h"
-#include "exception.h"
+#include "Exception.h"
 //#include "thread_pool.h"
 #include "thrift_connection_pool.h"
 
@@ -240,6 +240,15 @@ void PrintInPriorQue( CONTAINER& que ) {
     }
     printf( "\n" );
 }
+
+inline void PrintVectorInts(std::vector<int>& arr, int sz) {
+    for ( int i = 0; i < sz; i ++ ) {
+        std::cout << " " << arr[i];
+    }
+    std::cout << std::endl;
+};
+
+
 
 /*!
  * \brief The Align enum

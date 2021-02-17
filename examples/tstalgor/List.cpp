@@ -29,6 +29,10 @@ void PrintListNode(ListNode* pNode) {
 
 void PrintList(ListNode* pHead)
 {
+    if ( !pHead ) {
+        printf(" input list head is nullptr\n");
+        return ;
+    }
 //    printf("PrintList starts.\n");
     printf("\n");
     while (pHead) {

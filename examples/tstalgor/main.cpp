@@ -3705,27 +3705,7 @@ BstNode* lowestCommonAncestor_Bst(BstNode* root, BstNode* p, BstNode* q) {
 void Test_lowestCommonAncestor() {
 }
 
-// 给定一个数组arr，返回arr的最长无重复子串的长度(无重复指的是所有数字都不相同)。
-int maxLength(const std::vector<int>& arr) {
-    size_t n = arr.size();
-    size_t l = 0, r = 0;
-    std::set<int> s;
-    size_t res = 0;
 
-    while ( r < n ) {
-        if (!s.count(arr[r])) {
-            s.insert(arr[r]);
-            r ++;
-        } else {
-            s.erase(arr[l]);
-            l ++;
-        }
-        res = res > s.size() ? res : s.size();
-    }
-    return res;
-}
-void Test_maxLength() {
-}
 
 // 对于一个给定的链表，返回环的入口节点，如果没有环，返回null. 拓展：你能给出不利用额外空间的解法么？
 // 破坏链表节点连接 方式
@@ -3953,73 +3933,6 @@ void Test_FindNumsAppearOnce() {
     std::cout << "n1=" << n1 << " n2=" << n2 << std::endl;
 }
 
-ListNode* mergeKLists_pri_que(vector<ListNode*>& lists)  {
-//<<<<<<< HEAD
-//    struct cmp {
-//        bool operator() (ListNode* a, ListNode* b) {
-//            return a->m_nValue > b->m_nValue;
-//        }
-//    };
-
-//    std::priority_queue< ListNode*, vector<ListNode*>, cmp> pri_que;
-//    for (auto head : lists) {
-//        if (head) pri_que.push(head);
-//    }
-//    // PrintInPriorQue(pri_que);
-
-//    ListNode dummy;
-//    ListNode* cur = &dummy;
-//    while ( !pri_que.empty() ) {
-//        ListNode* top = pri_que.top(); pri_que.pop();
-//        cur->next_ = top;
-//        cur = cur->next_;
-//        if (top->next_) pri_que.push(top->next_);
-//    }
-//    return dummy.next_;
-}
-
-ListNode* merge(vector<ListNode*>& lists, int start, int end){
-    
-    return nullptr;
-}
-
-/*                  合并k个已排序链表
-给你一个链表数组，每个链表都已经按升序排列。
-请你将所有链表合并到一个升序链表中，返回合并后的链表。
-
-示例 1：
-输入：lists = [[1,4,5],[1,3,4],[2,6]]
-输出：[1,1,2,3,4,4,5,6]
-解释：链表数组如下：
-[
-  1->4->5,
-  1->3->4,
-  2->6
-]
-将它们合并到一个有序链表中得到。
-1->1->2->3->4->4->5->6
-*/
-void Test_mergeKLists() {
-    int listcount = 3;
-    // vector<ListNode*> lists = ConstructTestListByParam(1, 3000, 4, listcount);
-
-    vector<ListNode*> lists;
-    std::vector< int > a1{ 1, 2, 3, 4, 6};
-    auto l1 = ConstructTestList(a1);
-    std::vector< int > a2{ 123, 987, 3000, 4213, 98886};
-    auto l2 = ConstructTestList(a2);
-    std::vector< int > a3{ 5678, 20009, 376654};
-    auto l3 = ConstructTestList(a3);
-    // for ( int i = 0; i < listcount; i ++ ) {
-    //      PrintList(lists[i]);
-    // }
-    lists.push_back(l1);lists.push_back(l2);lists.push_back(l3);
-
-    {// heap sort
-        auto head = mergeKLists_pri_que(lists);
-        PrintList( head );
-    }
-}
 
 /*
 请完成一个函数，输入一个二叉树，该函数输出它的镜像。
@@ -4424,7 +4337,6 @@ void Test_isValidBst() {
 
 }
 
-// 卖股票的最好时机
 
 
 /*
@@ -4677,7 +4589,6 @@ void Test_levelOrder_1() {
 //    Test_levelOrder_1(); return 1;
 
 //    Test_maxDepth(); return 1;
-//    Test_mergeKLists(); return 1;
 
 //    {
 //        CMirrorBst cm;
@@ -5266,57 +5177,24 @@ void Test_addTwoNumber() {
     sa.Test_addTwoNumber();
 }
 
-/* 
-    寻找两个正序数组的中位数
-给定两个大小为 m 和 n 的正序（从小到大）数组 nums1 和 nums2。请你找出并返回这两个正序数组的中位数。
-
-进阶：你能设计一个时间复杂度为 O(log (m+n)) 的算法解决此问题吗？
-
-示例 1：
-输入：nums1 = [1,3], nums2 = [2]
-输出：2.00000
-解释：合并数组 = [1,2,3] ，中位数 2
-
-示例 2：
-输入：nums1 = [1,2], nums2 = [3,4]
-输出：2.50000
-解释：合并数组 = [1,2,3,4] ，中位数 (2 + 3) / 2 = 2.5
-
-示例 3：
-输入：nums1 = [0,0], nums2 = [0,0]
-输出：0.00000
-
-示例 4：
-输入：nums1 = [], nums2 = [1]
-输出：1.00000
-
-示例 5：
-输入：nums1 = [2], nums2 = []
-输出：2.00000
-*/
-double findMedianSortedArrays(vector<int>& nums1, vector<int>& nums2) {
-    double ret = 0;
-
-    return ret;
-}
 
 /*
-7. 整数反转
-给出一个 32 位的有符号整数，你需要将这个整数中每位上的数字进行反转。
+    7. 整数反转
+    给出一个 32 位的有符号整数，你需要将这个整数中每位上的数字进行反转。
 
-示例 1:
-输入: 123
-输出: 321
- 
- 示例 2:
-输入: -123
-输出: -321
+    示例 1:
+    输入: 123
+    输出: 321
 
- 示例 3:
-输入: 120
-输出: 21
-注意:假设我们的环境只能存储得下 32 位的有符号整数，则其数值范围为 [−231,  231 − 1]。
-请根据这个假设，如果反转后整数溢出那么就返回 0。
+    示例 2:
+    输入: -123
+    输出: -321
+
+    示例 3:
+    输入: 120
+    输出: 21
+    注意:假设我们的环境只能存储得下 32 位的有符号整数，则其数值范围为 [−2^31, 2^31 − 1]。
+    请根据这个假设，如果反转后整数溢出那么就返回 0。
 */
 int reverseInt(int x) {
     int res = 0;
@@ -5447,7 +5325,8 @@ void levelOrderPrint(BstNode* root) {
 /*
     剑指 Offer 52. 两个链表的第一个公共节点
     给定两个（单向）链表，判定它们是否相交并返回交点。
-    请注意相交的定义基于节点的引用，而不是基于节点的值。换句话说，如果一个链表的第k个节点与另一个链表的第j个节点是同一节点（引用完全相同），则这两个链表相交。
+    请注意相交的定义基于节点的引用，而不是基于节点的值。
+    换句话说，如果一个链表的第k个节点与另一个链表的第j个节点是同一节点（引用完全相同），则这两个链表相交。
 
     示例 1：
     输入：intersectVal = 8, listA = [4,1,8,4,5], listB = [5,0,1,8,4,5], skipA = 2, skipB = 3
@@ -5873,62 +5752,10 @@ public:
 };
 
 void initList() {
-    std::vector<int> l{ 13, 21, 98, 100, 518, 10000, 77612};
+    std::vector<int> l{ -11, -3, 0, 16, 23, 89, 110, 312, 5277, 77612};
     g_pListHead = ConstructList(l);
 }
 
-
-/*
-    61. 旋转链表
-    给定一个链表，旋转链表，将链表每个节点向右移动 k 个位置，其中 k 是非负数。
-
-    示例 1:
-    输入: 1->2->3->4->5->NULL, k = 2
-    输出: 4->5->1->2->3->NULL
-    解释:
-    向右旋转 1 步: 5->1->2->3->4->NULL
-    向右旋转 2 步: 4->5->1->2->3->NULL
-
-    示例 2:
-    输入: 0->1->2->NULL, k = 4
-    输出: 2->0->1->NULL
-    解释:
-    向右旋转 1 步: 2->0->1->NULL
-    向右旋转 2 步: 1->2->0->NULL
-    向右旋转 3 步: 0->1->2->NULL
-    向右旋转 4 步: 2->0->1->NULL
-*/
-ListNode* rotateRight(ListNode* head, int k) {
-    auto tmp = head;
-    int len = GetListLength(head);// 第 1 步：先要知道链表有多少个结点
-
-    k = k%len;
-    if (k == 0) {
-        return head;
-    }
-    ListNode* fast = head, *slow = head;
-    for ( int i = 0; i < k; i ++ ) {
-        fast = fast->next;
-    }
-    // std::cout << "fast=" << fast->val << std::endl;
-    while (fast->next) {
-        fast = fast->next;
-        slow = slow->next;
-    }
-    ListNode* newHead = slow->next;
-    slow->next = nullptr;
-    fast->next = head;
-    // std::cout << "fast=" << fast->val << std::endl;
-    // std::cout << "slow=" << slow->val << std::endl;
-    return newHead;
-}
-void Test_rotateRight() {
-    PrintList(g_pListHead);
-    std::cout << "before handle list -----" << std::endl;
-    auto newlist = rotateRight(g_pListHead, 3);
-    PrintList(newlist);
-    // PrintList(g_pListHead);
-}
 
 /*
     876. 链表的中间结点
@@ -5969,35 +5796,32 @@ void Test_middleNode() {
 
 /*
     100. 相同的树
-给定两个二叉树，编写一个函数来检验它们是否相同。
-如果两个树在结构上相同，并且节点具有相同的值，则认为它们是相同的。
+    给定两个二叉树，编写一个函数来检验它们是否相同。
+    如果两个树在结构上相同，并且节点具有相同的值，则认为它们是相同的。
 
-示例 1:
-输入:       1         1
-          / \       / \
-         2   3     2   3
+    示例 1:
+    输入:       1         1
+              / \       / \
+             2   3     2   3
 
-        [1,2,3],   [1,2,3]
+            [1,2,3],   [1,2,3]
+    输出: true
 
-输出: true
+    示例 2:
+    输入:      1          1
+              /           \
+             2             2
 
-示例 2:
-输入:      1          1
-          /           \
-         2             2
+            [1,2],     [1,null,2]
+    输出: false
 
-        [1,2],     [1,null,2]
+    示例 3:
+    输入:       1         1
+              / \       / \
+             2   1     1   2
 
-输出: false
-示例 3:
-
-输入:       1         1
-          / \       / \
-         2   1     1   2
-
-        [1,2,1],   [1,1,2]
-
-输出: false
+            [1,2,1],   [1,1,2]
+    输出: false
 */
 bool isSameTree(TreeNode* p, TreeNode* q) {
     if (!p && !q) return true;
@@ -6018,7 +5842,29 @@ int main(int argc, char *argv[])
 
     // --------------------function entry--------------------
 
-    LeetCodeEntry(); return 1;
+    if ( argc > 1 ) {
+//        std::cout << "argv[ 0 ]=" << argv[ 0 ] << std::endl;
+//        std::cout << "argv[ 1 ]=" << argv[ 1 ] << std::endl;
+
+        if ( strcmp( argv[1], "lc" ) == 0 ) {
+            std::cout << "tst leet code ---" << std::endl;
+            std::cout << std::endl;
+
+            LeetCodeEntry(); return 1;
+        } else {
+            std::cout << "tst list code ---" << std::endl;
+            std::cout << std::endl;
+
+            Test_ListEntry(); return 1;
+        }
+    } else {
+        std::cout << " argc < 1, argc=" << argc;
+        return -1;
+    }
+
+
+
+
 
     Test_ListEntry(); return 1;
 
@@ -6034,7 +5880,6 @@ int main(int argc, char *argv[])
 
     isSymmetric();      return 1;
 
-    Test_rotateRight(); return 1;
 
 {
     CSortedListToBst c1;
@@ -6066,7 +5911,6 @@ int main(int argc, char *argv[])
     Test_CKthSmallest(); return 1;
     Test_levelOrder_1(); return 1;
 
-    Test_mergeKLists(); return 1;
 
     // Test_isBalanced(); return 1;
     Test_isValidBst(); return 1;

@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 2.8)
 
 project(tstfun)
 
-
 set(CXX_FLAGS
     -g
     # -DVALGRIND

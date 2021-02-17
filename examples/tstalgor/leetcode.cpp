@@ -1033,27 +1033,28 @@ public:
 };
 
 /*
-112. 路径总和
-给定一个二叉树和一个目标和，判断该树中是否存在根节点到叶子节点的路径，这条路径上所有节点值相加等于目标和。
+    112. 路径总和
+    给定一个二叉树和一个目标和，判断该树中是否存在 根节点到叶子节点的 路径，这条路径上所有节点值相加和 等于 目标。
 
-说明: 叶子节点是指没有子节点的节点。
+    说明: 叶子节点是指没有子节点的节点。
 
-示例: 给定如下二叉树，以及目标和 sum = 22，
-              5
-             / \
-            4   8
-           /   / \
-          11  13  4
-         /  \      \
-        7    2      1
-返回 true, 因为存在目标和为 22 的根节点到叶子节点的路径 5->4->11->2
+    示例: 给定如下二叉树，以及目标和 sum = 22，
+                  5
+                 / \
+                4   8
+               /   / \
+              11  13  4
+             /  \      \
+            7    2      1
+    返回 true, 因为存在目标和为 22 的根节点到叶子节点的路径 5->4->11->2
 
------------------------------------------------------------------------
+    -----------------------------------------------------------------------
 复杂度分析：
-
-时间复杂度： O(N)，其中 NN 是树的节点数。对每个节点访问一次。
-空间复杂度： O(H)，其中 HH 是树的高度。空间复杂度主要取决于递归时栈空间的开销，最坏情况下，树呈现链状，空间复杂度为 O(N)。平均情况下树的高度与节点数的对数正相关，空间复杂度为 O(logN)。
------------------------------------------------------------------------
+    时间复杂度： O(N)，其中 N 是树的节点数。对每个节点访问一次。
+    空间复杂度： O(H)，其中 H 是树的高度。
+    空间复杂度主要取决于递归时栈空间的开销，最坏情况下，树呈现链状，空间复杂度为 O(N)。
+    平均情况下树的高度与节点数的对数正相关，空间复杂度为 O(logN)。
+    -----------------------------------------------------------------------
 */
 bool hasPathSum(BstNode *root, int sum) {
     if (!root)
@@ -1063,33 +1064,64 @@ bool hasPathSum(BstNode *root, int sum) {
     }
     return hasPathSum(root->left, sum - root->val) && hasPathSum(root->right, sum - root->val);
 }
-void Test_hasPathSum() {
+class CPathCollect {
+public:
+    std::vector<int> path;
+
+    std::vector< std::vector<int> > PathGet(BstNode* root, int sum) {
+
+        std::vector< std::vector<int> > res;
+        if (!root) return res;
+
+        sum -= root->val;
+        path.push_back(root->val);
+
+        if ( sum == 0  && root->left == nullptr && root->right == nullptr ) {
+            res.push_back(path);
+        }
+
+        if (root->left)  PathGet( root->left, sum );
+        if (root->right)  PathGet( root->right, sum );
+
+        path.pop_back();
+        return res;
+    }
+    void GetAllPath() {
+//        std::vector< std::vector<int> > res = PathGet(g_pBstTree, 100);
+
+    }
+};
+
+void tst_hasPathSum() {
+    PrintInorder(g_pBstTree);
+
     bool bret = hasPathSum(g_pBstTree, 100);
     std::cout << "bret=" << bret << std::endl;
 }
 
 /*
-        113. 路径总和 II
-给定一个二叉树和一个目标和，找到 `所有` 从根节点到叶子节点 路径总和 等于给定目标和的路径。
+    113. 路径总和 II
+    给定一个二叉树和一个目标和，找到 `所有` 从根节点到叶子节点 路径总和 等于给定目标和的路径。
 
-说明: 叶子节点是指没有子节点的节点。
+    说明: 叶子节点是指没有子节点的节点。
 
-示例: 给定如下二叉树，以及目标和 sum = 22，
-              5
-             / \
-            4   8
-           /   / \
-          11  13  4
-         /  \    / \
-        7    2  5   1
-返回:
-[
-   [5,4,11,2],
-   [5,8,4,5]
-]
+    示例: 给定如下二叉树，以及目标和 sum = 22，
+                  5
+                 / \
+                4   8
+               /   / \
+              11  13  4
+             /  \    / \
+            7    2  5   1
+    返回:
+    [
+       [5,4,11,2],
+       [5,8,4,5]
+    ]
 
 -----------------------------------------------------------------------
-注意到本题的要求是，找到所有满足从「根节点」到某个「叶子节点」经过的路径上的节点之和等于目标和的路径。核心思想是对树进行一次遍历，在遍历时记录从根节点到当前节点的路径和，以防止重复计算。
+注意到本题的要求是，找到所有满足从「根节点」到某个「叶子节点」经过的路径上的节点之和等于目标和的路径。
+核心思想是对树进行一次遍历，在遍历时记录从根节点到当前节点的路径和，以防止重复计算。
 -----------------------------------------------------------------------
 */
 class CFindAllPaths {
@@ -2457,7 +2489,9 @@ void tst_insert_sort_2() {
     输出：0
 -----------------------------------------------------------------------
 复杂度分析：
-时间复杂度：平均时间复杂度为 O(\log n)O(logn)，其中 nn 是数组 \it numbersnumbers 的长度。如果数组是随机生成的，那么数组中包含相同元素的概率很低，在二分查找的过程中，大部分情况都会忽略一半的区间。而在最坏情况下，如果数组中的元素完全相同，那么 while 循环就需要执行 nn 次，每次忽略区间的右端点，时间复杂度为 O(n)O(n)。
+时间复杂度：平均时间复杂度为 O(logn)，其中 n 是数组 numbers 的长度。
+如果数组是随机生成的，那么数组中包含相同元素的概率很低，在二分查找的过程中，大部分情况都会忽略一半的区间。
+而在最坏情况下，如果数组中的元素完全相同，那么 while 循环就需要执行 nn 次，每次忽略区间的右端点，时间复杂度为 O(n)。
 
 空间复杂度：O(1)
 -----------------------------------------------------------------------
@@ -2468,21 +2502,27 @@ int minArray(vector<int>& arr) {
 
     while ( low < high ) {
 
-        int pivot = low + ((high - low ) >> 1);
+        int mid = low + ((high - low) >> 1);
 
-        if ( arr [ pivot ] > arr [ high ] ) {
-            low = pivot + 1;
-        } else if (arr[ pivot ] < arr [ high ]) {
-            high = pivot;
+        if ( arr [ mid ] > arr [ high ] ) {
+            low = mid + 1;
+//        } else if ( arr[ mid ] < arr [ high ] ) {
+//            high = mid;
+//        } else {
+//            high -= 1;
+//        }
         } else {
-            high -= 1;
+            high = mid;
         }
     }
     return arr[low];
 }
 void tst_minArray() {
-    std::vector<int> arr { 315, 455, 987, 2048, -13, 1 };
-    std::cout << "minVal=" << minArray(arr) << std::endl;
+    std::vector<int> arr1 { 4,5,6,7,0,1,2 };
+    std::cout << "minVal=" << minArray(arr1) << std::endl;
+
+    std::vector<int> arr2 { 315, 455, 987, 2048, -13, 1 };
+    std::cout << "minVal=" << minArray(arr2) << std::endl;
 }
 
 
@@ -3011,8 +3051,7 @@ public:
         que1.push(val);
     }
     int top() {
-
-        return 1;
+        return que1.front();
     }
     int pop() {
        int sz = que1.size();
@@ -3039,9 +3078,7 @@ private:
     std::queue<int> que2;
 };
 void tst_MyStack() {
-
     MyStack ms;
-
 }
 
 /*
@@ -3208,7 +3245,600 @@ bool hasCycle_1(ListNode* head) {
 }
 
 
+/*
+    9. 回文数
+    给你一个整数 x ，如果 x 是一个回文整数，返回 ture ；否则，返回 false 。
+    回文数是指正序（从左向右）和倒序（从右向左）读都是一样的整数。例如，121 是回文，而 123 不是。
+
+    示例 1：
+    输入：x = 121
+    输出：true
+
+    示例 2：
+    输入：x = -121
+    输出：false
+    解释：从左向右读, 为 -121 。 从右向左读, 为 121- 。因此它不是一个回文数。
+
+    示例 3：
+    输入：x = 10
+    输出：false
+    解释：从右向左读, 为 01 。因此它不是一个回文数。
+
+    示例 4：
+    输入：x = -101
+    输出：false
+*/
+bool isPalindrome(int x) {
+
+    return false;
+}
+
+/*
+    41. 缺失的第一个正数
+    给你一个未排序的整数数组 nums ，请你找出其中没有出现的最小的正整数。
+    进阶：你可以实现时间复杂度为 O(n) 并且只使用常数级别额外空间的解决方案吗？
+
+    示例 1：
+    输入：nums = [1,2,0]
+    输出：3
+
+    示例 2：
+    输入：nums = [3,4,-1,1]
+    输出：2
+
+    示例 3：
+    输入：nums = [7,8,9,11,12]
+    输出：1
+
+-----------------------------------------------------------------------
+复杂度分析：
+-----------------------------------------------------------------------
+*/
+int firstMissingPositive(vector<int>& nums) {
+
+    int n = nums.size();
+    for (int i = 0; i < n; ++i) {
+        while (nums[i] > 0 && nums[i] <= n && nums[nums[i] - 1] != nums[i]) {
+            swap(nums[nums[i] - 1], nums[i]);
+        }
+    }
+    for (int i = 0; i < n; ++i) {
+        if (nums[i] != i + 1) {
+            return i + 1;
+        }
+    }
+    return n + 1;
+}
+void tst_firstMissingPositive() {
+    std::vector<int> arr{ 7,8,9,11,12 };
+    firstMissingPositive( arr );
+}
+
+
+#include <bits/stdc++.h>
+using namespace std;
+
+void print()
+{
+    cout << endl;
+}
+
+template<class T, class... Args>
+void print(T num, Args... rest)
+{
+    cout << num << " --- ";
+    print(rest...);
+}
+
+void  tst_someClass() {
+
+    {
+        print(1, 2, 3, 4, 5);
+        return;
+    }
+
+    {
+        class A {
+        };
+//        class B{
+//        public:
+//          A x;
+//        }; // sizeof(B) = 1
+
+        class B {
+        public:
+            A x;
+            inline virtual void fun() {
+            }
+        }; // sizeof(B) = 16
+
+        std::cout << "B=" << sizeof(B) << std::endl; // sizeee=8
+        return;
+    }
+    {
+
+        class CXX {
+        public:
+            CXX() {}
+            ~CXX() {}
+            virtual void f1() {
+                std::cout << "CXX::f1 called" << std::endl;
+            }
+        };
+        std::cout << "sizeee=" << sizeof(CXX) << std::endl; // sizeee=8
+        return ;
+
+        class CA {
+        public:
+            CA() {}
+            ~CA() {}
+            void f1() {
+                std::cout << "A::f1 called" << std::endl;
+            }
+        };
+        class CB : public CA {
+        public:
+            CB() {}
+            ~CB() {}
+            void f1() {
+                std::cout << "B::f1 called" << std::endl;
+            }
+        };
+
+        CA a;
+        CB b;
+        CA* p1 = &a;
+        p1->f1();
+        p1 = &b;
+        p1->f1();
+
+    }
+}
+
+class CBinarySearch {
+
+public:
+    int binarySearch_1(std::vector<int>& arr, int target) {
+
+        int low = 0;
+        int high = arr.size() - 1;
+
+        while ( low <= high ) {
+            int mid = low + ((high - low) >> 1);
+            if ( arr [ mid ] == target )
+                return mid;
+            else if ( arr [ mid ] < target ) {
+                low = mid + 1;
+            } else {
+                high = mid - 1;
+            }
+        }
+        return -1;
+    }
+
+    // 查找第一个等于给定值的元素所在的 index
+    int bsearchFirstEqual(std::vector<int>& arr, int target) {
+
+        int low = 0;
+        int high = arr.size() - 1;
+
+        while ( low <= high ) {
+
+            int mid = low + ((high - low) >> 1);
+
+            if ( arr [ mid ] < target ) {
+                low = mid + 1;
+            } else if ( arr[ mid ] > target ) {
+                high = mid - 1;
+            } else { // == target
+
+                if ( mid == 0 || arr[ mid - 1 ] != target ) {
+                    return mid;
+                } else {
+                    high = mid - 1;
+                }
+            }
+
+        } // end --- for
+
+        return -1;
+    }
+
+    // 查找最后一个等于给定值的元素所在的 index
+    int bsearchLastEqual(std::vector<int>& arr, int target) {
+
+        int low = 0;
+        int high = arr.size() - 1;
+
+        while ( low <= high ) {
+
+            int mid = low + ((high - low) >> 1);
+
+            if ( arr [ mid ] < target ) {
+                low = mid + 1;
+            } else if ( arr[ mid ] > target ) {
+                high = mid - 1;
+            } else { // == target
+
+                if ( mid == (arr.size() - 1) || arr[ mid + 1 ] != target ) {
+                    return mid;
+                } else {
+                    low = mid + 1;
+                }
+            }
+
+        } // end --- for
+
+        return -1;
+    }
+
+    // 查找第一个大于等于给定值的元素所在的 index
+    int bsearchFirstMore(std::vector<int>& arr, int target) {
+
+        int low = 0;
+        int high = arr.size() - 1;
+
+        while ( low <= high ) {
+
+            int mid = low + ((high - low) >> 1);
+
+            if ( arr [ mid ] < target ) {
+                low = mid + 1;
+            } else if ( arr[ mid ] > target ) {
+                high = mid - 1;
+            } else { // == target
+
+                if ( mid == 0 || arr[ mid - 1 ] < target ) {
+                    return mid;
+                } else {
+                    low = mid + 1;
+                }
+            }
+
+        } // end --- for
+
+        return -1;
+    }
+
+    // 查找最后一个小于等于给定值的元素所在的 index
+    int bsearchLastLess(std::vector<int>& arr, int target) {
+
+        int low = 0;
+        int high = arr.size() - 1;
+
+        while ( low <= high ) {
+
+            int mid = low + ((high - low) >> 1);
+
+            if ( arr [ mid ] < target ) {
+                low = mid + 1;
+            } else if ( arr[ mid ] > target ) {
+                high = mid - 1;
+            } else { // == target
+
+                if ( mid == arr.size() - 1 || arr[ mid + 1 ] > target ) {
+                    return mid;
+                } else {
+                    low = mid + 1;
+                }
+            }
+
+        } // end --- for
+
+        return -1;
+    }
+
+
+};
+void tst_binarySearch() {
+
+    std::vector<int> arr{ -1, 2, 3, 7, 13, 19, 6655, 65535, 65535, 99871};
+
+    CBinarySearch cbs;
+//    std::cout << "findPos=" << cbs.binarySearch_1(arr, 65535) << std::endl;
+//    std::cout << "findPos=" << cbs.bsearchFirstEqual(arr, 65535) << std::endl;
+    std::cout << "findPos=" << cbs.bsearchLastEqual(arr, 65535) << std::endl;
+}
+
+
+// 给定一个数组arr，返回arr的最长无重复子串的长度(无重复指的是所有数字都不相同)。
+int maxLength(std::vector<int>& arr) {
+
+    {
+        int res = -1;
+        int l = 0, r = 0;
+        int n = arr.size();
+        std::set<int> s;
+
+        while ( r < n ) {
+            if ( s.count(arr[ r ]) == 0 ) { // found element
+                s.insert( arr[r] );
+                r ++;
+            } else {
+                s.erase(arr[l]);
+                l++;
+            }
+        }
+        PrintInContainer(s);
+        return s.size();
+    }
+    size_t n = arr.size();
+    size_t l = 0, r = 0;
+    std::set<int> s;
+    size_t res = 0;
+
+    while ( r < n ) {
+        if (!s.count(arr[r])) {
+            s.insert(arr[r]);
+            r ++;
+        } else {
+            s.erase(arr[l]);
+            l ++;
+        }
+        res = res > s.size() ? res : s.size();
+    }
+    return res;
+}
+void tst_maxLength() {
+    std::vector<int> vec{ 1, 3, 4, 5, 77, 77, 88, 90 };
+    std::cout << "max sub string size=" << maxLength(vec) << std::endl;
+//    PrintInContainer(vec);
+}
+
+template < class T >
+class CShared_Ptr {
+private:
+    T*   ptr_;
+    int* use_count_;
+
+public:
+
+
+};
+
+
+
+/*
+    162. 寻找峰值
+    峰值元素是指其值大于左右相邻值的元素。
+    给你一个输入数组 nums，找到峰值元素并返回其索引。数组可能包含多个峰值，在这种情况下，返回 任何一个峰值 所在位置即可。
+    你可以假设 nums[-1] = nums[n] = -∞ 。
+
+    示例 1：
+    输入：nums = [1,2,3,1]
+    输出：2
+    解释：3 是峰值元素，你的函数应该返回其索引 2。
+
+    示例 2：
+    输入：nums = [1,2,1,3,5,6,4]
+    输出：1 或 5
+    解释：你的函数可以返回索引 1，其峰值元素为 2；
+         或者返回索引 5， 其峰值元素为 6。
+
+-----------------------------------------------------------------------
+复杂度分析：
+-----------------------------------------------------------------------
+首先要注意题目条件，在题目描述中出现了 nums[-1] = nums[n] = -∞，这就代表着 只要数组中存在一个元素比相邻元素大，那么沿着它一定可以找到一个峰值
+根据上述结论，我们就可以使用二分查找找到峰值
+查找时，左指针 l，右指针 r，以其保持左右顺序为循环条件
+根据左右指针计算中间位置 m，并比较 m 与 m+1 的值，如果 m 较大，则左侧存在峰值，r = m，如果 m + 1 较大，则右侧存在峰值，l = m + 1
+时间复杂度：O(logN)
+*/
+int findPeakElement(vector<int>& nums) {
+    int left = 0;
+    int right = nums.size() -1;
+    while ( left < right ) {
+        int mid = left + ((right - left)>>1);
+        if ( nums[ mid ] > nums [ mid + 1] ) {
+            right = mid;
+        } else {
+            left = mid + 1;
+        }
+    }
+    return left;
+}
+void tst_findPeakElement() {
+    std::vector<int> nums{ 1,2,1,3,5,6,4 };
+    std::cout << "peak ele=" << findPeakElement(nums) << std::endl;
+}
+
+
+/*
+    69. x 的平方根
+    实现 int sqrt(int x) 函数。
+    计算并返回 x 的平方根，其中 x 是非负整数。
+    由于返回类型是整数，结果只保留整数的部分，小数部分将被舍去。
+
+    示例 1:
+    输入: 4
+    输出: 2
+
+    示例 2:
+    输入: 8
+    输出: 2
+    说明: 8 的平方根是 2.82842...,
+         由于返回类型是整数，小数部分将被舍去。
+-----------------------------------------------------------------------
+复杂度分析：
+-----------------------------------------------------------------------
+
+*/
+int mySqrt(int x) {
+
+    int left = 0;
+    int right= x;
+    int mid = 0;
+
+    while (left <= right) {
+
+        mid = left + ((right - left) >> 1);
+
+        if ( ((long long) (mid * mid)) <= x ) {
+            left = mid + 1;
+        } else {
+            right = mid - 1;
+        }
+
+    }
+    return mid;
+    return 1;
+}
+
+/*
+    剑指 Offer 16. 数值的整数次方
+    实现函数，求base的exponent次方。不得使用库函数，同时不需要考虑大数问题。
+
+    示例 1:
+    输入: 2.00000, 10
+    输出: 1024.00000
+
+    示例 2:
+    输入: 2.10000, 3
+    输出: 9.26100
+
+    示例 3:
+    输入: 2.00000, -2
+    输出: 0.25000
+    解释: 2-2 = 1/22 = 1/4 = 0.25
+*/
+double Power(double base, int exponent) {
+
+//    long num = 31;
+//    std::cout << "sizeof-long=" << sizeof(num) << std::endl;
+
+//    int n1 = 9;
+//    std::cout << "val=" << (n1>>1) << std::endl;
+
+    double ans = 1.0;
+    int num = exponent;
+
+    while ( num ) {
+        if ( num & 1 )  ans *= base;
+
+        base *= base;
+        num = num >> 1;
+    }
+
+    return ans;
+}
+void tst_Power() {
+//    std::cout << "function Power=" << Power( 3.001, 3 ) << std::endl;
+
+    //创建一个空的unordered_set容器
+    std::unordered_set<std::string> uset;
+    //给 uset 容器添加数据
+    uset.emplace("http://c.biancheng.net/java/");
+    uset.emplace("http://c.biancheng.net/c/");
+    uset.emplace("http://c.biancheng.net/python/");
+    //查看当前 uset 容器存储元素的个数
+    cout << "uset size = " << uset.size() << endl;
+    //遍历输出 uset 容器存储的所有元素
+    for (auto iter = uset.begin(); iter != uset.end(); ++iter) {
+        cout << *iter << endl;
+    }
+
+}
+
+
+
+/*
+    202. 快乐数
+    编写一个算法来判断一个数 n 是不是快乐数。
+
+    「快乐数」定义为：
+    对于一个正整数，每一次将该数替换为它每个位置上的数字的平方和。
+    然后重复这个过程直到这个数变为 1，也可能是 无限循环 但始终变不到 1。
+    如果 可以变为 1，那么这个数就是快乐数。
+    如果 n 是快乐数就返回 true；不是，则返回 false 。
+
+    示例 1:
+    输入: 19
+    输出: true
+    解释:
+    12 + 92 = 82
+    82 + 22 = 68
+    62 + 82 = 100
+    12 + 02 + 02 = 1
+
+    示例 2:
+    输入: n = 2
+    输出: false
+
+*/
+class HappyNum {
+
+public:
+    int GetSum(int n) {
+
+        int sum = 0;
+        while ( n ) {
+            sum += (n % 10) * (n % 10);
+            n = n / 10;
+        }
+        return sum;
+    }
+    bool isHappy(int n) {
+        std::unordered_set<int> us;
+
+        while ( 1 ) {
+
+            int sum = GetSum(n);
+            if (sum == 1) {
+                return true;
+            }
+            if ( us.find( sum ) != us.end() ) {// 如果这个sum曾经出现过，说明已经陷入了无限循环了，立刻return false
+                return false;
+            } else {
+                us.insert( sum );
+            }
+            n = sum;
+        }
+        return false;
+    }
+
+};
+
+void tst_isHappy() {
+
+    typedef struct psd_header_st_tag
+    {
+        unsigned long saddr; //源地址
+        unsigned long daddr; //目的地址
+        char mbz;//置空
+        char ptcl; //协议类型
+        unsigned short tcpl; //TCP长度, total length - IP length
+    }psd_header_st;
+
+    psd_header_st ph;
+    std::cout << "sizeof(psd_header)=" << sizeof(psd_header_st) << std::endl;
+    std::cout << "sizeof(ph)=" << sizeof(psd_header_st) << std::endl;
+    std::cout << "sizeof(ph.saddr)=" << sizeof(ph.saddr) << std::endl;
+    return ;
+
+    HappyNum hn;
+    std::cout << "result 19=" << hn.isHappy( 19 ) << std::endl;
+    std::cout << "result 11=" << hn.isHappy( 11 ) << std::endl;
+}
+
+
 void LeetCodeEntry() {
+
+    tst_isHappy(); return;
+
+    tst_Power(); return;
+
+    tst_minArray();return;
+
+    tst_findPeakElement(); return;
+
+    tst_maxLength(); return;
+
+    tst_binarySearch(); return;
+//    std::cout << "g_sInts=" << g_sInts << std::endl;
+//    return;
+    tst_someClass(); return;
+
+    tst_hasPathSum(); return;
 
     tst_minSubArrayLen(); return;
 
@@ -3226,7 +3856,6 @@ void LeetCodeEntry() {
 
     tst_findNumCount();return;
 
-    tst_minArray();return;
 
     tst_KthBig(); return;
 
