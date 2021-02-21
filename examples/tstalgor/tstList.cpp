@@ -1148,7 +1148,15 @@ public:
     进阶: 如果你已经实现复杂度为 O(n) 的解法，尝试使用更为精妙的分治法求解。
 */
 int maxSubArray(vector<int>& nums) {
-    int maxValue = INT_MIN;
+    {
+        int maxSum = nums[ 0 ], res = maxSum;
+        for ( int i = 1; i < nums.size(); i ++ ) {
+            maxSum = std::max( maxSum + nums[ i ], nums[ i ]);
+            res = std::max( maxSum, res );
+        }
+        return res;
+    }
+
     int dp = 0, res = 0;
     for (int i = 0; i < nums.size(); i++)
     {
@@ -1157,9 +1165,9 @@ int maxSubArray(vector<int>& nums) {
     }
     return res;
 }
-void Test_maxSubArray() {
-    // std::vector<int> v1{ 7, 1, 5, 3, 6, 4 };
-    std::vector<int> v1{ -2,1,-3,4,-1,2,1,-5,4 };
+void tst_maxSubArray() {
+     std::vector<int> v1{ 4,-1,2,1 };
+//    std::vector<int> v1{ -2,1,-3,4,-1,2,1,-5,4 };
     std::cout << "maxSubArray=" << maxSubArray(v1) << std::endl;
 }
 
@@ -1340,25 +1348,32 @@ void tst_mergeTwoArray() {
 -----------------------------------------------------------------------
 */
 std::vector<int> twoSum(std::vector<int>& nums, int target) {
-    std::vector<int> res;
     int left = 0, right = nums.size() - 1;
 
     while ( left < right ) {
 
         int s = nums[ left ] + nums[ right ];
         if ( s == target ) {
-            res.push_back(nums[ left ]);res. push_back(nums[ right ]);
-            return res;
+            return std::vector<int>{ nums[ left ], nums[ right ] };
         } else if ( s > target ) {
             right --;
         } else {
             left ++;
         }
+        std::cout << "s = " << s << std::endl;
     }
 
-    res.push_back(-1);
-    res.push_back(-1);
-    return res;
+    std::cout << "no found two sum number" << std::endl;
+    return std::vector<int>{};
+}
+void tst_twoSum() {
+    std::vector<int> v1{ 10,26,30,31,47,60 };
+    auto ves = twoSum(v1, 40);
+    // auto ves = twoSum(v1, 17);
+    for ( auto ele : ves ) {
+        std::cout << " " << ele;
+    }
+    std::cout << std::endl;
 }
 
 /*
@@ -2058,24 +2073,66 @@ void tst_rotateRight() {
     输出：[0]
 
     -----------------------------------------------------------------------
-    时间复杂度：
-    空间复杂度：
+    时间复杂度： O(N)
+    空间复杂度： O(logN)
     -----------------------------------------------------------------------
 */
-vector<int> getLeastNumbers(vector<int>& arr, int k) {
-    std::vector<int> res;
+class CLeastNumbser {
+public:
 
-    return res;
-}
+    std::vector<int> quickSort(std::vector<int>& arr, int k, int l, int r) {
+
+        {
+            //        int i = l, j = r;
+            //        while (i < j) {
+            //            while (i < j && arr[j] >= arr[l]) j--;
+            //            while (i < j && arr[i] <= arr[l]) i++;
+            //            swap(arr[i], arr[j]);
+            //        }
+            //        swap(arr[i], arr[l]);
+            //        if (i > k) return quickSort(arr, k, l, i - 1);
+            //        if (i < k) return quickSort(arr, k, i + 1, r);
+        }
+
+        int i = l, j = r;
+        int pivot = arr[ l ];
+        if ( i < j ) {
+            while ( i < j && arr[ j ] >= pivot ) j --;
+            if ( i < j ) arr[ i++ ] = arr[ j ];
+
+            while ( i < j && arr[ i ] <= pivot ) i ++;
+            if ( i < j ) arr[ j-- ] = arr[ i ];
+        }
+        arr[ i ] = pivot;
+        if ( i > k ) return quickSort( arr, k, l, i - 1 );
+        if ( i < k ) return quickSort( arr, k, i + 1, r );
+
+        vector<int> res;
+        res.assign(arr.begin(), arr.begin() + k);
+        return res;
+    }
+    std::vector<int> getLeastNumbers(std::vector<int>& arr, int k) {
+        if (k >= arr.size()) return arr;
+
+        return quickSort(arr, k, 0, arr.size() - 1);
+    }
+};
+
 void tst_getLeastNumbers() {
-    std::vector<int> arr{ 4, 5, 1, 6, 2, 7, 3, 8 };
-    auto res = getLeastNumbers(arr, 3);
+    std::vector<int> arr{ 4, 5, 6, 7, 8, -1, 77, 133, 89, 61 };
+
+    CLeastNumbser cln;
+    auto res = cln.getLeastNumbers(arr, 3);
     PrintInContainer(res);
 }
 
 
 
 int Test_ListEntry() {
+
+        tst_twoSum(); return 1;
+    tst_maxSubArray(); return 1;
+
 
     tst_getLeastNumbers(); return 1;
 
@@ -2115,12 +2172,9 @@ int Test_ListEntry() {
 
     tst_mergeTwoArray(); return 1;
 
-
     tst_reorderList(); return 1;
 
-    Test_maxSubArray(); return 1;
 
-    
     Test_moveZeroes(); return 1;
     
     Test_majorityElement_3(); return 1;
@@ -2134,9 +2188,6 @@ int Test_ListEntry() {
     Test_listOfDepth(); return 1;
 
     Test_isPalindrome(); return 1;
-
-
-
 
     Test_MergeTwoList(); return 1;
 

@@ -573,35 +573,6 @@ void tst_int64_1() {
     }
 }
 
-/*
-    最大连续子数组
-
-    常规方法,时间复杂度O（n*n）
-    先从第一个元素开始向后累加，
-    每次累加后与之前的和比较，保留最大值，
-    再从第二个元素开始向后累加，以此类推。
-*/
-int Test_MaxSubArray(int* array, int length) {
-    int maxSum = 0;
-    int curSum = 0;
-
-    for (int i = 0; i < length; i++ ) {
-
-        for (int j = i; j < i; j++ ) {
-
-            for (int k = i; k < j; k++) {
-                curSum += array[k];
-            }
-
-            if (curSum > maxSum)
-                maxSum = curSum;
-
-            curSum = 0;
-        }
-
-    }
-    return maxSum;
-}
 
 // 联机算法：联机算法是在任意时刻算法对要操作的数据只读入(扫描)一次，
 // 一旦被读入并处理，它就不需要在被记忆了。而在此处理过程中算法能对它已经读入的数据立即给出相应子序列问题的正确答案。
@@ -5536,40 +5507,7 @@ void Test_ConstuctMaxBst() {
 }
 
 
-/*
-    两数之和
-给定一个整数数组 nums 和一个目标值 target，
-请你在该数组中找出和为目标值的那 两个 整数，并返回他们的数组下标。
-可以假设每种输入只会对应一个答案。但是，数组中同一个元素不能使用两遍。
 
-示例: 给定 nums = [2, 7, 11, 15], target = 9
-
-因为 nums[0] + nums[1] = 2 + 7 = 9, 所以返回 [0, 1]
-*/
-vector<int> twoSum(const vector<int>& nums, int target) {
-    std::vector<int> ret;
-    std::unordered_map <int, int> um;
-        
-    for (size_t i = 0; i < nums.size(); i ++) {
-        auto it = um.find(target - nums[i]);
-        if (it != um.end()) {
-            ret.push_back(it->second);
-            break;
-        } else {
-            um[nums[i]] = i;
-        }
-    }
-    return ret;
-}
-void Test_twoSum() {
-    std::vector<int> v1{ 1, 9, 8, 7, 3};
-    auto ves = twoSum(v1, 10);
-    // auto ves = twoSum(v1, 17);
-    for ( auto ele : ves ) {
-        std::cout << " " << ele;
-    }
-    std::cout << std::endl;
-}
 
 /*
     783. 二叉搜索树节点最小距离
@@ -5841,6 +5779,7 @@ int main(int argc, char *argv[])
     LOG_INFO << "pid = " << getpid() << ", tid=" << CurrentThread::tid();
 
     // --------------------function entry--------------------
+//    tst_qs_new(); return 1;
 
     if ( argc > 1 ) {
 //        std::cout << "argv[ 0 ]=" << argv[ 0 ] << std::endl;
@@ -5870,7 +5809,6 @@ int main(int argc, char *argv[])
 
 
 
-    tst_qs_new(); return 1;
 
 
     Test_middleNode(); return 1;
@@ -5895,8 +5833,6 @@ int main(int argc, char *argv[])
     CreateBstTreeEx(); return 1;
 
     Test_minDiffInBST(); return 1;
-
-    Test_twoSum(); return 1;
 
 {
     CSearchBst csb;

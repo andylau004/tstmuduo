@@ -449,8 +449,29 @@ void my_qs(int arr[], int head, int tail) {// 简洁靠谱 快排实现
     }
 }
 void newfun(int* a, int head, int tail) {
-    if (head >= tail) return;
+    {
+        int i = head;
+        int j = tail;
+        if ( i >= j ) return;
 
+        int pivot = a[ i ];
+        while ( i < j ) {
+
+            while ( i < j && a[ j ] >= pivot ) j --;
+            if ( i < j ) a[ i ++ ] = a[ j ];
+
+            while ( i < j && a[ i ] <= pivot ) i ++;
+            if ( i < j ) a[ j -- ] = a[ i ];
+        }
+        a[ i ] = pivot;
+
+        newfun( a, head, i - 1 );
+        newfun( a, j + 1, tail );
+        return;
+    }
+
+
+    if (head >= tail) return;
     {
         int i = head, j = tail;
         int x = a[i];
@@ -495,25 +516,25 @@ void newfun(int* a, int head, int tail) {
 }
 
 void tst_qs_new() {
-    struct AliMem {
-        int a1;
-        char b1;
-        char b2;
-    };
-    struct AliMemEx {
-        char b1;
-        int a1;
-        char b2;
-    };
-    struct AliMemExx {
-        char b1;
-        char b2;
-        int a1;
-    };
-    std::cout << "size=" << sizeof(AliMem) << std::endl;// 有效对齐值为4, output=8
-    std::cout << "size=" << sizeof(AliMemEx) << std::endl;// =12
-    std::cout << "size=" << sizeof(AliMemExx) << std::endl;// =8
-    return;
+//    struct AliMem {
+//        int a1;
+//        char b1;
+//        char b2;
+//    };
+//    struct AliMemEx {
+//        char b1;
+//        int a1;
+//        char b2;
+//    };
+//    struct AliMemExx {
+//        char b1;
+//        char b2;
+//        int a1;
+//    };
+//    std::cout << "size=" << sizeof(AliMem) << std::endl;// 有效对齐值为4, output=8
+//    std::cout << "size=" << sizeof(AliMemEx) << std::endl;// =12
+//    std::cout << "size=" << sizeof(AliMemExx) << std::endl;// =8
+//    return;
 
     int arr[] = {12, 45, 748, 3986, 15, 56, 3, 89, 4, 48, 2, 0, -1, 1024, };
 //    int arr[] = { 10, 9, 8, 7, 6, 5, 4, 3, 2, 1 };
@@ -524,7 +545,7 @@ void tst_qs_new() {
 
     newfun( arr, 0, length - 1 );
     justPrint( arr, length );
-//    return ;
+    return ;
 //    f_2(arr, 0, length - 1);
     my_qs( arr, 0, length - 1 );
 //    t_qsort<int>( arr, 0, length - 1 );

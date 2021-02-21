@@ -412,7 +412,7 @@ public:
 //            cf.sortByQuickSort(cpy);
             cf.sortByPriQue(cpy, idx);
 
-//            PrintInContainer(cpy);
+            PrintInContainer(cpy);
             return ;
         }
 //        auto retVal = sort_desc(vRandom, 0, vRandom.size() - 1, idx);
@@ -1268,36 +1268,37 @@ vector<int> countBits(int num) {
 
 /*
     191. 位1的个数
-编写一个函数，输入是一个无符号整数（以二进制串的形式），返回其二进制表达式中数字位数为 '1' 的个数（也被称为汉明重量）。
+    编写一个函数，输入是一个无符号整数（以二进制串的形式），返回其二进制表达式中数字位数为 '1' 的个数（也被称为汉明重量）。
 
-进阶： 如果多次调用这个函数，你将如何优化你的算法？
+    进阶： 如果多次调用这个函数，你将如何优化你的算法？
 
-示例 1：
-输入：00000000000000000000000000001011
-输出：3
-解释：输入的二进制串 00000000000000000000000000001011 中，共有三位为 '1'。
+    示例 1：
+    输入：00000000000000000000000000001011
+    输出：3
+    解释：输入的二进制串 00000000000000000000000000001011 中，共有三位为 '1'。
 
-示例 2：
-输入：00000000000000000000000010000000
-输出：1
-解释：输入的二进制串 00000000000000000000000010000000 中，共有一位为 '1'。
+    示例 2：
+    输入：00000000000000000000000010000000
+    输出：1
+    解释：输入的二进制串 00000000000000000000000010000000 中，共有一位为 '1'。
 
-示例 3：
-输入：11111111111111111111111111111101
-输出：31
-解释：输入的二进制串 11111111111111111111111111111101 中，共有 31 位为 '1'。
+    示例 3：
+    输入：11111111111111111111111111111101
+    输出：31
+    解释：输入的二进制串 11111111111111111111111111111101 中，共有 31 位为 '1'。
 
------------------------------------------------------------------------
-复杂度分析
+    -----------------------------------------------------------------------
+    复杂度分析
 
-时间复杂度：O(1)O(1) 。运行时间与 nn 中位为 11 的有关。在最坏情况下， nn 中所有位都是 11 。对于 32 位整数，运行时间是 O(1)O(1) 的。
+    时间复杂度：O(1)。
+    运行时间与 n 中位为 1 的有关。
+    在最坏情况下， n 中所有位都是 1 。对于 32 位整数，运行时间是 O(1) 的。
 
-空间复杂度：O(1)O(1) 。没有使用额外空间。
------------------------------------------------------------------------
+    空间复杂度：O(1)。
+    -----------------------------------------------------------------------
 */
 int hammingWeight(uint32_t n) {
-    if (!n)
-        return 0;
+    if (!n) return 0;
     int count = 0;
     while (n) {
         count++;
@@ -1375,22 +1376,22 @@ void Test_climbStairs() {
 */
 int fib(int n)
 {
-    if (n== 0)
-        return 0;
-    if (n== 1)
-        return 1;
-    int a = 0;
-    int b = 1;
-    int c = 0;
-    for ( int i = 2; i < n; i ++ ) {
-        c = (a + b)%1000000007;
-        a = b;
-        b = c;
+    {
+        if ( 0 == n ) return 0;
+        if ( 1 == n ) return 1;
+
+        int n1 = 0, n2 = 1, sum = 0;
+        while ( n >= 2 )  {
+            sum = ( n1 + n2 ) % 1000000007;
+            n1 = n2;
+            n2 = sum;
+            n --;
+        }
+        return sum;
     }
-    return c;
 }
-void Test_fib() {
-    std::cout << "fib result=" << fib(1) << std::endl;
+void tst_fib() {
+    std::cout << "fib result=" << fib(11) << std::endl;
 }
 
 /*
@@ -1409,17 +1410,17 @@ void Test_fib() {
     给定 target = 5， 返回 true。
     给定 target = 20，返回 false。
 
------------------------------------------------------------------------
-复杂度分析：
-时间复杂度 O(M+N)：其中，N 和 M 分别为矩阵行数和列数，此算法最多循环 M+N 次。
-空间复杂度 O(1): i, j 指针使用常数大小额外空间。
------------------------------------------------------------------------
+    -----------------------------------------------------------------------
+    复杂度分析：
+    时间复杂度 O(M+N)：其中，N 和 M 分别为矩阵行数和列数，此算法最多循环 M+N 次。
+    空间复杂度 O(1): i, j 指针使用常数大小额外空间。
+    -----------------------------------------------------------------------
 */
 bool findNumberIn2DArray(vector<vector<int>> &matrix, int target)
 {
     int i = matrix.size() - 1;
     int j = 0;
-    while (i >= 0 && j < matrix.size()) {
+    while (i >= 0 && j < matrix[0].size()) {
         if (matrix[i][j] == target) return true;
         else if (matrix[i][j] > target) i --;
         else if (matrix[i][j] < target) j ++;
@@ -2478,7 +2479,7 @@ void tst_insert_sort_2() {
 
 /*
     剑指 Offer 11. 旋转数组的最小数字
-    把一个数组最开始的若干个元素搬到数组的末尾，我们称之为数组的旋转。输入一个递增排序的数组的一个旋转，输出旋转数组的最小元素。例如，数  组 [3,4,5,1,2] 为 [1,2,3,4,5] 的一个旋转，该数组的最小值为1。
+    把一个数组最开始的若干个元素搬到数组的末尾，我们称之为数组的旋转。输入一个递增排序的数组的一个旋转，输出旋转数组的最小元素。例如，数组 [3,4,5,1,2] 为 [1,2,3,4,5] 的一个旋转，该数组的最小值为1。
 
     示例 1：
     输入：[3,4,5,1,2]
@@ -2496,26 +2497,23 @@ void tst_insert_sort_2() {
 空间复杂度：O(1)
 -----------------------------------------------------------------------
 */
-int minArray(vector<int>& arr) {
-    int low = 0;
-    int high = arr.size() - 1;
+int minArray(vector<int>& numbers) {
+    int l = 0, r = numbers.size() - 1;
 
-    while ( low < high ) {
+    while ( l < r ) {
 
-        int mid = low + ((high - low) >> 1);
+        int mid =  l +  ( ( r - l )  >> 1);
 
-        if ( arr [ mid ] > arr [ high ] ) {
-            low = mid + 1;
-//        } else if ( arr[ mid ] < arr [ high ] ) {
-//            high = mid;
-//        } else {
-//            high -= 1;
-//        }
+        if  ( numbers [ mid ] > numbers[ r ] ) {
+            l = mid + 1;
+        } else  if  ( numbers [ mid ] < numbers[ r ] )  {
+            r = mid;
         } else {
-            high = mid;
+            r --;
         }
     }
-    return arr[low];
+
+    return numbers[ l ];
 }
 void tst_minArray() {
     std::vector<int> arr1 { 4,5,6,7,0,1,2 };
@@ -2542,6 +2540,43 @@ void tst_minArray() {
 -----------------------------------------------------------------------
 */
 int findNumCount(vector<int>& nums, int target) {
+
+    {
+        int count = 0;
+        if (nums.empty()) return 0;
+        int mid = -1;
+        int left = 0, right = nums.size() - 1;
+
+        while ( left < right ) {// confirm left ...
+
+            mid = left + ((right - left) >> 1);
+
+            if ( nums[ mid ] >= target ) {
+                right = mid;
+            } else {
+                left = mid + 1;
+            }
+        }
+        if ( nums[ left ] != target ) return 0;
+
+        for ( int t = left; t < nums.size(); t ++ ) {
+            if ( nums[ t ] == target ) {
+                count ++;
+            }
+        }
+        return count;
+//        while ( left < right ) {// confirm right ...
+
+//            mid = left + ((right - left) >> 1);
+
+//            if ( nums [ mid ] <= target ) {
+//                left = mid + 1;
+//            } else {
+////                right =
+//            }
+//        }
+        return -1;
+    }
 
     int mid = 0;
     int left = 0, right = nums.size() - 1;
@@ -2574,8 +2609,9 @@ int findNumCount(vector<int>& nums, int target) {
     return left - x;
 }
 void tst_findNumCount() {
-    std::vector<int> arr { 315, 455, 987, 2048, 2048, 2048, 2048, 2048, 2048, 9981 };
-    std::cout << "findNumCount=" << findNumCount(arr, 2048) << std::endl;
+//    std::vector<int> arr { 315, 455, 987, 2048, 2048, 2048, 2048, 2048, 2048, 9981 };
+    std::vector<int> arr{ 5,7,7,8,8,10 };
+    std::cout << "findNumCount=" << findNumCount(arr, 6) << std::endl;
 }
 
 
@@ -2594,6 +2630,9 @@ void tst_findNumCount() {
     输出: 8
 -----------------------------------------------------------------------
 复杂度分析：
+如果 k == nums[k]，那么缺失的数字一定在 k 右边;
+如果 k != nums[k]，那么缺失的数字要么为 k 要么在 k 左边;
+这个很类似于二分查找，我们也可以使用二分的思想去优化时间复杂度。
 -----------------------------------------------------------------------
 */
 int missingNum(vector<int>& nums, int sz) {
@@ -2605,14 +2644,16 @@ int missingNum(vector<int>& nums, int sz) {
 
         if (nums[ mid ] == mid) {
             left = mid + 1;
-        }
-        else {
+        } else {
             right = mid - 1;
         }
     }
     return left;
 }
 void tst_missingNum() {
+    int num = 1;
+    string src = to_string(num);
+
     std::vector<int> arr { 0, 1, 2, 3, 4, 5, 7, 8, 9 };
     std::cout << "missingNum=" << missingNum(arr, arr.size()) << std::endl;
 }
@@ -2845,7 +2886,6 @@ int lengthOfLongestSubstringEx(string s) {
     }
     return maxsize;
 }
-
 void tst_lengthOfLongestSubstringEx() {
     std::unordered_set< std::string > us;
     us.insert("998761");
@@ -2897,9 +2937,30 @@ vector<int> maxSlidingWindow(vector<int>& nums, int k) {
     int n = nums.size();
     std::priority_queue< pair<int, int> > pri_que;
 
-    for (int i = 0; i < k ; i ++ ) {
+    for ( int i = 0; i < k; i ++ ) {
         pri_que.emplace( nums[ i ], i );
     }
+    {
+        std::vector<int> ans { pri_que.top().first };
+        for ( int j = k; j < n; j ++ ) {
+
+            pri_que.emplace( nums[ j ], j );
+
+            while ( pri_que.top().second >= j - k ) {
+                pri_que.pop();
+            }
+
+            ans.push_back(pri_que.top().first);
+        }
+        return ans;
+    }
+
+//    while ( pri_que.size() ) {
+//        auto ele = pri_que.top();
+//        std::cout << "first=" << ele.first << ", second=" << ele.second <<std::endl;
+//        pri_que.pop();
+//    }
+//    return std::vector<int> {};
 
     std::vector<int> ans{pri_que.top().first};
 
@@ -2907,29 +2968,68 @@ vector<int> maxSlidingWindow(vector<int>& nums, int k) {
 
         pri_que.emplace( nums[ j ], j );
 
-        while (pri_que.top().second <= j - k) {
+        while ( (j - k) >= pri_que.top().second /*pri_que.top().second <= j - k*/ ) {
             pri_que.pop();
         }
 
         ans.push_back( pri_que.top().first );
     }
-
     return ans;
 }
 void tst_maxSlidingWindow() {
 
-    std::priority_queue< int > p_q;
-    p_q.emplace(-1);
-    p_q.emplace(123);
-    p_q.emplace(21);
-    p_q.emplace(2048);
+    std::vector<int> nums { 1, 3, -1, -3, 5, 3, 6, 7 };
 
-    std::vector<int> nums {1,3,-1,-3,5,3,6,7};
+    auto res = maxSlidingWindow( nums, /*3*/ nums.size() );
+    PrintInContainer(res);
 
-//    auto res = maxSlidingWindow( nums, 3 );
-//    PrintInContainer(res);
+//    std::priority_queue< int > p_q;
+//    p_q.emplace(-1);
+//    p_q.emplace(123);
+//    p_q.emplace(21);
+//    p_q.emplace(2048);
 //    std::cout << "max=" << p_q.top() << ", sz=" << p_q.size() << std::endl;
 }
+
+/*
+    219. 存在重复元素 II
+    给定一个整数数组和一个整数 k，判断数组中是否存在两个不同的索引 i 和 j，
+    使得 nums [i] = nums [j]，并且 i 和 j 的差的 绝对值 至多为 k。
+
+    示例 1:
+    输入: nums = [1,2,3,1], k = 3
+    输出: true
+
+    示例 2:
+    输入: nums = [1,0,1,1], k = 1
+    输出: true
+
+    示例 3:
+    输入: nums = [1,2,3,1,2,3], k = 2
+    输出: false
+*/
+bool containsNearbyDuplicate(vector<int>& nums, int k) {
+    std::set<int> s;
+
+    for ( int i = 0; i < nums.size(); i ++ ) {
+
+        if ( s.find( nums[ i ] ) != s.end() ) {// find one ele
+            return true;
+        }
+
+        s.insert( nums[ i ] );
+
+        if ( s.size() > k ) {
+            s.erase( i - k );
+        }
+    }
+    return false;
+}
+void tst_containsNearbyDuplicate() {
+    std::vector<int> arr{ 1,0,1,1 };
+    std::cout << "containsNearbyDuplicate=" << containsNearbyDuplicate(arr, 1) << std::endl;
+}
+
 /*
     20. 有效的括号
     给定一个只包括 '('，')'，'{'，'}'，'['，']' 的字符串 s ，判断字符串是否有效。
@@ -3800,28 +3900,86 @@ public:
 
 void tst_isHappy() {
 
-    typedef struct psd_header_st_tag
-    {
-        unsigned long saddr; //源地址
-        unsigned long daddr; //目的地址
-        char mbz;//置空
-        char ptcl; //协议类型
-        unsigned short tcpl; //TCP长度, total length - IP length
-    }psd_header_st;
+//    typedef struct psd_header_st_tag
+//    {
+//        unsigned long saddr; //源地址
+//        unsigned long daddr; //目的地址
+//        char mbz;//置空
+//        char ptcl; //协议类型
+//        unsigned short tcpl; //TCP长度, total length - IP length
+//    }psd_header_st;
 
-    psd_header_st ph;
-    std::cout << "sizeof(psd_header)=" << sizeof(psd_header_st) << std::endl;
-    std::cout << "sizeof(ph)=" << sizeof(psd_header_st) << std::endl;
-    std::cout << "sizeof(ph.saddr)=" << sizeof(ph.saddr) << std::endl;
-    return ;
+//    psd_header_st ph;
+//    std::cout << "sizeof(psd_header)=" << sizeof(psd_header_st) << std::endl;
+//    std::cout << "sizeof(ph)=" << sizeof(psd_header_st) << std::endl;
+//    std::cout << "sizeof(ph.saddr)=" << sizeof(ph.saddr) << std::endl;
+//    return ;
 
     HappyNum hn;
     std::cout << "result 19=" << hn.isHappy( 19 ) << std::endl;
     std::cout << "result 11=" << hn.isHappy( 11 ) << std::endl;
 }
 
+/*
+    剑指 Offer 21. 调整数组顺序使奇数位于偶数前面
+    输入一个整数数组，实现一个函数来调整该数组中数字的顺序，使得所有奇数位于数组的前半部分，
+所有偶数位于数组的后半部分。
+    示例：
+    输入：nums = [1,2,3,4]
+    输出：[1,3,2,4] 注：[3,1,2,4] 也是正确的答案之一。
+*/
+vector<int> exchange(vector<int>& nums) {
+
+    int left = 0, right = nums.size() - 1;
+
+    while ( left < right ) {
+
+        if ( (nums[ left ] & 1) == 1 ) {// jishu
+            left ++;
+            continue;
+        }
+
+        if ( (nums[ right ] & 1) == 0 ) { // oushu
+            right --;
+            continue;
+        }
+        std::swap( nums[ left++ ], nums[ right-- ] );
+    }
+    return nums;
+}
+void tst_exchange() {
+    std::vector<int> arr{ 1, 3, 2, 4, 5, 7, 8, 12, 14 };
+
+    auto res = exchange( arr );
+    PrintInContainer(res);
+}
+
+
 
 void LeetCodeEntry() {
+
+        tst_containsNearbyDuplicate(); return;
+//    {
+//        std::unordered_set<std::string> myset =
+//        {"USA","Canada","France","UK","Japan","Germany","Italy"};
+
+//        myset.erase ( myset.begin() );                    // erasing by iterator
+////        myset.erase ( "France" );                         // erasing by key
+//        myset.erase ( myset.find("France"), myset.end() ); // erasing by range
+
+//        PrintInContainer(myset);
+//        return;
+//    }
+
+    tst_maxSlidingWindow(); return;
+
+    tst_findNumCount();return;
+
+    tst_missingNum();return;
+
+    tst_exchange(); return;
+
+    tst_fib(); return;
 
     tst_isHappy(); return;
 
@@ -3846,15 +4004,11 @@ void LeetCodeEntry() {
 
     tst_IsValidString(); return;
 
-    tst_maxSlidingWindow(); return;
 
     tst_lengthOfLongestSubstringEx(); return;
 
     tst_maxArea(); return;
 
-    tst_missingNum();return;
-
-    tst_findNumCount();return;
 
 
     tst_KthBig(); return;
@@ -3893,22 +4047,17 @@ void LeetCodeEntry() {
     std::cout << "sizeof(Trie)=" << array_size(next) << std::endl;
     return;
 
-    Test_productExceptSelf();
-    return;
+    Test_productExceptSelf(); return;
 
-    Test_BstCodec();
-    return;
+    Test_BstCodec(); return;
 
-    Test_coinChange();
-    return;
+    Test_coinChange(); return;
 
-    Test_C11Random();
-    return;
+    Test_C11Random(); return;
 
     Test_hanmingWeight(); return;
     
-    Test_totalHammingDistance();
-    return;
+    Test_totalHammingDistance(); return;
 
     Test_sumOfLeftLeaves(); return;
 
@@ -4050,12 +4199,12 @@ void LeetCodeEntry() {
         LOG_IF_EVERY_N(INFO, (i > 5), 2) << "LOG_IF_EVERY_N i > 5 2 i:" << i;
         LOG_FIRST_N(INFO, 4) << "LOG_FIRST_N 4 i:" << i << " google::COUNTER:" << google::COUNTER;
     }
-    return ;
+    return;
 
     CheckIfBst chck;
     std::cout << "chck result=" << chck.IsValidBst_1(g_pBstTree) << std::endl;
+    return;
 
-    return ;
     CheckHuiWen checkHuiwen;
     checkHuiwen.IsHuiWen();
     return;
