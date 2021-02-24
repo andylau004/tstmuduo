@@ -1152,20 +1152,20 @@ public:
 
 /*
     477. 汉明距离总和
-两个整数的 汉明距离 指的是这两个数字的二进制数对应位不同的数量。
+    两个整数的 汉明距离 指的是这两个数字的二进制数对应位不同的数量。
 
-计算一个数组中，任意两个数之间汉明距离的总和。
+    计算一个数组中，任意两个数之间汉明距离的总和。
 
-示例:
-输入: 4, 14, 2
-输出: 6
+    示例:
+    输入: 4, 14, 2
+    输出: 6
 
-解释: 在二进制表示中，4表示为0100，14表示为1110，2表示为0010。（这样表示是为了体现后四位之间关系）
-答案：
-4   0100
-14  1110
-2   0010
-HammingDistance(4, 14) + HammingDistance(4, 2) + HammingDistance(14, 2) = 2 + 2 + 2 = 6
+    解释: 在二进制表示中，4表示为0100，14表示为1110，2表示为0010。（这样表示是为了体现后四位之间关系）
+    答案：
+    4   0100
+    14  1110
+    2   0010
+    HammingDistance(4, 14) + HammingDistance(4, 2) + HammingDistance(14, 2) = 2 + 2 + 2 = 6
 */
 int totalHammingDistance(const std::vector<int>& nums) {
     if (!nums.size()) return 0;
@@ -3953,6 +3953,7 @@ void tst_exchange() {
     auto res = exchange( arr );
     PrintInContainer(res);
 }
+
 
 
 

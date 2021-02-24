@@ -2046,15 +2046,6 @@ void AddNewNode(BstNode*& root, BstNode* newNode) {
 
 }
 
-void preOrder(BstNode* root) {
-    std::cout << " " << root->val;
-    if (root->left) {
-        preOrder(root->left);
-    }
-    if (root->right) {
-        preOrder(root->right);
-    }
-}
 
 
 // 递归中序遍历二叉树；
@@ -2065,6 +2056,16 @@ void inOrder(BstNode* root) {
     std::cout << " " << root->val;
     if (root->right) {
         inOrder(root->right);
+    }
+}
+
+void preOrder(BstNode* root) {
+    std::cout << " " << root->val;
+    if (root->left) {
+        preOrder(root->left);
+    }
+    if (root->right) {
+        preOrder(root->right);
     }
 }
 void preOrderNonRecru(BstNode* root) {
@@ -4514,12 +4515,13 @@ void Test_levelOrder_1() {
     }
     {
         std::cout << std::endl;
-        std::cout << "-------------------------------preOrder beg-------------------------------" << std::endl;
+        std::cout << "-------------------------------preOrderNonRecr beg-------------------------------" << std::endl;
         preOrderNonRecru(g_pBstTree);
         std::cout << std::endl;
-        std::cout << "-------------------------------preOrder end-------------------------------" << std::endl;
+        std::cout << "-------------------------------preOrderNonRecr end-------------------------------" << std::endl;
         std::cout << std::endl;
     }
+
     auto ret = levelOrder_1(g_pBstTree);
     for ( auto itLine : ret ) {
         for ( auto itVal :itLine ) {
@@ -5770,6 +5772,56 @@ bool isSameTree(TreeNode* p, TreeNode* q) {
         return isSameTree(p->left, q->right) && isSameTree(p->right, q->right);
 }
 
+void simple_multi_derive() {
+    class A {
+    public:
+        int a;
+        virtual void v();
+    };
+    class B {
+    public:
+        int b;
+        virtual void w();
+    };
+    class C : public A, public B {
+    public:
+        int c;
+    };
+
+    // size C=32
+    std::cout << "size C=" << sizeof(C) << std::endl;
+}
+void some_derive() {
+    class XXXX
+    {
+    public:
+        XXXX()  { std::cout << " cst XXXX obj" << std::endl; }
+        XXXX(int val) : a(val)  {
+            std::cout << " cst XXXX obj, by val" << ", a=" << a << std::endl;
+        }
+        ~XXXX() { std::cout << " dst XXXX obj" << std::endl; }
+    public:
+        int a;
+    };
+    class AAAA
+    {
+        public:
+            int a;
+        public:
+            virtual void v();
+    };
+    class BBBB : public AAAA {
+    public:
+        int b;
+    };
+    std::shared_ptr<XXXX> x1 = std::make_shared<XXXX>(1123);
+//    return;
+
+    std::cout << "size XXXX=" << sizeof(XXXX) << std::endl; // 4 bytes
+    std::cout << "size AAAA=" << sizeof(AAAA) << std::endl; // 16 bytes
+    std::cout << "size BBBB=" << sizeof(BBBB) << std::endl; // 16 bytes
+}
+
 int main(int argc, char *argv[])
 {
     initList();
@@ -5780,6 +5832,12 @@ int main(int argc, char *argv[])
 
     // --------------------function entry--------------------
 //    tst_qs_new(); return 1;
+
+    {
+//        simple_multi_derive();
+        some_derive(); return 1;
+    }
+    Test_levelOrder_1(); return 1;
 
     if ( argc > 1 ) {
 //        std::cout << "argv[ 0 ]=" << argv[ 0 ] << std::endl;
@@ -5800,15 +5858,6 @@ int main(int argc, char *argv[])
         std::cout << " argc < 1, argc=" << argc;
         return -1;
     }
-
-
-
-
-
-    Test_ListEntry(); return 1;
-
-
-
 
 
     Test_middleNode(); return 1;
@@ -5845,7 +5894,6 @@ int main(int argc, char *argv[])
     Test_reverseInt(); return 1;
     Test_addTwoNumber(); return 1;
     Test_CKthSmallest(); return 1;
-    Test_levelOrder_1(); return 1;
 
 
     // Test_isBalanced(); return 1;
