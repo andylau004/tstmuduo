@@ -53,9 +53,11 @@ struct TreeNode {
 
 extern bool isBalanced(BstNode* root);
 
-extern void LeetCodeEntry();
+extern void lc_Entry();
 
-
+extern void CreateBstTree();
+extern void CreateBstTree(const std::vector<int>& inVec);
+extern void inOrderNonRecru(BstNode* root);
 
 extern ListNode* ConstructTestList(const std::vector<int>& vecInts);
 extern std::vector< ListNode* > ConstructTestListByParam(int start, int end, int numCount, int listCount);

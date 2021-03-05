@@ -890,7 +890,6 @@ void tst_randEx() {
     std::cout << std::endl;
 }
 
-int foo(int in) { return 32; }
 
 //extern static int s_val;
 void tstMemoryLeak() {
@@ -1037,8 +1036,8 @@ void tst_print_time() {
 //        ::mktime(&t);
         time_t xti = (::mktime(&t));
         struct tm* p = localtime(&xti);
-        struct tm* pp;
-        time_t tts = timegm(&t);
+//        struct tm* pp;
+//        time_t tts = timegm(&t);
 
         printf("1111 %d年%d月%d日 %d:%d:%d %s\n",p->tm_year+1900,p->tm_mon+1,p->tm_mday,p->tm_hour,p->tm_min,p->tm_sec, wday[p->tm_wday]);
         return ;
@@ -1154,7 +1153,7 @@ void tst_ptr_vec () {
 double g_iBenJin = 1000 * 10000;
 
 void tst_lixi() {
-    double yinhang = 0.04;
+//    double yinhang = 0.04;
     double yuebao  = 0.028;
 
     double year_yinhang = g_iBenJin * 0.04;
@@ -2008,46 +2007,6 @@ void mockAddBstNode(BstNode*& root, BstNode* pNewNode) {
     }
 }
 
-bool insertNewBstNode(BstNode*& root, int val) {
-    {
-        if (!root) {
-            root = new BstNode(val);
-            return true;
-        }
-        if ( val < root->val ) {
-            return insertNewBstNode(root->left, val);
-        }
-        return insertNewBstNode(root->right, val);
-    }
-}
-
-void AddNewNode(BstNode*& root, BstNode* newNode) {
-    {
-        BstNode* parent = nullptr;
-        BstNode* tmp = root;
-
-        while ( tmp ) {
-            parent = tmp;
-            if ( newNode->val > tmp->val ) {
-                tmp = tmp->right;
-            } else {
-                tmp = tmp->left;
-            }
-        }
-        newNode->parent_ = parent;
-        if (!parent) {
-            root = newNode;
-        } else if (newNode->val > parent->val) {
-            parent->right = newNode;
-        } else {
-            parent->left = newNode;
-        }
-    } // end bracket
-
-}
-
-
-
 // 递归中序遍历二叉树；
 void inOrder(BstNode* root) {
     if (root->left) {
@@ -2060,6 +2019,7 @@ void inOrder(BstNode* root) {
 }
 
 void preOrder(BstNode* root) {
+    if( !root ) return;
     std::cout << " " << root->val;
     if (root->left) {
         preOrder(root->left);
@@ -2068,53 +2028,7 @@ void preOrder(BstNode* root) {
         preOrder(root->right);
     }
 }
-void preOrderNonRecru(BstNode* root) {
-    if( !root ) return ;
-    {
-        std::cout << " " << root->val;
-        if (root->left)
-            preOrderNonRecru(root->left);
-        if (root->right)
-            preOrderNonRecru(root->right);
-    }
-}
-// 非递归中序遍历二叉树；
-void inOrderNonRecru(BstNode* root) {
-    if( !root ) return ;
-    {
-        if (root->left)
-            inOrderNonRecru(root->left);
-        std::cout << " " << root->val;
-        if (root->right)
-            inOrderNonRecru(root->right);
-    }
-    {
-//        if (root->left)
-//            inOrderNonRecru(root->left);
-//        std::cout << root->val << " ";
-//        if (root->right)
-//            inOrderNonRecru(root->right);
-    }
-    {
-        //    BstNode* tmp = root;
-        //    std::stack< BstNode* > stackNodes;
 
-        //    while (tmp || !stackNodes.empty()) {
-
-        //        if (tmp) {
-        //            stackNodes.push(tmp);
-        //            tmp = tmp->left;
-        //        } else {
-        //            tmp = stackNodes.top();
-        //            std::cout << " " << tmp->val;
-        //            stackNodes.pop();
-        //            tmp = tmp->right;
-        //        }
-
-        //    }
-    }
-
-}
 
 // 中序遍历获取第K大节点；
 BstNode* GetKthNode(BstNode* root, int& K) {
@@ -2224,22 +2138,6 @@ int tst_add_two_num() {
 }
 
 
-void CreateBstTree(const std::vector<int>& inVec) {// 构建二叉树；
-    for ( auto val : inVec ) {
-        BstNode* node = new BstNode(val);
-        AddNewNode(g_pBstTree, node);
-    }
-}
-
-void PrintInorder() {
-    std::cout << std::endl;
-    std::cout << "-------------------------------inOrder beg-------------------------------" << std::endl;
-    inOrderNonRecru(g_pBstTree);
-    std::cout << std::endl;
-    std::cout << "-------------------------------inOrder end-------------------------------" << std::endl;
-    std::cout << std::endl;
-}
-
 void printInorderImpl(BstNode* root) {
     if (!root) return;
     {
@@ -2253,59 +2151,11 @@ void printInorderImpl(BstNode* root) {
 void printInorder(BstNode* root) {
     std::cout << std::endl;
     std::cout << "-------------------------------inOrder beg-------------------------------" << std::endl;
-    printInorderImpl(g_pBstTree);
+    printInorderImpl(root);
     std::cout << std::endl;
     std::cout << "-------------------------------inOrder end-------------------------------" << std::endl;
     std::cout << std::endl;
 }
-void CreateBstTreeEx() {
-    ::srand(time(nullptr));
-    
-    for ( int i = 0; i < 10; i++ ) {
-        insertNewBstNode(g_pBstTree, rand() % 200);
-    }
-
-    PrintInorder();
-}
-
-void CreateBstTree() {// 构建二叉树；
-//    std::cout << "-------------------------------" << std::endl;
-//    std::cout << std::boolalpha;
-//    std::cout << "Minimum value for int: " << std::numeric_limits<int>::min() << std::endl;
-//    std::cout << "Maximum value for int: " << std::numeric_limits<int>::max() << std::endl;
-
-    {
-        ::srand(time(nullptr));
-
-//        std::cout << "-------------------------------beg random val-------------------------------" << std::endl;
-        for ( int i = 0; i < 10; i++ ) {
-            int randVal = rand() % 200;
-
-            BstNode* newNode = new BstNode(randVal);
-            AddNewNode(g_pBstTree, newNode);
-        }
-        return;
-    }
-
-    {
-        ::srand(time(nullptr));
-
-        int count = 20;
-//        std::cout << "-------------------------------beg random val-------------------------------" << std::endl;
-        for (int i = 0; i < count; ++i) {
-            int randVal = rand() % (300);
-            std::cout << randVal << "  ";
-
-            BstNode* pNewNode = new BstNode(randVal);
-            AddNewNode(g_pBstTree, pNewNode);
-        }
-        std::cout << std::endl;
-//        std::cout << "-------------------------------end random val-------------------------------" << std::endl;
-        return;
-    }
-}
-
-
 
 /**
  * 给定一个二叉树，返回该二叉树层序遍历的结果，（从左到右，一层一层地遍历）
@@ -2385,12 +2235,6 @@ void Test_zhiZiPrintBstTree() {
 
 void tst_my_bst_tree() {
     {
-        std::cout << std::endl;
-        std::cout << "-------------------------------inOrder beg-------------------------------" << std::endl;
-        inOrderNonRecru(g_pBstTree);
-        std::cout << std::endl;
-        std::cout << "-------------------------------inOrder end-------------------------------" << std::endl;
-        std::cout << std::endl;
     }
     // return ;
 
@@ -2495,12 +2339,11 @@ int GetLeafNodeCountImpl(BstNode* root) {
     int ret = leftCount + rightCount;
     return ret;
 }
-// 二叉树节点个数
-int GetBstTreeNodeCount(BstNode* root/*, int* pCount*/) {
+
+int GetBstTreeNodeCount(BstNode* root) {// 二叉树节点个数
     if (root == nullptr)
         return 0;
-    int count = 1 + GetBstTreeNodeCount(root->left/*, pCount*/) + GetBstTreeNodeCount(root->right/*, pCount*/);
-    return count;
+    return 1 + GetBstTreeNodeCount(root->left) + GetBstTreeNodeCount(root->right);
 }
 /*
     求二叉树的深度
@@ -2646,37 +2489,6 @@ void wrap_IsContinuous() {
     IsContinuous( vecPokers );
 }
 
-
-//给定一个字符串，找出不含有重复字符的最长子串的长度。
-
-//示例：
-
-//给定 "abcabcbb" ，没有重复字符的最长子串是 "abc" ，那么长度就是3。
-
-//给定 "bbbbb" ，最长的子串就是 "b" ，长度是1。
-
-//给定 "pwwkew" ，最长子串是 "wke" ，长度是3。请注意答案必须是一个子串，"pwke" 是 子序列  而不是子串。
-int lengthOfLongestSubstring(string s) {
-    size_t n=0,left=0;
-    map<char, size_t> m;
-    for(size_t i=0;i<s.length();i++)  //每次遍历都会判断左边界限，当有重复时，更新left
-    {
-        left=max(left,m[s[i]]);    //更新左边界限
-        m[s[i]]=i+1;               //更新哈希表的值
-        n=max(n,i-left+1);         //更新n的值
-    }
-
-    for ( map<char,size_t>::iterator it = m.begin(); it != m.end(); it ++ ) {
-        std::cout << " " << it->first ;
-    }
-    std::cout << std::endl;
-    return n;
-}
-void wrap_longestsubstring() {
-    std::string st1 = "pwwkew";
-    int retlen = lengthOfLongestSubstring(st1);
-    std::cout << "retlen= " << retlen << std::endl;
-}
 
 void tst_copy_backward() {
     std::vector<int> myvector;
@@ -2995,6 +2807,8 @@ void tst_kuohao_pipei() {
      * 数组{2,3,4,2,6,2,5,1}的长度为3的滑动窗口最大值求解步骤如下
 */
 std::vector<int> maxInWindow(std::vector<int>& nums, unsigned int size) {
+    UNUSED(nums);
+    UNUSED(size);
     std::vector<int> vret;
     std::deque<int> dq;
 
@@ -3273,7 +3087,7 @@ typedef struct MyConn_st {
 }MyConn;
 
 typedef struct Bit_st {
-    unsigned         instance:9981;
+    unsigned         instance;
 }Bit_ST;
 
 
@@ -3965,7 +3779,7 @@ public:
     }
     
     void push(int x) {
-
+        UNUSED(x);
     }
     
     void pop() {
@@ -4014,7 +3828,7 @@ n == grid[i].length
 grid[i][j] 的值为 '0' 或 '1'
 */
 int numIslands(vector<vector<char>>& grid) {
-
+    UNUSED(grid);
     return 1;
 }
 
@@ -4185,7 +3999,7 @@ public:
         std::cout << std::endl;
     }
     std::string SerialTree(BstNode* root) {
-
+        UNUSED(root);
         // if (!root) return "";
 
         // std::ostringstream out;
@@ -4385,7 +4199,8 @@ std::cout << std::endl;
    15   7
 */
 TreeNode* buildTree(vector<int>& preorder, vector<int>& inorder) {
-
+    UNUSED(preorder);
+    UNUSED(inorder);
     return nullptr;
 }
 
@@ -4468,71 +4283,6 @@ auto mirror = mirrorTree(g_pBstTree);
 
 
 /*
-从上到下按层打印二叉树，同一层的节点按从左到右的顺序打印，每一层打印到一行。
-例如: 给定二叉树: [3,9,20,null,null,15,7],
-    3
-   / \
-  9  20
-    /  \
-   15   7
-返回其层次遍历结果：
-[
-  [3],
-  [9,20],
-  [15,7]
-]
-*/
-vector<vector<int>> levelOrder_1(BstNode* root) {
-    std::queue<BstNode*> que;
-    que.push(root);
-
-    vector<vector<int>> res;
-    while (que.size()) {
-        size_t sz = que.size();
-
-        std::vector<int> level;
-        for ( size_t i = 0; i < sz; i ++ ) {
-            BstNode* tmp = que.front(); que.pop();
-            level.push_back(tmp->val);
-
-            if (tmp->left)  que.push(tmp->left);
-            if (tmp->right) que.push(tmp->right);
-        }
-        if (level.size()) res.push_back(level);
-    }
-    return res;
-}
-
-void Test_levelOrder_1() {
-    CreateBstTree();
-    {
-        std::cout << std::endl;
-        std::cout << "-------------------------------inOrder beg-------------------------------" << std::endl;
-        inOrderNonRecru(g_pBstTree);
-        std::cout << std::endl;
-        std::cout << "-------------------------------inOrder end-------------------------------" << std::endl;
-        std::cout << std::endl;
-    }
-    {
-        std::cout << std::endl;
-        std::cout << "-------------------------------preOrderNonRecr beg-------------------------------" << std::endl;
-        preOrderNonRecru(g_pBstTree);
-        std::cout << std::endl;
-        std::cout << "-------------------------------preOrderNonRecr end-------------------------------" << std::endl;
-        std::cout << std::endl;
-    }
-
-    auto ret = levelOrder_1(g_pBstTree);
-    for ( auto itLine : ret ) {
-        for ( auto itVal :itLine ) {
-            std::cout << " " << itVal;
-        }
-        std::cout << std::endl;
-    }
-    return ;
-}
-
-/*
 剑指 Offer 33. 二叉搜索树的后序遍历序列
 输入一个整数数组，判断该数组是不是某二叉搜索树的后序遍历结果。
 如果是则返回 true，否则返回 false。假设输入的数组的任意两个数字都互不相同。
@@ -4551,79 +4301,6 @@ void Test_levelOrder_1() {
 输入: [1,3,2,6,5]
 输出: true
 */
-
-
-//int main(int argc, char *argv[])
-//{
-//    Logger::setLogLevel(Logger::DEBUG);
-//    LOG_INFO << "pid = " << getpid() << ", tid=" << CurrentThread::tid();
-
-    
-//    Test_levelOrder_1(); return 1;
-
-//    Test_maxDepth(); return 1;
-
-//    {
-//        CMirrorBst cm;
-//        cm.Test_mirrorTree();
-//        return 1;
-//    }
-//    Test_isBalanced(); return 1;
-//    Test_isValidBst(); return 1;
-
-//    CKthLeaest_FromBstTree klnode;
-//    klnode.Test_KthNode();
-//    return 1;
-
-//    CPathSum pathsum;
-//    return 1;
-
-//    CEncDecBstTree cEnDeTree;
-//    cEnDeTree.TestSerial();
-//    return 1;
-
-//    CKthLargest_FromBstTree ctt1;
-//    ctt1.KthLargest_FromBstTree();
-//    return 1;
-
-//    Test_oddEvenList(); return 1;
-////  tst_randEx();    return 1;
-
-
-//    findKth(); return 1;
-//    // struct cmpst {
-//    //     bool operator () (ListNode* a, ListNode* b) {
-//    //         return a->left > b->left;
-//    //     }
-//    // };
-
-//    struct cmp {
-//        bool operator() (ListNode* a, ListNode* b) {
-//            return a->val > b->val;
-//        }
-//    };
-
-//    std::priority_queue< ListNode*, vector<ListNode*>, cmp> pri_que;
-//    for (auto head : lists) {
-//        if (head) pri_que.push(head);
-//    }
-//    // PrintInPriorQue(pri_que);
-
-//    ListNode dummy;
-//    ListNode* cur = &dummy;
-//    while ( !pri_que.empty() ) {
-//        ListNode* top = pri_que.top(); pri_que.pop();
-//        cur->next = top;
-//        cur = cur->next;
-//        if (top->next) pri_que.push(top->next);
-//    }
-//    return dummy.next;
-//}
-
-//ListNode* merge(vector<ListNode*>& lists, int start, int end){
-    
-//    return nullptr;
-//}
 
 
 
@@ -4781,82 +4458,56 @@ void extractNodeInorder(BstNode *root, std::vector<BstNode *> &retVec)
 //}
  
 
-/*    棵二叉树的根节点，判断    叉树。
-如果   意节点的    的深        
-    :
-给定二叉树 [3,9,20nullnll        /  \
-   15   7
-返回             [1                                                     
-                           
-   returns td::m        x(    ft    pthEx(root->right)) + 1;
-}
-bool isBalancedEx(BstNode* root) {
-    if ( !root ) return true;
-    int leftDepth = maxDepthEx(root->left);
-    int rightDepth = maxDepthEx(root->right);
-    std::cout << "depth gap=" << std::abs(leftDepth - rightDepth) << std::endl;
-    if ( std::abs( leftDepth - rightDepth) > 1 ) return false;
+//bool isBalancedEx(BstNode* root) {
+//    if ( !root ) return true;
+//    int leftDepth = maxDepthEx(root->left);
+//    int rightDepth = maxDepthEx(root->right);
+//    std::cout << "depth gap=" << std::abs(leftDepth - rightDepth) << std::endl;
+//    if ( std::abs( leftDepth - rightDepth) > 1 ) return false;
 
-    return isBalancedEx(root->left) && isBalancedEx(root->right);
-}
-void Test_isBalanced() {    
-    PrintInorder(g_pBstTree);
-    std::cout << std::endl;
-
-std::cout << std::endl;
-std::cout << "level print beg" <<  std::endl;
-    // LevelTraverseBstTree(g_pBstTree);
-
-    // auto ret = levelOrder_new(g_pBstTree);
-    // for (std::vector< std::vector<int> >::iterator itLine = ret.begin(); itLine != ret.end(); itLine ++) {
-    //     for (std::vector<int>::iterator itVal = (*itLine).begin(); itVal != (*itLine).end(); itVal ++) {
-    //         std::cout << " " << *itVal;
-    //     }
-    //     std::cout << std::endl;
-    // }
-std::cout << "level print end" <<  std::endl;
-std::cout << std::endl;
-    std::cout << "is balance=" << isBalanced(g_pBstTree) << std::endl;
-}
-
-/*
-输入某二叉树的前序遍历和中序遍历的结果，请重建该二叉树。
-例如:
-    前序遍历 preorder = [3,9,20,15,7]
-    中序遍历 inorder  = [9,3,15,20,7]
-返回如下的二叉树：
-    3
-   / \
-  9  20
-    /  \
-   15   7
-*/
-//TreeNode* buildTree(vector<int>& preorder, vector<int>& inorder) {
-
-//    return nullptr;
+//    return isBalancedEx(root->left) && isBalancedEx(root->right);
 //}
+//void Test_isBalanced() {
+//    PrintInorder(g_pBstTree);
+//    std::cout << std::endl;
 
+//std::cout << std::endl;
+//std::cout << "level print beg" <<  std::endl;
+//    // LevelTraverseBstTree(g_pBstTree);
+
+//    // auto ret = levelOrder_new(g_pBstTree);
+//    // for (std::vector< std::vector<int> >::iterator itLine = ret.begin(); itLine != ret.end(); itLine ++) {
+//    //     for (std::vector<int>::iterator itVal = (*itLine).begin(); itVal != (*itLine).end(); itVal ++) {
+//    //         std::cout << " " << *itVal;
+//    //     }
+//    //     std::cout << std::endl;
+//    // }
+//std::cout << "level print end" <<  std::endl;
+//std::cout << std::endl;
+//    std::cout << "is balance=" << isBalanced(g_pBstTree) << std::endl;
+//}
 
 /*
     二叉树的镜像
     请完成一个函数，输入一个二叉树，该函数输出它的镜像。
-例如: 输入
-     4
-   /   \
-  2     7
- / \   / \
-1   3 6   9
-镜像输出：
-     4
-   /   \
-  7     2
- / \   / \
-9   6 3   1
+    例如: 输入
+         4
+       /   \
+      2     7
+     / \   / \
+    1   3 6   9
+    镜像输出：
+         4
+       /   \
+      7     2
+     / \   / \
+    9   6 3   1
 
-示例 1：
-输入：root = [4,2,7,1,3,6,9]
-输出：       [4,7,2,9,6,3,1]
+    示例 1：
+    输入：root = [4,2,7,1,3,6,9]
+    输出：       [4,7,2,9,6,3,1]
 */
+
 //class CMirrorBst {
 //    void swapNode(BstNode* node) {
 //        if ( !node || (!node->left && !node->right) ) return ;
@@ -4916,69 +4567,6 @@ std::cout << std::endl;
 */
 //【二叉树中的最大路径和】递归，条理清晰
 
-
-/*
-从上到下按层打印二叉树，同一层的节点按从左到右的顺序打印，每一层打印到一行。
-例如: 给定二叉树: [3,9,20,null,null,15,7],
-    3
-   / \
-  9  20
-    /  \
-   15   7
-返回其层次遍历结果：
-[
-  [3],
-  [9,20],
-  [15,7]
-]
-*/
-//vector<vector<int>> levelOrder_1(BstNode* root) {
-//    std::queue<BstNode*> que;
-//    que.push(root);
-
-//    vector<vector<int>> res;
-//    while (que.size()) {
-//        size_t sz = que.size();
-
-//        std::vector<int> level;
-//        for ( size_t i = 0; i < sz; i ++ ) {
-//            BstNode* tmp = que.front(); que.pop();
-//            level.push_back(tmp->val);
-
-//            if (tmp->left)  que.push(tmp->left);
-//            if (tmp->right) que.push(tmp->right);
-//        }
-//        if (level.size()) res.push_back(level);
-//    }
-//    return res;
-//}
-
-//void Test_levelOrder_1() {
-
-//    {
-//        std::cout << std::endl;
-//        std::cout << "-------------------------------inOrder beg-------------------------------" << std::endl;
-//        inOrderNonRecru(g_pBstTree);
-//        std::cout << std::endl;
-//        std::cout << "-------------------------------inOrder end-------------------------------" << std::endl;
-//        std::cout << std::endl;
-//    }
-//    {
-//        std::cout << std::endl;
-//        std::cout << "-------------------------------preOrder beg-------------------------------" << std::endl;
-//        preOrderNonRecru(g_pBstTree);
-//        std::cout << std::endl;
-//        std::cout << "-------------------------------preOrder end-------------------------------" << std::endl;
-//        std::cout << std::endl;
-//    }
-//    auto ret = levelOrder_1(g_pBstTree);
-//    for ( auto itLine : ret ) {
-//        for ( auto itVal :itLine ) {
-//            std::cout << " " << itVal;
-//        }
-//        std::cout << std::endl;
-//    }
-//}
 
 /*
     剑指 Offer 33. 二叉搜索树的后序遍历序列
@@ -5152,37 +4740,6 @@ void Test_addTwoNumber() {
 
 
 /*
-    7. 整数反转
-    给出一个 32 位的有符号整数，你需要将这个整数中每位上的数字进行反转。
-
-    示例 1:
-    输入: 123
-    输出: 321
-
-    示例 2:
-    输入: -123
-    输出: -321
-
-    示例 3:
-    输入: 120
-    输出: 21
-    注意:假设我们的环境只能存储得下 32 位的有符号整数，则其数值范围为 [−2^31, 2^31 − 1]。
-    请根据这个假设，如果反转后整数溢出那么就返回 0。
-*/
-int reverseInt(int x) {
-    int res = 0;
-    do {
-        if (res > INT_MAX / 10 || res  < INT_MIN / 10)  return 0; //溢出判定
-        res = res * 10 + x % 10;   
-    } while (x /= 10);
-    return res;
-}
-void Test_reverseInt() {
-    std::cout << "ret=" << reverseInt(-1998) << std::endl;
-    std::cout << "ret=" << reverseInt(INT_MAX) << std::endl;
-}
-
-/*
     938. 二叉搜索树的范围和
     给定二叉搜索树的根结点 root，返回值位于范围 [low, high] 之间的所有结点的值的和。
 
@@ -5350,7 +4907,7 @@ ListNode *getIntersectionNode(ListNode *headA, ListNode *headB) {
     整个树的坡度: 是其所有节点的坡度之和。
 */
 int findTilt(BstNode* root) {
-
+    UNUSED(root);
     return 1;
 }
 
@@ -5415,7 +4972,7 @@ std::cout << std::endl;
 -----------------------------------------------------------------------
 */
 int diameterOfBinaryTree(BstNode *root) {
-
+    UNUSED(root);
     return 1;
 }
 void Test_diameterOfBinaryTree() {
@@ -5600,8 +5157,6 @@ public:
         inorder(cur->right);
     }
     void findMode() {
-        CreateBstTreeEx();
-
         inorder(g_pBstTree);
         
         PrintInContainer(res);
@@ -5687,7 +5242,6 @@ public:
     }
     void sortedListToBST() {
         g_pBstTree = buildBstTree(g_pListHead, nullptr);
-        PrintInorder();
     }
 };
 
@@ -5762,14 +5316,24 @@ void Test_middleNode() {
 
             [1,2,1],   [1,1,2]
     输出: false
+-----------------------------------------------------------------------
+时间复杂度： O(min(m,n))，其中 m 和 n 分别是两个二叉树的节点数。
+对两个二叉树同时进行深度优先搜索，只有当两个二叉树中的对应节点都不为空时才会访问到该节点，
+因此被访问到的节点数不会超过较小的二叉树的节点数。
+
+空间复杂度： O(min(m,n))，其中 m 和 n 分别是两个二叉树的节点数。
+空间复杂度取决于递归调用的层数，递归调用的层数不会超过较小的二叉树的最大高度，最坏情况下，二叉树的高度等于节点数。
+-----------------------------------------------------------------------
 */
 bool isSameTree(TreeNode* p, TreeNode* q) {
-    if (!p && !q) return true;
-    else if (!p || !q) return false;
+    if (p == nullptr && q == nullptr)
+        return true;
+    else if (!p || !q)
+        return false;
     else if (p->val != q->val)
         return false;
     else 
-        return isSameTree(p->left, q->right) && isSameTree(p->right, q->right);
+        return isSameTree(p->left, q->left) && isSameTree(p->right, q->right);
 }
 
 void simple_multi_derive() {
@@ -5792,6 +5356,40 @@ void simple_multi_derive() {
     std::cout << "size C=" << sizeof(C) << std::endl;
 }
 void some_derive() {
+    {
+        class Base {
+        public:
+            virtual void func() {
+                cout << "base::func" << endl;
+            }
+            virtual void fun1() {
+                cout << "base::fun1" << endl;
+            }
+        };
+        class Derived : public Base{
+        public:
+            /*virtual*/ void func() /*override*/ { // 确保func被重写
+                cout << "derived::func" << endl;
+            }
+            void fun1() {
+                cout << "Derived::fun1 not virtual function" << endl;
+            }
+        };
+
+        Derived dd;
+        Base& b = dd;
+
+        dd.fun1();
+        b.fun1();
+//        Derived dd;
+//        dd.func();
+        return;
+
+        Base* pBase = &dd;
+        pBase->func();
+        return;
+    }
+
     class XXXX
     {
     public:
@@ -5800,6 +5398,9 @@ void some_derive() {
             std::cout << " cst XXXX obj, by val" << ", a=" << a << std::endl;
         }
         ~XXXX() { std::cout << " dst XXXX obj" << std::endl; }
+        inline void innerFun() {
+            std::cout << " inner fun" << std::endl;
+        }
     public:
         int a;
     };
@@ -5814,7 +5415,7 @@ void some_derive() {
     public:
         int b;
     };
-    std::shared_ptr<XXXX> x1 = std::make_shared<XXXX>(1123);
+//    std::shared_ptr<XXXX> x1 = std::make_shared<XXXX>(1123);
 //    return;
 
     std::cout << "size XXXX=" << sizeof(XXXX) << std::endl; // 4 bytes
@@ -5835,9 +5436,8 @@ int main(int argc, char *argv[])
 
     {
 //        simple_multi_derive();
-        some_derive(); return 1;
+//        some_derive(); return 1;
     }
-    Test_levelOrder_1(); return 1;
 
     if ( argc > 1 ) {
 //        std::cout << "argv[ 0 ]=" << argv[ 0 ] << std::endl;
@@ -5847,7 +5447,7 @@ int main(int argc, char *argv[])
             std::cout << "tst leet code ---" << std::endl;
             std::cout << std::endl;
 
-            LeetCodeEntry(); return 1;
+            lc_Entry(); return 1;
         } else {
             std::cout << "tst list code ---" << std::endl;
             std::cout << std::endl;
@@ -5879,7 +5479,7 @@ int main(int argc, char *argv[])
     std::cout << "INT_MIN=" << INT_MIN << std::endl;
 
     Test_arraySum();   return 1; 
-    CreateBstTreeEx(); return 1;
+//    CreateBstTreeEx(); return 1;
 
     Test_minDiffInBST(); return 1;
 
@@ -5891,7 +5491,6 @@ int main(int argc, char *argv[])
     Test_mirrorTree(); return 1;
     Test_maxDepth(); return 1;
 
-    Test_reverseInt(); return 1;
     Test_addTwoNumber(); return 1;
     Test_CKthSmallest(); return 1;
 

@@ -1269,7 +1269,8 @@ void tst_reorderList() {
 /*
     88. 合并两个有序数组
     给你两个有序整数数组 nums1 和 nums2，请你将 nums2 合并到 nums1 中，使 nums1 成为一个有序数组。
-    初始化 nums1 和 nums2 的元素数量分别为 m 和 n 。你可以假设 nums1 的空间大小等于 m + n，这样它就有足够的空间保存来自 nums2 的元素。
+    初始化 nums1 和 nums2 的元素数量分别为 m 和 n 。
+    你可以假设 nums1 的空间大小等于 m + n，这样它就有足够的空间保存来自 nums2 的元素。
 
     示例 1：
     输入：nums1 = [1,2,3,0,0,0], m = 3, nums2 = [2,5,6], n = 3
@@ -1285,55 +1286,102 @@ void tst_reorderList() {
 -----------------------------------------------------------------------
 */
 void mergeTwoArray(std::vector<int>& num1, int m, std::vector<int>& num2, int n) {
-    std::cout << "m=" << m << ", n=" << n << std::endl;
-    int k = m + n - 1;
-    int i = m - 1;
-    int j = n - 1;
+    {
+        int k = m + n - 1;
+        int i = m - 1;
+        int j = n - 1;
+        std::cout << "m=" << m << ", n=" << n << std::endl;
+        std::cout << "i=" << i << ", j=" << j << std::endl;
 
-    while ( i >= 0 && j >= 0 ) {
+        std::cout << "-----------------------------" << std::endl;
+        while ( i >= 0 && j >= 0 ) {
 
-        std::cout << "k=" << k << std::endl;
+            if ( num1[ i ] > num2[ j ] ) {
+                num1 [ k-- ] = num1 [ i-- ];
+//                std::cout << " " << num1 [ k + 1 ];
+            } else {
+                num1 [ k -- ] = num2 [ j-- ];
+//                std::cout << " " << num1 [ k + 1 ];
+            }
 
-        if ( num1[ i ] > num2 [ j ] ) {
-            num1[ k -- ]  = num1[ i -- ];
-        } else {
-            num1[ k -- ]  = num2[ j -- ];
+//            PrintInContainer(num1);
+        } // end --- for
+//        std::cout << "aaaaaaaaaaaaaaaaaaaaa" << std::endl;
+//        std::cout << "aaaaaaaaaaaaaaaaaaaaa" << std::endl;
+//        PrintInContainer(num1);
+//        std::cout << "aaaaaaaaaaaaaaaaaaaaa" << std::endl;
+
+        int bk = j;
+        while ( j >= 0 ) {
+//            std::cout << "xxx " << num2 [ j ];
+            num1 [ k -- ] = num2 [ j -- ];
         }
+        std::cout << " " << std::endl;
+        std::cout << "bk=" << bk << std::endl;
+        std::cout << "-----------------------------" << std::endl;
+        return;
+    }
 
-    }// end --- for
+    {// old code
 
-    while ( j >= 0 ) {
-        std::cout << "k=" << k << std::endl;
+        int k = m + n - 1;
+        int i = m - 1;
+        int j = n - 1;
 
-        num1 [ k -- ] = num2[ j -- ];
-    }// end --- while
+        while ( i >= 0 && j >= 0 ) {
+
+            std::cout << "k=" << k << std::endl;
+
+            if ( num1[ i ] > num2 [ j ] ) {
+                num1[ k -- ]  = num1[ i -- ];
+            } else {
+                num1[ k -- ]  = num2[ j -- ];
+            }
+
+        }// end --- for
+
+        while ( j >= 0 ) {
+            std::cout << "k=" << k << std::endl;
+
+            num1 [ k -- ] = num2[ j -- ];
+        }// end --- while
+    }
 }
 void tst_mergeTwoArray() {
     std::vector<int> v1;
+//    v1.reserve(10);
+    v1.resize(10);
+//    v1.insert();
+    v1[ 0 ] = 1;
+    v1[ 1 ] = 3;
+    v1[ 2 ] = 4;
+    v1[ 3 ] = 7;
+    v1[ 4 ] = 9;
+    for ( size_t t = 5; t < 10; t ++ ) {
+        v1[ t ] = 0;
+    }
 
-    v1.reserve(10);
-    v1.push_back(1); v1.push_back(3); v1.push_back(4); v1.push_back(7); v1.push_back(9);
     std::cout << "before print v1 ---" << std::endl;
     PrintInContainer(v1);
-    std::cout << "v1 size=" << v1.size() << ", cap=" << v1.capacity() << std::endl;
+    printf("v1 size=%u, cap=%u\n", v1.size(), v1.capacity());
     std::cout << "after  print v1 ---" << std::endl;
 
-    std::vector<int> v2 { -11, 0, 987, 2456, 30099 };
-    mergeTwoArray(v1, v1.size(), v2, v2.size());
+    std::vector<int> v2 { -11, 23, 987, 2456, 30099 };
+    mergeTwoArray( v1, 5, v2, v2.size() );
     std::cout << std::endl;
     std::cout << "v1 size=" << v1.size() << ", cap=" << v1.capacity() << std::endl;
     std::cout << "after ,,,,,,, handle" << std::endl;
-//    PrintInContainer(v1);
-    for ( int i = v1.capacity() - 1; i >= 0; i -- )  {
-        std::cout << " " << v1[i] ;
-    }
+
+    std::cout << "cap=" << v1.capacity() << ", sz=" << v1.size() << std::endl;
+    PrintInContainer(v1);
     std::cout << std::endl;
 }
 
 
 /*
     剑指 Offer 57. 和为s的两个数字
-    输入一个递增排序的数组和一个数字s，在数组中查找两个数，使得它们的和正好是s。如果有多对数字的和等于s，则输出任意一对即可。
+    输入一个递增排序的数组和一个数字s，在数组中查找两个数，使得它们的和正好是s。
+    如果有多对数字的和等于s，则输出任意一对即可。
 
     示例 1：
     输入：nums = [2,7,11,15], target = 9
@@ -1347,7 +1395,9 @@ void tst_mergeTwoArray() {
 -----------------------------------------------------------------------
 */
 std::vector<int> twoSum(std::vector<int>& nums, int target) {
-    int left = 0, right = nums.size() - 1;
+
+    std::sort( nums.begin(), nums.end() );
+    size_t left = 0, right = nums.size() - 1;
 
     while ( left < right ) {
 
@@ -1359,20 +1409,28 @@ std::vector<int> twoSum(std::vector<int>& nums, int target) {
         } else {
             left ++;
         }
-        std::cout << "s = " << s << std::endl;
+//        std::cout << "s = " << s << std::endl;
     }
 
-    std::cout << "no found two sum number" << std::endl;
+//    std::cout << "no found two sum number" << std::endl;
     return std::vector<int>{};
 }
 void tst_twoSum() {
-    std::vector<int> v1{ 10,26,30,31,47,60 };
-    auto ves = twoSum(v1, 40);
-    // auto ves = twoSum(v1, 17);
-    for ( auto ele : ves ) {
-        std::cout << " " << ele;
+
+    {
+//        std::vector<int> v1{ 2, 7, 11, 15 };
+        std::vector<int> v1{ 2, 11, 15, 7, 8};
+        auto ves = twoSum(v1, 9);
+        PrintInContainer(ves);
+        std::cout << std::endl;
     }
-    std::cout << std::endl;
+    {
+        std::vector<int> v1{ 10,26,30,31,47,60 };
+        auto ves = twoSum(v1, 40);
+        PrintInContainer(ves);
+        std::cout << std::endl;
+    }
+
 }
 
 /*
@@ -1391,7 +1449,7 @@ void tst_twoSum() {
 */
 int findRepeatNumber(vector<int>& nums) {
 
-    int i  = 0;
+    int i = 0;
     while ( i < nums.size() ) {
 
         if ( i == nums[ i ] ) {
@@ -2082,15 +2140,18 @@ public:
     std::vector<int> quickSort(std::vector<int>& arr, int k, int l, int r) {
 
         {
-            //        int i = l, j = r;
-            //        while (i < j) {
-            //            while (i < j && arr[j] >= arr[l]) j--;
-            //            while (i < j && arr[i] <= arr[l]) i++;
-            //            swap(arr[i], arr[j]);
-            //        }
-            //        swap(arr[i], arr[l]);
-            //        if (i > k) return quickSort(arr, k, l, i - 1);
-            //        if (i < k) return quickSort(arr, k, i + 1, r);
+
+            std::vector<int> res;
+            int i = l;
+            int j = r;
+            int pivot = arr[ l ];
+            while ( i < j ) {
+                while ( i < j && arr[ j ] >= pivot ) j --;
+                if ( i < j ) arr[ i ++ ] = arr[ j ];
+
+                while ( i < j && arr[ i ] <= pivot ) i ++;
+                if ( i < j )  arr[ j-- ] = arr[ i ];
+            }
         }
 
         int i = l, j = r;
@@ -2116,7 +2177,6 @@ public:
         return quickSort(arr, k, 0, arr.size() - 1);
     }
 };
-
 void tst_getLeastNumbers() {
     std::vector<int> arr{ 4, 5, 6, 7, 8, -1, 77, 133, 89, 61 };
 
@@ -2129,11 +2189,14 @@ void tst_getLeastNumbers() {
 
 int Test_ListEntry() {
 
+    tst_getLeastNumbers(); return 1;
+
+    tst_mergeTwoArray(); return 1;
+
     tst_twoSum(); return 1;
+
     tst_maxSubArray(); return 1;
 
-
-    tst_getLeastNumbers(); return 1;
 
     tst_rotateRight(); return 1;
 
@@ -2169,7 +2232,6 @@ int Test_ListEntry() {
 
     tst_findRepeatNumber(); return 1;
 
-    tst_mergeTwoArray(); return 1;
 
     tst_reorderList(); return 1;
 

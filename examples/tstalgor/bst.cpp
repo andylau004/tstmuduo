@@ -109,14 +109,16 @@ void tst_bst_1() {
     std::cout << "-------------inOrder print end" << std::endl;
 }
 
-//给出如下一棵二叉树：
 
-//     1
-//   /   \
-// -5     2
-// / \   /  \
-//0   3 -4  -5
-//返回值为 3 的节点。
+/*
+    给出如下一棵二叉树：
+         1
+       /   \
+     -5     2
+     / \   /  \
+    0   3 -4  -5
+    返回值为 3 的节点。
+*/
 
 BiTreeNode* bst_2_maxnode(BiTreeNode* root) {
     if (!root) return nullptr;

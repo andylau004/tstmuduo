@@ -25,7 +25,7 @@
 
 extern int tst_rand();
 extern int tst_rand(int low, int high);
-
+extern void AddNewNode(BstNode*& root, BstNode* newNode);
 
 extern BstNode* g_pBstTree;
 
@@ -1487,6 +1487,14 @@ void Test_coinChange() {
     示例 4:
     输入: [1,3,5,6], 0
     输出: 0
+
+-----------------------------------------------------------------------
+复杂度分析：以后大家「只要看到面试题里给出的数组是有序数组，都可以想一想是否可以使用二分法。」
+同时题目还强调数组中无重复元素，因为一旦有重复元素，使用二分查找法返回的元素下表可能不是唯一的。
+
+时间复杂度：
+空间复杂度：
+-----------------------------------------------------------------------
 */
 int searchInsert(vector<int>& nums, int target) {
     {
@@ -1497,90 +1505,28 @@ int searchInsert(vector<int>& nums, int target) {
 
             int mid = left + ((right - left) >> 1);
 
-            if ( nums[ mid ] >= target ) {
-                right = mid;
-            } else { // < target
-                left = mid + 1;
+            if ( nums[ mid ] > target ) {
+                right = mid; // target 在左区间，在[left, middle)中
+            } else if ( nums [ mid ] < target ) {
+                left = mid + 1; // target 在右区间，在 [middle+1, right)中
+            } else { // ==
+                return mid; // 数组中找到目标值的情况，直接返回下标
             }
         }
+        // 分别处理如下四种情况
+        // 目标值在数组所有元素之前 [0,0)
+        // 目标值等于数组中某一个元素 return mid
+        // 目标值插入数组中的位置 [left, right) ，return right 即可
+        // 目标值在数组所有元素之后的情况 [left, right)，return right 即可
         return left;
     }
 
-
-
-
-    int left = 0;
-    int right = nums.size() - 1;
-
-    while ( left <= right ) {
-        int mid = left + ((right-left)>>1);
-
-        if ( nums[mid] > target ) {
-            right = mid - 1;
-        }
-        else if ( nums[mid] < target ) {
-            left = mid + 1;
-        } else {
-            return mid;
-        }
-    }
-    return right + 1;
 }
-void Test_searchInsert() {
-
+void tst_searchInsert() {
     std::vector<int> a { 1,3,5,6 };
-    std::cout << "insert pos=" << searchInsert(a, 2) << std::endl;
+    std::cout << "insert pos1=" << searchInsert(a, 2) << std::endl;
+    std::cout << "insert pos2=" << searchInsert(a, 7) << std::endl;
 }
-
-/*
-    34. 在排序数组中查找元素的第一个和最后一个位置
-    给定一个按照升序排列的整数数组 nums，和一个目标值 target。找出给定目标值在数组中的开始位置和结束位置。
-    如果数组中不存在目标值 target，返回 [-1, -1]。
-
-    进阶： 你可以设计并实现时间复杂度为 O(log n) 的算法解决此问题吗？
-
-    示例 1：
-    输入：nums = [5,7,7,8,8,10], target = 8
-    输出：[3,4]
-
-    示例 2：
-    输入：nums = [5,7,7,8,8,10], target = 6
-    输出：[-1,-1]
-
-    示例 3：
-    输入：nums = [], target = 0
-    输出：[-1,-1]
------------------------------------------------------------------------
-
------------------------------------------------------------------------
-*/
-std::vector<int> searchRange(std::vector<int> &nums, int target) {
-    std::vector<int> res;
-
-    int n = nums.size() - 1, l = 0, r = n;
-
-    while ( l <= r ) {
-        int mid = l + ((r - l) >> 1);
-
-        if (nums[mid] > target) {
-            r = mid - 1;
-        } else if (nums[mid] < target) {
-            l = mid;
-        } else { // == target
-            int start = mid - 1, end = mid + 1;
-            while ( start >= 0 && nums[start] == target )
-                start--;
-            while ( end < r && nums[ end ] == target )
-                end++;
-            res.push_back(start + 1);
-            res.push_back(end - 1);
-            return res;
-        }
-    }
-
-    return {-1, -1};
-}
-
 
 /*
     365. 水壶问题
@@ -2866,31 +2812,29 @@ TreeNode* mergeTrees(TreeNode* t1, TreeNode* t2) {
                 ----  滑动窗口
 -----------------------------------------------------------------------
 */
-int lengthOfLongestSubstringEx(string s) {
+size_t lengthOfLongestSubstringEx(string s) {
     if (s.empty()) return 0;
 
-    int left = 0;
-    int maxsize = 0;
+    size_t left = 0;
+    size_t maxsize = 0;
     std::unordered_set < char > us;
 
-    for (int i = 0; i < s.size(); i ++) {
+    for (size_t i = 0; i < s.size(); i ++) {
 
         while ( us.find( s[i] ) != us.end() ) { // find 'c' ---> exist in hashmap
 
-            us.erase(s[left]);
+//            std::cout << "i=" << i << ", s[" << left << "]=" << s[left] << std::endl;
+            us.erase( s[left] );
             left ++;
         }
 
         maxsize = std::max( maxsize, i - left + 1 );
         us.insert( s[i] );
+//        PrintInContainer(us);
     }
     return maxsize;
 }
 void tst_lengthOfLongestSubstringEx() {
-    std::unordered_set< std::string > us;
-    us.insert("998761");
-    us.insert("886541");
-
     std::string str = "9987711";
     str = "998711";
     std::cout << "lenght_long_substr=" << lengthOfLongestSubstringEx(str) << std::endl;
@@ -2932,17 +2876,17 @@ void tst_lengthOfLongestSubstringEx() {
     输入：nums = [4,-2], k = 2
     输出：[4]
 */
-vector<int> maxSlidingWindow(vector<int>& nums, int k) {
+vector<size_t> maxSlidingWindow(vector<int>& nums, size_t k) {
 
-    int n = nums.size();
-    std::priority_queue< pair<int, int> > pri_que;
+    size_t n = nums.size();
+    std::priority_queue< pair<size_t, size_t> > pri_que;
 
-    for ( int i = 0; i < k; i ++ ) {
+    for ( size_t i = 0; i < k; i ++ ) {
         pri_que.emplace( nums[ i ], i );
     }
     {
-        std::vector<int> ans { pri_que.top().first };
-        for ( int j = k; j < n; j ++ ) {
+        std::vector<size_t> ans { pri_que.top().first };
+        for ( size_t j = k; j < n; j ++ ) {
 
             pri_que.emplace( nums[ j ], j );
 
@@ -2955,26 +2899,28 @@ vector<int> maxSlidingWindow(vector<int>& nums, int k) {
         return ans;
     }
 
-//    while ( pri_que.size() ) {
-//        auto ele = pri_que.top();
-//        std::cout << "first=" << ele.first << ", second=" << ele.second <<std::endl;
-//        pri_que.pop();
-//    }
-//    return std::vector<int> {};
+    {
+//        //    while ( pri_que.size() ) {
+//        //        auto ele = pri_que.top();
+//        //        std::cout << "first=" << ele.first << ", second=" << ele.second <<std::endl;
+//        //        pri_que.pop();
+//        //    }
+//        //    return std::vector<int> {};
 
-    std::vector<int> ans{pri_que.top().first};
+//        std::vector<int> ans{pri_que.top().first};
 
-    for ( auto j = k; j < n; j ++ ) {
+//        for ( auto j = k; j < n; j ++ ) {
 
-        pri_que.emplace( nums[ j ], j );
+//            pri_que.emplace( nums[ j ], j );
 
-        while ( (j - k) >= pri_que.top().second /*pri_que.top().second <= j - k*/ ) {
-            pri_que.pop();
-        }
+//            while ( (j - k) >= pri_que.top().second /*pri_que.top().second <= j - k*/ ) {
+//                pri_que.pop();
+//            }
 
-        ans.push_back( pri_que.top().first );
+//            ans.push_back( pri_que.top().first );
+//        }
+//        return ans;
     }
-    return ans;
 }
 void tst_maxSlidingWindow() {
 
@@ -3277,7 +3223,6 @@ void tst_findRepeatedDNASequences() {
 class LRUCache {
 public:
     LRUCache(int capacity) : cap_(capacity) {
-
     }
 
     int get(int key) {
@@ -3325,6 +3270,69 @@ private:
 
     int cap_;
 };
+
+/*
+    460. LFU 缓存
+    请你为 最不经常使用（LFU）缓存算法设计并实现数据结构。
+
+    实现 LFUCache 类：
+    LFUCache(int capacity) - 用数据结构的容量 capacity 初始化对象
+    int get(int key)       - 如果键存在于缓存中，则获取键的值，否则返回 -1。
+    void put(int key, int value) -
+    如果键已存在，则变更其值；
+    如果键不存在，请插入键值对。
+    当缓存达到其容量时，则应该在插入新项之前，使最不经常使用的项无效。
+    在此问题中，当存在平局（即两个或更多个键具有相同使用频率）时，应该去除 最久未使用 的键。
+    注意「项的使用次数」就是自插入该项以来对其调用 get 和 put 函数的次数之和。使用次数会在对应项被移除后置为 0 。
+
+    为了确定最不常使用的键，可以为缓存中的每个键维护一个 使用计数器 。使用计数最小的键是最久未使用的键。
+
+    当一个键首次插入到缓存中时，它的使用计数器被设置为 1 (由于 put 操作)。
+    对缓存中的键执行 get 或 put 操作，使用计数器的值将会递增。
+
+    示例：
+    输入：
+    ["LFUCache", "put", "put", "get", "put", "get", "get", "put", "get", "get", "get"]
+    [[2], [1, 1], [2, 2], [1], [3, 3], [2], [3], [4, 4], [1], [3], [4]]
+    输出：
+    [null, null, null, 1, null, -1, 3, null, -1, 3, 4]
+
+    解释：
+    // cnt(x) = 键 x 的使用计数
+    // cache=[] 将显示最后一次使用的顺序（最左边的元素是最近的）
+    LFUCache lFUCache = new LFUCache(2);
+    lFUCache.put(1, 1);   // cache=[1,_], cnt(1)=1
+    lFUCache.put(2, 2);   // cache=[2,1], cnt(2)=1, cnt(1)=1
+    lFUCache.get(1);      // 返回 1
+                          // cache=[1,2], cnt(2)=1, cnt(1)=2
+    lFUCache.put(3, 3);   // 去除键 2 ，因为 cnt(2)=1 ，使用计数最小
+                          // cache=[3,1], cnt(3)=1, cnt(1)=2
+    lFUCache.get(2);      // 返回 -1（未找到）
+    lFUCache.get(3);      // 返回 3
+                          // cache=[3,1], cnt(3)=2, cnt(1)=2
+    lFUCache.put(4, 4);   // 去除键 1 ，1 和 3 的 cnt 相同，但 1 最久未使用
+                          // cache=[4,3], cnt(4)=1, cnt(3)=2
+    lFUCache.get(1);      // 返回 -1（未找到）
+    lFUCache.get(3);      // 返回 3
+                          // cache=[3,4], cnt(4)=1, cnt(3)=3
+    lFUCache.get(4);      // 返回 4
+                          // cache=[3,4], cnt(4)=2, cnt(3)=3
+*/
+class LFUCache {
+public:
+    LFUCache(int capacity) {
+
+    }
+
+    int get(int key) {
+
+    }
+
+    void put(int key, int value) {
+
+    }
+};
+
 
 bool hasCycle_1(ListNode* head) {
 
@@ -3930,7 +3938,7 @@ void tst_isHappy() {
 */
 vector<int> exchange(vector<int>& nums) {
 
-    int left = 0, right = nums.size() - 1;
+    size_t left = 0, right = nums.size() - 1;
 
     while ( left < right ) {
 
@@ -3954,12 +3962,741 @@ void tst_exchange() {
     PrintInContainer(res);
 }
 
+class CAX {
+public:
+    CAX() : ptr_( new int( 123 ) ) {
+    }
+    ~CAX() {
+        std::cout << " dst obj, ptr=" << ptr_ << std::endl;
+        delete ptr_;
+    }
+private:
+    int* ptr_;
+};
+CAX getobj(bool flag) {
+    CAX a;
+    CAX b;
+    if (flag)
+    {
+        return a;
+    }
+    else {
+        return b;
+    }
+    return b;
+}
+void tst_del_class_ptr() {
+    std::cout << "beg ------------" << std::endl;
+    CAX tmp = getobj(false);
+    std::cout << "end ------------" << std::endl;
+}
+
+void tst_mystring() {
+    class MyString {
+        void copy_data( const char* data ) {
+            m_data = new char[ m_len + 1 ];
+            memcpy(m_data, data, m_len);
+            m_data[ m_len ] = '\0';
+        }
+    public:
+        MyString() : m_data( nullptr ), m_len( 0 ) {
+        }
+        virtual ~MyString() {
+            if (m_data) {
+                cout <<"delet "<<(void*)m_data << std::endl;
+                delete []m_data;
+                m_len = 0;
+            }
+        }
+        MyString(const char* data) {
+            if ( strlen( data ) ) {
+                m_len = strlen(data);
+                copy_data(data);
+            }
+        }
+        MyString(const MyString& other) {
+            m_len = strlen( other.m_data );
+            copy_data( other.m_data );
+            std::cout << "Copy Constructor is called! source:" << other.m_data << std::endl;
+        }
+        MyString& operator = (const MyString& other) {
+            if  ( this != &other ) {
+                if ( m_data ) {
+                    delete []m_data;
+                    m_len = 0;
+                }
+                m_len = strlen( other.m_data );
+                copy_data( other.m_data );
+            }
+            cout << "Copy Assignment is called! source:"<< other.m_data << std::endl;
+            return *this;
+        }
+
+
+        MyString(MyString&& other) {
+            std::cout << "Move Constructor is called! source:" << other.m_data << std::endl;
+            m_len = other.m_len;
+            m_data = other.m_data;
+            other.m_len = 0;
+            other.m_data = nullptr;
+        }
+//        MyString& operator = (MyString&& other) {
+//            std::cout << "Move Assignment is called! source:"<< other.m_data << std::endl;
+//            if  ( this != &other ) {
+//                m_len = other.m_len;
+//                m_data = other.m_data;
+//                other.m_len = 0;
+//                other.m_data = nullptr;
+//            }
+//            return *this;
+//        }
+    private:
+        char* m_data;
+        size_t m_len;
+    };
+
+
+    MyString a;
+    a = MyString("Hello");
+    std::vector<MyString> vec;
+//    vec.push_back(MyString("World"));
+    vec.emplace_back(MyString("World"));
+
+    /*
+Move Assignment is called! source:Hello
+Move Constructor is called! source:World
+delet 0x2460ac0
+delet 0x2460aa0
+    */
+}
+
+int bitCount(unsigned int n) {
+
+    unsigned int c = 0;
+    for ( c = 0; n; c ++ ) {
+        n &= (n - 1);
+    }
+    return c;
+}
+void tst_bitCount() {
+    std::cout << "bit count = " << bitCount( 15 ) << std::endl;
+}
+
+
+void PreOrderRec(BstNode* root) {
+    if (!root) return;
+    {
+        std::cout << " " << root->val ;
+        if (root->left)
+            PreOrderRec(root->left);
+        if (root->right)
+            PreOrderRec(root->right);
+    }
+}
+/*
+    复杂度分析
+
+    时间复杂度：O(n)，其中 n 是二叉树的节点数。每一个节点恰好被遍历一次。
+    空间复杂度：O(n)，为迭代过程中显式栈的开销，平均情况下为 O(logn)，最坏情况下树呈现链状，为 O(n)。
+*/
+std::vector<int> PreOrderNonRecImpl(BstNode* root) {
+    std::vector<int> res;
+    if (!root) return res;
+
+    std::stack<BstNode*> stk;
+    BstNode* node = root;
+    while ( !stk.empty() || node ) {
+
+        while ( node ) {
+            res.emplace_back(node->val);
+            stk.emplace(node);
+            node = node->left;
+        }
+        node = stk.top();
+        stk.pop();
+        node = node->right;
+    }
+    return res;
+}
+void PreOrderNonRec(BstNode* root) {
+    if( !root ) return;
+    auto res = PreOrderNonRecImpl( root );
+    PrintInContainer(res);
+}
+
+void inOrderRecru(BstNode* root) {
+    if (!root) return;
+    if (root->left)
+        inOrderRecru(root->left);
+    std::cout << " " << root->val;
+    if (root->right)
+        inOrderRecru(root->right);
+}
+std::vector<int> inOrderNonRecruImpl(BstNode* root) {
+    std::vector<int> res;
+    if (!root) return res;
+    {
+        std::stack< BstNode* > stk;
+        while ( root || !stk.empty() ) {
+
+            while ( root ) {
+                stk.push( root );
+                root = root->left;
+            }
+            root = stk.top();
+            stk.pop();
+
+            res.push_back(root->val);
+            root = root->right;
+        }
+    }
+    return res;
+}
+void inOrderNonRecru(BstNode* root) {
+    auto res = inOrderNonRecruImpl(root);
+    PrintInContainer(res);
+}
+
+
+void CreateBstTree(const std::vector<int>& inVec) {// 构建二叉树；
+    for ( auto val : inVec ) {
+        BstNode* node = new BstNode(val);
+        AddNewNode(g_pBstTree, node);
+    }
+}
+
+
+void AddNewNode(BstNode*& root, BstNode* newNode) {
+    {
+        BstNode* parent = nullptr;
+        BstNode* tmp = root;
+
+        while ( tmp ) {
+            parent = tmp;
+            if ( newNode->val > tmp->val ) {
+                tmp = tmp->right;
+            } else {
+                tmp = tmp->left;
+            }
+        }
+        newNode->parent_ = parent;
+        if (!parent) {
+            root = newNode;
+        } else if (newNode->val > parent->val) {
+            parent->right = newNode;
+        } else {
+            parent->left = newNode;
+        }
+    } // end bracket
+
+}
+
+void CreateBstTree() {// 构建二叉树；
+//    std::cout << "-------------------------------" << std::endl;
+//    std::cout << std::boolalpha;
+//    std::cout << "Minimum value for int: " << std::numeric_limits<int>::min() << std::endl;
+//    std::cout << "Maximum value for int: " << std::numeric_limits<int>::max() << std::endl;
+
+    {
+        ::srand(time(nullptr));
+
+//        std::cout << "-------------------------------beg random val-------------------------------" << std::endl;
+        for ( int i = 0; i < 10; i++ ) {
+            int randVal = rand() % 200;
+
+            BstNode* newNode = new BstNode(randVal);
+            AddNewNode(g_pBstTree, newNode);
+        }
+        return;
+    }
+
+    {
+        ::srand(time(nullptr));
+
+        int count = 20;
+//        std::cout << "-------------------------------beg random val-------------------------------" << std::endl;
+        for (int i = 0; i < count; ++i) {
+            int randVal = rand() % (300);
+            std::cout << randVal << "  ";
+
+            BstNode* pNewNode = new BstNode(randVal);
+            AddNewNode(g_pBstTree, pNewNode);
+        }
+        std::cout << std::endl;
+//        std::cout << "-------------------------------end random val-------------------------------" << std::endl;
+        return;
+    }
+}
+bool insertNewBstNode(BstNode*& root, int val) {
+    {
+        if (!root) {
+            root = new BstNode(val);
+            return true;
+        }
+        if ( val < root->val ) {
+            return insertNewBstNode(root->left, val);
+        }
+        return insertNewBstNode(root->right, val);
+    }
+}
+void CreateBstTreeEx() {
+    ::srand(time(nullptr));
+
+    for ( int i = 0; i < 10; i++ ) {
+        insertNewBstNode(g_pBstTree, rand() % 200);
+    }
+}
+
+
+/*
+    从上到下按层打印二叉树，同一层的节点按从左到右的顺序打印，每一层打印到一行。
+    例如: 给定二叉树: [3,9,20,null,null,15,7],
+        3
+       / \
+      9  20
+        /  \
+       15   7
+    返回其层次遍历结果：
+    [
+      [3],
+      [9,20],
+      [15,7]
+    ]
+*/
+vector<vector<int>> levelOrder_1(BstNode* root) {
+
+    {
+        std::vector<std::vector<int>> res;
+
+        std::queue<BstNode*> que;
+        que.push(root);
+
+        while (!que.empty()) {
+
+            std::vector<int> level;
+            size_t sz = que.size();
+            for ( size_t i = 0; i < sz; i ++ ) {
+
+                auto node = que.front(); que.pop();
+                level.push_back(node->val);
+
+                if ( node->left ) que.push(node->left);
+                if ( node->right )que.push(node->right);
+            }
+
+            res.push_back( level );
+        }
+        return res;
+    }
+
+}
+
+int bstNodeCount(BstNode* root) {
+    if (!root) return 0;
+    return 1 + bstNodeCount(root->left) + bstNodeCount(root->right);
+}
+void tst_bst_operator() {
+
+    {
+
+        const int size_cnt = 16;
+        std::vector<int> nums{ 91, 33, 77, 21, 8, 23, 4, 34 };
+        std::cout << "first print --- ---" << std::endl;
+        for ( size_t i = 0; i < nums.size(); i ++ ) {
+            std::cout << " " << nums[ i ] % size_cnt;
+        }
+        std::cout << std::endl;
+
+        std::cout << "second print --- ---" << std::endl;
+        for ( size_t i = 0; i < nums.size(); i ++ ) {
+            std::cout << " " << (nums[ i ] & (size_cnt - 1));
+        }
+        std::cout << std::endl;
+//        return ;
+    }
+    CreateBstTree();
+    {
+        std::cout << std::endl;
+        std::cout << "-------------------------------inOrder beg-------------------------------" << std::endl;
+        inOrderRecru(g_pBstTree);
+        std::cout << std::endl;
+        std::cout << "-------------------------------inOrder end-------------------------------" << std::endl;
+        std::cout << std::endl;
+    }
+{
+        std::cout << std::endl;
+        std::cout << "-------------------------------inOrderNonRecru beg-------------------------------" << std::endl;
+        inOrderNonRecru(g_pBstTree);
+        std::cout << std::endl;
+        std::cout << "-------------------------------inOrderNonRecru end-------------------------------" << std::endl;
+        std::cout << std::endl;
+}
+    {
+        std::cout << std::endl;
+        std::cout << "-------------------------------preOrderNonRecr beg-------------------------------" << std::endl;
+        PreOrderNonRec(g_pBstTree);
+        std::cout << std::endl;
+        std::cout << "-------------------------------preOrderNonRecr end-------------------------------" << std::endl;
+        std::cout << std::endl;
+    }
+    {
+        std::cout << std::endl;
+        std::cout << "-------------------------------preOrderRecr beg-------------------------------" << std::endl;
+        PreOrderRec(g_pBstTree);
+        std::cout << std::endl;
+        std::cout << "-------------------------------preOrderRecr end-------------------------------" << std::endl;
+        std::cout << std::endl;
+    }
+
+    std::cout << "before level print ---" << std::endl;
+    auto ret = levelOrder_1(g_pBstTree);
+    for ( auto itLevel : ret ) {
+        for ( auto itVal : itLevel ) {
+            std::cout << " " << itVal;
+        }
+        std::cout << std::endl;
+    }
+    std::cout << "end    level print ---" << std::endl << std::endl;
+
+    std::cout << " bst count=" << bstNodeCount(g_pBstTree) << std::endl;
+}
+/*
+    二叉树第k层的结点个数
+*/
+int GetKLevelNodesCount(BstNode* root, int k) {
+    if ( !root ) return 0;
+    if ( 1 == k ) return 1;
+    return GetKLevelNodesCount(root->left, k - 1) + GetKLevelNodesCount(root->right, k - 1);
+}
+// 树的深度
+int GetDepthByBstTree(BstNode* root) {
+    if ( !root ) return 0;
+    int leftDepth = GetDepthByBstTree(root->left);
+    int rightDepth = GetDepthByBstTree(root->right);
+    return std::max(leftDepth, rightDepth) + 1;
+}
+
+// 判断两棵二叉树是否结构相同
+bool isSameBstTree( BstNode* t1, BstNode* t2) {
+    if ( t1 == nullptr && t2 == nullptr ) {
+        return true;
+    }
+    if ( t1 != nullptr || t2 != nullptr ) {
+        return false;
+    }
+    if ( t1->val != t2->val ) {
+        return false;
+    }
+
+    return isSameBstTree(t1->left, t2->left) && isSameBstTree(t1->right, t2->right);
+}
+
+/*
+    34. 在排序数组中查找元素的第一个和最后一个位置
+    给定一个按照升序排列的整数数组 nums，和一个目标值 target。找出给定目标值在数组中的开始位置和结束位置。
+
+    如果数组中不存在目标值 target，返回 [-1, -1]。
+
+    进阶：你可以设计并实现时间复杂度为 O(log n) 的算法解决此问题吗？
+
+    示例 1：
+    输入：nums = [5,7,7,8,8,10], target = 8
+    输出：[3,4]
+
+    示例 2：
+    输入：nums = [5,7,7,8,8,10], target = 6
+    输出：[-1,-1]
+
+    示例 3：
+    输入：nums = [], target = 0
+    输出：[-1,-1]
+
+实现了C++的lower_bound和upper_bound，模板题，记住这2个函数的实现会很有用。
+需要注意的是，当lower_bound和upper_bound的返回值一样的时候，说明这个元素不存在。
+而且这两个函数的实现极其相似，只有一个条件不同，
+在lower_bound中，是e<=nums[mi]，
+而在upper_bound中，对应的是e<nums[mi]，就只有这一点不同，所以也很好记。
+
+注意:
+lower_bound是找到有序数组中，第一个满足nums[i]>=e的i
+upper_bound是找到有序数组中，第一个满足nums[i]>e的i。其中e是待查找的元素。
+*/
+class CSearchValRange {
+public:
+    int n;
+    int lower_Bound(vector<int> &nums, int target) {
+        size_t left = 0;
+        size_t right = nums.size();
+        while ( left < right ) {
+
+            size_t mid = left + ((right - left) >> 1);
+
+            if ( nums[ mid ] >= target ) {
+                right = mid;
+            } else {
+                left = mid + 1;
+            }
+        }
+        return left;
+    }
+    int upper_Bound(vector<int> &nums, int target) {
+        size_t left = 0;
+        size_t right = nums.size();
+        while ( left < right ) {
+
+            size_t mid = left + ((right - left) >> 1);
+
+            if ( nums[ mid ] > target ) {
+                right = mid;
+            } else {
+                left = mid + 1;
+            }
+        }
+        return left;
+    }
+    vector<int> searchRange(vector<int> &nums, int target) {
+        vector<int> res;
+        if (nums.empty()) return std::vector<int>{ -1, -1 };
+
+        int lo = lower_Bound(nums, target);
+        int hi = upper_Bound(nums, target);
+        if (lo == hi) return std::vector<int>{ -1, -1 };
+
+        return std::vector<int>{ lo, hi - 1 };
+    }
+};
+
+/*
+    287. 寻找重复数
+    给定一个包含 n + 1 个整数的数组 nums ，其数字都在 1 到 n 之间（包括 1 和 n），可知至少存在一个重复的整数。
+    假设 nums 只有 一个重复的整数 ，找出 这个重复的数 。
+
+    示例 1：
+    输入：nums = [1,3,4,2,2]
+    输出：2
+
+    示例 2：
+    输入：nums = [3,1,3,4,2]
+    输出：3
+
+    示例 3：
+    输入：nums = [1,1]
+    输出：1
+
+    示例 4：
+    输入：nums = [1,1,2]
+    输出：1
+
+*/
+int findDuplicate(vector<int>& nums) {
+    size_t left = 0;
+    size_t right = nums.size() - 1;
+
+
+    while ( left < right ) {
+        size_t mid = left + ((right - left) >> 1);
+
+        size_t cnt = 0;
+        for ( auto num : nums ) {
+            if ( num <= mid )
+                cnt ++;
+        }// end --- for
+
+        if ( cnt > mid ) {
+            right = mid;
+        } else {
+            left = mid + 1;
+        }
+    }
+    return left;
+}
+void tst_findDuplicate() {
+    std::vector<int> arr{1, 2, 2, 3, 4, 5, 6, 7};
+//    std::vector<int> arr{1,3,4,2,2};
+//    std::vector<int> arr{3,1,3,4,2};
+    std::cout << "find result=" << findDuplicate(arr) << std::endl << std::endl << std::endl;
+}
+
+
+/*
+    1. 两数之和
+    给定一个整数数组 nums 和一个整数目标值 target，请你在该数组中找出 和为目标值 的那 两个 整数，并返回它们的数组下标。
+    你可以假设每种输入只会对应一个答案。但是，数组中同一个元素不能使用两遍。
+    你可以按任意顺序返回答案。
+
+    示例 1：
+    输入：nums = [2,7,11,15], target = 9
+    输出：[0,1]
+    解释：因为 nums[0] + nums[1] == 9 ，返回 [0, 1] 。
+
+    示例 2：
+    输入：nums = [3,2,4], target = 6
+    输出：[1,2]
+
+    示例 3：
+    输入：nums = [3,3], target = 6
+    输出：[0,1]
+*/
+std::vector<int> twoSum_nosort(std::vector<int>& nums, int target) {
+
+    std::unordered_map<int, int> hashTable;
+
+    for ( int i = 0; i < nums.size(); i ++ ) {
+
+        auto it = hashTable.find( target - nums[ i ] );
+
+        if ( it != hashTable.end() ) { // no found val,,,
+            return std::vector<int>{ i, it->second };
+        } else {
+            hashTable[ nums[ i ] ] = i;
+        }
+    }
+    return std::vector<int>{ -1, -1 };
+}
+void tst_twoSum_nosort() {
+
+    {
+//        std::vector<int> v1{ 2, 7, 11, 15 };
+        std::vector<int> v1{ 2, 11, 15, 7, 8};
+        auto ves = twoSum_nosort(v1, 9);
+        PrintInContainer(ves);
+        std::cout << std::endl;
+    }
+    {
+        std::vector<int> v1{ 10,26,30,31,47,60 };
+        auto ves = twoSum_nosort(v1, 40);
+        PrintInContainer(ves);
+        std::cout << std::endl;
+    }
+
+}
 
 
 
-void LeetCodeEntry() {
+/*
+    7. 整数反转
+    给出一个 32 位的有符号整数，你需要将这个整数中每位上的数字进行反转。
 
-        tst_containsNearbyDuplicate(); return;
+    示例 1:
+    输入: 123
+    输出: 321
+
+    示例 2:
+    输入: -123
+    输出: -321
+
+    示例 3:
+    输入: 120
+    输出: 21
+    注意:假设我们的环境只能存储得下 32 位的有符号整数，则其数值范围为 [−2^31, 2^31 − 1]。
+    请根据这个假设，如果反转后整数溢出那么就返回 0。
+*/
+int reverseInt(int x) {
+    int res = 0;
+    auto pfnCheck = [&]() -> bool {
+        if ( res > INT_MAX || res < INT_MIN )
+            return true;
+        else
+            return false;
+    };
+
+    do {
+        if ( pfnCheck() ) return 0;
+        res = res * 10;
+
+        if ( pfnCheck() ) return 0;
+        res += (x % 10);
+        std::cout << "res=" << res << ", (x % 10)=" << (x % 10) << std::endl;
+    } while (x /= 10);
+    return res;
+}
+void tst_reverseInt() {
+//    std::cout << "ret=" << reverseInt(-1998) << std::endl;
+    std::cout << "input=" << 1534236469 << ", ret=" << reverseInt(1534236469) << std::endl;
+//    std::cout << "input=" << 1234567 << ", ret=" << reverseInt(1234567) << std::endl;
+//    std::cout << "ret=" << reverseInt(INT_MAX) << std::endl;
+}
+
+
+void tst_hashTable() {
+    unordered_map<string,string> mymap =
+    {
+        {"house","maison"},
+        {"apple","pomme"},
+        {"tree","arbre"},
+        {"book","livre"},
+        {"door","porte"},
+        {"grapefruit","pamplemousse"}
+    };
+    /************begin和end迭代器***************/
+    cout << "mymap contains:";
+    for ( auto it = mymap.begin(); it != mymap.end(); ++it )
+        cout << " " << it->first << ":" << it->second;
+    cout << endl;
+    /************bucket操作***************/
+
+    size_t n = mymap.bucket_count();
+    cout << "mymap has " << n << " buckets.\n";
+
+    for (size_t i=0; i<n; ++i)
+    {
+        cout << "bucket #" << i << "'s size:"<<mymap.bucket_size(i)<<" contains: ";
+        for (auto it = mymap.begin(i); it!=mymap.end(i); ++it)
+            cout << "[" << it->first << ":" << it->second << "] ";
+        cout << "\n";
+    }
+
+    cout <<"\nkey:'apple' is in bucket #" << mymap.bucket("apple") <<endl;
+    cout <<"\nkey:'computer' is in bucket #" << mymap.bucket("computer") <<endl;
+}
+
+//void iniq(q, data)
+//{
+//    Node* node =new Node;
+//    node->val= data;
+//    node->next= nullptr;
+//    q.head = q.tail = node;
+//}
+
+void tst_unorder_set() {
+
+    std::unordered_set < int > us;
+
+    us.insert( 372 );
+    us.insert( 372 );
+    us.insert( 123 );
+    us.insert( 456 );
+    us.insert( 991 );
+
+    PrintInContainer( us );
+}
+void lc_Entry() {
+
+    tst_lengthOfLongestSubstringEx(); return;
+
+    tst_unorder_set(); return;
+
+    tst_hashTable();  return;
+
+    tst_reverseInt(); return;
+
+    tst_bst_operator();
+
+    std::cout << "depth=" << GetDepthByBstTree( g_pBstTree ) << std::endl;
+    std::cout << "count=" << GetKLevelNodesCount( g_pBstTree, 4 ) << std::endl;
+
+    tst_twoSum_nosort(); return;
+
+    tst_findDuplicate(); return;
+
+    tst_searchInsert(); return;
+
+    tst_bitCount(); return;
+    tst_mystring(); return;
+
+    tst_del_class_ptr(); return;
+
+    tst_containsNearbyDuplicate(); return;
 //    {
 //        std::unordered_set<std::string> myset =
 //        {"USA","Canada","France","UK","Japan","Germany","Italy"};
@@ -4001,12 +4738,10 @@ void LeetCodeEntry() {
 
     tst_minSubArrayLen(); return;
 
-    Test_searchInsert(); return;
 
     tst_IsValidString(); return;
 
 
-    tst_lengthOfLongestSubstringEx(); return;
 
     tst_maxArea(); return;
 
