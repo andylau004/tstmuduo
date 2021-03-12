@@ -47,8 +47,6 @@ extern BstNode*  g_pBstTree;
 
 
 
-extern void tst_reverse_list_1();
-
 extern void tst_RGetKthNode_fun();
 
 

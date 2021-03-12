@@ -26,6 +26,8 @@
 extern int tst_rand();
 extern int tst_rand(int low, int high);
 extern void AddNewNode(BstNode*& root, BstNode* newNode);
+extern void printInorder(BstNode* root);
+
 
 extern BstNode* g_pBstTree;
 
@@ -220,41 +222,36 @@ void TstList1()
     // PrintList(pReverseList);
 }
 
-// Given preorder and inorder traversal of a tree, construct the binary tree.
-// Note:
-// You may assume that duplicates do not exist in the tree.
-
-// For example, given
-// preorder = [3,9,20,15,7]
-// inorder  = [9,3,15,20,7]
-
-// Return the following binary tree:
-
 /*
-    3
-   / \
-    9  20
-    /  \
-   15   7
+        105. 从前序与中序遍历序列构造二叉树
+        根据一棵树的前序遍历与中序遍历构造二叉树。
+
+        注意: 你可以假设树中没有重复的元素。
+
+        例如: 给出
+        前序遍历 preorder = [3,9,20,15,7]
+        中序遍历 inorder  = [9,3,15,20,7]
+        返回如下的二叉树：
+            3
+           / \
+          9  20
+            /  \
+           15   7
+
+    首先要知道一个结论，前序/后序+中序序列可以唯一确定一棵二叉树，所以自然而然可以用来建树。
+    看一下前序和中序有什么特点，前序1,2,4,7,3,5,6,8，中序4,7,2,1,5,3,8,6；
+
+    有如下特征：
+    1. 前序中左起第一位1肯定是根结点，我们可以据此找到中序中根结点的位置rootin；
+    2. 中序中根结点左边就是左子树结点，右边就是右子树结点，即[左子树结点，根结点，右子树结点]，
+       我们就可以得出左子树结点个数为int left = rootin - leftin;；
+    3. 前序中结点分布应该是：[根结点，左子树结点，右子树结点]；
+    4. 根据前一步确定的左子树个数，可以确定前序中左子树结点和右子树结点的范围；
+    5. 如果我们要前序遍历生成二叉树的话，下一层递归应该是：
+        左子树：root->left = pre_order(前序左子树范围，中序左子树范围，前序序列，中序序列);；
+        右子树：root->right = pre_order(前序右子树范围，中序右子树范围，前序序列，中序序列);。
+    6. 每一层递归都要返回当前根结点root；
 */
-/*
- *
- *  首先要知道一个结论，前序/后序+中序序列可以唯一确定一棵二叉树，所以自然而然可以用来建树。
- *  看一下前序和中序有什么特点，前序1,2,4,7,3,5,6,8 ，中序4,7,2,1,5,3,8,6；
- *
- *  有如下特征：
- *
- *  1. 前序中左起第一位1肯定是根结点，我们可以据此找到中序中根结点的位置rootin；
- *  2. 中序中根结点左边就是左子树结点，右边就是右子树结点，即[左子树结点，根结点，右子树结点]，
- *     我们就可以得出左子树结点个数为int left = rootin - leftin;；
- *  3. 前序中结点分布应该是：[根结点，左子树结点，右子树结点]；
- *  4. 根据前一步确定的左子树个数，可以确定前序中左子树结点和右子树结点的范围；
- *  5. 如果我们要前序遍历生成二叉树的话，下一层递归应该是：
- *      左子树：root->left = pre_order(前序左子树范围，中序左子树范围，前序序列，中序序列);；
- *      右子树：root->right = pre_order(前序右子树范围，中序右子树范围，前序序列，中序序列);。
- *  6. 每一层递归都要返回当前根结点root；
- */
-
 class CBuildBstByPreInorder {
 public:
     TreeNode* buildTree(vector<int>& preorder, vector<int>& inorder) {
@@ -263,24 +260,56 @@ public:
     }
 
     TreeNode* buildTree(vector<int>& preorder, int& pos, vector<int>& inorder, int left, int right) {
-        if (pos >= preorder.size()) return 0;
-        int i = left;
-        for (; i <= right; ++i) {
-            if (inorder[i] == preorder[pos]) break;
+        int m = preorder.size();
+        if(m == 0) return NULL;
+        TreeNode* root = new TreeNode(preorder[0]);
+        vector<int> preorder_left, inorder_left, preorder_right, inorder_right;
+        //在inorder里面寻找根节点，划分左子树和右子树
+        int i;
+        //构造左子树的中序遍历
+        for(i = 0; i < m; i ++){
+            if(inorder[i] == preorder[0]) break;
+            inorder_left.push_back(inorder[i]);
         }
-        TreeNode* newNode = new TreeNode(preorder[pos]);
-        if (left <= i-1)  newNode->left  = buildTree(preorder, ++pos, inorder, left, i-1);  // 左子树
-        if (i+1 <= right) newNode->right = buildTree(preorder, ++pos, inorder, i + 1, right);  // 右子树
-        return newNode;
+        //构造右子树的中序遍历
+        for(i = i + 1; i < m; i ++){
+            inorder_right.push_back(inorder[i]);
+        }
+        for(int j = 1; j < m; j ++){
+            //构造左子树的前序遍历
+            if(j <= inorder_left.size()) preorder_left.push_back(preorder[j]);
+            //构造右子树的前序遍历
+            else preorder_right.push_back(preorder[j]);
+        }
+        root->left = buildTree(preorder_left, inorder_left);
+        root->right = buildTree(preorder_right, inorder_right);
+        return root;
+//        if (pos >= preorder.size()) return 0;
+//        int i = left;
+//        for (; i <= right; ++i) {
+//            if (inorder[i] == preorder[pos]) break;
+//        }
+//        TreeNode* newNode = new TreeNode(preorder[pos]);
+//        if (left <= i-1)
+//            newNode->left  = buildTree(preorder, ++pos, inorder, left, i-1);  // 左子树
+//        if (i+1 <= right)
+//            newNode->right = buildTree(preorder, ++pos, inorder, i + 1, right);  // 右子树
+//        return newNode;
     }
 
     void WorkEntry() {
+//        std::vector < int > preOrder = {1,2,4,7,3,5,6,8};
+//        std::vector < int > inOrder  = {4,7,2,1,5,3,8,6};
         std::vector < int > preOrder = {3,9,20,15,7};
         std::vector < int > inOrder  = {9,3,15,20,7};
         TreeNode* root = buildTree(preOrder, inOrder);
         InOrtderPtrint(root);
     }
 };
+void tst_buildTree() {
+    CBuildBstByPreInorder buildBst;
+    buildBst.WorkEntry();
+}
 
 
 
@@ -299,43 +328,68 @@ public:
 class CFindKthBigest {
 
 public:
+    // int sort_desc(vector<int>& nums, int l, int r, int k) {
 
+    //     {
+    //         if ( l > r ) return -1;
 
-    int sort_desc(vector<int>& nums, int l, int r, int k) {
+    //         int i = l, j = r;
+    //         int tmp = nums [ i ];
 
-        {
-            if ( l > r ) return -1;
+    //         while ( i < j ) {
+    //             while ( i < j &&  nums [ j ] >= tmp ) j --;
+    //             if ( i < j ) nums [ i ++ ]  = nums[ j ];
 
-            int i = l, j = r;
-            int tmp = nums [ i ];
+    //             while ( i < j  &&  nums [ i ] <= tmp ) i ++;
+    //             if ( i < j ) nums [ j -- ] = nums[ i ];
+    //         }
+    //         nums[ i ] = tmp;
 
-            while ( i < j ) {
-                while ( i < j &&  nums [ j ] >= tmp ) j --;
-                if ( i < j ) nums [ i ++ ]  = nums[ j ];
+    //         if ( i == k ) return nums[ i ];
+    //         else if ( i < k ) return sort_desc(nums, i + 1, r, k);
+    //         else return sort_desc( nums, l, i - 1, k );
+    //     }
+    // }
+    int partition( std::vector<int>& nums, int left, int right ) {
 
-                while ( i < j  &&  nums [ i ] <= tmp ) i ++;
-                if ( i < j ) nums [ j -- ] = nums[ i ];
-            }
-            nums[ i ] = tmp;
+        int pivot = nums[ left ];
 
-            if ( i == k ) return nums[ i ];
-            else if ( i < k ) return sort_desc(nums, i + 1, r, k);
-            else return sort_desc( nums, l, i - 1, k );
+        while ( left < right ) {
+
+            while ( left < right && nums[ right ] >= pivot ) right --;
+            if ( left < right ) nums[ left ] = nums[ right ];
+
+            while ( left < right && nums [ left ] <= pivot ) left ++;
+            if ( left < right ) nums[ right ] = nums[ left ];
         }
-
+        nums[ left ] = pivot;
+        return left;
     }
-
     int findKthLargest(vector<int>& nums, int k) {
+        int sz = nums.size();
+        int newK = sz - k;
 
-        int length = nums.size();
+        int left = 0;
+        int right = sz - 1;
 
-        if (k > length)
-            return 0;
+        while ( 1 ) {
+            auto pos = partition( nums, left, right );
+            
+            if ( pos == newK ) {
+                return nums[ pos ];
+            }
+            else if ( newK < pos ) {
+                right = pos - 1;
+            } else {
+                left = pos + 1;
+            }
+        }
+        return -1;
+        // int length = nums.size();
+        // if (k > length) return 0;
 
-        return sort_desc(nums, 0, length-1, length-k);
+        // return sort_desc(nums, 0, length-1, length-k);
     }
-
-
 
     void sort_impl(vector<int>& nums, int l, int r) {
         if ( l > r ) return;
@@ -406,14 +460,14 @@ public:
              { 9, 1, 123, 6613, 31, 25, 123, -333,  72,  19, 9981, 33812, -17 };
 
         {
-            auto cpy = vRandom;
+//            auto cpy = vRandom;
 
-            CFindKthBigest cf;
-//            cf.sortByQuickSort(cpy);
-            cf.sortByPriQue(cpy, idx);
+//            CFindKthBigest cf;
+////            cf.sortByQuickSort(cpy);
+//            cf.sortByPriQue(cpy, idx);
 
-            PrintInContainer(cpy);
-            return ;
+//            PrintInContainer(cpy);
+//            return;
         }
 //        auto retVal = sort_desc(vRandom, 0, vRandom.size() - 1, idx);
 
@@ -935,7 +989,7 @@ vector<string> binaryTreePaths(BstNode *root) {
     traversal(root, path, result);
     return result;
 }
-void Test_binaryTreePaths() {
+void tst_binaryTreePaths() {
     std::cout << "before handle ..." << std::endl;
     PrintInorder(g_pBstTree);
     std::cout << std::endl;
@@ -1339,17 +1393,17 @@ void Test_hanmingWeight() {
 -----------------------------------------------------------------------
 */
 int climbStairs(int n) {
-   if ( n <= 2 )
-        return n;
-    int a, b, c;
-    a = 1;
-    b = 2;
-    for (int i = 3; i < n; i ++) {
-        c = a + b;
-        a = b;
-        b = c;
+    {
+        if ( n <= 2 ) return n;
+        int a = 1;
+        int b = 2, c = 0;
+        for ( int i = 3; i < n; i ++ ) {
+            c = a + b;
+            a = b;
+            b = c;
+        }
+        return c;
     }
-    return c;
 }
 void Test_climbStairs() {
     std::cout << "climb Stairs=" << climbStairs(13) << std::endl;
@@ -2821,7 +2875,8 @@ size_t lengthOfLongestSubstringEx(string s) {
 
     for (size_t i = 0; i < s.size(); i ++) {
 
-        while ( us.find( s[i] ) != us.end() ) { // find 'c' ---> exist in hashmap
+        while ( us.count( s[i] ) ) { // find 'c' ---> exist in hashmap
+        // while ( us.find( s[i] ) != us.end() ) { // find 'c' ---> exist in hashmap
 
 //            std::cout << "i=" << i << ", s[" << left << "]=" << s[left] << std::endl;
             us.erase( s[left] );
@@ -3332,25 +3387,6 @@ public:
 
     }
 };
-
-
-bool hasCycle_1(ListNode* head) {
-
-    if ( !head ) return false;
-
-    ListNode* fast = head;
-    ListNode* slow = head;
-
-    while ( fast && fast->next )  {
-
-        fast = fast->next ->next;
-        slow = slow ->next;
-
-        if ( fast == slow ) return true;
-    }
-
-    return false;
-}
 
 
 /*
@@ -4428,7 +4464,6 @@ public:
         size_t left = 0;
         size_t right = nums.size();
         while ( left < right ) {
-
             size_t mid = left + ((right - left) >> 1);
 
             if ( nums[ mid ] >= target ) {
@@ -4442,8 +4477,8 @@ public:
     int upper_Bound(vector<int> &nums, int target) {
         size_t left = 0;
         size_t right = nums.size();
-        while ( left < right ) {
 
+        while ( left < right ) {
             size_t mid = left + ((right - left) >> 1);
 
             if ( nums[ mid ] > target ) {
@@ -4491,7 +4526,6 @@ public:
 int findDuplicate(vector<int>& nums) {
     size_t left = 0;
     size_t right = nums.size() - 1;
-
 
     while ( left < right ) {
         size_t mid = left + ((right - left) >> 1);
@@ -4670,9 +4704,360 @@ void tst_unorder_set() {
 
     PrintInContainer( us );
 }
-void lc_Entry() {
 
-    tst_lengthOfLongestSubstringEx(); return;
+
+/*
+    415. 字符串相加
+    给定两个字符串形式的非负整数 num1 和num2 ，计算它们的和。
+
+    提示：
+    num1 和num2 的长度都小于 5100
+    num1 和num2 都只包含数字 0-9
+    num1 和num2 都不包含任何前导零
+    你不能使用任何內建 BigInteger 库， 也不能直接将输入的字符串转换为整数形式
+
+复杂度分析
+
+时间复杂度：O(len1, len2)。竖式加法的次数取决于较大数的位数。
+空间复杂度：O(1)。除答案外我们只需要常数空间存放若干变量。
+*/
+std::string addStrings(std::string num1, std::string num2) {
+
+    {
+        string str;
+        int cur = 0, i = num1.size()-1, j = num2.size()-1;
+        while (i >= 0 || j >= 0 || cur != 0) {
+            if (i >= 0) cur += num1[i--] - '0';
+            if (j >= 0) cur += num2[j--] - '0';
+            str += to_string (cur % 10);
+            cur /= 10;
+        }
+        reverse(str.begin(), str.end());
+        return str;
+    }
+
+    {
+        std::string ans;
+
+        int i = num1.size() - 1;
+        int j = num2.size() - 1;
+        int add = 0;
+
+        while ( i >= 0 || j >= 0 ) {
+
+            int v1 = (i >= 0) ? num1[ i ] - '0' : 0;
+            int v2 = (j >= 0) ? num2[ j ] - '0' : 0;
+
+            auto result = v1 + v2 + add;
+            ans.push_back( '0' + result % 10 );
+            add = result / 10;
+
+            i -= 1;
+            j -= 1;
+        }
+
+        return ans;
+    }
+}
+void tst_addStrings() {
+    std::cout << "add res=" << addStrings( "334", "666" ) << std::endl;
+//    std::cout << "add res=" << addStrings( "333", "666" ) << std::endl;
+//    std::cout << "add res=" << addStrings( "333", "766" ) << std::endl;
+}
+
+/*
+    347. 前 K 个高频元素
+    给定一个非空的整数数组，返回其中出现频率前 K 高的元素。
+
+    示例 1:
+    输入: nums = [1,1,1,2,2,3], k = 2
+    输出: [1,2]
+
+    示例 2:
+    输入: nums = [1], k = 1
+    输出: [1]
+
+    提示：
+    你可以假设给定的 k 总是合理的，且 1 ≤ k ≤ 数组中不相同的元素的个数。
+    你的算法的时间复杂度必须优于 O(n log n) , n 是数组的大小。
+    题目数据保证答案唯一，换句话说，数组中前 k 个高频元素的集合是唯一的。
+    你可以按任意顺序返回答案。
+*/
+vector<int> topKFrequent(vector<int>& nums, int k) {
+    vector<int> res;
+
+    std::unordered_map<int, int> um;
+    for ( auto ele : nums ) {
+        um [ ele ]++;
+    }
+
+    struct mycompare {
+        bool operator ()( const pair<int,int>& p1, const pair<int,int>& p2 ) {
+            return p1.second > p2.second;
+        }
+    };
+
+    std::priority_queue< pair<int,int>, vector<pair<int,int>>, mycompare > pq;
+
+    for ( auto it : um ) {
+        std::cout << " " << it.first << ", " << it.second << std::endl;
+        pq.push( it );
+        if ( pq.size() > k ) {
+            pq.pop();
+        }
+    }
+
+    while ( pq.size() ) {
+        res.push_back( pq.top().first );
+        pq.pop();
+    }
+
+    std::cout << std::endl;
+    return res;
+}
+void tst_topKFrequent() {
+    std::vector<int> nums{ 1, 2, 3, 1, 3, 3, 9, 10};
+    auto res = topKFrequent(nums, 2);
+    PrintInContainer(res);
+}
+
+void ReverseAndCount(int n) {
+    if ( n <= 0 ) {
+        return;
+    }
+
+    int bk1 = n;
+    int count = 0;
+
+    int  ans = 0;
+    while ( bk1 ) {
+
+        ans = ans * 10 + bk1 % 10;
+
+        bk1 = bk1 / 10;
+        count ++;
+
+//        std::cout << "ans=" << ans << std::endl;
+    }
+
+    std::cout << "bit count=" << count << std::endl;
+    std::cout << "ans=" << ans << std::endl;
+}
+void tst_reverseAndCount() {
+    ReverseAndCount( 123456789 );
+}
+
+
+/*
+    LeetCode-2 两数相加
+    给出两个 非空 的链表用来表示两个非负的整数。
+    其中，它们各自的位数是按照 逆序 的方式存储的，并且它们的每个节点只能存储 一位 数字。
+
+    如果，我们将这两个数相加起来，则会返回一个新的链表来表示它们的和。
+
+    您可以假设除了数字 0 之外，这两个数都不会以 0 开头。
+
+    示例：
+    输入：(2 -> 4 -> 3) + (5 -> 6 -> 4)
+    输出：7 -> 0 -> 8
+    原因：342 + 465 = 807
+*/
+class Solution_addTwoNumbers {
+public:
+    ListNode* addTwoNumbers(ListNode* l1, ListNode* l2) {
+        {
+            ListNode* dummy = new ListNode(-1);
+            auto pre = dummy;
+            int plus = 0;
+
+            while ( l1 || l2 || plus ) {
+                int sum = 0;
+                if ( l1 ) {
+                    sum += l1->val;
+                    l1 = l1->next;
+                }
+                if ( l2 ) {
+                    sum += l2->val;
+                    l2 = l2->next;
+                }
+
+                sum += plus;
+
+                pre->next = new ListNode( sum % 10 );
+                pre = pre->next;
+
+                plus = sum / 10;
+            }
+            return dummy->next;
+        }
+    }
+    void Test_addTwoNumber() {
+        std::vector<int> v1{9, 1, 3};
+        std::vector<int> v2{8, 2, 9};
+
+        auto l1 = ConstructList(v1);
+        auto l2 = ConstructList(v2);
+        auto ret = addTwoNumbers(l1, l2);
+        PrintList(ret);
+    }
+};
+void tst_addTwoNumber() {
+    Solution_addTwoNumbers sa;
+    sa.Test_addTwoNumber();
+}
+
+
+/*
+验证二叉搜索树
+给定一个二叉树，判断其是否是一个有效的二叉搜索树。
+
+假设一个二叉搜索树具有如下特征：
+节点的左子树只包含小于当前节点的数。
+节点的右子树只包含大于当前节点的数。
+所有左子树和右子树自身必须也是二叉搜索树。
+
+示例 1:
+输入:
+    2
+   / \
+  1   3
+输出: true
+
+示例 2:
+输入:
+    5
+   / \
+  1   4
+     / \
+    3   6
+输出: false
+解释: 输入为: [5,1,4,null,null,3,6]。
+     根节点的值为 5，但是其右子节点值为 4。
+*/
+bool isValidBst(BstNode* root, long long pre) {
+    if (!root) return true;
+    
+    if (!isValidBst(root->left, pre)) return false;
+    if (root->val <= pre) return false;
+
+    pre = root->val;
+    return isValidBst(root->right, pre);
+}
+void tst_isValidBst() {
+    // CreateBstTree();
+
+    // std::vector<BstNode *> retVec;
+    // extractNodeInorder(g_pBstTree, retVec);
+    // retVec[retVec.size() - 1 ]->val = 2;
+
+    printInorder(g_pBstTree);
+    std::cout << std::endl;
+    
+    long long pre = LONG_MIN;
+    // pre = 0;
+    std::cout << "pre=" << pre << std::endl;
+
+    std::cout << "valid res=" << isValidBst(g_pBstTree, pre) << std::endl;
+    std::cout << std::endl;
+
+    std::cout << "isBalanced=" << isBalanced(g_pBstTree) << std::endl;
+    std::cout << std::endl;
+}
+
+
+
+/*
+    二叉树的镜像
+    请完成一个函数，输入一个二叉树，该函数输出它的镜像。
+例如: 输入
+     4
+   /   \
+  2     7
+ / \   / \
+1   3 6   9
+镜像输出：
+     4
+   /   \
+  7     2
+ / \   / \
+9   6 3   1
+
+示例 1：
+输入：root = [4,2,7,1,3,6,9]
+输出：       [4,7,2,9,6,3,1]
+
+时间复杂度 O(N)： 其中 N 为二叉树的节点数量，建立二叉树镜像需要遍历树的所有节点，占用 O(N) 时间。
+空间复杂度 O(N)： 最差情况下（当二叉树退化为链表），递归时系统需使用 O(N) 大小的栈空间。
+*/
+class CMirrorBst {
+    void swapNode(BstNode* node) {
+        if ( !node || (!node->left && !node->right) ) return ;
+        BstNode* temp = node->left;
+        node->left = node->right;
+        node->right = temp;
+    }
+public:
+
+    BstNode* mirrorTree(BstNode* root) {
+        {
+            if ( !root )  return nullptr;
+            auto tmp = root->left;
+            root->left  = mirrorTree(root->right);
+            root->right = mirrorTree(tmp);
+            return root;
+        }
+
+{
+        if ( !root || (!root->left && !root->right) ) return nullptr;
+        swapNode(root);
+        mirrorTree(root->left);
+        mirrorTree(root->right);
+        return root;
+}
+    }
+    void Test_mirrorTree() {
+        std::vector<int> vecData{4, 2, 7, 1, 3, 6, 9};
+        CreateBstTree(vecData);
+        // CreateBstTree();
+
+std::cout << "before mirror ..." << std::endl;
+        printInorder(g_pBstTree);
+        std::cout << std::endl;
+
+std::cout << "after mirror ..." << std::endl;
+auto mirror = mirrorTree(g_pBstTree);
+        printInorder(mirror);
+        std::cout << std::endl;
+    }
+};
+void tst_mirrorTree() {
+    CMirrorBst cm;
+    cm.Test_mirrorTree();
+}
+
+
+void lc_Entry() {
+    
+        tst_lengthOfLongestSubstringEx(); return;
+
+    tst_addTwoNumber(); return;
+    
+    tst_mirrorTree(); return;
+
+    
+
+    tst_isValidBst(); return;
+
+    tst_buildTree(); return;
+    tst_reverseAndCount(); return;
+
+
+    tst_topKFrequent(); return;
+
+    tst_KthBig(); return;
+
+    tst_addStrings(); return;
+
 
     tst_unorder_set(); return;
 
@@ -4741,13 +5126,7 @@ void lc_Entry() {
 
     tst_IsValidString(); return;
 
-
-
     tst_maxArea(); return;
-
-
-
-    tst_KthBig(); return;
 
     {
 //        int myints[]={10,20,30,40,50,60,70};
@@ -4797,7 +5176,7 @@ void lc_Entry() {
 
     Test_sumOfLeftLeaves(); return;
 
-    Test_binaryTreePaths(); return;
+    tst_binaryTreePaths(); return;
 
     Test_getNodesNum(); return;
 
@@ -4954,9 +5333,6 @@ void lc_Entry() {
     std::cout << "ret=" << ret << std::endl;
     return ;
 
-    CBuildBstByPreInorder buildBst;
-    buildBst.WorkEntry();
-    return;
 
 
     tst_1_lc();

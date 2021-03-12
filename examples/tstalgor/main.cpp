@@ -1259,78 +1259,6 @@ void call_rever_KthNode() {
     DestroyList(pNode1);
 }
 
-ListNode* IsCycle(ListNode *pHead) {
-//    if (nullptr == pHead || nullptr == pHead->next)
-//        return nullptr;
-
-//    std::set<ListNode*> setNodes;
-//    ListNode* pnode = pHead;
-//    while (pnode) {
-//        int iPos = setNodes.insert(pnode).second;
-//        if ( iPos ) {
-//            pnode = pnode->next;
-//            std::cout << "" << iPos << " insert success! nodeval=" << pnode->val << std::endl;
-//        }
-//        else {
-//            std::cout << "" << iPos << " insert duplicate! nodeval=" << pnode->val << std::endl;
-//            return pnode;
-//        }
-//    }
-//    return NULL;
-
-    if (!pHead)
-        return nullptr;
-
-    ListNode* pFast = pHead;
-    ListNode* pSlow = pHead;
-
-    while (pFast && pFast->next) {
-
-        pSlow = pSlow->next;
-
-        if (pFast->next)
-            pFast = pFast->next->next;
-
-        if (pSlow == pFast)
-            return pFast;
-    }
-    return nullptr;
-
-    while (pFast && pFast->next) {
-        pFast = pFast->next->next;
-        pSlow = pSlow->next;
-        if (pFast == pSlow) {
-            return pFast;
-        }
-    }
-    return NULL;
-}
-
-void check_cyclelist() {
-    ListNode* pNode1 = CreateListNode(1);
-    ListNode* pNode2 = CreateListNode(2);
-    ListNode* pNode3 = CreateListNode(3);
-    ListNode* pNode4 = CreateListNode(4);
-    ListNode* pNode5 = CreateListNode(5);
-    ListNode* pNode6 = CreateListNode(6);
-    ListNode* pNode7 = CreateListNode(7);
-
-    ConnectListNodes(pNode1, pNode2);
-    ConnectListNodes(pNode2, pNode3);
-    ConnectListNodes(pNode3, pNode4);
-    ConnectListNodes(pNode4, pNode5);
-    ConnectListNodes(pNode5, pNode6);
-    ConnectListNodes(pNode6, pNode7);
-    ConnectListNodes(pNode7, pNode4);
-
-    ListNode* pNode = IsCycle(pNode1);
-    if (!pNode) {
-        std::cout << "pNode is null" << std::endl;
-    } else {
-        std::cout << "val=" << pNode->val << std::endl;
-    }
-}
-
 //
 int Max_array_Sum(int* arr, int length) {
     int max = arr[0];
@@ -2162,6 +2090,29 @@ void printInorder(BstNode* root) {
  * @return
  */
 std::vector< std::vector<int> > levelOrder_new(BstNode* root) {
+    {
+        std::vector< std::vector<int> > res;
+
+        std::vector< BstNode* > vecNodes;
+        vecNodes.push_back( root );
+
+        while ( !vecNodes.empty() ) {
+            std::vector<int> vline;
+            std::vector<BstNode*> nextLine;
+
+            for ( auto node : vecNodes ) {
+                vline.push_back(node->val);
+
+                if ( node->left ) nextLine.push_back( node->left );
+                if ( node->right )nextLine.push_back( node->right );
+            }
+
+            vecNodes = nextLine;
+            res.push_back(vline);
+        }
+        return res;
+    }
+
     std::vector< std::vector<int> > result;
     if (!root) return result;
 
@@ -2234,9 +2185,6 @@ void Test_zhiZiPrintBstTree() {
 
 
 void tst_my_bst_tree() {
-    {
-    }
-    // return ;
 
     auto ret = levelOrder_new(g_pBstTree);
     for (std::vector< std::vector<int> >::iterator itLine = ret.begin(); itLine != ret.end(); itLine ++) {
@@ -3167,55 +3115,7 @@ void removeNthFromEnd(int k) {
     PrintList(head);
 }
 
-// 将两个有序的链表合并为一个新链表，要求新的链表是通过拼接两个链表的节点来生成的。
-ListNode* mergeTwoList(ListNode* l1, ListNode* l2) {
-//<<<<<<< HEAD
-//    if (!l1) return l2;
-//    if (!l2) return l1;
-//    ListNode* h;
-//    if (l1->m_nValue <= l2->m_nValue) {
-//        h = l1;
-//        l1->next_ = mergeTwoList(l1->next_, l2);
-//    } else {
-//        h = l2;
-//        l2->next_ = mergeTwoList(l1, l2->next_);
-//=======
-    if (l1 == nullptr && l2) { return l2;}
-    if (l2 == nullptr && l1) { return l1;}
-    if (l2 == nullptr && l1 == nullptr) { return nullptr;}
 
-    ListNode* newHead = nullptr;
-    if (l1->val < l2->val) {
-        newHead = l1;
-        newHead->next = mergeTwoList(l1->next, l2);
-    } else {
-        newHead = l2;
-        newHead->next = mergeTwoList(l1, l2->next);
-//>>>>>>> b76a882d3a34dee237d198232f59bc789372a704
-    }
-    return newHead;
-}
-void Test_mergeTwoList() {
-    std::vector <int> vecInts1{ 10, 97, 113, 269, 398, 10000};
-    auto list_1 = ConstructList(vecInts1);
-
-//    LOG_INFO << "print list node 111";
-//    PrintList(list_1);
-//    LOG_INFO << "print list node 222";
-
-    std::vector <int> vecInts2{ 2000, 9700, 21000, 21999, 32000};
-    auto list_2 = ConstructList(vecInts2);
-
-//    LOG_INFO << "print list node 111";
-//    PrintList(list_1);
-//    LOG_INFO << "print list node 222";
-
-    auto listNew = mergeTwoList(list_1, list_2);
-
-    LOG_INFO << "print list node before -------------------";
-    PrintList(listNew);
-    LOG_INFO << "print list node after  -------------------";
-}
 void tst1() {
 //    std::vector<int> vecArr{ 10,-3,0,5,9};
 //    TreeNode* root = sortedArrayToBst(vecArr);
@@ -3414,18 +3314,25 @@ public:
         stack1.push(val);
     }
     int pop() {
-        if (stack1.empty()) return -1;
 
-        while (!stack1.empty()) {
-            stack2.push(stack1.top());
-            stack1.pop();
-        }
-        int res = stack2.top();
-        while (!stack2.empty()) {
-            stack1.push(stack2.top());
+
+        {
+            if ( stack1.empty() ) return -1;
+
+            while ( !stack1.empty() ) {
+                stack2.push( stack1.top() );
+                stack1.pop();
+            }
+
+            auto ret = stack2.top();
             stack2.pop();
+
+            while ( !stack2.empty() ) {
+                stack1.push( stack2.top() );
+                stack2.pop();
+            }
+            return ret;
         }
-        return res;
     }
 
 private:
@@ -3753,8 +3660,6 @@ BstNode* mirrorTree(BstNode* root) {
     }
     return nullptr;
 }
-void Test_mirrorTree() {
-}
 
 
 
@@ -4065,64 +3970,6 @@ public:
 };
 
 
-/*
-验证二叉搜索树
-给定一个二叉树，判断其是否是一个有效的二叉搜索树。
-
-假设一个二叉搜索树具有如下特征：
-节点的左子树只包含小于当前节点的数。
-节点的右子树只包含大于当前节点的数。
-所有左子树和右子树自身必须也是二叉搜索树。
-
-示例 1:
-输入:
-    2
-   / \
-  1   3
-输出: true
-
-示例 2:
-输入:
-    5
-   / \
-  1   4
-     / \
-    3   6
-输出: false
-解释: 输入为: [5,1,4,null,null,3,6]。
-     根节点的值为 5，但是其右子节点值为 4。
-*/
-bool isValidBst(BstNode* root, long long pre) {
-    if (!root) return true;
-    
-    if (!isValidBst(root->left, pre)) return false;
-    if (root->val <= pre) return false;
-
-    pre = root->val;
-    return isValidBst(root->right, pre);
-}
-void Test_isValidBst() {
-    CreateBstTree();
-
-    // std::vector<BstNode *> retVec;
-    // extractNodeInorder(g_pBstTree, retVec);
-    // retVec[retVec.size() - 1 ]->val = 2;
-
-    printInorder(g_pBstTree);
-    std::cout << std::endl;
-    
-    long long pre = LONG_MIN;
-    pre = 0;
-    std::cout << "pre=" << pre << std::endl;
-
-    std::cout << "valid res=" << isValidBst(g_pBstTree, pre) << std::endl;
-    std::cout << std::endl;
-
-    std::cout << "isBalanced=" << isBalanced(g_pBstTree) << std::endl;
-    std::cout << std::endl;
-
-}
-
 
 
 /*
@@ -4204,57 +4051,6 @@ TreeNode* buildTree(vector<int>& preorder, vector<int>& inorder) {
     return nullptr;
 }
 
-
-/*
-    二叉树的镜像
-    请完成一个函数，输入一个二叉树，该函数输出它的镜像。
-例如: 输入
-     4
-   /   \
-  2     7
- / \   / \
-1   3 6   9
-镜像输出：
-     4
-   /   \
-  7     2
- / \   / \
-9   6 3   1
-
-示例 1：
-输入：root = [4,2,7,1,3,6,9]
-输出：       [4,7,2,9,6,3,1]
-*/
-class CMirrorBst {
-    void swapNode(BstNode* node) {
-        if ( !node || (!node->left && !node->right) ) return ;
-        BstNode* temp = node->left;
-        node->left = node->right;
-        node->right = temp;
-    }
-public:
-    BstNode* mirrorTree(BstNode* root) {
-        if ( !root || (!root->left && !root->right) ) return nullptr;
-        swapNode(root);
-        mirrorTree(root->left);
-        mirrorTree(root->right);
-        return root;
-    }
-    void Test_mirrorTree() {
-        std::vector<int> vecData{4, 2, 7, 1, 3, 6, 9};
-        CreateBstTree(vecData);
-        // CreateBstTree();
-    
-std::cout << "before mirror ..." << std::endl;
-        printInorder(g_pBstTree);
-        std::cout << std::endl;
-
-std::cout << "after mirror ..." << std::endl;
-auto mirror = mirrorTree(g_pBstTree);
-        printInorder(mirror);
-        std::cout << std::endl;
-    }
-};
 
 /*
     二叉树中的最大路径和
@@ -4402,62 +4198,6 @@ void extractNodeInorder(BstNode *root, std::vector<BstNode *> &retVec)
 //};
 
 
-/*
-验证二叉搜索树
-给定一个二叉树，判断其是否是一个有效的二叉搜索树。
-
-假设一个二叉搜索树具有如下特征：
-节点的左子树只包含小于当前节点的数。
-节点的右子树只包含大于当前节点的数。
-所有左子树和右子树自身必须也是二叉搜索树。
-
-示例 1:
-输入:
-    2
-   / \
-  1   3
-输出: true
-
-示例 2:
-输入:
-    5
-   / \
-  1   4
-     / \
-    3   6
-输出: false
-解释: 输入为: [5,1,4,null,null,3,6]。
-     根节点的值为 5，但是其右子节点值为 4。
-*/
-//bool isValidBst(BstNode* root, long long pre) {
-//    if (!root) return true;
-    
-//    if (!isValidBst(root->left, pre)) return false;
-//    if (root->val <= pre) return false;
-
-//    pre = root->val;
-//    return isValidBst(root->right, pre);
-//}
-//void Test_isValidBst() {
-
-//    // std::vector<BstNode *> retVec;
-//    // extractNodeInorder(g_pBstTree, retVec);
-//    // retVec[retVec.size() - 1 ]->val = 2;
-
-//    PrintInorder(g_pBstTree);
-//    std::cout << std::endl;
-    
-//    long long pre = LONG_MIN;
-//    pre = 0;
-//    std::cout << "pre=" << pre << std::endl;
-//    std::cout << "valid res=" << isValidBst(g_pBstTree, pre) << std::endl;
-//    std::cout << std::endl;
-
-//    std::cout << "isBalanced=" << isBalanced(g_pBstTree) << std::endl;
-//    std::cout << std::endl;
-//}
- 
-
 //bool isBalancedEx(BstNode* root) {
 //    if ( !root ) return true;
 //    int leftDepth = maxDepthEx(root->left);
@@ -4487,60 +4227,6 @@ void extractNodeInorder(BstNode *root, std::vector<BstNode *> &retVec)
 //    std::cout << "is balance=" << isBalanced(g_pBstTree) << std::endl;
 //}
 
-/*
-    二叉树的镜像
-    请完成一个函数，输入一个二叉树，该函数输出它的镜像。
-    例如: 输入
-         4
-       /   \
-      2     7
-     / \   / \
-    1   3 6   9
-    镜像输出：
-         4
-       /   \
-      7     2
-     / \   / \
-    9   6 3   1
-
-    示例 1：
-    输入：root = [4,2,7,1,3,6,9]
-    输出：       [4,7,2,9,6,3,1]
-*/
-
-//class CMirrorBst {
-//    void swapNode(BstNode* node) {
-//        if ( !node || (!node->left && !node->right) ) return ;
-//        BstNode* temp = node->left;
-//        node->left = node->right;
-//        node->right = temp;
-//    }
-//public:
-//    BstNode* mirrorTree(BstNode* root) {
-//        if (!root || (!root->left && !root->right)) return nullptr;
-//        swapNode(root);
-//        mirrorTree(root->left);
-//        mirrorTree(root->right);
-//        return root;
-//    }
-//    void impl_mirrorTree() {
-//        std::vector<int> vecData{4, 2, 7, 1, 3, 6, 9};
-//        CreateBstTree(vecData);
-    
-//        std::cout << "before mirror ..." << std::endl;
-//        PrintInorder(g_pBstTree);
-//        std::cout << std::endl;
-
-//        std::cout << "after mirror ..." << std::endl;
-//        auto mirror = mirrorTree(g_pBstTree);
-//        PrintInorder(mirror);
-//        std::cout << std::endl;
-//    }
-//};
-//void Test_mirrorTree() {
-//    CMirrorBst cm;
-//    cm.impl_mirrorTree();
-//}
 
 /*
     二叉树中的最大路径和
@@ -4680,64 +4366,6 @@ void Test_CKthSmallest() {
     }
 }
 
-/*
-给出两个 非空 的链表用来表示两个非负的整数。
-其中，它们各自的位数是按照 逆序 的方式存储的，并且它们的每个节点只能存储 一位 数字。
-
-如果，我们将这两个数相加起来，则会返回一个新的链表来表示它们的和。
-
-您可以假设除了数字 0 之外，这两个数都不会以 0 开头。
-
-示例：
-输入：(2 -> 4 -> 3) + (5 -> 6 -> 4)
-输出：7 -> 0 -> 8
-原因：342 + 465 = 807
-*/
-class Solution_addTwoNumbers {
-public:
-    ListNode* addTwoNumbers(ListNode* l1, ListNode* l2) {
-        ListNode* head = new ListNode(-1);
-        ListNode* h = head;
-        int  sum   = 0;
-        bool carry = false;
-
-        while (l1 || l2) {
-            sum = 0;
-            if (l1) {
-                sum += l1->val;
-                l1 = l1->next;
-            }
-            if (l2) {
-                sum += l2->val;
-                l2 = l2->next;
-            }
-            if (carry) {
-                sum ++;
-            }
-            h->next = new ListNode(sum % 10);
-            h = h->next;
-            carry = sum > 10 ? true : false;
-        } // end --- while
-        if (carry) {
-            h->next = new ListNode(1);
-        }
-        return head->next;
-    }
-    void Test_addTwoNumber() {
-        std::vector<int> v1{9, 1, 3};
-        std::vector<int> v2{8, 2, 9};
-
-        auto l1 = ConstructList(v1);
-        auto l2 = ConstructList(v2);
-        auto ret = addTwoNumbers(l1, l2);
-        PrintList(ret);
-    }
-};
-void Test_addTwoNumber() {
-    Solution_addTwoNumbers sa;
-    sa.Test_addTwoNumber();
-}
-
 
 /*
     938. 二叉搜索树的范围和
@@ -4814,7 +4442,7 @@ public:
         int idx = 0;
         while (idx == 0) {
             idx = rand() % 10;
-        } 
+        }
         std::cout << "idx=" << idx << std::endl;
         getKthVal(g_pBstTree, idx);
 
@@ -5422,6 +5050,28 @@ void some_derive() {
     std::cout << "size AAAA=" << sizeof(AAAA) << std::endl; // 16 bytes
     std::cout << "size BBBB=" << sizeof(BBBB) << std::endl; // 16 bytes
 }
+    int lower_Bound(vector<int> &nums, int target) {
+        size_t left = 0;
+        size_t right = nums.size();
+
+        while ( left < right ) {
+            size_t mid = left + ((right - left) >> 1);
+
+                std::cout << "000_mid=" << mid << std::endl;
+            if ( nums[ mid ] >= target ) {
+                right = mid;
+                std::cout << "111_mid=" << mid << std::endl;
+            } else {
+                left = mid + 1;
+            }
+        }
+        return left;
+    }
+
+void tst_lower_bound() {
+    std::vector<int> nums{ 1, 2, 3,  3, 3, 3,  3, 3,   4, 4, 5, 8 };
+    std::cout << "lower_bound=" << lower_Bound(nums, 4) << std::endl;
+}
 
 int main(int argc, char *argv[])
 {
@@ -5435,13 +5085,19 @@ int main(int argc, char *argv[])
 //    tst_qs_new(); return 1;
 
     {
-//        simple_multi_derive();
-//        some_derive(); return 1;
+        // tst_lower_bound(); return 1;
+        //        simple_multi_derive();
+        //        some_derive(); return 1;
     }
 
     if ( argc > 1 ) {
 //        std::cout << "argv[ 0 ]=" << argv[ 0 ] << std::endl;
 //        std::cout << "argv[ 1 ]=" << argv[ 1 ] << std::endl;
+
+        // tst_my_bst_tree();
+        // std::cout << "res=" << kthSmallest(g_pBstTree, 3) << std::endl;
+        // return 1;
+
 
         if ( strcmp( argv[1], "lc" ) == 0 ) {
             std::cout << "tst leet code ---" << std::endl;
@@ -5488,15 +5144,12 @@ int main(int argc, char *argv[])
     csb.Test_searchBst(); return 1;
 }
     Test_rangeSumBST(); return 1;
-    Test_mirrorTree(); return 1;
     Test_maxDepth(); return 1;
 
-    Test_addTwoNumber(); return 1;
     Test_CKthSmallest(); return 1;
 
 
     // Test_isBalanced(); return 1;
-    Test_isValidBst(); return 1;
 
     CPathSum pathsum; return 1;
 
@@ -5538,15 +5191,9 @@ int main(int argc, char *argv[])
 //    std::cout << "serial ret=" << Serialize(g_pBstTree) << std::endl;
 //    return 1;
 
-    tst_my_bst_tree();
-    std::cout << "res=" << kthSmallest(g_pBstTree, 3) << std::endl;
-    return 1;
-
-    Test_mergeTwoList(); return 1;
 
     removeNthFromEnd(3); return 1;
 
-    check_cyclelist(); return 1;
 
 
     tstC11();  return 1;
@@ -5678,8 +5325,6 @@ int main(int argc, char *argv[])
     my_itoa(-32652300); return 1;
 
     MakeX7(); return 1;
-
-    tst_reverse_list_1(); return 1;
 
     tst_hash_fun_entry(); return 1;
 

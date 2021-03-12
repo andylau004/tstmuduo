@@ -10,7 +10,6 @@ using namespace std;
 
 
 
-extern ListNode* mergeTwoList(ListNode* l1, ListNode* l2);
 
 
 
@@ -163,33 +162,6 @@ void tst_RPrintList_fun() {
 
 
 
-//已知两个单链表pHead1 和pHead2 各自有序，把它们合并成一个链表依然有序
-ListNodeEx* MergeTwoList(ListNodeEx* pHead1, ListNodeEx* pHead2) {
-    if (!pHead1) return pHead2;
-    if (!pHead2) return pHead1;
-
-    ListNodeEx* pMerged = NULL;
-    if (pHead1->val < pHead2->val) {
-        pMerged = pHead1;
-        pMerged->next = MergeTwoList(pHead1->next, pHead2);
-    } else {
-        pMerged = pHead2;
-        pMerged = MergeTwoList(pHead1, pHead2->next);
-    }
-    return pMerged;
-}
-void Test_MergeTwoList() {
-    std::vector<int> v1{6, 8, 12};
-    auto l1 = ConstructList(v1);
-    PrintList(l1);
-
-    std::vector<int> v2{13, 88, 137};
-    auto l2 = ConstructList(v2);
-    PrintList(l2);
-
-    std::cout << "merge result -------------------" << std::endl;
-    PrintList( mergeTwoList(l1, l2) );
-}
 
 
 bool HasCircle(ListNodeEx * pHead) {
@@ -461,10 +433,9 @@ ListNode* getKthFromEnd(ListNode* head, int k) {
     {
         ListNode* fast = head, *slow = nullptr;
 
-        while ( k ) {
+        while ( k-- ) {
             if ( !fast ) return nullptr;
             fast = fast->next;
-            k --;
         }
 
         while ( fast ) {
@@ -591,8 +562,8 @@ bool hasCycle(ListNode *head) {
     }
     return false;
 }
-void Test_hasCycle() {
-    hasCycle(nullptr);
+void tst_hasCycle() {
+    hasCycle(g_pListHead);
 }
 
 /*
@@ -642,10 +613,6 @@ ListNode* detectCycle(ListNode* head) {
     }
     return nullptr;
 }
-void tst_detectCycle() {
-    
-}
-
 
 /*
     面试题 02.06. 回文链表
@@ -842,7 +809,7 @@ ListNode* sortList(ListNode* head) {
     输入: 1->2->3->4->5->NULL
     输出: 5->4->3->2->1->NULL
 
-    好理解的双指针
+好理解的双指针
     定义两个指针： pre 和 cur；pre 在前 cur 在后。
     每次让 pre 的 next 指向 cur ，实现一次局部反转
     局部反转完成之后， pre 和 cur 同时往前移动一个位置
@@ -1138,7 +1105,8 @@ public:
 
 /*
     53. 最大子序和
-    给定一个整数数组 nums ，找到一个具有最大和的连续子数组（子数组最少包含一个元素），返回其最大和。
+    给定一个整数数组 nums ，找到一个具有最大和的连续子数组（子数组最少包含一个元素），
+    返回其最大和。
 
     示例:
     输入: [-2,1,-3,4,-1,2,1,-5,4]
@@ -1148,21 +1116,27 @@ public:
 */
 int maxSubArray(vector<int>& nums) {
     {
-        int maxSum = nums[ 0 ], res = maxSum;
-        for ( int i = 1; i < nums.size(); i ++ ) {
-            maxSum = std::max( maxSum + nums[ i ], nums[ i ]);
-            res = std::max( maxSum, res );
+        int cur = 0;
+        int max = INT_MIN;
+        for ( int i = 0 ; i < nums.size(); i ++ ) {
+            cur += nums[ i ];
+            max = std::max(cur, max);
+            if (cur < 0) {
+                cur = 0;
+            }
         }
-        return res;
+        return max;
     }
-
-    int dp = 0, res = 0;
-    for (int i = 0; i < nums.size(); i++)
     {
-        dp = std::max(dp + nums[i], nums[i]);
-        res = std::max(dp, res);
+            int cur = 0;
+            int max = INT_MIN;
+            for (int i = 0; i < nums.size(); ++i) {
+                cur += nums[i];
+                max = std::max(max, cur);
+                cur = cur < 0 ? 0 : cur;
+            }
+            return max;
     }
-    return res;
 }
 void tst_maxSubArray() {
      std::vector<int> v1{ 4,-1,2,1 };
@@ -1218,22 +1192,6 @@ public:
         return pre;
     }
 
-    void mergeList(ListNode* l1, ListNode* l2) {
-        ListNode* l1_tmp;
-        ListNode* l2_tmp;
-
-        while (l1 && l2) {
-            l1_tmp = l1->next;
-            l2_tmp = l2->next;
-
-            l1->next = l2;
-            l1 = l1_tmp;
-
-            l2->next = l1;
-            l2 = l2_tmp;
-        }
-    }
-
     void reorderList(ListNode* head) {
 
         // 1、找到链表的中间位置，分成左右2个链表
@@ -1247,9 +1205,6 @@ public:
         l2->next = nullptr;
 
         l2 = reverseList(l2);
-
-        // 3、处理143题的逻辑，重排链表
-        mergeList(l1, l2);
     }
 
 };
@@ -1467,7 +1422,6 @@ int findRepeatNumber(vector<int>& nums) {
     return -1;
 }
 void tst_findRepeatNumber() {
-
     std::vector<int> v2 { 2, 0, 3, 3, 4 };
 
     auto ret = findRepeatNumber(v2);
@@ -2140,7 +2094,6 @@ public:
     std::vector<int> quickSort(std::vector<int>& arr, int k, int l, int r) {
 
         {
-
             std::vector<int> res;
             int i = l;
             int j = r;
@@ -2152,6 +2105,11 @@ public:
                 while ( i < j && arr[ i ] <= pivot ) i ++;
                 if ( i < j )  arr[ j-- ] = arr[ i ];
             }
+            arr[ i ] = pivot;
+            if ( i > k ) return quickSort( arr, k, l, i - 1 );
+            if ( i < k ) return quickSort( arr, k, i + 1, r );
+            res.assign(arr.begin(), arr.begin() + k);
+            return res;
         }
 
         int i = l, j = r;
@@ -2181,13 +2139,134 @@ void tst_getLeastNumbers() {
     std::vector<int> arr{ 4, 5, 6, 7, 8, -1, 77, 133, 89, 61 };
 
     CLeastNumbser cln;
-    auto res = cln.getLeastNumbers(arr, 3);
+    auto res = cln.getLeastNumbers(arr, 5);
     PrintInContainer(res);
 }
+
+/*
+    25. K 个一组翻转链表
+    给你一个链表，每 k 个节点一组进行翻转，请你返回翻转后的链表。
+    k 是一个正整数，它的值小于或等于链表的长度。
+
+    如果节点总数不是 k 的整数倍，那么请将最后剩余的节点保持原有顺序。
+
+    进阶：
+    你可以设计一个只使用常数额外空间的算法来解决此问题吗？
+    你不能只是单纯的改变节点内部的值，而是需要实际进行节点交换。
+
+    示例 1：
+    输入：head = [1,2,3,4,5], k = 2
+    输出：[2,1,4,3,5]
+
+    示例 2：
+    输入：head = [1,2,3,4,5], k = 3
+    输出：[3,2,1,4,5]
+
+    示例 3：
+    输入：head = [1,2,3,4,5], k = 1
+    输出：[1,2,3,4,5]
+
+    示例 4：
+    输入：head = [1], k = 1
+    输出：[1]
+
+*/
+ListNode* reverseKGroup(ListNode* head, int k) {
+
+    return nullptr;
+}
+void tst_reverseKGroup() {
+    g_pListHead;
+}
+
+// 将两个有序的链表合并为一个新链表，要求新的链表是通过拼接两个链表的节点来生成的。
+ListNode* mergeTwoLists(ListNode* l1, ListNode* l2) {
+    {
+        if ( !l1 && l2 ) return l2;
+        if ( !l2 && l1 ) return l1;
+        if ( !l1 && !l2 ) return nullptr;
+
+        ListNode *newHead = nullptr;
+        if ( l1->val < l2->val ) {
+            newHead = l1;
+            newHead->next = mergeTwoLists(l1->next, l2);
+        } else {
+            newHead = l2;
+            newHead->next = mergeTwoLists(l1, l2->next);
+        }
+        return newHead;
+    }
+
+    if (l1 == nullptr && l2) { return l2;}
+    if (l2 == nullptr && l1) { return l1;}
+    if (l2 == nullptr && l1 == nullptr) { return nullptr;}
+
+    ListNode* newHead = nullptr;
+    if (l1->val < l2->val) {
+        newHead = l1;
+        newHead->next = mergeTwoLists(l1->next, l2);
+    } else {
+        newHead = l2;
+        newHead->next = mergeTwoLists(l1, l2->next);
+    }
+    return newHead;
+}
+void tst_mergeTwoList() {
+    std::vector <int> vecInts1{ 10, 97, 113, 269, 398, 10000};
+    auto list_1 = ConstructList(vecInts1);
+
+//    LOG_INFO << "print list node 111";
+//    PrintList(list_1);
+//    LOG_INFO << "print list node 222";
+
+    std::vector <int> vecInts2{ 2000, 9700, 21000, 21999, 32000};
+    auto list_2 = ConstructList(vecInts2);
+
+//    LOG_INFO << "print list node 111";
+//    PrintList(list_1);
+//    LOG_INFO << "print list node 222";
+
+    auto listNew = mergeTwoLists(list_1, list_2);
+
+    LOG_INFO << "print list node before -------------------";
+    PrintList(listNew);
+    LOG_INFO << "print list node after  -------------------";
+}
+
+
+/*
+    剑指 Offer 48. 最长不含重复字符的子字符串
+    请从字符串中找出一个最长的不包含重复字符的子字符串，计算该最长子字符串的长度。
+
+    示例 1:
+    输入: "abcabcbb"
+    输出: 3 
+    解释: 因为无重复字符的最长子串是 "abc"，所以其长度为 3。
+
+    示例 2:
+    输入: "bbbbb"
+    输出: 1
+    解释: 因为无重复字符的最长子串是 "b"，所以其长度为 1。
+
+    示例 3:
+    输入: "pwwkew"
+    输出: 3
+    解释: 因为无重复字符的最长子串是 "wke"，所以其长度为 3。
+        请注意，你的答案必须是 子串 的长度，"pwke" 是一个子序列，不是子串。
+
+*/
 
 
 
 int Test_ListEntry() {
+
+    tst_mergeTwoList(); return 1;
+
+    tst_maxSubArray(); return 1;
+
+    tst_reverseKGroup(); return 1;
+
+    tst_reorderList(); return 1;
 
     tst_getLeastNumbers(); return 1;
 
@@ -2195,14 +2274,12 @@ int Test_ListEntry() {
 
     tst_twoSum(); return 1;
 
-    tst_maxSubArray(); return 1;
 
 
     tst_rotateRight(); return 1;
 
     tst_reversePrint(); return 1;
 
-    tst_detectCycle(); return 1;
 
     tst_mergeKLists(); return 1;
 
@@ -2233,7 +2310,6 @@ int Test_ListEntry() {
     tst_findRepeatNumber(); return 1;
 
 
-    tst_reorderList(); return 1;
 
 
     Test_moveZeroes(); return 1;
@@ -2250,7 +2326,6 @@ int Test_ListEntry() {
 
     Test_isPalindrome(); return 1;
 
-    Test_MergeTwoList(); return 1;
 
     insert_sort_1(); return 1;
 
