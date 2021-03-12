@@ -80,7 +80,7 @@
 #include "bst.h"
 #include "List.h"
 #include "tstdp.h"
-#include "leetcode.h"
+#include "lc.h"
 
 
 

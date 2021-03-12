@@ -11,9 +11,8 @@
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
 #include <boost/scoped_ptr.hpp>
-//#include <Windows.h>
 
-#include "leetcode.h"
+#include "lc.h"
 
 #include "boost_use_1.h"
 

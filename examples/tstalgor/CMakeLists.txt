@@ -18,7 +18,7 @@ set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -gdwarf-2 -Wno-deprecated -ffunction-se
 
 
 add_executable(${PROJECT_NAME}
-    leetcode.h leetcode.cpp
+    lc.h lc.cpp
     tstdp.h tstdp.cpp
     List.h List.cpp
     bst.h bst.cpp
