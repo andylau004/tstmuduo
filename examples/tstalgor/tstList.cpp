@@ -1085,18 +1085,33 @@ class MinStack {
 public:
     MinStack() {
     }
-    
-    // void push(int x) {
-    // }
-    
-    // void pop() {
-    // }
-    
-    // int top() {
-    // }
-    
-    // int min() {
-    // }
+public:
+    std::stack<int> data, help;
+    void push(int x) {
+        data.push(x);
+        if ( help.empty() || x < help.top() ) {
+            help.push(x);// 如果x是data和help的第一个元素，或者x小于等于help的最小元素，入栈
+        }
+        if ( x > help.top() ) {
+            // 如果x大于help的最小元素，向help中再压入一遍该最小元素，保持两个栈元素个数相等
+            // 比如data里现在有3，help里现在也有3，data里压入一个4，那么help里压入一个3
+            // 这样如果把data的4弹出，我们同步把help的3也弹出
+            auto tmp = help.top();
+            help.push(tmp);
+        }
+    }
+    void pop() {
+        if ( !data.empty() && !help.empty() ) {
+            data.pop();
+            help.pop();
+        }
+    }
+    int top() {
+        return data.top();
+    }
+    int min() {
+        return help.top();
+    }
 };
 
 
@@ -1686,28 +1701,25 @@ double findMedianSortedArrays(vector<int>& nums1, vector<int>& nums2) {
     输入：head = [1,2], n = 1
     输出：[1]
 */
-ListNode* removeNthFromEnd(ListNode* head, int n) {
-    if ( !head ) return nullptr;
-
-    ListNode* fast = head;
-    ListNode* slow = head;
-
-    for ( int i = 0; fast && i < n + 1; i ++ ) {
-        fast = fast->next;
+ListNode* removeNthFromEnd(ListNode* head, int k) {
+    {
+        auto n = k;
+        ListNode *dummyhead = new ListNode(-10234);
+        dummyhead->next = head;
+        ListNode* slow = dummyhead;
+        ListNode* fast = dummyhead;
+        while(n--)
+        {
+            fast = fast->next;
+        }
+        while(fast->next)
+        {
+            slow = slow->next;
+            fast = fast->next;
+        }
+        slow->next = slow->next->next;
+        return dummyhead->next;
     }
-    std::cout << "111 fast=" << fast->val << std::endl;
-
-    while ( fast ) {
-        fast = fast->next;
-        slow = slow->next;
-    }
-
-    if (fast)
-        std::cout << "222 fast=" << fast->val << std::endl;
-    std::cout << "slow=" << slow->val << std::endl;
-
-    slow->next = slow->next->next;
-    return head;
 }
 void tst_removeNthFromEnd() {
 
@@ -2258,6 +2270,148 @@ void tst_mergeTwoList() {
 
 
 
+/*
+这里的方法不需要记录已经走过的路径，所以执行用时和内存消耗都相对较小
+
+首先设定上下左右边界
+其次向右移动到最右，此时第一行因为已经使用过了，可以将其从图中删去，体现在代码中就是重新定义上边界
+判断若重新定义后，上下边界交错，表明螺旋矩阵遍历结束，跳出循环，返回答案
+若上下边界不交错，则遍历还未结束，接着向下向左向上移动，操作过程与第一，二步同理
+不断循环以上步骤，直到某两条边界交错，跳出循环，返回答案
+*/
+    vector<int> spiralOrder(vector<vector<int>>& matrix) {
+        vector <int> ans;
+        if(matrix.empty()) return ans; //若数组为空，直接返回答案
+        int u = 0; //赋值上下左右边界
+        int d = matrix.size() - 1;
+        int l = 0;
+        int r = matrix[0].size() - 1;
+        while(true)
+        {
+            for(int i = l; i <= r; ++i) ans.push_back(matrix[u][i]); //向右移动直到最右
+            if(++ u > d) break; //重新设定上边界，若上边界大于下边界，则遍历遍历完成，下同
+            for(int i = u; i <= d; ++i) ans.push_back(matrix[i][r]); //向下
+            if(-- r < l) break; //重新设定有边界
+            for(int i = r; i >= l; --i) ans.push_back(matrix[d][i]); //向左
+            if(-- d < u) break; //重新设定下边界
+            for(int i = d; i >= u; --i) ans.push_back(matrix[i][l]); //向上
+            if(++ l > r) break; //重新设定左边界
+        }
+        return ans;
+    }
+
+
+/*
+674. 最长连续递增序列
+给定一个未经排序的整数数组，找到最长且 连续递增的子序列，并返回该序列的长度。
+
+连续递增的子序列 可以由两个下标 l 和 r（l < r）确定，如果对于每个 l <= i < r，都有 nums[i] < nums[i + 1] ，那么子序列 [nums[l], nums[l + 1], ..., nums[r - 1], nums[r]] 就是连续递增子序列。
+
+ 
+
+示例 1：
+
+输入：nums = [1,3,5,4,7]
+输出：3
+解释：最长连续递增序列是 [1,3,5], 长度为3。
+尽管 [1,3,5,7] 也是升序的子序列, 但它不是连续的，因为 5 和 7 在原数组里被 4 隔开。 
+示例 2：
+
+输入：nums = [2,2,2,2,2]
+输出：1
+解释：最长连续递增序列是 [2], 长度为1。
+*/
+int findLengthOfLCIS(vector<int>& nums) {
+    int ans = 0;
+    int start = 0;
+
+    for (size_t i = 0; i < nums.size(); i++)
+    {
+        if ( i > 0 && nums[ i ] < nums[ i - 1 ] ) {
+            start = i;
+        }
+
+        ans = std::max(ans, i - start + 1);
+    }
+        return ans;
+}
+
+
+/*
+    15. 三数之和
+    给你一个包含 n 个整数的数组 nums，判断 nums 中是否存在三个元素 a，b，c ，
+    使得 a + b + c = 0 ？请你找出所有和为 0 且不重复的三元组。
+    注意：答案中不可以包含重复的三元组。
+
+    示例 1：
+    输入：nums = [-1,0,1,2,-1,-4]
+    输出：[[-1,-1,2],[-1,0,1]]
+
+    示例 2：
+    输入：nums = []
+    输出：[]
+
+    示例 3：
+    输入：nums = [0]
+    输出：[]
+
+*/
+vector<vector<int>> threeSum(vector<int>& nums) {
+    vector<vector<int>> ans;
+
+    int left = 0;
+    int right = nums.size();
+
+    std::sort( nums.begin(), nums.end() );
+    
+    for (int i = 0; i < nums.size(); i++) {
+        if ( nums[ i ] > 0 ) return ans;
+
+        int left = i + 1;
+        int right = nums.size() - 1;
+
+        while ( left < right ) {
+
+            auto sum = (nums[i] + nums[left] + nums[right]);
+            if ( sum > 0) {
+                right--;
+            }
+            else if ( sum < 0 ) {
+                left++;
+            } else {
+                ans.push_back(std::vector<int>{nums[i], nums[left], nums[right]});
+
+                while ( right > left && nums[ right ] == nums[right - 1] )
+                    right--;
+                while ( right > left && nums[ left ] == nums[left + 1] )
+                    left ++;
+                
+                right--;
+                left++;
+            }
+        }
+    }// for --- end ---
+
+    return ans;
+}
+
+
+/*
+    剑指 Offer 38. 字符串的排列
+    输入一个字符串，打印出该字符串中字符的所有排列。
+    你可以以任意顺序返回这个字符串数组，但里面不能有重复元素。
+
+    示例:
+    输入：s = "abc"
+    输出：["abc","acb","bac","bca","cab","cba"]
+*/
+
+vector<string> Permutation(string str) {
+    vector<string> ans;
+
+    return ans;
+}
+
 int Test_ListEntry() {
 
     tst_mergeTwoList(); return 1;
@@ -2274,12 +2428,9 @@ int Test_ListEntry() {
 
     tst_twoSum(); return 1;
 
-
-
     tst_rotateRight(); return 1;
 
     tst_reversePrint(); return 1;
-
 
     tst_mergeKLists(); return 1;
 
@@ -2308,9 +2459,6 @@ int Test_ListEntry() {
     Test_removeEle(); return 1;
 
     tst_findRepeatNumber(); return 1;
-
-
-
 
     Test_moveZeroes(); return 1;
     

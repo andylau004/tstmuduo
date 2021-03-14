@@ -3072,49 +3072,6 @@ void tstC11() {
 }
 
 
-// 删除链表中反向第K个节点，时间复杂度O(n)
-void removeNthFromEnd(int k) {
-    std::vector <int> vecInts{ 10, 97, 21, 16, 2, 0};
-
-    auto head = ConstructList(vecInts);
-
-    LOG_INFO << "print list node 111";
-    PrintList(head);
-    LOG_INFO << "print list node 222";
-
-    ListNode* p1 = head;
-    ListNode* p2 = head;
-
-    for ( int i = 0; i < k; i ++ ) {
-//<<<<<<< HEAD
-//        p1 = p1->next_;
-//    }
-//    if (p1 == nullptr) {
-//        head = head->next_;
-//        return;
-//    }
-//    while (p1->next_) {
-//        p1 = p1->next_;
-//        p2 = p2->next_;
-//    }
-//    p2->next_ = p2->next_->next_;
-//=======
-        p1 = p1->next;
-    }
-    if (p1 == nullptr) {
-        head = head->next;
-        return;
-    }
-    while (p1->next) {
-        p1 = p1->next;
-        p2 = p2->next;
-    }
-    p2->next = p2->next->next;
-//>>>>>>> b76a882d3a34dee237d198232f59bc789372a704
-
-    PrintList(head);
-}
-
 
 void tst1() {
 //    std::vector<int> vecArr{ 10,-3,0,5,9};
@@ -3182,81 +3139,6 @@ int findKth() {
 
     quick_st_aesc(abc, 0, abc.size() - 1, 4);
     return 1;
-}
-
-/**
-   * @Description: 给定一个链表，删除链表的倒数第k个节点, 并返回链表的头指针
-                例如:
-                给出的链表为:1->2->3->4->5, n=2.
-                删除了链表的倒数第k个节点之后,链表变为1->2->3->5.
-                备注：
-                题目保证n一定是有效的
-                请给出请给出时间复杂度为\ O(n) O(n)的算法
-   * @Param: [arr, k, length]
-   * @return:
-   * @Date: 2020/1/30-21:55
- */
-ListNode* RemoveNthFromEnd(ListNode* head, int k) {
-    if (!head) return nullptr;
-
-    ListNode* fast = head;
-    ListNode* slow = head;
-    ListNode* temp = head;
-
-    for ( int i = 0; i < k; i ++ ) {
-        if (fast) {
-//<<<<<<< HEAD
-//            fast = fast->next_;
-//        }
-//    }
-//    if (fast == nullptr) {
-//        temp = head->next_;
-//=======
-            fast = fast->next;
-        }
-    }
-    if (fast == nullptr) {
-        temp = head->next;
-//>>>>>>> b76a882d3a34dee237d198232f59bc789372a704
-        delete head;
-        return temp;
-    }
-
-//<<<<<<< HEAD
-//    while (fast->next_) {
-//        fast = fast->next_;
-//        slow = slow->next_;
-//    }
-
-//    temp = slow->next_;
-//    slow->next_ = slow->next_->next_;
-//=======
-    while (fast->next) {
-        fast = fast->next;
-        slow = slow->next;
-    }
-
-    temp = slow->next;
-    slow->next = slow->next->next;
-//>>>>>>> b76a882d3a34dee237d198232f59bc789372a704
-    delete temp;
-
-    return head;
-}
-void TestRemoveNthListNode() {
-    std::vector <int> vecInts{ 10, 97, 21, 16, 2, 0};
-
-    auto head = ConstructList(vecInts);
-
-    LOG_INFO << "before remove list";
-    PrintList(head);
-
-    LOG_INFO << "remove reverse idx=" << 3;
-    auto newhead = RemoveNthFromEnd(head, 3);
-    UNUSED(newhead);
-
-    LOG_INFO << "after remove list";
-    PrintList(head);
 }
 
 // 输入n个整数，找出其中最小的K个数。例如输入4,5,1,6,2,7,3,8这8个数字，则最小的4个数字是1,2,3,4。
@@ -3348,21 +3230,22 @@ void Test_stackToQueue() {
 /*
     给定一棵二叉树以及这棵树上的两个节点 o1 和 o2，请找到 o1 和 o2 的最近公共祖先节点。
     当我们用递归去做这个题时不要被题目误导，应该要明确一点
-    这个函数的功能有三个：给定两个节点 pp 和 qq
+    这个函数的功能有三个：给定两个节点 p 和 q
 
-    如果 pp 和 qq 都存在，则返回它们的公共祖先；
+    如果 p 和 q 都存在，则返回它们的公共祖先；
     如果只存在一个，则返回存在的一个；
-    如果 pp 和 qq 都不存在，则返回NULL
+    如果 p 和 q 都不存在，则返回NULL
 
     思路：
     （1） 如果当前结点 root 等于 NULL，则直接返回 NULL
-    （2） 如果 root 等于 pp 或者 qq ，那这棵树一定返回 pp 或者 qq
+    （2） 如果 root 等于 p 或者 q ，那这棵树一定返回 p 或者 q
     （3） 然后递归左右子树，因为是递归，使用函数后可认为左右子树已经算出结果，用 left 和 right 表示
     （4） 此时若 left 为空，那最终结果只要看 right; 若 right 为空，那最终结果只要看 left
-    （5） 如果 left 和 right 都非空，因为只给了 pp 和 qq 两个结点，都非空，说明一边一个，因此 root 是他们的最近公共祖先
+    （5） 如果 left 和 right 都非空，因为只给了 p 和 q 两个结点，都非空，说明一边一个，因此 root 是他们的最近公共祖先
     （6） 如果 left 和 right 都为空，则返回空（其实已经包含在前面的情况中了）
 
-    时间复杂度是 O(n)：每个结点最多遍历一次或用主定理，空间复杂度是 O(n)：需要系统栈空间
+    时间复杂度是 O(n)：每个结点最多遍历一次或用主定理
+    空间复杂度是 O(n)：需要系统栈空间
 */
 TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q) {
     if (!root || root == p || root == q) return root;
@@ -3372,8 +3255,24 @@ TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q) {
     if (leftNode && rightNode) { return root; }
     return leftNode ? leftNode : rightNode;
 }
+
 // 二叉搜索树 版本，跟二叉树版本实现逻辑不太一样；
 BstNode* lowestCommonAncestor_Bst(BstNode* root, BstNode* p, BstNode* q) {
+
+{
+    auto tmp = root;
+    while ( 1 ) {
+        if ( p->val < tmp->val && q->val < tmp->val ) {
+            tmp = tmp->left;
+        } else if ( p->val > tmp->val && q->val > tmp->val ) {
+            tmp = tmp->right;
+        } else {
+            break;
+        }
+    }
+    return tmp;
+}
+
     if ( root == nullptr ) return nullptr;
 
     if ( p->val > root->val && q->val > root->val ) {
@@ -3386,16 +3285,9 @@ BstNode* lowestCommonAncestor_Bst(BstNode* root, BstNode* p, BstNode* q) {
         return root;
     }
         
-//    if ( (root->val - o1) * ( root->val - o2 ) <= 0 ) {
-//        return root->val;
-//    } else if ( (root->val < o1)  &&  ( root->val < o2 ) ) {
-//        return lowestCommonAncestor_Bst( root->right, o1, o2  );
-//    } else {
-//        return lowestCommonAncestor_Bst( root->left, o1, o2  );
-//    }
 }
 
-void Test_lowestCommonAncestor() {
+void tst_lowestCommonAncestor() {
 }
 
 
@@ -4499,8 +4391,23 @@ void levelOrderPrint(BstNode* root) {
     示例 3：
     输入：intersectVal = 0, listA = [2,6,4], listB = [1,5], skipA = 3, skipB = 2
     输出：null
-    输入解释：从各自的表头开始算起，链表 A 为 [2,6,4]，链表 B 为 [1,5]。由于这两个链表不相交，所以 intersectVal 必须为 0，而 skipA 和 skipB 可以是任意值。
+    输入解释：从各自的表头开始算起，链表 A 为 [2,6,4]，链表 B 为 [1,5]。
+    由于这两个链表不相交，所以 intersectVal 必须为 0，而 skipA 和 skipB 可以是任意值。
     解释：这两个链表不相交，因此返回 null。
+
+    创建两个指针 pA 和 pB，分别初始化为链表 A 和 B 的头结点。然后让它们向后逐结点遍历。
+当 pApA 到达链表的尾部时，将它重定位到链表 B 的头结点 (你没看错，就是链表 B); 
+当 pBpB 到达链表的尾部时，将它重定位到链表 A 的头结点。
+若在某一时刻 pApA 和 pBpB 相遇，则 pApA/pBpB 为相交结点。
+想弄清楚为什么这样可行, 可以考虑以下两个链表: A={1,3,5,7,9,11} 和 B={2,4,9,11}，相交于结点 9。
+由于 B.length (=4) < A.length (=6)，pBpB 比 pApA 少经过 2 个结点，会先到达尾部。
+将 pB 重定向到 A 的头结点，pA 重定向到 B 的头结点后，pB 要比 pA 多走 2 个结点。因此，它们会同时到达交点。
+如果两个链表存在相交，它们末尾的结点必然相同。因此当 pApA/pBpB 到达链表结尾时，记录下链表 A/B 对应的元素。
+若最后元素不相同，则两个链表不相交。
+
+复杂度分析
+时间复杂度 : O(m+n)
+空间复杂度 : O(1)
 */
 ListNode *getIntersectionNode(ListNode *headA, ListNode *headB) {
     if ( headA == nullptr || headA == nullptr ) return nullptr;
@@ -5180,19 +5087,17 @@ int main(int argc, char *argv[])
 
     Test_DetectListCycle(); return 1;
 
-    Test_lowestCommonAncestor(); return 1;
+    tst_lowestCommonAncestor(); return 1;
 
     Test_stackToQueue(); return 1;
 
     Test_GetLeastNumbers(); return 1;
 
-    TestRemoveNthListNode(); return 1;
+    // tst_RemoveNthListNode(); return 1;
 
 //    std::cout << "serial ret=" << Serialize(g_pBstTree) << std::endl;
 //    return 1;
 
-
-    removeNthFromEnd(3); return 1;
 
 
 

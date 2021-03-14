@@ -2870,47 +2870,77 @@ size_t lengthOfLongestSubstringEx(string s) {
     {
         if (s.empty()) return 0;
 
-        int arr[ 256 ] = {0}, start = 0, len = 0;
+        int map[ 128 ] = {0};
+        size_t start = 0, len = 0;
         
         for ( size_t i = 0; i < s.size(); i ++ ) {
-            ++ arr [ s[i] ];
+            ++ map[ s[i] ];
             
-            while ( arr [ s[i] ] > 1 ) {
-
+            while ( map[ s[i] ] > 1 ) {
+                --map[ s[start++] ];
             }
 
+            len = std::max(len, i - start + 1);
         }
-
-
-        return 0;
+        // for ( auto e : map ) {
+        //     std::cout << " " << e;
+        // }
+        std::cout << " " << std::endl;
+        return len;
     }
-    if (s.empty()) return 0;
 
-    size_t left = 0;
-    size_t maxsize = 0;
-    std::unordered_set < char > us;
-
-    for (size_t i = 0; i < s.size(); i ++) {
-
-        while ( us.count( s[i] ) ) { // find 'c' ---> exist in hashmap
-        // while ( us.find( s[i] ) != us.end() ) { // find 'c' ---> exist in hashmap
-
-//            std::cout << "i=" << i << ", s[" << left << "]=" << s[left] << std::endl;
-            us.erase( s[left] );
-            left ++;
-        }
-
-        maxsize = std::max( maxsize, i - left + 1 );
-        us.insert( s[i] );
-//        PrintInContainer(us);
+    {
     }
-    return maxsize;
 }
 void tst_lengthOfLongestSubstringEx() {
     std::string str = "9987711";
     str = "998711";
     std::cout << "lenght_long_substr=" << lengthOfLongestSubstringEx(str) << std::endl;
 }
+
+// 给定一个数组arr，返回arr的最长无重复子串的长度(无重复指的是所有数字都不相同)。
+int maxLength(std::vector<int>& arr) {
+
+    {
+        int ans = -1;
+        int l = 0, r = 0;
+        std::set<int> s;
+
+        while ( r < arr.size() ) {
+            if ( s.count(arr[ r ]) == 0 ) { // found element
+                std::cout << "r=" << r << ", insert=" << arr[r] << std::endl;
+                s.insert( arr[r++] );
+            } else {
+                std::cout << "l=" << l << ", remove=" << arr[l] << std::endl;
+                s.erase( arr[l++] );
+            }
+            ans = ans > arr.size() ? ans: arr.size();
+        }
+        PrintInContainer(s);
+        return ans;
+    }
+
+}
+void tst_maxLength() {
+    std::vector<int> vec{ 1, 3, 4, 5, 77, 77, 88, 90 };
+    std::cout << "max sub string size=" << maxLength(vec) << std::endl;
+//    PrintInContainer(vec);
+}
+    // int maxLength(vector<int>& arr) {
+        
+    //     int l = 0, r = 0, ans = 0;;
+    //     std::set<int> s;
+
+    //     while (r < arr.size()) {
+    //         if ( !s.count(arr[r]) ) {
+    //             s.insert(arr[r++]);
+    //         } else{
+    //             s.erase(arr[l++]);
+    //         }
+    //         ans = ans > s.size() ? ans : s.size();
+    //     }
+    //     return ans;
+    // }
 
 
 /*
@@ -3702,49 +3732,6 @@ void tst_binarySearch() {
 }
 
 
-// 给定一个数组arr，返回arr的最长无重复子串的长度(无重复指的是所有数字都不相同)。
-int maxLength(std::vector<int>& arr) {
-
-    {
-        int res = -1;
-        int l = 0, r = 0;
-        int n = arr.size();
-        std::set<int> s;
-
-        while ( r < n ) {
-            if ( s.count(arr[ r ]) == 0 ) { // found element
-                s.insert( arr[r] );
-                r ++;
-            } else {
-                s.erase(arr[l]);
-                l++;
-            }
-        }
-        PrintInContainer(s);
-        return s.size();
-    }
-    size_t n = arr.size();
-    size_t l = 0, r = 0;
-    std::set<int> s;
-    size_t res = 0;
-
-    while ( r < n ) {
-        if (!s.count(arr[r])) {
-            s.insert(arr[r]);
-            r ++;
-        } else {
-            s.erase(arr[l]);
-            l ++;
-        }
-        res = res > s.size() ? res : s.size();
-    }
-    return res;
-}
-void tst_maxLength() {
-    std::vector<int> vec{ 1, 3, 4, 5, 77, 77, 88, 90 };
-    std::cout << "max sub string size=" << maxLength(vec) << std::endl;
-//    PrintInContainer(vec);
-}
 
 template < class T >
 class CShared_Ptr {
@@ -4413,6 +4400,102 @@ void tst_bst_operator() {
 
     std::cout << " bst count=" << bstNodeCount(g_pBstTree) << std::endl;
 }
+
+
+
+
+/*
+    剑指 Offer 32 - III. 从上到下打印二叉树 III
+    请实现一个函数按照之字形顺序打印二叉树，即第一行按照从左到右的顺序打印，第二层按照从右到左的顺序打印，第三行再按照从左到右的顺序打印，其他行以此类推。
+
+    例如:
+    给定二叉树: [3,9,20,null,null,15,7],
+            3
+           / \
+          9  20
+            /  \
+           15   7
+    返回其层次遍历结果：
+
+    [
+        [3],
+        [20,9],
+        [15,7]
+    ]
+*/
+vector<vector<int>> zhiPrint_levelOrder(BstNode* root) {
+
+
+            vector<vector<int>> allNode;
+            if (root == nullptr) {
+                return allNode;
+            }
+         
+            std::queue< BstNode* >  que;
+            que.push( root );
+
+            int flag  = 1;
+            while (  !que.empty()   ) {
+
+                std::vector<int> level;
+                size_t sz = que.size();
+                for ( size_t i = 0; i < sz; i ++ ) {
+
+                    auto node = que.front(); que.pop();
+                    level.push_back( node->val );
+
+                    if ( node->left ) que.push( node->left );
+                    if ( node->right )que.push( node->right );
+                }
+                
+                if  (     flag % 2 == 0      ) { // 偶数
+                    std::reverse( level.begin(), level.end() );
+                }
+                allNode.push_back( level );
+                flag ++;
+            }
+            return allNode;
+
+}
+
+void tst_bst_level_order() {
+
+    CreateBstTree();
+    {
+        std::cout << std::endl;
+        std::cout << "-------------------------------inOrder beg-------------------------------" << std::endl;
+        inOrderRecru(g_pBstTree);
+        std::cout << std::endl;
+        std::cout << "-------------------------------inOrder end-------------------------------" << std::endl;
+        std::cout << std::endl;
+    }
+
+    {
+        std::cout << "before level print ---" << std::endl;
+        auto ret = levelOrder_1(g_pBstTree);
+        for ( auto itLevel : ret ) {
+            for ( auto itVal : itLevel ) {
+                std::cout << " " << itVal;
+            }
+            std::cout << std::endl;
+        }
+        std::cout << "end    level print ---" << std::endl << std::endl;
+    }
+
+    {
+        std::cout << "before zhi level print ---" << std::endl;
+        auto ret = zhiPrint_levelOrder(g_pBstTree);
+        for ( auto itLevel : ret ) {
+            for ( auto itVal : itLevel ) {
+                std::cout << " " << itVal;
+            }
+            std::cout << std::endl;
+        }
+        std::cout << "end    zhi level print ---" << std::endl << std::endl;
+    }
+
+}
+
 /*
     二叉树第k层的结点个数
 */
@@ -4866,7 +4949,7 @@ void tst_reverseAndCount() {
 
 
 /*
-    LeetCode-2 两数相加
+    LeetCode-2 两数相加/链表求和
     给出两个 非空 的链表用来表示两个非负的整数。
     其中，它们各自的位数是按照 逆序 的方式存储的，并且它们的每个节点只能存储 一位 数字。
 
@@ -4883,6 +4966,27 @@ class Solution_addTwoNumbers {
 public:
     ListNode* addTwoNumbers(ListNode* l1, ListNode* l2) {
         {
+            ListNode* dummy = new ListNode( -1 );
+            auto pre = dummy;
+            int plus = 0;
+
+            while ( l1 || l2 || plus ) {
+                int sum = 0;
+                if ( l1 ) {
+                    sum += l1->val; l1 = l1->next;
+                }
+                if ( l2 ) {
+                    sum += l2->val; l2 = l2->next;
+                }
+                sum += plus;
+
+                pre->next = new ListNode( sum % 10 );
+                pre = pre->next;
+                plus = plus / 10;
+            }
+            return dummy->next;
+        }
+        {
             ListNode* dummy = new ListNode(-1);
             auto pre = dummy;
             int plus = 0;
@@ -4890,14 +4994,11 @@ public:
             while ( l1 || l2 || plus ) {
                 int sum = 0;
                 if ( l1 ) {
-                    sum += l1->val;
-                    l1 = l1->next;
+                    sum += l1->val; l1 = l1->next;
                 }
                 if ( l2 ) {
-                    sum += l2->val;
-                    l2 = l2->next;
+                    sum += l2->val; l2 = l2->next;
                 }
-
                 sum += plus;
 
                 pre->next = new ListNode( sum % 10 );
@@ -5054,13 +5155,28 @@ void tst_mirrorTree() {
 
 
 void lc_Entry() {
-    
+
+    tst_addTwoNumber(); return;
+
+    tst_bst_level_order(); return;
+
+
+    tst_maxLength(); return;
+
     {
-        // std::map 
+        // std::map < int, string > mapInfo;
+        // mapInfo[ 13 ] = "bbc";
+        // mapInfo[ 12 ] = "aaa";
+        // mapInfo[ 11 ] = "ttc";
+        // mapInfo[ 9 ] = "991";
+        
+        // for ( auto el : mapInfo ) {
+        //     std::cout << el.first << " "  << el.second << std::endl;
+        // }
+        // return;
     }
     tst_lengthOfLongestSubstringEx(); return;
 
-    tst_addTwoNumber(); return;
     
     tst_mirrorTree(); return;
 
@@ -5132,7 +5248,6 @@ void lc_Entry() {
 
     tst_findPeakElement(); return;
 
-    tst_maxLength(); return;
 
     tst_binarySearch(); return;
 //    std::cout << "g_sInts=" << g_sInts << std::endl;
