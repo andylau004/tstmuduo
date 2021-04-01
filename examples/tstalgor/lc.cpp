@@ -2753,7 +2753,7 @@ std::vector< std::vector<int> > levelOrderBst(BstNode* root) {
 }
 
 /*
-    LeetCode 题解 | 11. 盛最多水的容器
+    LeetCode 题解 | 11. 盛最多水的容器/容器盛水问题
 
     给你 n 个非负整数 a1，a2，...，an，每个数代表坐标中的一个点 (i, ai) 。
     在坐标内画 n 条垂直线，垂直线 i 的两个端点分别为 (i, ai) 和 (i, 0) 。
@@ -2762,7 +2762,8 @@ std::vector< std::vector<int> > levelOrderBst(BstNode* root) {
     示例 1：
     输入：[1,8,6,2,5,4,8,3,7]
     输出：49
-    解释：图中垂直线代表输入数组 [1,8,6,2,5,4,8,3,7]。在此情况下，容器能够容纳水（表示为蓝色部分）的最大值为 49。
+    解释：图中垂直线代表输入数组 [1,8,6,2,5,4,8,3,7]。
+    在此情况下，容器能够容纳水（表示为蓝色部分）的最大值为 49。
 
     示例 2：
     输入：height = [1,1]
@@ -3461,7 +3462,40 @@ public:
 */
 bool isPalindrome(int x) {
 
-    return false;
+    int a = 0, b = x;
+    while ( b > 0 ) {
+        a = a * 10  + b % 10;
+        b = b / 10;
+        std::cout << " " << a << " ";
+    }
+    std::cout << std::endl;
+    std::cout << "a=" << a << std::endl;
+    return ((a - x) == 0);
+}
+void tst_isPalindrome_int() {
+    std::cout << "ret=" << isPalindrome( 1234321 ) << std::endl;
+    std::cout << "ret=" << isPalindrome( 9981 ) << std::endl;
+}
+
+bool isPalindrome(std::string str) {
+    if ( str.size() == 0 )
+        return false;
+    if ( str.size() == 1 )
+        return true;
+
+    size_t sz = str.size();
+    for (size_t i = 0; i < sz; i++)
+    {
+        if ( str[ i ] != str[ sz - 1 - i ] ) {
+            return false;
+        }
+    }
+    return true;
+}
+void tst_isPalindrome_str() {
+    std::cout << "ret=" << isPalindrome( "1234321" ) << std::endl;
+    std::cout << "ret=" << isPalindrome( "9981" ) << std::endl;
+    std::cout << "ret=" << isPalindrome( "9999" ) << std::endl;
 }
 
 /*
@@ -5153,10 +5187,34 @@ void tst_mirrorTree() {
     cm.Test_mirrorTree();
 }
 
+std::vector<int> rightSideView(TreeNode* root) {
+    std::vector<int> res;
+    if ( !root ) return res;
 
+    std::queue<TreeNode*> que;
+    que.push(root);
+    while ( !que.empty() ) {
+        size_t sz = que.size();
+        for ( int i = 0; i < sz; i ++ ) {
+            auto node = que.front();
+            que.pop();
+            if ( i == sz - 1 ) res.push_back( node->val );
+            if (node->left ) que.push(node->left);
+            if ( node->right )
+                que.push(node->right);
+        }
+    }
+    return res;
+}
 void lc_Entry() {
 
-    tst_addTwoNumber(); return;
+    tst_isPalindrome_str();
+    return;
+    tst_isPalindrome_int();
+    return;
+
+    tst_addTwoNumber();
+    return;
 
     tst_bst_level_order(); return;
 

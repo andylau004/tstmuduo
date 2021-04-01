@@ -1757,25 +1757,18 @@ void tst_removeNthFromEnd() {
 */
 int maxProfit(vector<int>& prices) {
     {
-        int minPrice = 10000000, maxProfit = 0;
-        for ( int price : prices ) {
-            maxProfit = std::max( maxProfit, price - minPrice );
+        int minPrice = 1e9, maxval = 0;
+        for ( auto price : prices ) {
+            maxval = std::max( maxval, price - minPrice );
             minPrice = std::min( minPrice, price );
         }
-        return maxProfit;
+        return maxval;
     }
-    int inf = 1e9;
-    int minprice = inf, maxprofit = 0;
-    for (int price : prices) {
-        maxprofit = max(maxprofit, price - minprice);
-        minprice = min(price, minprice);
-    }
-    return maxprofit;
 }
 void tst_maxProfit() {
 //    std::vector<int> v1{ 7, 1, 5, 3, 6, 4 }; // ret=5
     std::vector<int> v1{ 7,6,4,3,1 }; // ret=0
-    std::cout << "maxProfit=" << maxProfit(v1) << std::endl;
+    std::cout << "res=" << maxProfit(v1) << std::endl;
 }
 
 template < typename T >
@@ -2304,19 +2297,17 @@ void tst_mergeTwoList() {
 /*
 674. 最长连续递增序列
 给定一个未经排序的整数数组，找到最长且 连续递增的子序列，并返回该序列的长度。
-
-连续递增的子序列 可以由两个下标 l 和 r（l < r）确定，如果对于每个 l <= i < r，都有 nums[i] < nums[i + 1] ，那么子序列 [nums[l], nums[l + 1], ..., nums[r - 1], nums[r]] 就是连续递增子序列。
-
- 
+连续递增的子序列 可以由两个下标 l 和 r（l < r）确定，
+如果对于每个 l <= i < r，都有 nums[i] < nums[i + 1] ，
+那么子序列 [nums[l], nums[l + 1], ..., nums[r - 1], nums[r]] 就是连续递增子序列。
 
 示例 1：
-
 输入：nums = [1,3,5,4,7]
 输出：3
 解释：最长连续递增序列是 [1,3,5], 长度为3。
 尽管 [1,3,5,7] 也是升序的子序列, 但它不是连续的，因为 5 和 7 在原数组里被 4 隔开。 
-示例 2：
 
+示例 2：
 输入：nums = [2,2,2,2,2]
 输出：1
 解释：最长连续递增序列是 [2], 长度为1。
@@ -2331,9 +2322,9 @@ int findLengthOfLCIS(vector<int>& nums) {
             start = i;
         }
 
-        ans = std::max(ans, i - start + 1);
+        // ans = std::max(ans, i - start + 1);
     }
-        return ans;
+    return ans;
 }
 
 
@@ -2414,6 +2405,8 @@ vector<string> Permutation(string str) {
 
 int Test_ListEntry() {
 
+    tst_longestCommonPrefix(); return 1;
+
     tst_mergeTwoList(); return 1;
 
     tst_maxSubArray(); return 1;
@@ -2454,7 +2447,6 @@ int Test_ListEntry() {
 
     tst_removeDuplicates(); return 1;
 
-    tst_longestCommonPrefix(); return 1;
 
     Test_removeEle(); return 1;
 
