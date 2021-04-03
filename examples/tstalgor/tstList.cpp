@@ -1562,13 +1562,16 @@ string longestCommonPrefix(vector<string>& strs) {
 }
 void tst_longestCommonPrefix() {
 
-    std::string res = "1234";
-    res = res.substr(0, res.length() - 1);
-    std::cout << "res=" << res << std::endl;
-    std::cout << std::endl;
+    if (string::npos  != 0 )
+        std::cout << "npos=" << string::npos << std::endl;
+
+    // std::string res = "1234";
+    // res = res.substr(0, res.length() - 1);
+    // std::cout << "res=" << res << std::endl;
+    // std::cout << std::endl;
 //    return 1;
 
-    std::vector<string> vec { "dog","racecar","car" };
+    std::vector<string> vec { "doggggg", "dog","racecar","car" };
 //    std::vector<string> vec { "flower","flow","flight" };
     std::cout << "res=" << longestCommonPrefix(vec) << std::endl;
 }
