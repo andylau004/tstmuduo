@@ -25,7 +25,7 @@
 
 #include <iterator>     // ostream_iterator
 #include <algorithm>    // unique，distance
-
+#include <memory>
 
 
 #include "muduo/base/BinaryTree.h"
@@ -67,6 +67,5 @@ extern std::vector< ListNode* > ConstructTestListByParam(int start, int end, int
 extern TreeNode* generateBST(int left, int right, std::vector<int>& vec);
 
 extern void TstList1();
-
 
 

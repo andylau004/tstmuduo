@@ -5217,7 +5217,7 @@ std::vector<int> rightSideView(TreeNode* root) {
     输入: [1, 2, 3, 2, 2, 2, 5, 4, 2]
     输出: 2
 */
-int MoreThanHalfNum_Solution(vector<int> numbers) {
+int MoreThanHalfNum_Solution(vector<int> nums) {
 
         int n=1;
         int result=nums[0];
@@ -5234,18 +5234,157 @@ int MoreThanHalfNum_Solution(vector<int> numbers) {
 
 }
 
+void addroundKey( unsigned char state[4][4], unsigned char key[4][4] ) {
+    int i, j;
+    for (i = 0; i < 4; i++)
+    {
+        for (j = 0; j < 4; j ++ ) {
+            state[i][j] ^= key[i][j];
+        }
+    }
+}
+
+
+void tst_Widget() {
+    // Widget wt;
+
+    {
+        int init_ = 6;
+        int eventVal = 5;
+        int sum = init_ | eventVal;
+        std::cout << "first=" << sum << std::endl;
+
+        auto tmp = ~eventVal;
+        std::cout << "~=" << tmp << std::endl;
+
+        sum &= ~eventVal;
+        std::cout << "second=" << sum << std::endl;
+        return;
+    }
+
+    {
+        struct MyData 
+        {
+            int nLen;
+            char data[0];
+        };
+
+        char str[10] = "123456789";
+        cout << "Size of MyData: " <<sizeof(MyData) << endl;
+        // MyData myddd;
+        // cout << "Size of nLen: " <<sizeof(myddd.nLen) << endl;
+        // cout << "Size of data: " <<sizeof(myddd.data) << endl;
+        // return;
+
+        MyData *myData = (MyData *)malloc(sizeof(MyData) + 10);
+        memcpy(myData->data, str, 10);
+
+        printf_buffer("check data===", str, 10);
+
+        cout << "myData's Data is: " << myData->data << endl;
+        free(myData);
+
+        return;
+    }
+
+const int BUF_SIZE = 100;
+
+struct s_one {
+    int s_one_cout;
+    char *s_one_buf;
+};//16
+struct s_two {
+    int s_two_cout;
+    char s_two_buf[0];
+};//4
+struct s_three {
+    int s_three_cout;
+    char s_three_buf[1];
+};//8
+
+    std::cout<< "sizeof(s_one) = " << sizeof(s_one) << std::endl; //16
+    std::cout<< "sizeof(s_two) = " << sizeof(s_two) << std::endl; //4
+    std::cout<< "sizeof(s_three) = " << sizeof(s_three) << std::endl;//8
+    std::cout<< endl;
+
+    const char* tmp_buf = "abcdefghijklmnopqrstuvwxyz";//赋值用
+    int ntmp_buf_size = strlen(tmp_buf);
+
+    //为buf分配100个字节大小的空间
+    int ntotal_stwo_len = sizeof(s_two) + (1 + ntmp_buf_size) * sizeof(char);
+    int ntotal_sthree_len = sizeof(s_three) + ntmp_buf_size * sizeof(char);
+
+
+//给s_one buf赋值
+s_one* p_sone = (s_one*)malloc(sizeof(s_one));
+memset(p_sone,0, sizeof(s_one));
+p_sone->s_one_buf = (char*)malloc(1 + ntmp_buf_size);
+memset(p_sone->s_one_buf,0, 1 + ntmp_buf_size);
+memcpy(p_sone->s_one_buf,tmp_buf, ntmp_buf_size);
+ 
+//给s_two buf赋值
+s_two* p_stwo = (s_two*)malloc(ntotal_stwo_len);
+memset(p_stwo,0, ntotal_stwo_len);
+memcpy((char*)(p_stwo->s_two_buf),tmp_buf, ntmp_buf_size);  //不用加偏移量，直接拷贝!
+ 
+//给s_three_buf赋值
+s_three* p_sthree = (s_three*)malloc(ntotal_sthree_len);
+memset(p_sthree,0, ntotal_sthree_len);
+memcpy((char*)(p_sthree->s_three_buf),tmp_buf, ntmp_buf_size);
+ 
+cout<< "p_sone->s_one_buf = " << p_sone->s_one_buf<< endl;
+cout<< "p_stwo->s_two_buf = " << p_stwo->s_two_buf<< endl;
+cout<< "p_sthree->s_three_buf = " <<p_sthree->s_three_buf << endl; //不用加偏移量，直接拷贝!
+cout<< endl;
+return;
+
+//<2>注意s_one 与s_two释放的不同！
+if(NULL != p_sone->s_one_buf)
+{
+        free(p_sone->s_one_buf);
+        p_sone->s_one_buf= NULL;
+ 
+        if(NULL != p_sone)
+        {
+               free(p_sone);
+               p_sone= NULL;
+        }
+        cout<< "free(p_sone) successed!" << endl;
+}
+ 
+if(NULL != p_stwo)
+{
+        free(p_stwo);
+        p_stwo= NULL;
+ 
+        cout<< "free(p_stwo) successed!" << endl;
+}
+ 
+if(NULL != p_sthree)
+{
+        free(p_sthree);
+        p_sthree= NULL;
+ 
+        cout<< "free(p_sthree) successed!" << endl;
+}
+
+}
+
 void lc_Entry() {
 
-    tst_isPalindrome_str();
-    return;
-    tst_isPalindrome_int();
+
+
+
+    tst_Widget();
     return;
 
-    tst_addTwoNumber();
-    return;
+    tst_isPalindrome_str(); return;
+
+    tst_isPalindrome_int(); return;
+
+    tst_addTwoNumber(); return;
 
     tst_bst_level_order(); return;
-
 
     tst_maxLength(); return;
 

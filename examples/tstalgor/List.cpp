@@ -1,7 +1,5 @@
 
 #include "List.h"
-#include <stdio.h>
-#include <stdlib.h>
 
 ListNode* CreateListNode(int value)
 {
@@ -129,4 +127,18 @@ int GetListLength(ListNode* listHead) {
     }
     return len;
 }
+
+
+
+class CImpl {
+public:
+    CImpl() {
+        std::cout << "cst" << std::endl;
+    }
+    ~CImpl() {
+        std::cout << "dst" << std::endl;
+    }
+};
+
+// Widget::~Widget() = default;
 

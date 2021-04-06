@@ -27,7 +27,19 @@ using namespace muduo;
 //using namespace muduo::net;
 
 
-
+void printf_buffer(const char* title, char* buffer, int size)
+{
+    int i;
+    printf("==========================================================\n");
+    printf("%s: length:%d\n", title, size);
+    for(i=0;i<size;i++)
+    {
+        if (((i%16)==0) && (i!=0)) printf("\n");
+        printf("%02x ", (unsigned char)buffer[i]);
+    }
+    printf("\n");
+    printf("==========================================================\n");
+}
 void printf_buffer(const char* title, unsigned char* buffer, int size)
 {
     int i;

@@ -490,7 +490,8 @@ void GetIntFromJson( const rapidjson::Document& jsonReader, const char* szName, 
 
 uint64_t stringToUint64_t(const char* lpszVal);
 
-void printf_buffer(const char* title, unsigned char* buffer, int size);
+void printf_buffer(const char *title, char *buffer, int size);
+void printf_buffer(const char *title, unsigned char *buffer, int size);
 char* NewAllocMem(int isize);
 
 
