@@ -61,7 +61,7 @@ using namespace muduo::net;
 #include <signal.h>
 // ---------------------------
 
-
+#include "tstperf.h"
 
 /*
  * 安装mtrace
@@ -213,16 +213,62 @@ void tst_Stack_print() {
     exit(EXIT_SUCCESS);
 }
 
+pthread_mutex_t g_smutex ; 
+ 
+void * func(void *arg)
+{
+	int i=0;
+ 
+	//lock
+ 
+	pthread_mutex_lock( &g_smutex);
+	
+	for (i = 0; i < 0x7fffffff; i++) {
+        ::sleep(1);
+    }
+
+    //forget unlock
+	
+	return NULL;
+}
+
+void tst_dead_lock() {
+
+	pthread_t  thread_id_01;
+	pthread_t  thread_id_02;
+	pthread_t  thread_id_03;
+	pthread_t  thread_id_04;
+	pthread_t  thread_id_05;
+	
+	pthread_mutex_init( &g_smutex, NULL );
+ 
+	pthread_create(&thread_id_01, NULL, func, NULL);
+	pthread_create(&thread_id_02, NULL, func, NULL);
+	pthread_create(&thread_id_03, NULL, func, NULL);
+	pthread_create(&thread_id_04, NULL, func, NULL);
+	pthread_create(&thread_id_05, NULL, func, NULL);
+ 
+	while(1)
+	{
+		sleep(0xfff);
+	}
+}
+
 int tst_meml_entry(int argc, char *argv[]) {
 //    int tmp_array[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
 //    LOG_INFO << "array_size(tmp_array)=" << array_size(tmp_array) * sizeof(int);
 
-    tst_Stack_print();
-    return 1;
+tst_perf_1(argc, argv);
+return 1;
 
+tst_dead_lock();
+return 1;
 
-    tst_mem_leak_();
-    return 1;
+tst_Stack_print();
+return 1;
+
+tst_mem_leak_();
+return 1;
 }
 
 

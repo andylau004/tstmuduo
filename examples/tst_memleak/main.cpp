@@ -13,14 +13,9 @@
 
 
 
-
-//#include "tst_1.h"
-
 #include "codeconvert.h"
 
-
 #include "muduo/net/InetAddress.h"
-
 #include "muduo/net/Channel.h"
 
 #include "muduo/net/EventLoop.h"
@@ -45,6 +40,7 @@ using namespace muduo::net;
 
 
 #include "tst-meml.h"
+#include "tstperf.h"
 
 
 int main(int argc, char *argv[])

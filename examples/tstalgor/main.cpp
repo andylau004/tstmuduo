@@ -4980,6 +4980,41 @@ void tst_lower_bound() {
     std::cout << "lower_bound=" << lower_Bound(nums, 4) << std::endl;
 }
 
+
+
+
+void longa() 
+{ 
+  int i,j; 
+  for(i = 0; i < 10000000; i++) 
+    j=i; //am I silly or crazy? I feel boring and desperate. 
+}
+
+void funcA() 
+{
+    int i;
+    for(i=0 ; i < 1000; i++) {
+        longa();
+    }
+}
+
+void funcB() 
+{ 
+  int i;
+
+  for(i = 0; i< 10000; i++) {
+      longa();
+  }
+}
+
+void tst_perf() {
+  for(auto i = 0; i< 10000; i++) {
+      sleep(2);
+  }
+    // funcA();
+    // funcB();
+}
+
 int main(int argc, char *argv[])
 {
     initList();
@@ -4987,6 +5022,9 @@ int main(int argc, char *argv[])
 
     Logger::setLogLevel(Logger::DEBUG);
     LOG_INFO << "pid = " << getpid() << ", tid=" << CurrentThread::tid();
+
+tst_perf();
+return 1;
 
     // --------------------function entry--------------------
 //    tst_qs_new(); return 1;
