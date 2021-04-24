@@ -2,7 +2,7 @@ obj/
 *.o
 
 *.a
-
+*.Plo
 *.lo
 *.o
 
@@ -59,6 +59,8 @@ build/vgcore.127017
 build/mysavefile
 build/chargen
 
+
+thirdpart/thrift/thrift-0.9.3/lib/cpp/test/gen-cpp/
 
 
 
