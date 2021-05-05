@@ -40,11 +40,11 @@
 #include <boost/shared_ptr.hpp>
 
 
-using namespace boost;
 
 using namespace std;
 using namespace muduo;
 using namespace muduo::net;
+using namespace boost;
 
 
 #include <mcheck.h>
@@ -62,6 +62,10 @@ using namespace muduo::net;
 // ---------------------------
 
 #include "tstperf.h"
+
+
+#include "tst-memcheck.h"
+#include "ngxmempool.h"
 
 /*
  * 安装mtrace
@@ -123,6 +127,8 @@ Memory not freed:
 ==14194== For counts of detected and suppressed errors, rerun with: -v
 ==14194== ERROR SUMMARY: 1 errors from 1 contexts (suppressed: 4 from 4)
 */
+
+
 
 void tst_mem_leak_() {
 
@@ -254,9 +260,79 @@ void tst_dead_lock() {
 	}
 }
 
+void printxx() {
+
+}
+void print_entry() {
+
+    {
+// #pragma pack(4)
+typedef struct _t {
+    double d;    //8Byte
+    short s1;    //2Byte
+    int i;       //4Byte
+    short s2;    //2Byte
+}t;
+// #pragma pack(pop)
+printf("size=%d\n", sizeof(t));
+return;
+    }
+
+#if 0 
+        char *s1 = "abcde";  //"abcde"作为字符串常量存储在常量区 s1、s2、s5拥有相同的地址
+	    char *s2 = "abcde";
+	      char s3[] = "abcd";
+	      long int *s4[100]; 
+	      char *s5 = "abcde";
+	      int a = 5;
+	      int b =6;//a,b在栈上，&a>&b地址反向增长  
+
+	     printf("variables address in main function: s1=%p  s2=%p s3=%p s4=%p s5=%p a=%p b=%p\n",
+	             s1,s2,s3,s4,s5,&a,&b);
+	    //  printf("variables address in processcall:n");
+        //  print("ddddddddd",5);//参数入栈从右至左进行,p先进栈,str后进 &p>&str
+	     printf("main=%p printxx=%p\n",tst_meml_entry,printxx);
+	     //打印代码段中主函数和子函数的地址，编译时先编译的地址低，后编译的地址高main<print
+#endif
+
+}
+
+
+void print_marsk() {
+    int size = 16;
+    int mask = size - 1;
+
+    for (auto i = 0; i < 10; i ++) {
+        std::cout << " " << (i & mask);
+    }
+    std::cout << std::endl;
+    std::cout << "------------------------------------" << std::endl;
+    std::cout << std::endl;
+
+    for (auto i = 0; i < 10; i ++) {
+        std::cout << " " << (i % size);
+    }
+    std::cout << std::endl;
+
+}
+
+
 int tst_meml_entry(int argc, char *argv[]) {
 //    int tmp_array[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
 //    LOG_INFO << "array_size(tmp_array)=" << array_size(tmp_array) * sizeof(int);
+
+tst_alignex();
+return 1;
+
+print_marsk();
+return 1;
+print_entry();
+return 1;
+
+std::cout << "before  -----exec" << std::endl;
+tst_mem_check();
+std::cout << "after   -----exec" << std::endl;
+return 1;
 
 tst_perf_1(argc, argv);
 return 1;

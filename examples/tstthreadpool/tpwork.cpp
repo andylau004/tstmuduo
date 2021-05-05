@@ -39,7 +39,7 @@ public:
 private:
     muduo::string name_;
 };
-
+//定义两个线程特定数据对象，每个线程都有这样的对象
 muduo::ThreadLocal<Test> testObj1;
 muduo::ThreadLocal<Test> testObj2;
 
@@ -57,16 +57,22 @@ void print()
 
 void threadFunc()
 {
+    printf("\n");
+    printf("threadFunc beg----------------------------------\n");
     print();
+    //testObj1.value()返回的是Test类型的引用
     testObj1.value().setName("changed 1");
     testObj2.value().setName("changed 42");
     print();
+    printf("threadFunc end----------------------------------\n");
+    printf("\n");
 }
 
 void tst_threadpoolWork_entry() {
     testObj1.value().setName("main one");
     print();
 
+    // getchar();
     muduo::Thread t1(threadFunc);
     t1.start();
     t1.join();

@@ -21,6 +21,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <functional>
+#include <unordered_map>
 
 #include <boost/atomic.hpp>
 #include <boost/circular_buffer.hpp>
@@ -1220,6 +1221,7 @@ void* thread_run( void* ) {
         }
         sleep(1);
     }
+    return nullptr;
 }
 
 void f(unsigned char v) {
@@ -1774,10 +1776,119 @@ void tst_set() {
     LOG_INFO << "findIter =" << *findIter;
 }
 
+void tst_array_zero() {
+
+class KVSharedLock {
+    // std::shared_mutex m_mutex;
+    std::unordered_map<std::string, int> m_map;
+
+public:
+    void put(const std::string &key, int value) {
+        // std::lock_guard lock(m_mutex);
+        // m_map.emplace(key, value);
+    }
+
+    int get(const std::string &key) {
+        return 0;
+        // std::shared_lock lock(m_mutex);
+        // auto it = m_map.find(key);
+        // if (it != m_map.end())
+        //     return it->second;
+        // return {};
+    }
+
+    bool remove(const std::string &key) {
+        return true;
+        // std::lock_guard lock(m_mutex);
+        // auto n = m_map.erase(key);
+        // return n;
+    }
+};
+
+
+
+    /*
+        零长数组在有固定头部的可变对象上非常有用。
+    优点:
+        1. 不需要使用指针来分配内存，节约一个指针变量所占内存大小，也使内存申请方式更加便捷；
+        2. 分配的内存连续，管理与释放简单，只需要一次操作。
+    缺点
+        1. 零长数组是GNU C的实现，非标准，因此并不是所有的编译器都支持，有移植风险。
+        2. 在结构体中，数组为0的数组必须在最后声明，使 用上有一定限制。
+    */
+    struct line{
+        int length;
+        char data[0];
+    };
+    std::cout << "size = " << sizeof(line) << std::endl;
+
+struct line_1{
+	int length;
+	// char *data;
+};
+std::cout << "size = " << sizeof(line_1) << std::endl;
+
+    char a[0];
+    printf("sizeof(a)=%ld\n", sizeof(a));
+
+}
+
+
+std::string random_string(int len) {
+    static const char alphanum[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+    static std::mt19937 gen(123);
+    static std::uniform_int_distribution<int> dist(0, sizeof(alphanum) - 1);
+    std::string s;
+    for (int i = 0; i < len; ++i)
+        s += alphanum[dist(gen)];
+    return s;
+}
+#include <atomic>
+// bool g_bInit = false;
+std::atomic<bool> g_bInit(false);
+
+void fun1(void)
+{
+    // Thread 1
+    // ready was initialized to false
+    auto pfnInit = [&] {
+        printf("i am init\n");
+    };
+    pfnInit();
+    // g_bInit = true;
+    g_bInit.store(true, std::memory_order_release);
+}
+void fun2(void) {
+    auto pfnLook = [&] {
+        printf("look exec ...\n");
+    };
+    // if (g_bInit) {
+    if (g_bInit.load(std::memory_order_acquire)) {
+        pfnLook();
+    } else {
+        printf("no found init ...\n");
+    }
+}
+
+void tst_memory_fence() {
+
+    std::thread t1(fun1);
+    std::thread t2(fun2);
+    t1.join();
+    t2.join();
+
+    sleep(1);
+}
 
 // 2020-6-20
 // add new 测试分支预测
 void tst_c11fun_entry(int argc, char *argv[]) {
+
+    tst_memory_fence();
+    return;
+
+    tst_array_zero();
+    return;
 
     tst_boost_specfic_fun(); return;
 
