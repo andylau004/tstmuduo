@@ -21,24 +21,7 @@
 
 
 
-//#include "muduo/base/common.h"
-
-//#include "muduo/net/InetAddress.h"
-//#include "muduo/net/Channel.h"
-//#include "muduo/net/EventLoop.h"
-//#include "muduo/net/EventLoopThread.h"
-//#include "muduo/net/EventLoopThreadPool.h"
-//#include "muduo/net/TcpServer.h"
-//#include "muduo/base/Logging.h"
-//#include "muduo/net/TcpClient.h"
-
-
-//#include "tstskiplist.h"
 #include "tstboost.h"
-
-using namespace std;
-//using namespace muduo;
-//using namespace muduo::net;
 
 
 

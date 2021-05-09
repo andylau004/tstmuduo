@@ -117,11 +117,16 @@ public:
 
     void operator()()
     {
+        printf("\n");
+        printf("before ----consumer operator \n");
         for (unsigned long i = 0L; i < total_elements; ++i)
         {
             m_container->pop_back(&m_item);
             printf("%d ", m_item);
         }
+        printf("\n");
+        printf("after  ----consumer operator \n");
+//        printf("\n");
     }
 };
 
@@ -132,10 +137,12 @@ Include a call to boost::progress_timer
 
 */
 template<class Buffer>
-void fifo_test(Buffer* buffer)
-{
-    // Start of timing.
-    boost::timer::auto_cpu_timer progress;
+void fifo_test(Buffer* buffer) {
+
+//    boost::timer::auto_cpu_timer progress;// Start of timing.
+    boost::timer::cpu_timer t;
+    boost::timer::auto_cpu_timer auto_timer(6,
+            "%ws real time\n");
 
     // Initialize the buffer with some values before launching producer and consumer threads.
     for (unsigned long i = queue_size / 2L; i > 0; --i)
@@ -143,7 +150,7 @@ void fifo_test(Buffer* buffer)
 //#if BOOST_WORKAROUND(__BORLANDC__, BOOST_TESTED_AT(0x581))
 //        buffer->push_front(Buffer::value_type());
 //#else
-        buffer->push_front(BOOST_DEDUCED_TYPENAME Buffer::value_type());
+        buffer->push_front(i/*BOOST_DEDUCED_TYPENAME Buffer::value_type()*/);
 //#endif
     }
 
@@ -163,6 +170,7 @@ void fifo_test(Buffer* buffer)
     // destructor of boost::timer::auto_cpu_timer will output the time to std::cout.
 
     printf("\n\n");
+    std::cout << t.format(2, "%us user + %ss system = %ts(%p%)") << std::endl;
 }
 //] [/circular_buffer_bound_example_2]
 
