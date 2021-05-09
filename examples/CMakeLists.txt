@@ -8,6 +8,9 @@ set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -gdwarf-2 -Wno-deprecated -ffunction-se
 
 #set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -gdwarf-2 -Wno-deprecated -ffunction-sections -W -Wall -pthread -Wno-missing-braces -Wparentheses" )
 
+
+
+add_subdirectory(tstboost)
 add_subdirectory(tstclient)
 add_subdirectory(tstserver)
 
