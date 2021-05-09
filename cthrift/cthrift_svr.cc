@@ -78,11 +78,11 @@ CthriftSvr::~CthriftSvr(void) {
 
 int32_t CthriftSvr::Init(void) {
 
-//    int ret = g_cthrift_config.LoadConfig(false);
-//    if (ret != SUCCESS) {
-//        CTHRIFT_LOG_ERROR("Fail to load config. errno" <<  ret);
-//        return ret;
-//    }
+    int ret = g_cthrift_config.LoadConfig(false);
+    if (ret != SUCCESS) {
+        CTHRIFT_LOG_ERROR("Fail to load config. errno" <<  ret);
+        return ret;
+    }
 
     str_svr_appkey_ = g_cthrift_config.server_appkey_;
     u16_svr_port_ = static_cast<uint16_t >(g_cthrift_config.listen_port_);
