@@ -220,9 +220,9 @@ private:
     static int8_t CheckRegion(const double &d_weight);
 
     // filter
-//    bool FilterAll(const meituan_mns::SGService &sg);
-//    bool FilterService(const meituan_mns::SGService &sg);
-//    bool FilterPort(const meituan_mns::SGService &sg);
+   bool FilterAll(const meituan_mns::SGService &sg);
+   bool FilterService(const meituan_mns::SGService &sg);
+   bool FilterPort(const meituan_mns::SGService &sg);
 
     // async
     void AsyncCallback(const uint32_t &size,

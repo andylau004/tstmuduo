@@ -100,6 +100,7 @@ void tst_twfun_entry() {
     time_wheel.InitTimerWheel(100, 5);
 //    int timer1 = time_wheel.AddTimer(100, f100);
     int timer2 = time_wheel.AddTimer(200, f200);
+    UNUSED(timer2);
 //    int timer3 = time_wheel.AddTimer(500, f500);
 //	time_wheel.AddTimer(1500, f1500);
 

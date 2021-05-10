@@ -39,7 +39,7 @@ add_executable(${PROJECT_NAME}
 
 #add_executable(${PROJECT_NAME} ${CODE_LIST})
 
-target_link_libraries(${PROJECT_NAME} pthread boost_system boost_thread muduo_base muduo_net rt  event ssl crypto  thrift  thriftnb  thriftz      )
+target_link_libraries(${PROJECT_NAME} pthread boost_system boost_thread muduo_base muduo_net rt  event ssl crypto  thrift  thriftnb  thriftz   z   )
 
 #asan
 

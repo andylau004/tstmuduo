@@ -455,18 +455,18 @@ void CthriftClientWorker::InitWorker(void) {
 //    CTHRIFT_LOG_INFO("InitWorker end");
 }
 
-//bool CthriftClientWorker::FilterAll(const meituan_mns::SGService &sg) {
-//    return sg.serviceInfo.find(str_serviceName_filter_) == sg.serviceInfo.end()
-//            || i32_port_filter_ != sg.port;
-//}
+bool CthriftClientWorker::FilterAll(const meituan_mns::SGService &sg) {
+   return sg.serviceInfo.find(str_serviceName_filter_) == sg.serviceInfo.end()
+           || i32_port_filter_ != sg.port;
+}
 
-//bool CthriftClientWorker::FilterService(const meituan_mns::SGService &sg) {
-//    return sg.serviceInfo.find(str_serviceName_filter_) == sg.serviceInfo.end();
-//}
+bool CthriftClientWorker::FilterService(const meituan_mns::SGService &sg) {
+   return sg.serviceInfo.find(str_serviceName_filter_) == sg.serviceInfo.end();
+}
 
-//bool CthriftClientWorker::FilterPort(const meituan_mns::SGService &sg) {
-//    return i32_port_filter_ != sg.port;
-//}
+bool CthriftClientWorker::FilterPort(const meituan_mns::SGService &sg) {
+   return i32_port_filter_ != sg.port;
+}
 
 void CthriftClientWorker::GetSvrList(void) {
 //    ServicePtr service = boost::make_shared<meituan_mns::getservice_res_param_t>();
