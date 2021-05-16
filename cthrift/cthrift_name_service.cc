@@ -44,7 +44,7 @@ muduo::MutexLock CthriftNameService::s_lock;
 
 const CthriftNameService g_cthrift_ns;
 
-//CthriftNsInterface  CthriftNameService::ns_interface_;
+CthriftNsInterface  CthriftNameService::ns_interface_;
 
 CthriftNameService::CthriftNameService(void) throw(TException) {
     GetHostIPInfo();  // fill str_local_ip_, b_isMac_, str_host_
@@ -250,24 +250,24 @@ double CthriftNameService::FetchOctoWeight(const double &fweight,
             && !CheckDoubleEqual(fweight, static_cast<double>(0))) ? fweight : weight;
 }
 
-//int CthriftNameService::GetSrvListFrom(ServicePtr service) {
-//    if (!b_is_init_ns_) {
-//        ////CTHRIFT_LOG_ERROR("GetSrvListFrom b_is_init_ns_ false");
-//        return -1;
-//    }
+int CthriftNameService::GetSrvListFrom(ServicePtr service) {
+   if (!b_is_init_ns_) {
+       CTHRIFT_LOG_ERROR("GetSrvListFrom b_is_init_ns_ false");
+       return -1;
+   }
 
-//    return ns_interface_.GetSrvList(service);
-//}
+   return ns_interface_.GetSrvList(service);
+}
 
-//int CthriftNameService::RegisterService(
-//    const meituan_mns::SGService &oservice) {
-//  if (!b_is_init_ns_) {
-//    ////CTHRIFT_LOG_ERROR("GetSrvListFrom b_is_init_ns_ false");
-//    return -1;
-//  }
+int CthriftNameService::RegisterService(
+   const meituan_mns::SGService &oservice) {
+ if (!b_is_init_ns_) {
+   CTHRIFT_LOG_ERROR("GetSrvListFrom b_is_init_ns_ false");
+   return -1;
+ }
 
-//  return ns_interface_.RegisterService(oservice);
-//}
+ return ns_interface_.RegisterService(oservice);
+}
 
 int32_t CthriftNameService::InitNS() {
     if (b_is_init_ns_) {

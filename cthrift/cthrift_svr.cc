@@ -316,11 +316,11 @@ void CthriftSvr::Process(const int32_t &i32_req_size,
     TcpConnectionPtr sp_tcp_conn(wp_tcp_conn.lock());
 
     if (!CTHRIFT_LIKELY(sp_tcp_conn && sp_tcp_conn->connected())) {
-//        CTHRIFT_LOG_ERROR("connection broken, discard response pkg from conn  ");
+        CTHRIFT_LOG_ERROR("connection broken, discard response pkg from conn  ");
         return;
     }
     if (CTHRIFT_UNLIKELY(0 == i32_req_size || 0 == p_ui8_req_buf)) {
-//      CTHRIFT_LOG_ERROR("i32_req_size " << i32_req_size << "  OR p_ui8_req_buf = NULL ");
+        CTHRIFT_LOG_ERROR("i32_req_size " << i32_req_size << "  OR p_ui8_req_buf = NULL ");
         return;
     }
 
@@ -330,7 +330,7 @@ void CthriftSvr::Process(const int32_t &i32_req_size,
 
     // check if more than svr overtime
     if (i32_svr_overtime_ms_ && CheckOverTime(timestamp_from_recv, d_svr_overtime_secs, 0)) {
-//        CTHRIFT_LOG_WARN("before business handle, already overtime, maybe queue congest, drop the request");
+        CTHRIFT_LOG_WARN("before business handle, already overtime, maybe queue congest, drop the request");
         return;
     }
 
@@ -344,19 +344,20 @@ void CthriftSvr::Process(const int32_t &i32_req_size,
 
 //    CTHRIFT_LOG_INFO("Begin business Process");
     try {
-        (*sp_p_processor_)->process(*sp_p_input_tprotocol_, *sp_p_output_tprotocol_, 0);
+        (*sp_p_processor_)->process(*sp_p_input_tprotocol_,
+                                    *sp_p_output_tprotocol_, 0);
     } catch(exception& e) {
-//        CTHRIFT_LOG_ERROR("exception from business process: " << e.what());
+       CTHRIFT_LOG_ERROR("exception from business process: " << e.what());
 
         d_business_time_diff_ms =
                 timeDifference(Timestamp::now(), timestamp_begin_business) * MILLISENCOND_COUNT_IN_SENCOND;
-//        CTHRIFT_LOG_DEBUG("business cost " << d_business_time_diff_ms << "ms");
+       CTHRIFT_LOG_INFO("business cost " << d_business_time_diff_ms << "ms");
 
         if (i32_svr_overtime_ms_ && CheckOverTime(timestamp_from_recv, d_svr_overtime_secs, 0)) {
-//            CTHRIFT_LOG_WARN("after business handle, already overtime "
-//                             << i32_svr_overtime_ms_ << "ms, business cost "
-//                             << d_business_time_diff_ms
-//                             << " ms, just WARN without drop");
+           CTHRIFT_LOG_WARN("after business handle, already overtime "
+                            << i32_svr_overtime_ms_ << "ms, business cost "
+                            << d_business_time_diff_ms
+                            << " ms, just WARN without drop");
         }
         return;
     }
@@ -366,13 +367,13 @@ void CthriftSvr::Process(const int32_t &i32_req_size,
             timeDifference(Timestamp::now(), timestamp_begin_business) * MILLISENCOND_COUNT_IN_SENCOND;
 //    CTHRIFT_LOG_DEBUG("business cost " << d_business_time_diff_ms << "ms");
 
-//    if (i32_svr_overtime_ms_
-//            && CheckOverTime(timestamp_from_recv, d_svr_overtime_secs, 0)) {
-//        CTHRIFT_LOG_WARN("after business handle, already overtime "
-//                         << i32_svr_overtime_ms_ << "ms, business cost "
-//                         << d_business_time_diff_ms
-//                         << " ms, just WARN without drop");
-//    }
+   if (i32_svr_overtime_ms_
+           && CheckOverTime(timestamp_from_recv, d_svr_overtime_secs, 0)) {
+       CTHRIFT_LOG_WARN("after business handle, already overtime "
+                        << i32_svr_overtime_ms_ << "ms, business cost "
+                        << d_business_time_diff_ms
+                        << " ms, just WARN without drop");
+   }
 
     double total_cost = timeDifference(Timestamp::now(), timestamp_from_recv) * MILLISENCOND_COUNT_IN_SENCOND;
 //    CTHRIFT_LOG_DEBUG("after business process, total cost " << total_cost << "ms");
@@ -394,13 +395,13 @@ void CthriftSvr::Process(const int32_t &i32_req_size,
     } else {
         CTHRIFT_LOG_WARN("connection broken, discard response pkg ");
     }
-//    CTHRIFT_LOG_INFO("Process Done from Peer:" << (sp_tcp_conn->peerAddress()).toIpPort());
+    CTHRIFT_LOG_INFO("Process Done from Peer:" << (sp_tcp_conn->peerAddress()).toIpPort());
 }
 
 void CthriftSvr::OnMsg(const TcpConnectionPtr &conn, Buffer *buffer, Timestamp receiveTime) {
-    CTHRIFT_LOG_DEBUG("OnMsg address  " << (conn->peerAddress()).toIpPort()
-                                        << " Current EventLoop size "
-                                        << EventLoop::getEventLoopOfCurrentThread()->queueSize());
+    CTHRIFT_LOG_INFO("OnMsg address  " << (conn->peerAddress()).toIpPort()
+                                       << " Current EventLoop size "
+                                       << EventLoop::getEventLoopOfCurrentThread()->queueSize());
 
     ConnContextSharedPtr sp_conn_info;
     try {
@@ -409,18 +410,24 @@ void CthriftSvr::OnMsg(const TcpConnectionPtr &conn, Buffer *buffer, Timestamp r
         CTHRIFT_LOG_ERROR("bad_any_cast:" << e.what());
         return;
     }
+    // 先进行可用连接激活操作，避免正常连接被剔除.
+    // 放在while循环后，永远无法执行该段逻辑
     sp_conn_info->t_last_active = time(0);
 
-    auto pfnInsertTimeWheel = [&]() {
+    auto pfnInsertTimeWheel = [&]() -> bool {
         // 时间轮插入,新的entry,防止该连对象被清理;
         ConnEntrySharedPtr sp_conn_entry(sp_conn_info->wp_conn_entry.lock());
         if (!sp_conn_entry.get()) {
             CTHRIFT_LOG_ERROR("sp_conn_entry invalid??");
-            return;
+            return false;
         } else {
             (LocalSingConnEntryCirculBuf::instance()).back().insert(sp_conn_entry);
+            return true;
         }
     };
+    auto ret = pfnInsertTimeWheel();
+    if (!ret)
+        return;
 
     bool more = true;
     while (more) {
@@ -445,14 +452,14 @@ void CthriftSvr::OnMsg(const TcpConnectionPtr &conn, Buffer *buffer, Timestamp r
                 boost::shared_ptr<muduo::net::Buffer> sp_copy_buf = boost::make_shared<muduo::net::Buffer>();
                 sp_copy_buf->append(buffer->peek(), sp_conn_info->i32_want_size);
 
-                // round robin choose next worker thread, no mutex for performance
-                EventLoop* p_worker_event_loop = NULL;
+                // pick worker thread, RR
+                EventLoop* p_worker_event_loop = nullptr;
                 if (CTHRIFT_LIKELY(1 < i16_worker_thread_num_)) {
                     p_worker_event_loop =
                         vec_worker_event_loop_[atom_i64_worker_thread_pos_.getAndAdd(1) % i16_worker_thread_num_];
                 } else if (CTHRIFT_LIKELY(1 == i16_worker_thread_num_)) {
                     p_worker_event_loop = vec_worker_event_loop_[0];
-                }
+                }// round robin choose next worker thread, no mutex for performance
 
 //                CTHRIFT_LOG_DEBUG("io Thread begin into work Thread EventLoop queueSize " << p_worker_event_loop->queueSize());
                 p_worker_event_loop->runInLoop(boost::bind(&CthriftSvr::Process,
@@ -460,8 +467,8 @@ void CthriftSvr::OnMsg(const TcpConnectionPtr &conn, Buffer *buffer, Timestamp r
                                                            sp_copy_buf,
                                                            wp_tcp_conn,
                                                            receiveTime));
-
 //                CTHRIFT_LOG_DEBUG("io Thread end into work Thread");
+
                 buffer->retrieve((size_t)sp_conn_info->i32_want_size);
                 sp_conn_info->enum_state = kExpectFrameSize;
 
@@ -469,7 +476,8 @@ void CthriftSvr::OnMsg(const TcpConnectionPtr &conn, Buffer *buffer, Timestamp r
                 // 放在while循环后，永远无法执行该段逻辑
                 sp_conn_info->t_last_active = time(0);
 
-                pfnInsertTimeWheel();
+                if (!pfnInsertTimeWheel())
+                    return;
             }
 
         } else {

@@ -49,7 +49,7 @@ class CthriftNameService {
   static std::string str_host_;
   static std::string str_hostname_;
 
-//  static CthriftNsInterface ns_interface_;
+ static CthriftNsInterface ns_interface_;
 
   CthriftNameService(void) throw(TException);
   static void PackDefaultSgservice(const std::string &str_svr_appkey,
@@ -64,9 +64,9 @@ class CthriftNameService {
   static int32_t InitNS();
   static void UnInitNS();
 
-//  static int GetSrvListFrom(ServicePtr service);
+ static int GetSrvListFrom(ServicePtr service);
 
-//  static int RegisterService(const meituan_mns::SGService &oservice);
+ static int RegisterService(const meituan_mns::SGService &oservice);
 };
 
 extern const meituan_cthrift::CthriftNameService g_cthrift_ns;
