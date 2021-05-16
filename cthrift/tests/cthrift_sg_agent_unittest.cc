@@ -53,6 +53,7 @@ TEST_F(CthriftNameServiceTest, Handle_FetchOctoWeight) {
 }
 
 TEST_F(CthriftNameServiceTest, Handle_RegisterService) {
+
 //    const std::string str_svr_appkey = "test.appkey";
 //    const std::string str_local_ip = "127.0.0.1";
 //    const uint16_t u16_port = 16888;

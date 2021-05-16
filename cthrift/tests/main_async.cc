@@ -11,6 +11,7 @@
 #include <thrift/transport/TSocket.h>
 #include <thrift/transport/TTransportUtils.h>
 
+#include <muduo/base/common.h>
 #include <muduo/base/AsyncLogging.h>
 #include <muduo/base/Logging.h>
 #include <muduo/base/TimeZone.h>
@@ -76,10 +77,14 @@ void my_echo(EchoCobClient *client) {
 void TestAsyncSvrList(const string &str_svr_appkey,
                       const string &str_cli_appkey,
                       const int32_t &i32_loop_num) {
+    std::cout << "beg test async svr list... " << std::endl;
+    deferTime([&]() {
+        std::cout << "end test async svr list... " << std::endl;
+    });
+
     //建议CthriftClient生命期也和线程保持一致，不要一次请求创建销毁一次
     boost::shared_ptr<CthriftClient>
             cthrift_client = boost::make_shared<CthriftClient>(str_svr_appkey, 30);
-
 
     //开启异步化，并设置异步场景下队列阈值，任务超过阈值后会被丢弃，并且向该业务线程抛出异常
     cthrift_client->SetAsync(true);
@@ -132,7 +137,6 @@ void TestAsyncSvrList(const string &str_svr_appkey,
     arg4["3"] = arg;
 
     arg_all.__set_arg4(arg4);
-
     arg_all.__set_arg5(false);
 
     std::set<int64_t> arg6;
@@ -141,9 +145,7 @@ void TestAsyncSvrList(const string &str_svr_appkey,
     arg6.insert(3);
 
     arg_all.__set_arg6(arg6);
-
     arg_all.__set_arg7(7);
-
     arg_all.__set_arg8(TweetType::REPLY);
 
     for (int i = muduo::CurrentThread::tid() * 1000;
@@ -214,13 +216,9 @@ void TestRegSvr(muduo::net::EventLoop *p_event_loop) {
 
 int main(int argc, char **argv) {
 
-    std::cout << "----------" << std::endl;
     testing::InitGoogleTest(&argc, argv);
-
-    std::cout << "----------" << std::endl;
     log4cplus::PropertyConfigurator::doConfigure(LOG4CPLUS_TEXT("log4cplus.conf"));
 
-    std::cout << "----------" << std::endl;
     if (CTHRIFT_UNLIKELY(4 < argc)) {
         CTHRIFT_LOG_ERROR(
                     "prog <appkey,default \"com.sankuai.inf.newct\"> <echo loop time, default 100> <port, defalut 6666>");
@@ -230,7 +228,7 @@ int main(int argc, char **argv) {
         std::cout << "--------111" << std::endl;
         exit(-1);
     }
-    std::cout << "--------222" << std::endl;
+    std::cout << "--------222345" << std::endl;
     string str_svr_appkey("com.sankuai.inf.newct");
     string str_cli_appkey("com.sankuai.inf.newct.client");
     int32_t i32_echo_time = 100;
@@ -241,17 +239,13 @@ int main(int argc, char **argv) {
             i32_echo_time = atoi(argv[2]);
         }
     }
-
-    CTHRIFT_LOG_DEBUG(
-                "str_svr_appkey: " << str_svr_appkey << " i32_echo_time: " <<
-                i32_echo_time);
+    CTHRIFT_LOG_DEBUG("str_svr_appkey: " << str_svr_appkey << " i32_echo_time: " << i32_echo_time);
 
     g_sp_thread_svr =
             boost::make_shared<muduo::Thread>(boost::bind(&TestRegSvr, &event_loop));
     g_sp_thread_svr->start();
 
-    muduo::CurrentThread::sleepUsec(3000 * 1000); //wait 3s for reg svr
-
+    muduo::CurrentThread::sleepUsec(1000 * 1000); //wait 3s for reg svr
 
     g_sp_thread_asyc_cli =
             boost::make_shared<muduo::Thread>(boost::bind(&TestAsyncSvrList,
@@ -261,7 +255,6 @@ int main(int argc, char **argv) {
     g_sp_thread_asyc_cli->start();
 
     event_loop.runAfter(60.0, boost::bind(&Quit));
-
     event_loop.loop();
 
     CTHRIFT_LOG_INFO("EXIT loop");

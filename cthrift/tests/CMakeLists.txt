@@ -10,7 +10,9 @@ SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cthrift/cmake")
 MESSAGE(STATUS "CMAKE_MODULE_PATH is: ${CMAKE_MODULE_PATH}")
 MESSAGE(STATUS "CMAKE_SOURCE_DIR is: ${CMAKE_SOURCE_DIR}")
 
-set(EXECUTABLE_OUTPUT_PATH "")
+set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR})
+
+MESSAGE(STATUS "EXECUTABLE_OUTPUT_PATH is: ${EXECUTABLE_OUTPUT_PATH}")
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -fprofile-arcs -ftest-coverage")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}  -fprofile-arcs -ftest-coverage")
@@ -88,10 +90,9 @@ foreach (TEST_FILE_NAME ${TEST_FILE_LIST})
     add_executable(${test_name} ${TEST_FILE_NAME})
 
     target_link_libraries(${test_name} util_unit_test_main
-        -Xlinker "-("libcthrift.a libmns_sdk.a libmuduo_base_cpp11.a libmuduo_net_cpp11.a ${MUDUO_HTTP_LIBRARY}
+        -Xlinker "-("libboost_system.a libcthrift.a libmns_sdk.a libmuduo_base_cpp11.a libmuduo_net_cpp11.a ${MUDUO_HTTP_LIBRARY}
         ${ZOOKEEPER_LIBRARY} liboctoidl.a  pthread rt libz.so liblog4cplus.so
-        libthrift.a  libthriftnb.a
-        gtest -Xlinker "-)"
+        libthrift.a  libthriftnb.a gtest -Xlinker "-)"
         )
     cthrift_add_test(${test_name} ${test_name} CONFIGURATIONS Debug)
 endforeach ()
@@ -110,23 +111,23 @@ link_directories(/host_WorkDir/mygitwork/tstmuduo/build/muduo/net/)
 
 add_executable(main_async_unittest main_async.cc cthrift_client_worker_unittest.cc)
 target_link_libraries(main_async_unittest util_unit_test_main_async
-        -Xlinker "-("libz.so libcthrift.a libmns_sdk.a libmuduo_base_cpp11.a libmuduo_net_cpp11.a ${MUDUO_HTTP_LIBRARY}
+        -Xlinker "-("libz.so libboost_system.a libcthrift.a libmns_sdk.a libmuduo_base_cpp11.a libmuduo_net_cpp11.a ${MUDUO_HTTP_LIBRARY}
         ${ZOOKEEPER_LIBRARY} liboctoidl.a  pthread rt  liblog4cplus.so 
         libthrift.a  libthriftnb.a   
         gtest -Xlinker "-)"
         )
 cthrift_add_test(main_async_unittest main_async_unittest CONFIGURATIONS Debug)
 
-add_custom_target(copyTarget1
-    COMMAND cp -n ${PROJECT_BINARY_DIR}/cthrift/tests/main_async_unittest ${PROJECT_BINARY_DIR}/
-)
-add_dependencies(main_async_unittest copyTarget1)
+#add_custom_target(copyTarget1
+#    COMMAND cp -n ${PROJECT_BINARY_DIR}/cthrift/tests/main_async_unittest ${PROJECT_BINARY_DIR}/
+#)
+#add_dependencies(main_async_unittest copyTarget1)
 
 
 
 add_executable(main_svr_unittest main_svr.cc cthrift_server_unittest.cc)
 target_link_libraries(main_svr_unittest util_unit_test_main_async
-         -Xlinker "-("libz.so libcthrift.a libmns_sdk.a libmuduo_base_cpp11.a libmuduo_net_cpp11.a ${MUDUO_HTTP_LIBRARY}
+         -Xlinker "-("libz.so libboost_system.a libcthrift.a libmns_sdk.a libmuduo_base_cpp11.a libmuduo_net_cpp11.a ${MUDUO_HTTP_LIBRARY}
          ${ZOOKEEPER_LIBRARY} liboctoidl.a  pthread rt  liblog4cplus.so
          libthrift.a  libthriftnb.a
          gtest -Xlinker "-)"
@@ -134,11 +135,20 @@ target_link_libraries(main_svr_unittest util_unit_test_main_async
 cthrift_add_test(main_svr_unittest main_svr_unittest CONFIGURATIONS Debug)
 
 
- add_executable(main_all_unittest main_all.cc ${TEST_FILE_LIST} cthrift_client_worker_unittest.cc)
- target_link_libraries(main_all_unittest util_unit_test_main_async
-         -Xlinker "-("libz.so libcthrift.a libmns_sdk.a libmuduo_base_cpp11.a libmuduo_net_cpp11.a ${MUDUO_HTTP_LIBRARY}
+add_executable(main_all_unittest main_all.cc ${TEST_FILE_LIST} cthrift_client_worker_unittest.cc)
+target_link_libraries(main_all_unittest util_unit_test_main_async
+         -Xlinker "-("libz.so libboost_system.a libcthrift.a libmns_sdk.a libmuduo_base_cpp11.a libmuduo_net_cpp11.a ${MUDUO_HTTP_LIBRARY}
          ${ZOOKEEPER_LIBRARY} liboctoidl.a  pthread rt  liblog4cplus.so
          libthrift.a  libthriftnb.a
          gtest -Xlinker "-)"
          )
- cthrift_add_test(main_all_unittest main_all_unittest CONFIGURATIONS Debug)
+cthrift_add_test(main_all_unittest main_all_unittest CONFIGURATIONS Debug)
+
+
+
+
+
+
+
+
+

@@ -71,6 +71,7 @@
 #include <thrift/transport/TSocket.h>
 #include <thrift/async/TAsyncChannel.h>
 
+#include "muduo/base/common.h"
 #include "muduo/base/AsyncLogging.h"
 #include "muduo/base/CurrentThread.h"
 #include "muduo/base/Logging.h"
@@ -220,7 +221,7 @@ enum AsyncState {
 };
 
 enum ErrorNum {
-  SUCCESS = 0,
+//  SUCCESS = 0,
   ERR_EMPRY_CONFIG = 1,
   ERR_WRONG_CONTENT = 2,
   ERR_EMPTY_NS_ORIGIN =3,

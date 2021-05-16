@@ -43,10 +43,10 @@ public:
     CthriftClientWorker *p_cthrift_client_worker_;
 };
 
+/*
 TEST_F(CthriftClientWorkerTest, Handle_DelContextMapByID) {
     std::string str_id = "test_id";
-    p_cthrift_client_worker_->
-            DelContextMapByID(str_id);
+    p_cthrift_client_worker_->DelContextMapByID(str_id);
 
     boost::unordered_map<std::string, SharedContSharedPtr>::iterator
             map_iter = p_cthrift_client_worker_->map_id_sharedcontextsp_.find(str_id);
@@ -84,3 +84,4 @@ TEST_F(CthriftClientWorkerTest, Handle_FilterOther) {
 
     EXPECT_TRUE(p_cthrift_client_worker_->FilterService(sgservice));
 }
+*/

@@ -92,8 +92,8 @@ int32_t CthriftSvr::Init(void) {
     i16_worker_thread_num_ = static_cast<int16_t >(g_cthrift_config.server_work_threadnum_);
     con_collection_interval_ = static_cast<double >(g_cthrift_config.server_conn_gctime_);
 
-    CTHRIFT_LOG_INFO("port=" << u16_svr_port_);
-    std::cout << "port=" << u16_svr_port_ << std::endl;
+    CTHRIFT_LOG_INFO("thrift svr --- port=" << u16_svr_port_);
+    std::cout << "thrift svr --- port=" << u16_svr_port_ << std::endl;
 //    std::string str_reason;
 //    ret = ArgumentCheck(str_svr_appkey_,
 //                        u16_svr_port_,
@@ -150,7 +150,7 @@ int32_t CthriftSvr::Init(void) {
                                              &sg_service_);
 
     countdown_connthread_init.wait();
-    CTHRIFT_LOG_INFO("conn thread init done");
+    CTHRIFT_LOG_INFO("conn thread init done ---");
 
     // init worker thread
     string str_pool_name("cthrift_svr_worker_event_thread_pool");
