@@ -165,7 +165,9 @@ void tst_list_splice() {
 
 }
 
+
 class Connect {
+
 //    class Connect : public std::enable_shared_from_this<Connect> {
 public:
     Connect() {
@@ -187,6 +189,8 @@ public:
     }
 private:
 };
+using ConnectPtr = std::shared_ptr< Connect >;
+
 class ConnectEntry {
 public:
     ConnectEntry(const boost::weak_ptr<Connect>& inweakConn)
@@ -315,12 +319,20 @@ int xx1() {
 
 void tst_shared_ptr_2() {
 
+
+    {
+        ConnectPtr cObj = std::make_shared<Connect>();
+        std::cout << "cObj usecount=" << cObj.use_count() << std::endl;
+        cObj.reset();
+        std::cout << "cObj usecount=" << cObj.use_count() << std::endl;
+    }
+    return;
+
     xx1();return ;
     {
-        std::shared_ptr < Connect >  objC( new Connect );
-        std::shared_ptr < Connect >  objD = objC->GetPtr();
+        ConnectPtr  objC( new Connect );
+        ConnectPtr  objD = objC->GetPtr();
         std::cout << "objD usecount=" << objD.use_count() << std::endl;
-
     }
 
 //    std::shared_ptr < Connect > objC( new Connect );
@@ -334,7 +346,6 @@ void tst_shared_ptr_2() {
     std::shared_ptr< int > pobj = std::make_shared< int > (ival);
     std::shared_ptr< int > p2 = pobj;
     std::cout << "pobj usecount=" << pobj.use_count() << std::endl;
-
     return;
 
     std::shared_ptr<CA> item = getItem();
@@ -2005,12 +2016,15 @@ void tstFuture() {
 // add new 测试分支预测
 void tst_c11fun_entry(int argc, char *argv[]) {
 
-    tstFuture();
-    return ;
+    tst_shared_ptr_2(); return;
+
     {
         tstmakesharedptr();
         return;
     }
+
+    tstFuture();
+    return ;
     {
         // std::unique_ptr<int> pint(new int(1023));
         // std::cout << "pit=" << *pint << std::endl;
@@ -2066,8 +2080,7 @@ void tst_c11fun_entry(int argc, char *argv[]) {
 
     tst_run(); return;
 
-    print_x_val();
-    return;
+    print_x_val(); return;
 
     tst_stdmove();
     pfff1("xxv");

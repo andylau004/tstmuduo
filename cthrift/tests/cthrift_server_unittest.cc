@@ -5,6 +5,9 @@
 
 #include <string>
 #include <vector>
+
+#include "muduo/base/common.h"
+
 #include <gtest/gtest.h>
 #define private public
 #define protected public
@@ -60,6 +63,10 @@ public:
 };
 
 TEST_F(CthriftSvrTest, Handle_name) {
+    std::cout << "beg ,,,, exec tst_f handle_name" << std::endl;
+    deferTime([&]() {
+        std::cout << "end ,,,, exec tst_f handle_name" << std::endl;
+    });
     const std::string str_name = "com.sankuai.inf.newct_cthrift_svr";
 
     p_cthrift_svr_->StatMsgNumPerMin();

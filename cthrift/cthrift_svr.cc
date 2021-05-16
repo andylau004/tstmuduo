@@ -93,7 +93,6 @@ int32_t CthriftSvr::Init(void) {
     con_collection_interval_ = static_cast<double >(g_cthrift_config.server_conn_gctime_);
 
     CTHRIFT_LOG_INFO("thrift svr --- port=" << u16_svr_port_);
-    std::cout << "thrift svr --- port=" << u16_svr_port_ << std::endl;
 //    std::string str_reason;
 //    ret = ArgumentCheck(str_svr_appkey_,
 //                        u16_svr_port_,
@@ -267,11 +266,13 @@ void CthriftSvr::OnWriteComplete(const muduo::net::TcpConnectionPtr &conn) {
 }
 
 void CthriftSvr::OnConn(const TcpConnectionPtr &conn) {
+
     CTHRIFT_LOG_INFO(conn->localAddress().toIpPort() << " -> "
                      << conn->peerAddress().toIpPort()
                      << " is "
                      << (conn->connected() ? "UP" : "DOWN")
                      << " Name:" << conn->name());
+
     if (conn->connected()) {
         ++i32_curr_conn_num_;
 
@@ -288,7 +289,6 @@ void CthriftSvr::OnConn(const TcpConnectionPtr &conn) {
     } else if (0 < i32_curr_conn_num_) {
         --i32_curr_conn_num_;
     }
-
 }
 
 void CthriftSvr::Process(const boost::shared_ptr<muduo::net::Buffer> &sp_buf,

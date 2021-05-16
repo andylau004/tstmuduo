@@ -36,27 +36,27 @@ const int32_t g_string_limit = 16 * 1024 * 1024;
 AtomicInt32 g_atomic_i32_seq_id;
 
 int16_t meituan_cthrift::NumCPU(void) {
-  int16_t i16_cpu_num = static_cast<int16_t>(sysconf(_SC_NPROCESSORS_ONLN));
-  return i16_cpu_num;
+    int16_t i16_cpu_num = static_cast<int16_t>(sysconf(_SC_NPROCESSORS_ONLN));
+    return i16_cpu_num;
 }
 
 bool meituan_cthrift::CheckDoubleEqual(const double &d1, const double &d2) {
-  return fabs(d1 - d2) < numeric_limits<double>::epsilon();
+    return fabs(d1 - d2) < numeric_limits<double>::epsilon();
 }
 
 void meituan_cthrift::ReplaceAllDistinct(const string &old_value,
                                          const string &new_value,
                                          string *p_str) {
-  for (string::size_type pos(0); pos != string::npos;
-       pos += new_value.length()) {
-    if ((pos = p_str->find(old_value, pos)) != string::npos)
-      p_str->replace(pos, old_value.length(), new_value);
-    else break;
-  }
+    for (string::size_type pos(0); pos != string::npos;
+         pos += new_value.length()) {
+        if ((pos = p_str->find(old_value, pos)) != string::npos)
+            p_str->replace(pos, old_value.length(), new_value);
+        else break;
+    }
 }
 
 int32_t meituan_cthrift::GetStringLimit() {
-  return g_string_limit;
+    return g_string_limit;
 }
 
 bool meituan_cthrift::CheckOverTime(const muduo::Timestamp &timestamp,
@@ -64,7 +64,7 @@ bool meituan_cthrift::CheckOverTime(const muduo::Timestamp &timestamp,
                                     double *p_d_left_secs) {
     double d_time_diff_secs = timeDifference(Timestamp::now(), timestamp);
 
-//  CTHRIFT_LOG_DEBUG("d_time_diff_secs " << d_time_diff_secs);
+    CTHRIFT_LOG_DEBUG("d_time_diff_secs " << d_time_diff_secs);
 
     if (p_d_left_secs) {
         *p_d_left_secs = d_overtime_secs >
@@ -73,8 +73,8 @@ bool meituan_cthrift::CheckOverTime(const muduo::Timestamp &timestamp,
 
     if (d_overtime_secs < d_time_diff_secs ||
             (CheckDoubleEqual(d_overtime_secs, d_time_diff_secs))) {
-//    CTHRIFT_LOG_WARN("overtime " << d_overtime_secs << "secs, timediff "
-//                                 << d_time_diff_secs << " secs");
+        CTHRIFT_LOG_WARN("overtime " << d_overtime_secs << "secs, timediff "
+                         << d_time_diff_secs << " secs");
         return true;
     }
 
@@ -82,15 +82,15 @@ bool meituan_cthrift::CheckOverTime(const muduo::Timestamp &timestamp,
 }
 
 bool meituan_cthrift::ValidatePort(const unsigned int &port) {
-  if (port < 1 || port > 65535) {
-    return false;
-  }
-  return true;
+    if (port < 1 || port > 65535) {
+        return false;
+    }
+    return true;
 }
 
 string meituan_cthrift::StrToLower(const string &str_tmp) {
-  string str_lower(str_tmp);
-  transform(str_lower.begin(), str_lower.end(), str_lower.begin(), ::tolower);
+    string str_lower(str_tmp);
+    transform(str_lower.begin(), str_lower.end(), str_lower.begin(), ::tolower);
 
-  return str_lower;
+    return str_lower;
 }

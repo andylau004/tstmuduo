@@ -77,9 +77,9 @@ void my_echo(EchoCobClient *client) {
 void TestAsyncSvrList(const string &str_svr_appkey,
                       const string &str_cli_appkey,
                       const int32_t &i32_loop_num) {
-    std::cout << "beg test async svr list... " << std::endl;
+    CTHRIFT_LOG_INFO("beg test async svr list... ");
     deferTime([&]() {
-        std::cout << "end test async svr list... " << std::endl;
+        CTHRIFT_LOG_INFO("end test async svr list... ");
     });
 
     //建议CthriftClient生命期也和线程保持一致，不要一次请求创建销毁一次
@@ -94,6 +94,7 @@ void TestAsyncSvrList(const string &str_svr_appkey,
         return;
     }
     if (SUCCESS != cthrift_client->Init()) {
+        CTHRIFT_LOG_ERROR("cthrift client init failed!");
         return;
     }
     /* 注意：72行～84行关键代码段的Cthrift Client的初始化流程，请保证线程安全问题；
@@ -192,6 +193,11 @@ public:
 };
 
 void TestRegSvr(muduo::net::EventLoop *p_event_loop) {
+    CTHRIFT_LOG_INFO("beg test reg svr... ");
+    deferTime([&]() {
+        CTHRIFT_LOG_INFO("end test reg svr... ");
+    });
+
     boost::shared_ptr<EchoHandler> handler(new EchoHandler());
     boost::shared_ptr<TProcessor> processor(new EchoProcessor(handler));
 
@@ -228,7 +234,7 @@ int main(int argc, char **argv) {
         std::cout << "--------111" << std::endl;
         exit(-1);
     }
-    std::cout << "--------222345" << std::endl;
+    std::cout << "--------2223456" << std::endl;
     string str_svr_appkey("com.sankuai.inf.newct");
     string str_cli_appkey("com.sankuai.inf.newct.client");
     int32_t i32_echo_time = 100;
@@ -239,7 +245,7 @@ int main(int argc, char **argv) {
             i32_echo_time = atoi(argv[2]);
         }
     }
-    CTHRIFT_LOG_DEBUG("str_svr_appkey: " << str_svr_appkey << " i32_echo_time: " << i32_echo_time);
+    CTHRIFT_LOG_INFO("srv app key=" << str_svr_appkey << ", echo time=" << i32_echo_time);
 
     g_sp_thread_svr =
             boost::make_shared<muduo::Thread>(boost::bind(&TestRegSvr, &event_loop));

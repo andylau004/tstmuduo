@@ -45,14 +45,16 @@ int CthriftClient::InitWorker(bool async) {
             str_svr_appkey_ + str_serviceName_filter_ +
             boost::lexical_cast<std::string>(i32_port_filter_) + str_server_ip_
             + boost::lexical_cast<std::string>(i16_server_port_);
-    printf("async=%d srvip=%s port=%d\n", async, str_server_ip_.c_str(), i16_server_port_);
-    printf("map_key=%s\n", map_key.c_str());
+
+    printf("async=%d srvip=%s port=%d map_key=%s\n",
+           async, str_server_ip_.c_str(), i16_server_port_, map_key.c_str());
 
     if (async) {// async模式下，必须开启并发模式；因为异步场景下thrift本身的sendBuf无法保证线程安全
         b_parallel_ = true;
     }
     do {
         muduo::MutexLockGuard work_lock(work_resource_lock_);
+
         if (!b_parallel_ && map_appkey_worker_.count(map_key) >= i32_worker_num_) {
             std::pair<boost::unordered_multimap<string, WorkerWeakPtr>::iterator,
                       boost::unordered_multimap<string, WorkerWeakPtr>::iterator>
@@ -71,8 +73,7 @@ int CthriftClient::InitWorker(bool async) {
                         i32_port_filter_,
                         str_server_ip_,
                         i16_server_port_);
-            if (async) {
-                // startup async thread
+            if (async) {// startup async thread
                 sp_cthrift_client_worker_->EnableAsync(i32_timeout_ms_);
             }
 
@@ -140,8 +141,8 @@ int CthriftClient::Init(void) {
 
     int ret = g_cthrift_config.LoadConfig(true);
     if (ret != SUCCESS) {
-        printf("loadconfig failed\n");
-//        CTHRIFT_LOG_ERROR("Fail to load config. errno" <<  ret);
+        printf("loadconfig failed, ret=%d\n", ret);
+        CTHRIFT_LOG_ERROR("Fail to load config. errno" <<  ret);
         return ret;
     }
 

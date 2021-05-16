@@ -25,27 +25,27 @@
 
 #include "cthrift_ns_interface.h"
 
-//namespace meituan_cthrift {
+namespace meituan_cthrift {
 
-//class CthriftMnsImp {
-// public:
-//  CthriftMnsImp();
-//  int32_t Init();
-//  void Destroy();
+class CthriftMnsImp {
+ public:
+  CthriftMnsImp();
+  int32_t Init();
+  void Destroy();
 
-//  virtual ~CthriftMnsImp();
+  virtual ~CthriftMnsImp();
 
-//  int32_t GetSrvList(ServicePtr service, const int64_t rcv_watcher_time = -1);
+  int32_t GetSrvList(ServicePtr service, const int64_t rcv_watcher_time = -1);
 
-//  int32_t RegisterService(const meituan_mns::SGService &oservice,
-//                          meituan_mns::RegistCmd::type regCmd = meituan_mns::RegistCmd::REGIST,
-//                          int uptCmd = meituan_mns::UptCmd::RESET);
+  int32_t RegisterService(const meituan_mns::SGService &oservice,
+                          meituan_mns::RegistCmd::type regCmd = meituan_mns::RegistCmd::REGIST,
+                          int uptCmd = meituan_mns::UptCmd::RESET);
 
-//};
+};
 
-//extern meituan_cthrift::CthriftMnsImp g_cthrift_mns_default;
+extern meituan_cthrift::CthriftMnsImp g_cthrift_mns_default;
 
-//}  // namespace meituan_cthrift
+}  // namespace meituan_cthrift
 
 
 #endif  // CTHRIFT_SRC_CTHRIFT_UTIL_CTHRIFT_NS_IMP_H_

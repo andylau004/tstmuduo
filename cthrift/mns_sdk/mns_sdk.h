@@ -25,7 +25,6 @@
 #include "mns_worker.h"
 
 namespace mns_sdk {
-/*
 //获取服务列表回调函数，允许为空，另外注意MNS库的子线程在执行该函数，注意线程安全问题
 typedef boost::function<void(const std::vector<meituan_mns::SGService> &vec,
                              const std::string &str_svr_appkey)>
@@ -91,7 +90,6 @@ int8_t AddUpdateSvrListCallback(const std::string &str_svr_appkey,
                                 std::string *p_err_info);
 
 void DestroyMNS(void);//退出时调用
-*/
 }
 #endif //OCTO_OPEN_SOURCE_MNS_SDK_H_
 

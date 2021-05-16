@@ -185,7 +185,6 @@ void TestRegSvr(muduo::net::EventLoop *p_event_loop) {
 int main(int argc, char **argv) {
 
     testing::InitGoogleTest(&argc, argv);
-
     log4cplus::PropertyConfigurator::doConfigure(LOG4CPLUS_TEXT("log4cplus.conf"));
 
     if (CTHRIFT_UNLIKELY(4 < argc)) {
@@ -207,15 +206,13 @@ int main(int argc, char **argv) {
             i32_echo_time = atoi(argv[2]);
         }
     }
-
-    CTHRIFT_LOG_DEBUG(
-                "str_svr_appkey: " << str_svr_appkey << " i32_echo_time: " << i32_echo_time);
+    CTHRIFT_LOG_INFO("srv app key=" << str_svr_appkey << ", echo time=" << i32_echo_time);
 
     g_sp_thread_svr =
             boost::make_shared<muduo::Thread>(boost::bind(&TestRegSvr, &event_loop));
     g_sp_thread_svr->start();
 
-    muduo::CurrentThread::sleepUsec(3000 * 1000); //wait 5s for reg svr
+    muduo::CurrentThread::sleepUsec(1000 * 1000); //wait 5s for reg svr
 
     g_sp_thread_cli =
             boost::make_shared<muduo::Thread>(boost::bind(&TestGetSvrList,
@@ -225,7 +222,6 @@ int main(int argc, char **argv) {
     g_sp_thread_cli->start();
 
     event_loop.runAfter(10.0, boost::bind(&Quit));
-
     event_loop.loop();
 
     CTHRIFT_LOG_INFO("EXIT loop");

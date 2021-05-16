@@ -1,5 +1,5 @@
 
-
+#include "muduo/base/common.h"
 #include "cthrift_tbinary_protocol.h"
 #include "cthrift_client_worker.h"
 
@@ -425,6 +425,9 @@ void CthriftClientWorker::InitSgagentHandlerThread(void) {
 
 void CthriftClientWorker::InitWorker(void) {
     CTHRIFT_LOG_INFO("InitWorker begin");
+    deferTime ([&](){
+        CTHRIFT_LOG_INFO("InitWorker end");
+    });
     p_multimap_weight_wptcpcli_ = new multimap<double, TcpClientWeakPtr, WeightSort>;  // exit del, safe
 
     if (b_user_set_ip) {
@@ -452,7 +455,6 @@ void CthriftClientWorker::InitWorker(void) {
                                              this));
     }
 
-    CTHRIFT_LOG_INFO("InitWorker end");
 }
 
 bool CthriftClientWorker::FilterAll(const meituan_mns::SGService &sg) {

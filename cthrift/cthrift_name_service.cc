@@ -285,6 +285,9 @@ int32_t CthriftNameService::InitNS() {
         return 0;
     }
     CTHRIFT_LOG_INFO("InitNS BEGIN");
+    deferTime ([&]() {
+        CTHRIFT_LOG_INFO("InitNS END");
+    });
 
     if(g_cthrift_config.mns_origin_){
         // 用户可以设置自己的注册及获取服务列表函数 桥接模式
@@ -318,7 +321,6 @@ int32_t CthriftNameService::InitNS() {
 //    }
 
     b_is_init_ns_ = true;
-    CTHRIFT_LOG_INFO("InitNS END");
     return 0;
 }
 
