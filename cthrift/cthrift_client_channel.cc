@@ -27,8 +27,8 @@ void CthriftClientChannel::sendAndRecvMessage(
         const TAsyncChannel::VoidCallback &cob,
         TMemoryBuffer *sendBuf,
         TMemoryBuffer *recvBuf) {
-    // sendBuf不具备持久性，copy一份sendBuf内容
-    uint8_t *src_buf;
+
+    uint8_t *src_buf;// sendBuf不具备持久性，copy一份sendBuf内容
     uint32_t sz = 0;
     sendBuf->getBuffer(&src_buf, &sz);
 
@@ -51,14 +51,14 @@ void CthriftClientChannel::sendAndRecvMessage(
     sendBuf->resetBuffer();
 
     // 构建上下文内容
-    SharedContSharedPtr sp_shared_worker_transport_ = boost::make_shared<
-            SharedBetweenWorkerTransport>(&mutexlock_conn_ready,
-                                          &cond_ready_read,
-                                          sp_mutexlock_read_buf,
-                                          &sp_read_buf,
-                                          sp_mutexlock_write_buf,
-                                          &sp_write_buf,
-                                          sp_cthrift_client_->GetTimeout());
+    SharedContSharedPtr sp_shared_worker_transport_ =
+            boost::make_shared<SharedBetweenWorkerTransport>(&mutexlock_conn_ready,
+                                                             &cond_ready_read,
+                                                             sp_mutexlock_read_buf,
+                                                             &sp_read_buf,
+                                                             sp_mutexlock_write_buf,
+                                                             &sp_write_buf,
+                                                             sp_cthrift_client_->GetTimeout());
 
     sp_shared_worker_transport_->async_flag = true;
     sp_shared_worker_transport_->str_id = str_id;
@@ -80,8 +80,7 @@ void CthriftClientChannel::sendAndRecvMessage(
     bool b_timeout;
     double d_wait_secs = 0.0;
     const double d_timeout_secs =
-            static_cast<double>(sp_cthrift_client_->GetTimeout()) /
-            MILLISENCOND_COUNT_IN_SENCOND;
+            static_cast<double>(sp_cthrift_client_->GetTimeout()) / MILLISENCOND_COUNT_IN_SENCOND;
 
     while (0 >= sp_cthrift_client_worker_->atomic_avaliable_conn_num())
     {  // while, NOT if
@@ -99,8 +98,7 @@ void CthriftClientChannel::sendAndRecvMessage(
                 } else {
                     CTHRIFT_LOG_ERROR("wait " << d_wait_secs << " secs for good conn timeout");
                     throw TTransportException(TTransportException::TIMED_OUT,
-                                              "wait for good conn timeout, ""maybe conn"
-                                              " all be occupied or server list empty");
+                                              "wait for good conn timeout, maybe conn all be occupied or server list empty");
                 }
             }
 
@@ -109,8 +107,7 @@ void CthriftClientChannel::sendAndRecvMessage(
                                  << "ms countdown to 0, but no good conn ready, maybe server busy");
 
                 throw TTransportException(TTransportException::TIMED_OUT,
-                                          "wait for good conn timeout, maybe conn all"
-                                          " be occupied or server list empty");
+                                          "wait for good conn timeout, maybe conn all be occupied or server list empty");
             }
         }
     }

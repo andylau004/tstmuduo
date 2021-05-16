@@ -416,6 +416,8 @@ int8_t CthriftClientWorker::ChooseNextReadyConn(TcpClientWeakPtr *p_wp_tcpcli) {
 //}
 
 void CthriftClientWorker::InitSgagentHandlerThread(void) {
+    CTHRIFT_LOG_INFO("init sgagent handler thrd begin, curTid=" << CurrentThread::tid());
+
     p_event_loop_sgagent_->runInLoop(
                 boost::bind(&CthriftClientWorker::GetSvrList, this));
 
@@ -424,9 +426,9 @@ void CthriftClientWorker::InitSgagentHandlerThread(void) {
 }
 
 void CthriftClientWorker::InitWorker(void) {
-    CTHRIFT_LOG_INFO("InitWorker begin");
+    CTHRIFT_LOG_INFO("InitWorker begin, curTid=" << CurrentThread::tid());
     deferTime ([&](){
-        CTHRIFT_LOG_INFO("InitWorker end");
+        CTHRIFT_LOG_INFO("InitWorker end, curTid=" << CurrentThread::tid());
     });
     p_multimap_weight_wptcpcli_ = new multimap<double, TcpClientWeakPtr, WeightSort>;  // exit del, safe
 
@@ -471,6 +473,8 @@ bool CthriftClientWorker::FilterPort(const meituan_mns::SGService &sg) {
 }
 
 void CthriftClientWorker::GetSvrList(void) {
+    CTHRIFT_LOG_INFO("init GetSvrList, curTid=" << CurrentThread::tid());
+
     ServicePtr service = boost::make_shared<meituan_mns::getservice_res_param_t>();
 
     service->__set_localAppkey(str_client_appkey_);
@@ -530,35 +534,30 @@ void CthriftClientWorker::AddSrv(const vector<meituan_mns::SGService> &vec_add_s
     vector<meituan_mns::SGService> vec_chg_sgservice;
     MultiMapIter it_multimap;
 
-    vector<meituan_mns::SGService>::const_iterator
-            it_sgservice = vec_add_sgservice
-            .begin();
-//    while (it_sgservice != vec_add_sgservice.end()) {
-//        const meituan_mns::SGService &sgservice = *it_sgservice;
+    vector<meituan_mns::SGService>::const_iterator it_sgservice = vec_add_sgservice.begin();
+    while (it_sgservice != vec_add_sgservice.end()) {
+        const meituan_mns::SGService &sgservice = *it_sgservice;
 
-//        try {
-//            str_port = boost::lexical_cast<std::string>(sgservice.port);
-//        } catch (boost::bad_lexical_cast &e) {
-////            CTHRIFT_LOG_ERROR("boost::bad_lexical_cast :" << e.what()
-////                              << "sgservice.port "
-////                              << sgservice.port);
+        try {
+            str_port = boost::lexical_cast<std::string>(sgservice.port);
+        } catch (boost::bad_lexical_cast &e) {
+            CTHRIFT_LOG_ERROR("boost::bad_lexical_cast: " << e.what() << ", sgservice.port: " << sgservice.port);
+            ++it_sgservice;
+            continue;
+        }
 
-//            ++it_sgservice;
-//            continue;
-//        }
+        ConnInfoSharedPtr
+                &sp_conninfo = map_ipport_spconninfo_[sgservice.ip + ":" + str_port];
 
-//        ConnInfoSharedPtr
-//                &sp_conninfo = map_ipport_spconninfo_[sgservice.ip + ":" + str_port];
+        if (CTHRIFT_UNLIKELY(sp_conninfo.get())) {
+            CTHRIFT_LOG_WARN("svr " << CthriftNameService::SGService2String(sgservice)
+                             << " already exist in map_ipport_sptcpcli, just change it");
 
-//        if (CTHRIFT_UNLIKELY(sp_conninfo.get())) {
-//            CTHRIFT_LOG_WARN("svr " << CthriftNameService::SGService2String(sgservice)
-//                             << " already exist in map_ipport_sptcpcli, just change it");
+            vec_chg_sgservice.push_back(sgservice);
+            ++it_sgservice;
 
-//            vec_chg_sgservice.push_back(sgservice);
-//            ++it_sgservice;
-
-//            continue;
-//        }
+            continue;
+        }
 
 //        sp_conninfo = boost::make_shared<ConnInfo>(sgservice,
 //                                                   p_multimap_weight_wptcpcli_);
@@ -597,7 +596,7 @@ void CthriftClientWorker::AddSrv(const vector<meituan_mns::SGService> &vec_add_s
 //        sp_tcpcli->connect();
 
 //        ++it_sgservice;
-//    }
+    }
 
 //    if (vec_chg_sgservice.size()) {
 ////        CTHRIFT_LOG_ERROR("Add trans to Chg");

@@ -70,81 +70,78 @@ void CthriftNameService::PackDefaultSgservice(
     p_sgservice->__set_heartbeatSupport(0);
 }
 
-//string CthriftNameService::SGService2String(
-//    const meituan_mns::SGService &sgservice) {
-//  string str_ret
-//      ("appkey:" + sgservice.appkey + " version:" + sgservice.version + " ip:"
-//           + sgservice.ip);
+string CthriftNameService::SGService2String(const meituan_mns::SGService &sgservice) {
+  string str_ret
+      ("appkey:" + sgservice.appkey + " version:" + sgservice.version + " ip:" + sgservice.ip);
 
-//  try {
-//    str_ret.append(" port:" + boost::lexical_cast<string>(sgservice.port));
-//  } catch (boost::bad_lexical_cast &e) {
+  try {
+    str_ret.append(" port:" + boost::lexical_cast<string>(sgservice.port));
+  } catch (boost::bad_lexical_cast &e) {
+    CTHRIFT_LOG_ERROR("boost::bad_lexical_cast :" << e.what()
+                                                  << "sgservice.port : "
+                                                  << sgservice.port);
+  }
 
-//    ////CTHRIFT_LOG_ERROR("boost::bad_lexical_cast :" << e.what()
-//                                                  << "sgservice.port : "
-//                                                  << sgservice.port);
-//  }
+  try {
+    str_ret.append(
+        " weight:" + boost::lexical_cast<string>(sgservice.weight));
+  } catch (boost::bad_lexical_cast &e) {
 
-//  try {
-//    str_ret.append(
-//        " weight:" + boost::lexical_cast<string>(sgservice.weight));
-//  } catch (boost::bad_lexical_cast &e) {
+    CTHRIFT_LOG_ERROR("boost::bad_lexical_cast :" << e.what()
+                                                  << "sgservice.weight : "
+                                                  << sgservice.weight);
+  }
 
-//    ////CTHRIFT_LOG_ERROR("boost::bad_lexical_cast :" << e.what()
-//                                                  << "sgservice.weight : "
-//                                                  << sgservice.weight);
-//  }
+  try {
+    str_ret.append(
+        " status:" + boost::lexical_cast<string>(sgservice.status));
+  } catch (boost::bad_lexical_cast &e) {
 
-//  try {
-//    str_ret.append(
-//        " status:" + boost::lexical_cast<string>(sgservice.status));
-//  } catch (boost::bad_lexical_cast &e) {
+      CTHRIFT_LOG_ERROR("boost::bad_lexical_cast :" << e.what()
+                                                        << "sgservice.status : "
+                                                        << sgservice.status);
+  }
 
-//    ////CTHRIFT_LOG_ERROR("boost::bad_lexical_cast :" << e.what()
-//                                                  << "sgservice.status : "
-//                                                  << sgservice.status);
-//  }
+  try {
+    str_ret.append(" role:" + boost::lexical_cast<string>(sgservice.role));
+  } catch (boost::bad_lexical_cast &e) {
 
-//  try {
-//    str_ret.append(" role:" + boost::lexical_cast<string>(sgservice.role));
-//  } catch (boost::bad_lexical_cast &e) {
+      CTHRIFT_LOG_ERROR("boost::bad_lexical_cast :" << e.what()
+                        << "sgservice.role : "
+                        << sgservice.role);
+  }
 
-//    ////CTHRIFT_LOG_ERROR("boost::bad_lexical_cast :" << e.what()
-//                                                  << "sgservice.role : "
-//                                                  << sgservice.role);
-//  }
+  try {
+    str_ret.append(
+        " envir:" + boost::lexical_cast<string>(sgservice.envir));
+  } catch (boost::bad_lexical_cast &e) {
 
-//  try {
-//    str_ret.append(
-//        " envir:" + boost::lexical_cast<string>(sgservice.envir));
-//  } catch (boost::bad_lexical_cast &e) {
+    CTHRIFT_LOG_ERROR("boost::bad_lexical_cast :" << e.what()
+                                                  << "sgservice.envir : "
+                                                  << sgservice.envir);
+  }
 
-//    ////CTHRIFT_LOG_ERROR("boost::bad_lexical_cast :" << e.what()
-//                                                  << "sgservice.envir : "
-//                                                  << sgservice.envir);
-//  }
+  try {
+    str_ret.append(
+        " fweight:" + boost::lexical_cast<string>(sgservice.fweight));
+  } catch (boost::bad_lexical_cast &e) {
 
-//  try {
-//    str_ret.append(
-//        " fweight:" + boost::lexical_cast<string>(sgservice.fweight));
-//  } catch (boost::bad_lexical_cast &e) {
-
-//    ////CTHRIFT_LOG_ERROR("boost::bad_lexical_cast :" << e.what()
+    //CTHRIFT_LOG_ERROR("boost::bad_lexical_cast :" << e.what()
 //                                                  << "sgservice.fweight : "
 //                                                  << sgservice.fweight);
-//  }
+  }
 
-//  try {
-//    str_ret.append(" serverType:"
-//                       + boost::lexical_cast<string>(sgservice.serverType));
-//  } catch (boost::bad_lexical_cast &e) {
+  try {
+    str_ret.append(" serverType:"
+                       + boost::lexical_cast<string>(sgservice.serverType));
+  } catch (boost::bad_lexical_cast &e) {
 
-//    //CTHRIFT_LOG_ERROR("boost::bad_lexical_cast :" << e.what()
+    //CTHRIFT_LOG_ERROR("boost::bad_lexical_cast :" << e.what()
 //                                                  << "sgservice.serverType : "
 //                                                  << sgservice.serverType);
-//  }
-//  return str_ret;
-//}
+  }
+  return str_ret;
+}
 
 void CthriftNameService::IntranetIp(char ip[INET_ADDRSTRLEN]) {
     struct ifaddrs *ifAddrStruct = NULL;

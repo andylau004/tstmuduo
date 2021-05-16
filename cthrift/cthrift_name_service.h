@@ -57,7 +57,7 @@ class CthriftNameService {
                                    const uint16_t &u16_port,
                                    meituan_mns::SGService *p_sgservice);
 
-//  static std::string SGService2String(const meituan_mns::SGService &sgservice);
+  static std::string SGService2String(const meituan_mns::SGService &sgservice);
 
   static double FetchOctoWeight(const double &fweight, const double &weight);
 

@@ -61,6 +61,9 @@
 #include <thrift/concurrency/PlatformThreadFactory.h>
 
 
+#include <thrift/async/TAsyncChannel.h>
+#include <thrift/async/TEvhttpClientChannel.h>
+
 #include <thrift/protocol/TBinaryProtocol.h>
 #include <thrift/protocol/TJSONProtocol.h>
 #include <thrift/transport/TBufferTransports.h>
@@ -75,6 +78,8 @@
 
 #include "boostany.h"
 #include "threadsepcific.h"
+
+
 
 ///////////////////////////////////
 
@@ -318,7 +323,6 @@ int xx1() {
 }
 
 void tst_shared_ptr_2() {
-
 
     {
         ConnectPtr cObj = std::make_shared<Connect>();
@@ -2012,11 +2016,19 @@ void tstFuture() {
     task_lambda();
 
 }
+
+
+
+#include "async_thrift_client.h"
+
 // 2020-6-20
 // add new 测试分支预测
 void tst_c11fun_entry(int argc, char *argv[]) {
 
-    tst_shared_ptr_2(); return;
+    tst_async_thrift_client(); return;
+    
+    tst_shared_ptr_2();
+    return;
 
     {
         tstmakesharedptr();
@@ -2090,7 +2102,6 @@ void tst_c11fun_entry(int argc, char *argv[]) {
     tstC11Thrd(); return;
 //    OutputDbgInfo tmpOut( "tst_c11fun_entry begin", "tst_c11fun_entry end" );
     tst_getline(); return;
-    tst_shared_ptr_2();  return;
 
     GetCurSecond();  return;
 

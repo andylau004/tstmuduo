@@ -108,8 +108,8 @@ void TestAsyncSvrList(const string &str_svr_appkey,
     //业务借助AsyncCallback<class type>模版, 传入业务自己的回调处理callback: Success、Timeout ...
     boost::function<void(EchoCobClient *client)> echo_cob = boost::bind(&my_echo, _1);
     AsyncCallback <EchoCobClient> *pecho = new AsyncCallback<EchoCobClient>();
-    //传入成功处理callback
-    pecho->Success(echo_cob);
+    pecho->Success(echo_cob);//传入成功处理callback
+
     boost::function<void(EchoCobClient *client)>
             cob = boost::bind(&AsyncCallback<EchoCobClient>::Callback, pecho, _1);
 
@@ -155,9 +155,7 @@ void TestAsyncSvrList(const string &str_svr_appkey,
         try {
             str_tmp = boost::lexical_cast<std::string>(i);
         } catch (boost::bad_lexical_cast &e) {
-
-            cerr << "boost::bad_lexical_cast :" << e.what()
-                 << "i : " << i;
+            cerr << "boost::bad_lexical_cast :" << e.what() << ", i : " << i;
             continue;
         }
 
@@ -193,9 +191,9 @@ public:
 };
 
 void TestRegSvr(muduo::net::EventLoop *p_event_loop) {
-    CTHRIFT_LOG_INFO("beg test reg svr... ");
+    CTHRIFT_LOG_INFO("beg --- test reg svr... ");
     deferTime([&]() {
-        CTHRIFT_LOG_INFO("end test reg svr... ");
+        CTHRIFT_LOG_INFO("end --- test reg svr... ");
     });
 
     boost::shared_ptr<EchoHandler> handler(new EchoHandler());
@@ -234,7 +232,7 @@ int main(int argc, char **argv) {
         std::cout << "--------111" << std::endl;
         exit(-1);
     }
-    std::cout << "--------2223456" << std::endl;
+    std::cout << "--------22234567" << std::endl;
     string str_svr_appkey("com.sankuai.inf.newct");
     string str_cli_appkey("com.sankuai.inf.newct.client");
     int32_t i32_echo_time = 100;

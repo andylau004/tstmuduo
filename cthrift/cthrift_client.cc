@@ -108,8 +108,7 @@ int CthriftClient::InitWorker(bool async) {
                 } else {
                     CTHRIFT_LOG_WARN("wait " << d_left_time_sec
                                      << " secs for good conn for "
-                                     << "appkey " << str_svr_appkey_
-                                     << " timeout, maybe need more time");
+                                     << "appkey " << str_svr_appkey_ << " timeout, maybe need more time");
                 }
                 return SUCCESS;
             }

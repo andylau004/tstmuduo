@@ -64,7 +64,7 @@ bool meituan_cthrift::CheckOverTime(const muduo::Timestamp &timestamp,
                                     double *p_d_left_secs) {
     double d_time_diff_secs = timeDifference(Timestamp::now(), timestamp);
 
-    CTHRIFT_LOG_DEBUG("d_time_diff_secs " << d_time_diff_secs);
+    CTHRIFT_LOG_INFO("d time diff secs=" << d_time_diff_secs);
 
     if (p_d_left_secs) {
         *p_d_left_secs = d_overtime_secs >

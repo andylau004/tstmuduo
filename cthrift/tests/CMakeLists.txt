@@ -70,13 +70,13 @@ add_library(util_unit_test_main_async STATIC ${unit_echo})
 
 
 set(TEST_FILE_LIST
-#        "cthrift_client_unittest.cc"
+        "cthrift_client_unittest.cc"
         "cthrift_transport_unittest.cc"
         "cthrift_common_unittest.cc"
         "cthrift_sg_agent_unittest.cc"
         "cthrift_util_zk_tools_unittest.cc"
         "cthrift_channel_unittest.cc"
-        )
+)
 
 foreach (TEST_FILE_NAME ${TEST_FILE_LIST})
 
