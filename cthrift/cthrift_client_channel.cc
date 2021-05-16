@@ -86,7 +86,7 @@ void CthriftClientChannel::sendAndRecvMessage(
 
     while (0 >= sp_cthrift_client_worker_->atomic_avaliable_conn_num())
     {  // while, NOT if
-//        CTHRIFT_LOG_WARN("No good conn from client worker, waiting");
+        CTHRIFT_LOG_WARN("No good conn from client worker, waiting");
 
         if (!CheckOverTime(sp_shared_worker_transport_->timestamp_start, d_timeout_secs, &d_wait_secs)) {
             do {
@@ -96,9 +96,9 @@ void CthriftClientChannel::sendAndRecvMessage(
 
             if (b_timeout) {
                 if (CTHRIFT_UNLIKELY(0 < sp_cthrift_client_worker_->atomic_avaliable_conn_num())) {
-//                    CTHRIFT_LOG_DEBUG("miss notify, but already get avaliable conn");
+                    CTHRIFT_LOG_DEBUG("miss notify, but already get avaliable conn");
                 } else {
-//                    CTHRIFT_LOG_ERROR("wait " << d_wait_secs << " secs for good conn timeout");
+                    CTHRIFT_LOG_ERROR("wait " << d_wait_secs << " secs for good conn timeout");
 
                     throw TTransportException(TTransportException::TIMED_OUT,
                                               "wait for good conn timeout, ""maybe conn"

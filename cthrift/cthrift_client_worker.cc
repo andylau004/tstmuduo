@@ -424,10 +424,10 @@ void CthriftClientWorker::InitSgagentHandlerThread(void) {
 }
 
 void CthriftClientWorker::InitWorker(void) {
-//    CTHRIFT_LOG_INFO("InitWorker begin");
+    CTHRIFT_LOG_INFO("InitWorker begin");
     p_multimap_weight_wptcpcli_ = new multimap<double, TcpClientWeakPtr, WeightSort>;  // exit del, safe
 
-//    if (b_user_set_ip) {
+    if (b_user_set_ip) {
 //        CTHRIFT_LOG_INFO("InitWorker b_user_set_ip  ip:"
 //                         << str_server_ip_ << " port:" << str_server_ip_);
 
@@ -443,16 +443,16 @@ void CthriftClientWorker::InitWorker(void) {
 //        p_event_loop_->runInLoop(boost::bind(&CthriftClientWorker::UpdateSvrList,
 //                                             this,
 //                                             list));
-//    } else {
-//        sp_event_thread_sgagent_ = boost::make_shared<muduo::net::EventLoopThread>();
+    } else {
+        sp_event_thread_sgagent_ = boost::make_shared<muduo::net::EventLoopThread>();
 
-//        p_event_loop_sgagent_ = sp_event_thread_sgagent_->startLoop();
-//        p_event_loop_sgagent_->runInLoop(boost::bind(
-//                                             &CthriftClientWorker::InitSgagentHandlerThread,
-//                                             this));
-//    }
+        p_event_loop_sgagent_ = sp_event_thread_sgagent_->startLoop();
+        p_event_loop_sgagent_->runInLoop(boost::bind(
+                                             &CthriftClientWorker::InitSgagentHandlerThread,
+                                             this));
+    }
 
-//    CTHRIFT_LOG_INFO("InitWorker end");
+    CTHRIFT_LOG_INFO("InitWorker end");
 }
 
 bool CthriftClientWorker::FilterAll(const meituan_mns::SGService &sg) {
@@ -469,11 +469,11 @@ bool CthriftClientWorker::FilterPort(const meituan_mns::SGService &sg) {
 }
 
 void CthriftClientWorker::GetSvrList(void) {
-//    ServicePtr service = boost::make_shared<meituan_mns::getservice_res_param_t>();
+    ServicePtr service = boost::make_shared<meituan_mns::getservice_res_param_t>();
 
-//    service->__set_localAppkey(str_client_appkey_);
-//    service->__set_remoteAppkey(str_svr_appkey_);
-//    service->__set_protocol("thrift");
+    service->__set_localAppkey(str_client_appkey_);
+    service->__set_remoteAppkey(str_svr_appkey_);
+    service->__set_protocol("thrift");
 
 ////    int ret = CthriftNameService::GetSrvListFrom(service);
 

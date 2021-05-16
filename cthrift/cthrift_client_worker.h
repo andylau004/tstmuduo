@@ -174,7 +174,7 @@ private:
     // MultiMapIter it_last_choose_conn;
 
     boost::shared_ptr<muduo::net::EventLoopThread> sp_event_thread_;
-    boost::shared_ptr<muduo::net::EventLoopThread> sp_event_thread_sgagent;
+    boost::shared_ptr<muduo::net::EventLoopThread> sp_event_thread_sgagent_;
 
     muduo::net::EventLoop *p_event_loop_;
     muduo::net::EventLoop *p_event_loop_sgagent_;

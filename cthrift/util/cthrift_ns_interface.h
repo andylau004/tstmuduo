@@ -36,96 +36,96 @@
 #include "cthrift_zk_client.h"
 #include "log4cplus.h"
 
-//namespace meituan_cthrift {
+namespace meituan_cthrift {
 
-//typedef boost::shared_ptr<meituan_mns::getservice_res_param_t> ServicePtr;
-//typedef boost::function<void()> DestroyFunction;
-//typedef boost::function<int()> InitFunction;
-//typedef boost::function<int(ServicePtr service,
-//                            const long rcv_watcher_time)> GetFunction;
-//typedef boost::function<int(const meituan_mns::SGService &oservice,
-//                            meituan_mns::RegistCmd::type regCmd,
-//                            int uptCmd)> RegFunction;
+typedef boost::shared_ptr<meituan_mns::getservice_res_param_t> ServicePtr;
+typedef boost::function<void()> DestroyFunction;
+typedef boost::function<int()> InitFunction;
+typedef boost::function<int(ServicePtr service,
+                            const long rcv_watcher_time)> GetFunction;
+typedef boost::function<int(const meituan_mns::SGService &oservice,
+                            meituan_mns::RegistCmd::type regCmd,
+                            int uptCmd)> RegFunction;
 
-//class CthriftNsInterface {
-// public:
-//  void SetRegFunction(RegFunction reg) {
-//    reg_ = reg;
-//  }
+class CthriftNsInterface {
+public:
+    void SetRegFunction(RegFunction reg) {
+        reg_ = reg;
+    }
 
-//  void SetInitFunction(InitFunction init) {
-//    init_ = init;
-//  }
+    void SetInitFunction(InitFunction init) {
+        init_ = init;
+    }
 
-//  void SetDesFunction(DestroyFunction des) {
-//    destroy_ = des;
-//  }
+    void SetDesFunction(DestroyFunction des) {
+        destroy_ = des;
+    }
 
-//  void SetGetFunction(GetFunction get) {
-//    get_ = get;
-//  }
+    void SetGetFunction(GetFunction get) {
+        get_ = get;
+    }
 
-//  CthriftNsInterface() {
-//    init_ = boost::bind(&CthriftNsInterface::OnInit, this);
-//    destroy_ = boost::bind(&CthriftNsInterface::OnDestory, this);
-//    reg_ = boost::bind(&CthriftNsInterface::OnRegisterService,
-//                       this, _1, _2, _3);
-//    get_ = boost::bind(&CthriftNsInterface::OnGetSrvList,
-//                       this, _1, _2);
-//  }
+    CthriftNsInterface() {
+        init_ = boost::bind(&CthriftNsInterface::OnInit, this);
+        destroy_ = boost::bind(&CthriftNsInterface::OnDestory, this);
+        reg_ = boost::bind(&CthriftNsInterface::OnRegisterService,
+                           this, _1, _2, _3);
+        get_ = boost::bind(&CthriftNsInterface::OnGetSrvList,
+                           this, _1, _2);
+    }
 
-//  virtual ~CthriftNsInterface() {
-//  }
+    virtual ~CthriftNsInterface() {
+    }
 
-//  int32_t Init() {
-//    return init_();
-//  }
+    int32_t Init() {
+        return init_();
+    }
 
-//  void Destory() {
-//    destroy_();
-//  }
+    void Destory() {
+        destroy_();
+    }
 
-//  int32_t GetSrvList(ServicePtr service,
-//                     const int64_t rcv_watcher_time = -1) {
-//    return get_(service, rcv_watcher_time);
-//  }
+    int32_t GetSrvList(ServicePtr service,
+                       const int64_t rcv_watcher_time = -1) {
+        return get_(service, rcv_watcher_time);
+    }
 
-//  int32_t RegisterService(const meituan_mns::SGService &oservice,
-//                          meituan_mns::RegistCmd::type regCmd = meituan_mns::RegistCmd::REGIST,
-//                          int32_t uptCmd = meituan_mns::UptCmd::RESET) {
-//    return reg_(oservice, regCmd, uptCmd);
-//  }
+    int32_t RegisterService(const meituan_mns::SGService &oservice,
+                            meituan_mns::RegistCmd::type regCmd = meituan_mns::RegistCmd::REGIST,
+                            int32_t uptCmd = meituan_mns::UptCmd::RESET) {
+        return reg_(oservice, regCmd, uptCmd);
+    }
 
-// private:
-//  int32_t OnRegisterService(const meituan_mns::SGService &oservice,
-//                            meituan_mns::RegistCmd::type regCmd,
-//                            int32_t uptCmd) {
-//    CTHRIFT_LOG_WARN("OnRegisterService default.");
-//    return -1;
-//  }
+private:
+    int32_t OnRegisterService(const meituan_mns::SGService &oservice,
+                              meituan_mns::RegistCmd::type regCmd,
+                              int32_t uptCmd) {
+        CTHRIFT_LOG_WARN("OnRegisterService default.");
+        return -1;
+    }
 
-//  int32_t OnGetSrvList(ServicePtr service, const int64_t rcv_watcher_time) {
-//    CTHRIFT_LOG_WARN("OnGetSrvList default.");
-//    return -1;
-//  }
+    int32_t OnGetSrvList(ServicePtr service, const int64_t rcv_watcher_time) {
+        CTHRIFT_LOG_WARN("OnGetSrvList default.");
+        return -1;
+    }
 
-//  void OnDestory() {
-//    CTHRIFT_LOG_WARN("OnDestory default.");
-//    return;
-//  }
+    void OnDestory() {
+        CTHRIFT_LOG_WARN("OnDestory default.");
+        return;
+    }
 
-//  int32_t OnInit() {
-//    CTHRIFT_LOG_WARN("OnInit default.");
-//    return -1;
-//  }
+    int32_t OnInit() {
+        CTHRIFT_LOG_WARN("OnInit default.");
+        return -1;
+    }
 
-//  DestroyFunction destroy_;
-//  InitFunction init_;
-//  RegFunction reg_;
-//  GetFunction get_;
-//};
+    DestroyFunction destroy_;
+    InitFunction init_;
+    RegFunction reg_;
+    GetFunction get_;
+};
 
-//}  // namespace meituan_cthrift
+}  // namespace meituan_cthrift
 
 
 #endif  // CTHRIFT_SRC_CTHRIFT_UTIL_CTHRIFT_NS_INTERFACE_H_

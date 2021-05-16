@@ -44,7 +44,6 @@ int CthriftConfig::LoadConfig(const bool client) {
   std::ifstream in("conf.json");
 
   if (!in.is_open()) {
-      /*
     CTHRIFT_LOG_ERROR("conf.json empty && need one config named config"
                           ".json and content:\r\n"<< "{\"ns\": {\"origin\":"
         " \"127.0.0.1:2188\",\"ismns\": 0,\"env\":\"test\" },"
@@ -54,7 +53,6 @@ int CthriftConfig::LoadConfig(const bool client) {
         "\"server.WorkThreadNum\": 4,\"server.MaxConnNum\": 10000,"
         "\"server.ServerTimeOut\": 100,\"server.ConnGCTime\": 10,"
         "\"server.ConnThreadNum\": 4 }");
-        */
     return ERR_EMPRY_CONFIG;
   }
 

@@ -59,6 +59,7 @@ SET(MNS_ZK_SRC
         util/cthrift_common.h
         util/cthrift_ns_imp.cc
         util/cthrift_ns_imp.h
+        util/cthrift_ns_interface.h
         util/cthrift_zk_client.cc
         util/cthrift_zk_client.h
         util/zk_tools.cc

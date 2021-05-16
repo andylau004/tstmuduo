@@ -12,16 +12,19 @@
 #include <thread>         // std::thread, std::this_thread::yield
 
 
-#include <iostream>
 #include <string>
-#include <thread>
 #include <mutex>
 
+#include <cmath>
+#include <future>
+#include <functional>
 
 #include <cstdio>
 #include <cstdlib>
 #include <functional>
 #include <unordered_map>
+
+#include <memory>
 
 #include <boost/atomic.hpp>
 #include <boost/circular_buffer.hpp>
@@ -1308,8 +1311,20 @@ void tst_run() {
 #endif
 }
 
+class CObj {
+public:
+    CObj(int val) : val_(val) { 
+        printf("cst CObj, val_=%d addr=%p\n", val_, this);
+    }
+    ~CObj() {
+        printf("dst CObj, val_=%d addr=%p\n", val_, this);
+    }
+    int val_;
+};
 
 class CBase {
+    using CObjPtr = std::shared_ptr<CObj>;
+
 public:
     CBase() { std::cout << "cst cbase" << std::endl; }
     CBase(int val) {
@@ -1319,11 +1334,25 @@ public:
     ~CBase() {
         std::cout << "dst cbase" << std::endl;
     }
+    CObjPtr TestObjPtr() {
+        auto obj = new CObj(111);
+
+        CObjPtr resptr(obj, [](CObj * res) {
+            if (res) {
+                printf("del res, addr=%p\n", res);
+                delete res;
+            }
+        });
+        objPtr_.swap(resptr);
+        // return nullptr;
+        return objPtr_;
+    }
 
     virtual void Print() {
         printf("print base val\n");
     }
 private:
+    CObjPtr objPtr_;
     int m_val;
 };
 
@@ -1880,10 +1909,117 @@ void tst_memory_fence() {
     sleep(1);
 }
 
+const int loop_count = 100000000;
+
+void tstmakesharedptr() {
+
+    class Foo
+    {
+    public:
+        typedef std::shared_ptr<Foo> Ptr;
+
+        Foo()
+            : a(42)
+            , b(false)
+            , c(12.234)
+            , d("FooBarBaz")
+        {}
+
+    private:
+        int a;
+        bool b;
+        float c;
+        std::string d;
+    };
+#ifdef USE_MAKE_SHARED
+    printf("make shared ,,,,\n");
+
+#else
+    printf("no make shared ,,,,\n");
+#endif
+
+    deferTime([&]() {
+        for (int i = 0; i < loop_count; i++)
+        {
+            // #ifdef USE_MAKE_SHARED
+            //             Foo::Ptr p = std::make_shared<Foo>();
+            // #else
+            Foo::Ptr p = Foo::Ptr(new Foo);
+            // #endif
+        }
+    });
+
+    {
+        deferTime([&]() {
+            for (int i = 0; i < loop_count; i++)
+            {
+                Foo::Ptr p = std::make_shared<Foo>();
+            }
+        });
+
+    }
+
+}
+void task_lambda() {
+
+    {
+//        std::packaged_task<int()> task(std::bind(std::pow, 2, 11));
+//        std::future<int> result = task.get_future();
+//        task();
+//        std::cout << "task_bind:\t" << result.get() << '\n';
+//        return;
+    }
+    {
+//        std::packaged_task<int()> task(std::bind([](int x, int y) { return std::pow(x, y); }, 2, 3));
+        std::packaged_task<int()> task(std::bind([](int a, int b) {return a+b;}, 3, 9 ));
+        std::cout << "valid=" << task.valid() << std::endl;
+        std::future<int> result = task.get_future();
+        task();
+        std::cout << "task_bind:\t" << result.get() << '\n';
+        return;
+    }
+    {
+        std::packaged_task<int(int, int)> task([](int a, int b) {
+            return a+b;
+        });
+        std::cout << "valid=" << task.valid() << std::endl;
+        std::future<int> result = task.get_future();
+        task(3, 12);
+        std::cout << "task_bind:\t" << result.get() << '\n';
+        return;
+    }
+    {
+        std::packaged_task<int(int,int)> task([](int a, int b) {
+            return a+b;
+        });
+        std::future<int> res = task.get_future();
+        task(2, 9);
+        std::cout << "task_lambda res=" << res.get() << std::endl;
+    }
+}
+void tstFuture() {
+    task_lambda();
+
+}
 // 2020-6-20
 // add new 测试分支预测
 void tst_c11fun_entry(int argc, char *argv[]) {
 
+    tstFuture();
+    return ;
+    {
+        tstmakesharedptr();
+        return;
+    }
+    {
+        // std::unique_ptr<int> pint(new int(1023));
+        // std::cout << "pit=" << *pint << std::endl;
+
+        std::unique_ptr<CBase> cbase(new CBase(111));
+        auto tmpObj = cbase->TestObjPtr();
+        std::cout << "count=" << tmpObj.use_count() << std::endl;
+        return;
+    }
     tst_memory_fence();
     return;
 

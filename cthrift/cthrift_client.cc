@@ -47,19 +47,17 @@ int CthriftClient::InitWorker(bool async) {
             + boost::lexical_cast<std::string>(i16_server_port_);
     printf("async=%d srvip=%s port=%d\n", async, str_server_ip_.c_str(), i16_server_port_);
     printf("map_key=%s\n", map_key.c_str());
-    // async模式下，必须开启并发模式；因为异步场景下thrift本身的sendBuf无法保证线程安全
-    if (async) {
+
+    if (async) {// async模式下，必须开启并发模式；因为异步场景下thrift本身的sendBuf无法保证线程安全
         b_parallel_ = true;
     }
     do {
         muduo::MutexLockGuard work_lock(work_resource_lock_);
         if (!b_parallel_ && map_appkey_worker_.count(map_key) >= i32_worker_num_) {
             std::pair<boost::unordered_multimap<string, WorkerWeakPtr>::iterator,
-                    boost::unordered_multimap<string, WorkerWeakPtr>::iterator>
+                      boost::unordered_multimap<string, WorkerWeakPtr>::iterator>
                     range = map_appkey_worker_.equal_range(map_key);
-            for (boost::unordered_multimap<string, WorkerWeakPtr>::iterator
-                 it = range.first;
-                 it != range.second; ++it) {
+            for (boost::unordered_multimap<string, WorkerWeakPtr>::iterator it = range.first; it != range.second; ++it) {
                 if (!(it->second).expired()) {
                     sp_cthrift_client_worker_ = (it->second).lock();
                     break;
@@ -78,15 +76,16 @@ int CthriftClient::InitWorker(bool async) {
                 sp_cthrift_client_worker_->EnableAsync(i32_timeout_ms_);
             }
 
-            map_appkey_worker_.insert(
-                        std::make_pair(map_key, sp_cthrift_client_worker_));
+            map_appkey_worker_.insert(std::make_pair(map_key, sp_cthrift_client_worker_));
         }
     } while (0);
 
     Timestamp timestamp_start = Timestamp::now();
 
-    muduo::Condition &cond = sp_cthrift_client_worker_->cond_avaliable_conn_ready();
-    muduo::MutexLock &mtx = sp_cthrift_client_worker_->mutexlock_avaliable_conn_ready();
+    muduo::Condition
+            &cond = sp_cthrift_client_worker_->cond_avaliable_conn_ready();
+    muduo::MutexLock
+            &mtx = sp_cthrift_client_worker_->mutexlock_avaliable_conn_ready();
 
     const double d_default_timeout_secs
             = static_cast<double>(kI32DefaultTimeoutMsForClient) / MILLISENCOND_COUNT_IN_SENCOND;
@@ -122,7 +121,7 @@ int CthriftClient::InitWorker(bool async) {
         }
     }
 
-//    CTHRIFT_LOG_DEBUG("wait done, avaliable conn num " << sp_cthrift_client_worker_->atomic_avaliable_conn_num());
+    CTHRIFT_LOG_DEBUG("wait done, avaliable conn num " << sp_cthrift_client_worker_->atomic_avaliable_conn_num());
 
     // CLIENT_INIT(str_cli_appkey_, str_svr_appkey_); init cmtrace
     return SUCCESS;
@@ -143,7 +142,7 @@ int CthriftClient::Init(void) {
     if (ret != SUCCESS) {
         printf("loadconfig failed\n");
 //        CTHRIFT_LOG_ERROR("Fail to load config. errno" <<  ret);
-//        return ret;
+        return ret;
     }
 
     if (str_cli_appkey_.empty()) {
@@ -196,8 +195,7 @@ int CthriftClient::SetClientAppkey(const std::string &str_appkey) {
 }
 
 boost::shared_ptr<TProtocol> CthriftClient::GetCthriftProtocol(void) {
-//    CTHRIFT_LOG_INFO("cthrift transport init, thread info: "
-//                     << CurreCthriftTransportntThread::tid());
+    CTHRIFT_LOG_INFO("cthrift transport init, thread info: " << CurrentThread::tid());
 
     boost::shared_ptr<CthriftTransport> sp_cthrift_transport_
             = boost::make_shared<CthriftTransport>(
