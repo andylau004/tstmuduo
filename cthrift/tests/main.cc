@@ -66,7 +66,8 @@ void TestGetSvrList(const string &str_svr_appkey,
                     const string &str_cli_appkey,
                     const int32_t &i32_loop_num) {
     //建议CthriftClient生命期也和线程保持一致，不要一次请求创建销毁一次
-    CthriftClient cthrift_client(str_svr_appkey, 30);
+    CthriftClient cthrift_client("127.0.0.1", 16888, 12);
+//    CthriftClient cthrift_client(str_svr_appkey, 30);
 
     //设置client appkey，方便服务治理识别来源
     if (SUCCESS != cthrift_client.SetClientAppkey(str_cli_appkey)) {
@@ -76,9 +77,7 @@ void TestGetSvrList(const string &str_svr_appkey,
         return;
     }
     //确保业务EchoClient的生命期和线程生命期同，不要一次请求创建销毁一次EchoClient！！
-    EchoClient
-            client
-            (cthrift_client.GetCthriftProtocol());
+    EchoClient client(cthrift_client.GetCthriftProtocol());
     string strRet;
     string str_tmp;
     size_t sz;
@@ -184,17 +183,18 @@ void TestRegSvr(muduo::net::EventLoop *p_event_loop) {
 
 int main(int argc, char **argv) {
 
-    testing::InitGoogleTest(&argc, argv);
+//    testing::InitGoogleTest(&argc, argv);
     log4cplus::PropertyConfigurator::doConfigure(LOG4CPLUS_TEXT("log4cplus.conf"));
 
-    if (CTHRIFT_UNLIKELY(4 < argc)) {
-        CTHRIFT_LOG_ERROR(
-                    "prog <appkey,default \"com.sankuai.inf.newct\"> <echo loop time, default 100> <port, defalut 6666>");
-        cerr
-                << "prog <appkey,default \"com.sankuai.inf.newct\"> <echo loop time, default 100> <port, defalut 6666>"
-                << endl;
-        exit(-1);
-    }
+//    if (CTHRIFT_UNLIKELY(4 < argc)) {
+//        CTHRIFT_LOG_ERROR(
+//                    "prog <appkey,default \"com.sankuai.inf.newct\"> <echo loop time, default 100> <port, defalut 6666>");
+//        cerr
+//                << "prog <appkey,default \"com.sankuai.inf.newct\"> <echo loop time, default 100> <port, defalut 6666>"
+//                << endl;
+//        exit(-1);
+//    }
+    printf("----------------\n");
 
     string str_svr_appkey("com.sankuai.inf.newct");
     string str_cli_appkey("com.sankuai.inf.newct.client");
@@ -221,11 +221,11 @@ int main(int argc, char **argv) {
                                                           i32_echo_time));
     g_sp_thread_cli->start();
 
-    event_loop.runAfter(10.0, boost::bind(&Quit));
+//    event_loop.runAfter(1000.0, boost::bind(&Quit));
     event_loop.loop();
 
-    CTHRIFT_LOG_INFO("EXIT loop");
+//    CTHRIFT_LOG_INFO("EXIT loop");
 
-    return RUN_ALL_TESTS();;
+    return RUN_ALL_TESTS();
 }
 

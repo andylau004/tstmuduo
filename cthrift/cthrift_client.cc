@@ -81,45 +81,45 @@ int CthriftClient::InitWorker(bool async) {
         }
     } while (0);
 
-    Timestamp timestamp_start = Timestamp::now();
+//    Timestamp timestamp_start = Timestamp::now();
 
-    muduo::Condition
-            &cond = sp_cthrift_client_worker_->cond_avaliable_conn_ready();
-    muduo::MutexLock
-            &mtx = sp_cthrift_client_worker_->mutexlock_avaliable_conn_ready();
+//    muduo::Condition
+//            &cond = sp_cthrift_client_worker_->cond_avaliable_conn_ready();
+//    muduo::MutexLock
+//            &mtx = sp_cthrift_client_worker_->mutexlock_avaliable_conn_ready();
 
-    const double d_default_timeout_secs
-            = static_cast<double>(kI32DefaultTimeoutMsForClient) / MILLISENCOND_COUNT_IN_SENCOND;
-    double d_left_time_sec = 0.0;
-    bool b_timeout = false;
+//    const double d_default_timeout_secs
+//            = static_cast<double>(kI32DefaultTimeoutMsForClient) / MILLISENCOND_COUNT_IN_SENCOND;
+//    double d_left_time_sec = 0.0;
+//    bool b_timeout = false;
 
-    while (0 >= sp_cthrift_client_worker_->atomic_avaliable_conn_num()) {  // while, NOT if
-        CTHRIFT_LOG_WARN("No good conn for appkey " << str_svr_appkey_ << " from worker, wait");
+//    while (0 >= sp_cthrift_client_worker_->atomic_avaliable_conn_num()) {  // while, NOT if
+//        CTHRIFT_LOG_WARN("No good conn for appkey " << str_svr_appkey_ << " from worker, wait");
 
-        if (!CheckOverTime(timestamp_start, d_default_timeout_secs, &d_left_time_sec)) {
-            do {
-                muduo::MutexLockGuard lock(mtx);
-                b_timeout = cond.waitForSeconds(d_left_time_sec);
-            } while (0);
+//        if (!CheckOverTime(timestamp_start, d_default_timeout_secs, &d_left_time_sec)) {
+//            do {
+//                muduo::MutexLockGuard lock(mtx);
+//                b_timeout = cond.waitForSeconds(d_left_time_sec);
+//            } while (0);
 
-            if (b_timeout) {
-                if (CTHRIFT_UNLIKELY(0 < sp_cthrift_client_worker_->atomic_avaliable_conn_num())) {
-                    CTHRIFT_LOG_DEBUG("miss notify, but already get");
-                } else {
-                    CTHRIFT_LOG_WARN("wait " << d_left_time_sec
-                                     << " secs for good conn for "
-                                     << "appkey " << str_svr_appkey_ << " timeout, maybe need more time");
-                }
-                return SUCCESS;
-            }
+//            if (b_timeout) {
+//                if (CTHRIFT_UNLIKELY(0 < sp_cthrift_client_worker_->atomic_avaliable_conn_num())) {
+//                    CTHRIFT_LOG_DEBUG("miss notify, but already get");
+//                } else {
+//                    CTHRIFT_LOG_WARN("wait " << d_left_time_sec
+//                                     << " secs for good conn for "
+//                                     << "appkey " << str_svr_appkey_ << " timeout, maybe need more time");
+//                }
+//                return SUCCESS;
+//            }
 
-            if (CTHRIFT_UNLIKELY(CheckOverTime(timestamp_start, d_default_timeout_secs, 0))) {
-                CTHRIFT_LOG_WARN(d_default_timeout_secs << "secs countdown to 0, "
-                                                        <<  "but no good conn ready, maybe need more time");
-                return SUCCESS;
-            }
-        }
-    }
+//            if (CTHRIFT_UNLIKELY(CheckOverTime(timestamp_start, d_default_timeout_secs, 0))) {
+//                CTHRIFT_LOG_WARN(d_default_timeout_secs << "secs countdown to 0, "
+//                                                        <<  "but no good conn ready, maybe need more time");
+//                return SUCCESS;
+//            }
+//        }
+//    }
 
     CTHRIFT_LOG_DEBUG("wait done, avaliable conn num " << sp_cthrift_client_worker_->atomic_avaliable_conn_num());
 
@@ -195,7 +195,7 @@ int CthriftClient::SetClientAppkey(const std::string &str_appkey) {
 }
 
 boost::shared_ptr<TProtocol> CthriftClient::GetCthriftProtocol(void) {
-    CTHRIFT_LOG_INFO("cthrift transport init, thread info: " << CurrentThread::tid());
+    CTHRIFT_LOG_INFO("cthrift transport init, tid=" << CurrentThread::tid());
 
     boost::shared_ptr<CthriftTransport> sp_cthrift_transport_
             = boost::make_shared<CthriftTransport>(

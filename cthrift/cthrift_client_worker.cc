@@ -10,29 +10,28 @@ using namespace meituan_cthrift;
 const int32_t CthriftClientWorker::kI32HighWaterSize = 64 * 1024;  // 64K
 const int8_t CthriftClientWorker::kI8TimeWheelNum = 5;
 
-//void ConnInfo::UptSgservice(const meituan_mns::SGService &sgservice) {
-//    double d_old_weight = CthriftNameService::FetchOctoWeight(sgservice_.fweight,
-//                                                              static_cast<double>(sgservice_.weight));
-//    double d_new_weight = CthriftNameService::FetchOctoWeight(sgservice.fweight,
-//                                                              static_cast<double>(sgservice.weight));
+void ConnInfo::UptSgservice(const meituan_mns::SGService &sgservice) {
+    double d_old_weight = CthriftNameService::FetchOctoWeight(sgservice_.fweight,
+                                                              static_cast<double>(sgservice_.weight));
+    double d_new_weight = CthriftNameService::FetchOctoWeight(sgservice.fweight,
+                                                              static_cast<double>(sgservice.weight));
 
-//    CTHRIFT_LOG_DEBUG("d_old_weight " << d_old_weight << " d_new_weight "
-//                      << d_new_weight);
+    CTHRIFT_LOG_INFO("d_old_weight " << d_old_weight << " d_new_weight " << d_new_weight);
 
-//    if (!CheckDoubleEqual(d_old_weight, d_new_weight)) {
-//        CTHRIFT_LOG_DEBUG("need update weight buf");
+    if (!CheckDoubleEqual(d_old_weight, d_new_weight)) {
+        CTHRIFT_LOG_INFO("need update weight buf");
 
-//        // real conn NOT erase, just del index
-//        p_map_weight_tcpclientwp_->erase(it_map_weight_tcpclientwp_index_);
+        // real conn NOT erase, just del index
+        p_map_weight_tcpclientwp_->erase(it_map_weight_tcpclientwp_index_);
 
-//        it_map_weight_tcpclientwp_index_ =
-//                p_map_weight_tcpclientwp_->insert(std::make_pair(
-//                                                      d_new_weight,
-//                                                      sp_tcpclient_));
-//    }
+        it_map_weight_tcpclientwp_index_ =
+                p_map_weight_tcpclientwp_->insert(std::make_pair(
+                                                      d_new_weight,
+                                                      sp_tcpclient_));
+    }
 
-//    sgservice_ = sgservice;
-//}
+    sgservice_ = sgservice;
+}
 
 void ConnInfo::setSp_tcpclient_(const TcpClientSharedPtr &sp_tcpclient) {
     if (CTHRIFT_UNLIKELY(sp_tcpclient_.get())) {
@@ -43,14 +42,14 @@ void ConnInfo::setSp_tcpclient_(const TcpClientSharedPtr &sp_tcpclient) {
 
     sp_tcpclient_ = sp_tcpclient;
 
-//    double d_weight =
-//            CthriftNameService::FetchOctoWeight(sgservice_.fweight,
-//                                                static_cast<double>(sgservice_.weight));
-//    CTHRIFT_LOG_DEBUG("dweight " << d_weight);
+    double d_weight =
+            CthriftNameService::FetchOctoWeight(sgservice_.fweight,
+                                                static_cast<double>(sgservice_.weight));
+    CTHRIFT_LOG_INFO("dweight=" << d_weight);
 
-//    it_map_weight_tcpclientwp_index_ =
-//            p_map_weight_tcpclientwp_->insert(std::make_pair(d_weight,
-//                                                             sp_tcpclient_));
+    it_map_weight_tcpclientwp_index_ =
+            p_map_weight_tcpclientwp_->insert(std::make_pair(d_weight,
+                                                             sp_tcpclient_));
 }
 
 CthriftClientWorker::CthriftClientWorker(
@@ -99,29 +98,29 @@ int8_t CthriftClientWorker::CheckRegion(const double &d_weight) {
 
 bool ConnInfo::CheckConnHealthy(void) const {
     if (CTHRIFT_UNLIKELY(!(sp_tcpclient_.get()))) {
-//        CTHRIFT_LOG_ERROR("sp_tcpconn invalid appkey: " << sgservice_.appkey
-//                          << " ip:" << sgservice_.ip
-//                          << " port: "
-//                          << sgservice_.port);
+        CTHRIFT_LOG_ERROR("sp_tcpconn invalid appkey: " << sgservice_.appkey
+                          << " ip:" << sgservice_.ip
+                          << " port: "
+                          << sgservice_.port);
         return false;
     }
 
     muduo::net::TcpConnectionPtr sp_tcpconn = sp_tcpclient_->connection();
     if (CTHRIFT_UNLIKELY(!sp_tcpconn || !(sp_tcpconn.get()))) {
-//        CTHRIFT_LOG_ERROR("sp_tcpconn invalid appkey: " << sgservice_.appkey
-//                          << " ip:" << sgservice_.ip
-//                          << " port: "
-//                          << sgservice_.port);
+        CTHRIFT_LOG_ERROR("sp_tcpconn invalid appkey: " << sgservice_.appkey
+                          << " ip:" << sgservice_.ip
+                          << " port: "
+                          << sgservice_.port);
         return false;
     }
 
     if (CTHRIFT_UNLIKELY(!(sp_tcpconn->connected()))) {
-//        CTHRIFT_LOG_DEBUG("address: " << (sp_tcpconn->peerAddress()).toIpPort() << "NOT connected");
+        CTHRIFT_LOG_INFO("address: " << (sp_tcpconn->peerAddress()).toIpPort() << "NOT connected");
         return false;
     }
 
     if (CTHRIFT_UNLIKELY((sp_tcpconn->getContext()).empty())) {
-//        CTHRIFT_LOG_ERROR("address: " << (sp_tcpconn->peerAddress()).toIpPort() << " context empty");    // NOT clear here
+        CTHRIFT_LOG_ERROR("address: " << (sp_tcpconn->peerAddress()).toIpPort() << " context empty");    // NOT clear here
         return false;
     }
 
@@ -129,19 +128,18 @@ bool ConnInfo::CheckConnHealthy(void) const {
     try {
         sp_context = boost::any_cast<Context4WorkerSharedPtr>(sp_tcpconn->getContext());
     } catch (boost::bad_any_cast &e) {
-//        CTHRIFT_LOG_ERROR("bad_any_cast:" << e.what() << " peer address "
-//                          << (sp_tcpconn->peerAddress()).toIpPort());
+        CTHRIFT_LOG_ERROR("bad_any_cast:" << e.what() << " peer address "
+                          << (sp_tcpconn->peerAddress()).toIpPort());
         return false;
     }
 
     if (CTHRIFT_UNLIKELY(sp_context->b_highwater || sp_context->b_occupied)) {
-//        CTHRIFT_LOG_WARN("address: " << (sp_tcpconn->peerAddress()).toIpPort() <<
-//                         " b_highwater " << sp_context->b_highwater
-//                         << " b_occupied "
-//                         << sp_context->b_occupied << " ignore");
+        CTHRIFT_LOG_WARN("address: " << (sp_tcpconn->peerAddress()).toIpPort() <<
+                         " b_highwater " << sp_context->b_highwater
+                         << " b_occupied "
+                         << sp_context->b_occupied << " ignore");
         return false;
     }
-
     return true;
 }
 
@@ -167,7 +165,7 @@ int8_t CthriftClientWorker::ChooseNextReadyConn(TcpClientWeakPtr *p_wp_tcpcli) {
     while (p_multimap_weight_wptcpcli_->end() != iter) {
         TcpClientSharedPtr sp_tcpcli((iter->second).lock());
         if (CTHRIFT_UNLIKELY(!sp_tcpcli || !(sp_tcpcli.get()))) {
-//            CTHRIFT_LOG_ERROR("tcpclient NOT avaliable");
+            CTHRIFT_LOG_ERROR("tcpclient NOT avaliable");
 
             p_multimap_weight_wptcpcli_->erase(iter++);
             continue;
@@ -175,19 +173,18 @@ int8_t CthriftClientWorker::ChooseNextReadyConn(TcpClientWeakPtr *p_wp_tcpcli) {
 
         sp_tcpconn = sp_tcpcli->connection();
         if (CTHRIFT_UNLIKELY(!sp_tcpconn)) {
-//            CTHRIFT_LOG_INFO("NOT connected yet");
+            CTHRIFT_LOG_INFO("NOT connected yet");
             ++iter;
             continue;
         }
-
-//        CTHRIFT_LOG_DEBUG("Address: " << (sp_tcpconn->peerAddress()).toIpPort() << " weight " << iter->first);
+        CTHRIFT_LOG_INFO("Address: " << (sp_tcpconn->peerAddress()).toIpPort() << " weight: " << iter->first);
 
         try {
             str_port = boost::lexical_cast<std::string>((sp_tcpconn->peerAddress()).toPort());
         } catch (boost::bad_lexical_cast &e) {
-//            CTHRIFT_LOG_ERROR("boost::bad_lexical_cast :" << e.what()
-//                              << "tcp connnect peer port : "
-//                              << (sp_tcpconn->peerAddress()).toPort());
+            CTHRIFT_LOG_ERROR("boost::bad_lexical_cast :" << e.what()
+                              << "tcp connnect peer port : "
+                              << (sp_tcpconn->peerAddress()).toPort());
 
             ++iter;
             continue;
@@ -196,9 +193,9 @@ int8_t CthriftClientWorker::ChooseNextReadyConn(TcpClientWeakPtr *p_wp_tcpcli) {
         iter_ipport_spconninfo = map_ipport_spconninfo_.find(
                     (sp_tcpconn->peerAddress()).toIp() + ":" + str_port);
         if (CTHRIFT_UNLIKELY(iter_ipport_spconninfo == map_ipport_spconninfo_.end())) {
-//            CTHRIFT_LOG_ERROR("Not find ip:"
-//                              << (sp_tcpconn->peerAddress()).toIp() << " port:"
-//                              << str_port << " in map_ipport_spconninfo_");
+            CTHRIFT_LOG_ERROR("Not find ip:"
+                              << (sp_tcpconn->peerAddress()).toIp() << " port:"
+                              << str_port << " in map_ipport_spconninfo_");
 
             p_multimap_weight_wptcpcli_->erase(iter++);
             continue;
@@ -217,8 +214,8 @@ int8_t CthriftClientWorker::ChooseNextReadyConn(TcpClientWeakPtr *p_wp_tcpcli) {
             if (CTHRIFT_LIKELY(!CheckDoubleEqual(d_last_weight, -1.0))) {  // NOT init
                 if (i8_stop_region <= CheckRegion(iter->first)) {  //i f already get
                     // conn and next region reach, stop
-//                    CTHRIFT_LOG_DEBUG("stop region " << i8_stop_region << " "
-//                                                                          "iter->first " << iter->first);
+                    CTHRIFT_LOG_INFO("stop region " << i8_stop_region << " "
+                                                                          "iter->first " << iter->first);
                     break;
                 }
 
@@ -227,7 +224,7 @@ int8_t CthriftClientWorker::ChooseNextReadyConn(TcpClientWeakPtr *p_wp_tcpcli) {
                 i8_stop_region =
                         static_cast<int8_t>(CheckRegion(iter->first) + 1);  // set stop region by the first weight
 
-//                CTHRIFT_LOG_DEBUG("i8_stop_region set to be " << i8_stop_region);
+                CTHRIFT_LOG_INFO("i8_stop_region set to be " << i8_stop_region);
             }
 
             vec_weight.push_back(iter->first);
@@ -288,132 +285,131 @@ int8_t CthriftClientWorker::ChooseNextReadyConn(TcpClientWeakPtr *p_wp_tcpcli) {
     return 0;
 }
 
-//void
-//CthriftClientWorker::UpdateSvrList(
-//        const vector<meituan_mns::SGService> &vec_sgservice) {
-//    vector<meituan_mns::SGService>::const_iterator it_vec;
-//    boost::unordered_map<string, meituan_mns::SGService>::iterator
-//            it_map_sgservice;
+void
+CthriftClientWorker::UpdateSvrList(const vector<meituan_mns::SGService> &vec_sgservice) {
 
-//    string str_port;
+    vector<meituan_mns::SGService>::const_iterator it_vec;
+    boost::unordered_map<string, meituan_mns::SGService>::iterator it_map_sgservice;
 
-//    vector<meituan_mns::SGService> vec_sgservice_add;
-//    vector<meituan_mns::SGService> vec_sgservice_del;
-//    vector<meituan_mns::SGService> vec_sgservice_chg;
+    string str_port;
 
-//    if (CTHRIFT_UNLIKELY(
-//                0 == map_ipport_sgservice_.size() && 0 == vec_sgservice.size())) {
-//        CTHRIFT_LOG_WARN("Init svr list but empty srvlist");
-//    } else if (CTHRIFT_UNLIKELY(0 == map_ipport_sgservice_.size())) {
-//        it_vec = vec_sgservice.begin();
-//        CTHRIFT_LOG_INFO("Init svr list for appkey " << it_vec->appkey);
+    vector<meituan_mns::SGService> vec_sgservice_add;
+    vector<meituan_mns::SGService> vec_sgservice_del;
+    vector<meituan_mns::SGService> vec_sgservice_chg;
 
-//        while (it_vec != vec_sgservice.end()) {
-//            if (CTHRIFT_UNLIKELY(2 != it_vec->status)) {
-//                CTHRIFT_LOG_DEBUG("svr info: "
-//                                  << CthriftNameService::SGService2String(*it_vec)
-//                                  << " IGNORED");
-//                ++it_vec;
-//                continue;
-//            }
+    if (CTHRIFT_UNLIKELY(0 == map_ipport_sgservice_.size() && 0 == vec_sgservice.size())) {
+        CTHRIFT_LOG_WARN("Init svr list but empty srvlist");
 
-//            try {
-//                str_port = boost::lexical_cast<std::string>(it_vec->port);
-//            } catch (boost::bad_lexical_cast &e) {
-////                CTHRIFT_LOG_ERROR("boost::bad_lexical_cast :" << e.what()
-////                                  << "it_vec->port "
-////                                  << it_vec->port);
+    } else if (CTHRIFT_UNLIKELY(0 == map_ipport_sgservice_.size())) {
 
-//                ++it_vec;
-//                continue;
-//            }
+        it_vec = vec_sgservice.begin();
+        CTHRIFT_LOG_INFO("Init svr list for appkey=" << it_vec->appkey << ", vec_sgservice size="<< vec_sgservice.size());
 
-//            map_ipport_sgservice_.insert(make_pair(it_vec->ip + ":" + str_port,
-//                                                   *it_vec));
+        while (it_vec != vec_sgservice.end()) {
+            if (CTHRIFT_UNLIKELY(2 != it_vec->status)) {
+                CTHRIFT_LOG_DEBUG("svr info: "
+                                  << CthriftNameService::SGService2String(*it_vec)
+                                  << " IGNORED");
+                ++it_vec;
+                continue;
+            }
 
-//            vec_sgservice_add.push_back(*(it_vec++));
-//        }
-//    } else if (CTHRIFT_UNLIKELY(0 == vec_sgservice.size())) {
-//        CTHRIFT_LOG_WARN("vec_sgservice empty");
+            try {
+                str_port = boost::lexical_cast<std::string>(it_vec->port);
+            } catch (boost::bad_lexical_cast &e) {
+                CTHRIFT_LOG_ERROR("boost::bad_lexical_cast :" << e.what()
+                                  << "it_vec->port "
+                                  << it_vec->port);
 
-//        it_map_sgservice = map_ipport_sgservice_.begin();
-//        while (it_map_sgservice != map_ipport_sgservice_.end()) {
-//            vec_sgservice_del.push_back(it_map_sgservice->second);
-//            map_ipport_sgservice_.erase(it_map_sgservice++);
-//        }
-//    } else {
-//        boost::unordered_map<string, meituan_mns::SGService>
-//                map_tmp_locate_del(map_ipport_sgservice_);
+                ++it_vec;
+                continue;
+            }
 
-//        it_vec = vec_sgservice.begin();
-//        while (it_vec != vec_sgservice.end()) {
-//            if (CTHRIFT_UNLIKELY(2 != it_vec->status)) {
-//                CTHRIFT_LOG_DEBUG("svr info: "
-//                                  << CthriftNameService::SGService2String(*it_vec)
-//                                  << " IGNORED");
-//                ++it_vec;
-//                continue;
-//            }
+            map_ipport_sgservice_.insert(make_pair(it_vec->ip + ":" + str_port, *it_vec));
 
-//            try {
-//                str_port = boost::lexical_cast<std::string>(it_vec->port);
-//            } catch (boost::bad_lexical_cast &e) {
-//                CTHRIFT_LOG_DEBUG("boost::bad_lexical_cast :" << e.what()
-//                                  << "it_vec->port "
-//                                  << it_vec->port);
+            vec_sgservice_add.push_back(*(it_vec++));
+        }
+    } else if (CTHRIFT_UNLIKELY(0 == vec_sgservice.size())) {
+        CTHRIFT_LOG_WARN("vec_sgservice empty");
 
-//                ++it_vec;
-//                continue;
-//            }
+        it_map_sgservice = map_ipport_sgservice_.begin();
+        while (it_map_sgservice != map_ipport_sgservice_.end()) {
+            vec_sgservice_del.push_back(it_map_sgservice->second);
+            map_ipport_sgservice_.erase(it_map_sgservice++);
+        }
+    } else {
+        boost::unordered_map<string, meituan_mns::SGService>
+                map_tmp_locate_del(map_ipport_sgservice_);
 
-//            string str_key(it_vec->ip + ":" + str_port);
-//            it_map_sgservice = map_ipport_sgservice_.find(str_key);
-//            if (map_ipport_sgservice_.end() == it_map_sgservice) {
-//                CTHRIFT_LOG_DEBUG("ADD svr list info: "
-//                                  << CthriftNameService::SGService2String(*it_vec));
+        it_vec = vec_sgservice.begin();
+        while (it_vec != vec_sgservice.end()) {
+            if (CTHRIFT_UNLIKELY(2 != it_vec->status)) {
+                CTHRIFT_LOG_INFO("svr info: "
+                                  << CthriftNameService::SGService2String(*it_vec)
+                                  << " IGNORED");
+                ++it_vec;
+                continue;
+            }
 
-//                vec_sgservice_add.push_back(*it_vec);
-//                map_ipport_sgservice_.insert(make_pair(str_key, *it_vec));
-//            } else {
-//                map_tmp_locate_del.erase(str_key);
+            try {
+                str_port = boost::lexical_cast<std::string>(it_vec->port);
+            } catch (boost::bad_lexical_cast &e) {
+                CTHRIFT_LOG_DEBUG("boost::bad_lexical_cast :" << e.what()
+                                  << "it_vec->port "
+                                  << it_vec->port);
 
-//                if (it_map_sgservice->second != *it_vec) {
-//                    CTHRIFT_LOG_DEBUG("UPDATE svr list. old info: "
-//                                      << CthriftNameService::SGService2String(
-//                                          it_map_sgservice->second));
-//                    CTHRIFT_LOG_DEBUG(" new info: "
-//                                      << CthriftNameService::SGService2String(*it_vec));
+                ++it_vec;
+                continue;
+            }
 
-//                    it_map_sgservice->second = *it_vec;
+            string str_key(it_vec->ip + ":" + str_port);
+            it_map_sgservice = map_ipport_sgservice_.find(str_key);
+            if (map_ipport_sgservice_.end() == it_map_sgservice) {
+                CTHRIFT_LOG_DEBUG("ADD svr list info: "
+                                  << CthriftNameService::SGService2String(*it_vec));
 
-//                    vec_sgservice_chg.push_back(*it_vec);
+                vec_sgservice_add.push_back(*it_vec);
+                map_ipport_sgservice_.insert(make_pair(str_key, *it_vec));
+            } else {
+                map_tmp_locate_del.erase(str_key);
 
-//                    map_tmp_locate_del.erase(str_key);
-//                }
-//            }
+                if (it_map_sgservice->second != *it_vec) {
+                    CTHRIFT_LOG_DEBUG("UPDATE svr list. old info: "
+                                      << CthriftNameService::SGService2String(
+                                          it_map_sgservice->second));
+                    CTHRIFT_LOG_DEBUG(" new info: "
+                                      << CthriftNameService::SGService2String(*it_vec));
 
-//            ++it_vec;
-//        }
+                    it_map_sgservice->second = *it_vec;
 
-//        if (map_tmp_locate_del.size()) {
-//            CTHRIFT_LOG_DEBUG("DEL svr list");
+                    vec_sgservice_chg.push_back(*it_vec);
 
-//            it_map_sgservice = map_tmp_locate_del.begin();
-//            while (it_map_sgservice != map_tmp_locate_del.end()) {
-//                CTHRIFT_LOG_DEBUG("del svr info: "
-//                                  << CthriftNameService::SGService2String(
-//                                      it_map_sgservice->second));
+                    map_tmp_locate_del.erase(str_key);
+                }
+            }
 
-//                vec_sgservice_del.push_back(it_map_sgservice->second);
-//                map_ipport_sgservice_.erase((it_map_sgservice++)->first);
-//            }
-//        }
-//    }
+            ++it_vec;
+        }
 
-//    AddSrv(vec_sgservice_add);
-//    DelSrv(vec_sgservice_del);
-//    ChgSrv(vec_sgservice_chg);
-//}
+        if (map_tmp_locate_del.size()) {
+            CTHRIFT_LOG_INFO("DEL svr list");
+
+            it_map_sgservice = map_tmp_locate_del.begin();
+            while (it_map_sgservice != map_tmp_locate_del.end()) {
+                CTHRIFT_LOG_INFO("del svr info: "
+                                  << CthriftNameService::SGService2String(
+                                      it_map_sgservice->second));
+
+                vec_sgservice_del.push_back(it_map_sgservice->second);
+                map_ipport_sgservice_.erase((it_map_sgservice++)->first);
+            }
+        }
+    }
+
+    AddSrv(vec_sgservice_add);
+    DelSrv(vec_sgservice_del);
+    ChgSrv(vec_sgservice_chg);
+}
 
 void CthriftClientWorker::InitSgagentHandlerThread(void) {
     CTHRIFT_LOG_INFO("init sgagent handler thrd begin, curTid=" << CurrentThread::tid());
@@ -433,21 +429,21 @@ void CthriftClientWorker::InitWorker(void) {
     p_multimap_weight_wptcpcli_ = new multimap<double, TcpClientWeakPtr, WeightSort>;  // exit del, safe
 
     if (b_user_set_ip) {
-//        CTHRIFT_LOG_INFO("InitWorker b_user_set_ip  ip:"
-//                         << str_server_ip_ << " port:" << str_server_ip_);
+        CTHRIFT_LOG_INFO("InitWorker b_user_set_ip  ip:"
+                         << str_server_ip_ << " port:" << i16_server_port_);
 
-//        vector<meituan_mns::SGService> list;
-//        meituan_mns::SGService sg;
-//        sg.ip = str_server_ip_;
-//        sg.status = 2;
-//        sg.fweight = 10.0;
-//        sg.weight = 10;
-//        sg.port = i16_server_port_;
-//        list.push_back(sg);
+        vector<meituan_mns::SGService> list;
+        meituan_mns::SGService sg;
+        sg.ip = str_server_ip_;
+        sg.status = 2;
+        sg.fweight = 10.0;
+        sg.weight = 10;
+        sg.port = i16_server_port_;
+        list.push_back(sg);
 
-//        p_event_loop_->runInLoop(boost::bind(&CthriftClientWorker::UpdateSvrList,
-//                                             this,
-//                                             list));
+        p_event_loop_->runInLoop(boost::bind(&CthriftClientWorker::UpdateSvrList,
+                                             this,
+                                             list));
     } else {
         sp_event_thread_sgagent_ = boost::make_shared<muduo::net::EventLoopThread>();
 
@@ -546,8 +542,10 @@ void CthriftClientWorker::AddSrv(const vector<meituan_mns::SGService> &vec_add_s
             continue;
         }
 
+        auto ip_port = sgservice.ip + ":" + str_port;
         ConnInfoSharedPtr
-                &sp_conninfo = map_ipport_spconninfo_[sgservice.ip + ":" + str_port];
+                &sp_conninfo = map_ipport_spconninfo_[ip_port];
+        CTHRIFT_LOG_INFO("sgSrvAppkey=" << sgservice.appkey << ", srv_ip_port=" << ip_port << ", conn_obj=" << sp_conninfo.get());
 
         if (CTHRIFT_UNLIKELY(sp_conninfo.get())) {
             CTHRIFT_LOG_WARN("svr " << CthriftNameService::SGService2String(sgservice)
@@ -555,53 +553,41 @@ void CthriftClientWorker::AddSrv(const vector<meituan_mns::SGService> &vec_add_s
 
             vec_chg_sgservice.push_back(sgservice);
             ++it_sgservice;
-
             continue;
         }
 
-//        sp_conninfo = boost::make_shared<ConnInfo>(sgservice,
-//                                                   p_multimap_weight_wptcpcli_);
+        sp_conninfo = boost::make_shared<ConnInfo>(sgservice,
+                                                   p_multimap_weight_wptcpcli_);
 
-//        boost::shared_ptr<muduo::net::TcpClient>
-//                sp_tcp_cli_tmp = boost::make_shared<muduo::net::TcpClient>(
-//                    p_event_loop_,
-//                    muduo::net::InetAddress(
-//                        sgservice.ip,
-//                        static_cast<uint16_t>(sgservice.port)),
-//                    "client worker for appkey "
-//                    + sgservice.appkey);
+        boost::shared_ptr<muduo::net::TcpClient>
+                sp_tcp_cli_tmp = boost::make_shared<muduo::net::TcpClient>(
+                    p_event_loop_,
+                    muduo::net::InetAddress(sgservice.ip, static_cast<uint16_t>(sgservice.port)),
+                    "client worker for appkey " + sgservice.appkey);
 
-//        sp_conninfo->setSp_tcpclient_(sp_tcp_cli_tmp);  // will set weight buf inside
+        sp_conninfo->setSp_tcpclient_(sp_tcp_cli_tmp);  // will set weight buf inside
 
-//        TcpClientSharedPtr &sp_tcpcli = sp_conninfo->getSp_tcpclient_();
+        TcpClientSharedPtr &sp_tcpcli = sp_conninfo->getSp_tcpclient_();
 
-//        sp_tcpcli->setConnectionCallback(
-//                    boost::bind(&CthriftClientWorker::OnConn,
-//                                this,
-//                                _1));
+        sp_tcpcli->setConnectionCallback(
+                    boost::bind(&CthriftClientWorker::OnConn, this, _1));
 
-//        sp_tcpcli->setMessageCallback(
-//                    boost::bind(&CthriftClientWorker::OnMsg,
-//                                this,
-//                                _1,
-//                                _2,
-//                                _3));
+        sp_tcpcli->setMessageCallback(
+                    boost::bind(&CthriftClientWorker::OnMsg, this, _1, _2, _3));
 
-//        sp_tcpcli->setWriteCompleteCallback(
-//                    boost::bind(&CthriftClientWorker::OnWriteComplete,
-//                                this,
-//                                _1));
+        sp_tcpcli->setWriteCompleteCallback(
+                    boost::bind(&CthriftClientWorker::OnWriteComplete, this, _1));
 
-//        sp_tcpcli->enableRetry();
-//        sp_tcpcli->connect();
+        sp_tcpcli->enableRetry();
+        sp_tcpcli->connect();
 
-//        ++it_sgservice;
+        ++it_sgservice;
     }
 
-//    if (vec_chg_sgservice.size()) {
-////        CTHRIFT_LOG_ERROR("Add trans to Chg");
-//        ChgSrv(vec_chg_sgservice);
-//    }
+    if (vec_chg_sgservice.size()) {
+        CTHRIFT_LOG_ERROR("Add trans to Chg");
+        ChgSrv(vec_chg_sgservice);
+    }
 }
 
 void CthriftClientWorker::DelSrv(
@@ -639,43 +625,41 @@ void CthriftClientWorker::ChgSrv(
 
     vector<meituan_mns::SGService> vec_add_sgservice;
 
-//    vector<meituan_mns::SGService>::const_iterator
-//            it_sgservice = vec_chg_sgservice.begin();
-//    while (it_sgservice != vec_chg_sgservice.end()) {
-//        const meituan_mns::SGService &sgservice = *it_sgservice;
+    vector<meituan_mns::SGService>::const_iterator
+            it_sgservice = vec_chg_sgservice.begin();
+    while (it_sgservice != vec_chg_sgservice.end()) {
+        const meituan_mns::SGService &sgservice = *it_sgservice;
 
-//        try {
-//            str_port = boost::lexical_cast<std::string>(sgservice.port);
-//        } catch (boost::bad_lexical_cast &e) {
-////            CTHRIFT_LOG_ERROR("boost::bad_lexical_cast :" << e.what()
-////                              << "sgservice.port "
-////                              << sgservice.port);
+        try {
+            str_port = boost::lexical_cast<std::string>(sgservice.port);
+        } catch (boost::bad_lexical_cast &e) {
+            CTHRIFT_LOG_ERROR("boost::bad_lexical_cast :" << e.what()
+                              << "sgservice.port "
+                              << sgservice.port);
+            ++it_sgservice;
+            continue;
+        }
 
-//            ++it_sgservice;
-//            continue;
-//        }
+        str_key.assign(sgservice.ip + ":" + str_port);
+        UnorderedMapStr2SpConnInfoIter
+                it_map = map_ipport_spconninfo_.find(str_key);
+        if (it_map == map_ipport_spconninfo_.end()) {
+            CTHRIFT_LOG_WARN("Not find " << str_key << " for appkey "
+                             << sgservice.appkey
+                             << " in map_ipport_spconninfo_, readd it");
 
-//        str_key.assign(sgservice.ip + ":" + str_port);
-//        UnorderedMapStr2SpConnInfoIter
-//                it_map = map_ipport_spconninfo_.find(str_key);
-//        if (it_map == map_ipport_spconninfo_.end()) {
-//            CTHRIFT_LOG_WARN("Not find " << str_key << " for appkey "
-//                             << sgservice.appkey
-//                             << " in map_ipport_spconninfo_, readd it");
+            vec_add_sgservice.push_back(sgservice);
+        } else {
+            it_map->second->UptSgservice(sgservice);
+        }
 
-//            vec_add_sgservice.push_back(sgservice);
-//        } else {
-//            // comment by fy. may be need
-////            it_map->second->UptSgservice(sgservice);
-//        }
+        ++it_sgservice;
+    }
 
-//        ++it_sgservice;
-//    }
-
-//    if (vec_add_sgservice.size()) {
-////        CTHRIFT_LOG_ERROR("Chg trans to Add");
-//        AddSrv(vec_add_sgservice);
-//    }
+    if (vec_add_sgservice.size()) {
+        CTHRIFT_LOG_ERROR("Chg trans to Add");
+        AddSrv(vec_add_sgservice);
+    }
 }
 
 void CthriftClientWorker::OnConn(const muduo::net::TcpConnectionPtr &conn) {
@@ -710,11 +694,7 @@ void CthriftClientWorker::OnConn(const muduo::net::TcpConnectionPtr &conn) {
 
         conn->setTcpNoDelay(true);
         conn->setHighWaterMarkCallback(
-                    boost::bind(&CthriftClientWorker::OnHighWaterMark,
-                                this,
-                                _1,
-                                _2),
-                    kI32HighWaterSize);  // every conn, 64K buff
+                    boost::bind(&CthriftClientWorker::OnHighWaterMark, this, _1, _2), kI32HighWaterSize);  // every conn, 64K buff
 
         Context4WorkerSharedPtr conn_context_ptr =
                 boost::make_shared<ConnContext4Worker>(unordered_map_iter->second);
@@ -727,7 +707,7 @@ void CthriftClientWorker::OnConn(const muduo::net::TcpConnectionPtr &conn) {
             CTHRIFT_LOG_ERROR("bad_any_cast:" << e.what());
             return;
         }
-//        tmp->wp_conn_info->t_last_recv_time_ = time(0);
+        // tmp->t_last_conn_time_ = time(0);
 
         if (CTHRIFT_UNLIKELY(1 == atomic_avaliable_conn_num_.incrementAndGet())) {
             muduo::MutexLockGuard lock(mutexlock_avaliable_conn_ready_);
@@ -802,6 +782,7 @@ void CthriftClientWorker::HandleThriftMsg(const muduo::net::TcpConnectionPtr &co
 
         CTHRIFT_LOG_DEBUG("id " << str_id << " send & recv cost "
                           << timeDifference(Timestamp::now(), sp_shared->timestamp_cliworker_send) << " secs");
+
         if (sp_shared->async_flag) {
             // copy一份recv数据，避免异步回调线程与IO线程竞争读/写
             // mutex不能保证这里逻辑的正确性，因为OnMsg一直被调用，muduo::buffer一直被重复填充数据
@@ -878,17 +859,18 @@ void CthriftClientWorker::OnMsg(const muduo::net::TcpConnectionPtr &conn,
 
     while (1) {
         if (sp_context_worker->enum_state == kExpectFrameSize) {
-            if (sizeof(int32_t) <= buffer->readableBytes()) {
+            size_t readable = buffer->readableBytes();
+            if (sizeof(int32_t) <= readable) {
                 sp_context_worker->i32_want_size = static_cast<uint32_t>(buffer->readInt32());
                 sp_context_worker->enum_state = kExpectFrame;
             } else {
-                CTHRIFT_LOG_WARN("not enough size for protocol, thrift total length, wait for more");
+                CTHRIFT_LOG_WARN("not enough size for protocol, thrift total length, wait for more, readable=" << readable);
                 return;
             }
         } else if (sp_context_worker->enum_state == kExpectFrame) {
             if (buffer->readableBytes() >= static_cast<size_t>(sp_context_worker->i32_want_size)) {
 
-//                 sp_context_worker->wp_conn_info->t_last_recv_time_ = time(0);
+                // sp_context_worker->t_last_recv_time_ = time(0);
                 HandleMsg(conn, sp_context_worker, buffer);
 
             } else {
@@ -942,7 +924,6 @@ void CthriftClientWorker::OnHighWaterMark(const muduo::net::TcpConnectionPtr &co
         CTHRIFT_LOG_ERROR("bad_any_cast:" << e.what());
         return;
     }
-
     conn_info->b_highwater = true;
 
     if (0 >= atomic_avaliable_conn_num_.decrementAndGet()) {
@@ -956,8 +937,7 @@ void CthriftClientWorker::SendTransportReq(SharedContSharedPtr sp_shared) {
     if (0 != sp_shared->GetWriteBuf(&send_buf)) {
         return;
     }
-
-    CTHRIFT_LOG_DEBUG("send_buf.size " << send_buf.readableBytes());
+    CTHRIFT_LOG_INFO("send_buf.size " << send_buf.readableBytes());
 
     TcpClientWeakPtr wp_tcpcli;
     if (ChooseNextReadyConn(&wp_tcpcli)) {
@@ -994,19 +974,19 @@ void CthriftClientWorker::SendTransportReq(SharedContSharedPtr sp_shared) {
         return;
     }
 
-    if (CTHRIFT_UNLIKELY(CheckOverTime(sp_shared->timestamp_start,
-                                       static_cast<double>(sp_shared->i32_timeout_ms)
-                                       / MILLISENCOND_COUNT_IN_SENCOND,
-                                       0))) {
-        CTHRIFT_LOG_WARN("before send, appkey " << str_svr_appkey_ << " id "
-                         << sp_shared->str_id
-                         << " timeout return");
-        return;
-    }
+//    if (CTHRIFT_UNLIKELY(CheckOverTime(sp_shared->timestamp_start,
+//                                       static_cast<double>(sp_shared->i32_timeout_ms)
+//                                       / MILLISENCOND_COUNT_IN_SENCOND,
+//                                       0))) {
+//        CTHRIFT_LOG_WARN("before send, appkey " << str_svr_appkey_ << " id "
+//                         << sp_shared->str_id
+//                         << " timeout return");
+//        return;
+//    }
 
     sp_tcpcli->connection()->send(&send_buf);
 
-    CTHRIFT_LOG_DEBUG("send id " << sp_shared->str_id << " done");
+    CTHRIFT_LOG_INFO("send id " << sp_shared->str_id << " done");
 
     Context4WorkerSharedPtr sp_context;
     try {
@@ -1035,7 +1015,8 @@ void CthriftClientWorker::TimewheelKick() {
 // 触发式资源分配
 void CthriftClientWorker::EnableAsync(const int32_t &i32_timeout_ms) {
     if (!p_async_event_loop_) {
-        sp_async_event_thread_ = boost::make_shared<muduo::net::EventLoopThread>();
+        sp_async_event_thread_ =
+                boost::make_shared<muduo::net::EventLoopThread>();
         p_async_event_loop_ = sp_async_event_thread_->startLoop();
         p_async_event_loop_->setContext(kTaskStateInit);
     }
@@ -1051,19 +1032,19 @@ void CthriftClientWorker::EnableAsync(const int32_t &i32_timeout_ms) {
 void CthriftClientWorker::AsyncCallback(const uint32_t &size,
                                         uint8_t *recv_buf,
                                         SharedContSharedPtr sp_shared) {
-    double d_left_secs = 0.0;
-    if (CheckOverTime(sp_shared->timestamp_start,
-                      static_cast<double>(sp_shared->i32_timeout_ms) / MILLISENCOND_COUNT_IN_SENCOND,
-                      &d_left_secs)) {
-        CTHRIFT_LOG_WARN("async wait appkey " << str_svr_appkey_ << " id "
-                         << sp_shared->str_id
-                         << " already "
-                         << sp_shared->i32_timeout_ms
-                         << " ms for readbuf, timeout");
-        p_async_event_loop_->setContext(kTaskStateTimeOut);
-    } else {
+//    double d_left_secs = 0.0;
+//    if (CheckOverTime(sp_shared->timestamp_start,
+//                      static_cast<double>(sp_shared->i32_timeout_ms) / MILLISENCOND_COUNT_IN_SENCOND,
+//                      &d_left_secs)) {
+//        CTHRIFT_LOG_WARN("async wait appkey " << str_svr_appkey_ << " id "
+//                         << sp_shared->str_id
+//                         << " already "
+//                         << sp_shared->i32_timeout_ms
+//                         << " ms for readbuf, timeout");
+//        p_async_event_loop_->setContext(kTaskStateTimeOut);
+//    } else {
         p_async_event_loop_->setContext(kTaskStateSuccess);
-    }
+//    }
     // 避免手动释放内存；内存统一由TMemoryBuffer对象管理
     sp_shared->ResetRecvBuf(recv_buf, size);
     // 回调用户业务逻辑
@@ -1076,19 +1057,19 @@ void CthriftClientWorker::AsyncCallback(const uint32_t &size,
 
 void CthriftClientWorker::AsyncSendReq(SharedContSharedPtr sp_shared) {
     // 发送时检测任务是否已经超时，如果超时不进行网络传输直接调用callback，反馈超时
-    double d_left_secs = 0.0;
-    if (CheckOverTime(sp_shared->timestamp_start,
-                      static_cast<double>(sp_shared->i32_timeout_ms)
-                      / MILLISENCOND_COUNT_IN_SENCOND, &d_left_secs)) {
-        CTHRIFT_LOG_WARN("async task already timeout, before send packet");
+//    double d_left_secs = 0.0;
+//    if (CheckOverTime(sp_shared->timestamp_start,
+//                      static_cast<double>(sp_shared->i32_timeout_ms)
+//                      / MILLISENCOND_COUNT_IN_SENCOND, &d_left_secs)) {
+//        CTHRIFT_LOG_WARN("async task already timeout, before send packet");
 
-        uint32_t buf_size = 0;
-        uint8_t *recv_buf = NULL;
-        p_async_event_loop_->runInLoop(
-                    boost::bind(&CthriftClientWorker::AsyncCallback,
-                                this, buf_size, recv_buf, sp_shared));
-        return;
-    }
+//        uint32_t buf_size = 0;
+//        uint8_t *recv_buf = NULL;
+//        p_async_event_loop_->runInLoop(
+//                    boost::bind(&CthriftClientWorker::AsyncCallback,
+//                                this, buf_size, recv_buf, sp_shared));
+//        return;
+//    }
 
     Buffer send_buf;
     if (0 != sp_shared->GetAsyncWriteBuf(&send_buf)) {
@@ -1134,13 +1115,13 @@ void CthriftClientWorker::AsyncSendReq(SharedContSharedPtr sp_shared) {
         return;
     }
 
-    if (CTHRIFT_UNLIKELY(CheckOverTime(sp_shared->timestamp_start,
-                                       static_cast<double>(sp_shared->i32_timeout_ms) / MILLISENCOND_COUNT_IN_SENCOND,
-                                       0))) {
-        CTHRIFT_LOG_WARN("before send, appkey " << str_svr_appkey_ << " id "
-                         << sp_shared->str_id << " timeout return");
-        return;
-    }
+//    if (CTHRIFT_UNLIKELY(CheckOverTime(sp_shared->timestamp_start,
+//                                       static_cast<double>(sp_shared->i32_timeout_ms) / MILLISENCOND_COUNT_IN_SENCOND,
+//                                       0))) {
+//        CTHRIFT_LOG_WARN("before send, appkey " << str_svr_appkey_ << " id "
+//                         << sp_shared->str_id << " timeout return");
+//        return;
+//    }
 
     sp_tcpcli->connection()->send(&send_buf);
 

@@ -78,7 +78,8 @@
 
 #include "boostany.h"
 #include "threadsepcific.h"
-
+#include "async_thrift_client.h"
+#include "tstnvi.h"
 
 
 ///////////////////////////////////
@@ -110,6 +111,53 @@ enum enum_Minganci {
     E_MINGANCI_SWITCH
 
 };
+
+
+class CObj {
+public:
+    CObj(int val) : val_(val) {
+        printf("cst CObj, val_=%d addr=%p\n", val_, this);
+    }
+    ~CObj() {
+        printf("dst CObj, val_=%d addr=%p\n", val_, this);
+    }
+    int val_;
+};
+
+class CBase {
+    using CObjPtr = std::shared_ptr<CObj>;
+
+public:
+    CBase() { std::cout << "cst cbase" << std::endl; }
+    CBase(int val) {
+        std::cout << "cst cbase" << std::endl;
+        m_val = val;
+    }
+    ~CBase() {
+        std::cout << "dst cbase" << std::endl;
+    }
+    CObjPtr TestObjPtr() {
+        auto obj = new CObj(111);
+
+        CObjPtr resptr(obj, [](CObj * res) {
+            if (res) {
+                printf("del res, addr=%p\n", res);
+                delete res;
+            }
+        });
+        objPtr_.swap(resptr);
+        // return nullptr;
+        return objPtr_;
+    }
+
+    virtual void Print() {
+        printf("print base val\n");
+    }
+private:
+    CObjPtr objPtr_;
+    int m_val;
+};
+
 
 // 模拟golang的defer实现
 
@@ -322,8 +370,33 @@ int xx1() {
     return 0;
 }
 
+typedef struct OwnerShare_st {
+    std::shared_ptr<CBase>& GetBasePtr() {
+        return spBasePtr_;
+    }
+    void SetBasePtr(const std::shared_ptr<CBase>& sp_obj) {
+        spBasePtr_ = sp_obj;
+    }
+public:
+    std::shared_ptr<CBase> spBasePtr_;
+} OwnerShare;
+
+
 void tst_shared_ptr_2() {
 
+    {
+        OwnerShare ost;
+
+        {
+            auto spObj = std::make_shared<CBase>(15);
+            ost.SetBasePtr(spObj);
+        }
+
+        std::shared_ptr<CBase>& tmp = ost.GetBasePtr();
+        std::cout << "use count = " << tmp.use_count() << std::endl;
+
+        return;
+    }
     {
         ConnectPtr cObj = std::make_shared<Connect>();
         std::cout << "cObj usecount=" << cObj.use_count() << std::endl;
@@ -1326,51 +1399,6 @@ void tst_run() {
 #endif
 }
 
-class CObj {
-public:
-    CObj(int val) : val_(val) { 
-        printf("cst CObj, val_=%d addr=%p\n", val_, this);
-    }
-    ~CObj() {
-        printf("dst CObj, val_=%d addr=%p\n", val_, this);
-    }
-    int val_;
-};
-
-class CBase {
-    using CObjPtr = std::shared_ptr<CObj>;
-
-public:
-    CBase() { std::cout << "cst cbase" << std::endl; }
-    CBase(int val) {
-        std::cout << "cst cbase" << std::endl;
-        m_val = val;
-    }
-    ~CBase() {
-        std::cout << "dst cbase" << std::endl;
-    }
-    CObjPtr TestObjPtr() {
-        auto obj = new CObj(111);
-
-        CObjPtr resptr(obj, [](CObj * res) {
-            if (res) {
-                printf("del res, addr=%p\n", res);
-                delete res;
-            }
-        });
-        objPtr_.swap(resptr);
-        // return nullptr;
-        return objPtr_;
-    }
-
-    virtual void Print() {
-        printf("print base val\n");
-    }
-private:
-    CObjPtr objPtr_;
-    int m_val;
-};
-
 class Derive1 : public CBase {
 public:
     Derive1() { std::cout << "cst derive1" << std::endl; }
@@ -2019,16 +2047,17 @@ void tstFuture() {
 
 
 
-#include "async_thrift_client.h"
 
 // 2020-6-20
 // add new 测试分支预测
 void tst_c11fun_entry(int argc, char *argv[]) {
 
+    tst_shared_ptr_2(); return;
+
+    tstnvi(); return ;
     tst_async_thrift_client(); return;
-    
-    tst_shared_ptr_2();
-    return;
+
+
 
     {
         tstmakesharedptr();

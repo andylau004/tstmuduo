@@ -32,41 +32,41 @@ using namespace apache::thrift::protocol;
 using namespace apache::thrift::transport;
 
 class CthriftNameService {
- public:
-  static bool b_is_init_ns_;
-  static muduo::MutexLock s_lock;
+public:
+    static bool b_is_init_ns_;
+    static muduo::MutexLock s_lock;
 
-  static void IntranetIp(char ip[INET_ADDRSTRLEN]);
-  static void GetHostIPInfo(void);  // fill ip, isMac, host,hostname
+    static void IntranetIp(char ip[INET_ADDRSTRLEN]);
+    static void GetHostIPInfo(void);  // fill ip, isMac, host,hostname
 
-  static const double kDGetSvrListIntervalSecs;
-  static const double kDFirstRegionMin;
-  static const double kDSecondRegionMin;
+    static const double kDGetSvrListIntervalSecs;
+    static const double kDFirstRegionMin;
+    static const double kDSecondRegionMin;
 
-  static std::string str_env_;
-  static std::string str_swimlane_;
-  static std::string str_local_ip_;
-  static std::string str_host_;
-  static std::string str_hostname_;
+    static std::string str_env_;
+    static std::string str_swimlane_;
+    static std::string str_local_ip_;
+    static std::string str_host_;
+    static std::string str_hostname_;
 
- static CthriftNsInterface ns_interface_;
+    static CthriftNsInterface ns_interface_;
 
-  CthriftNameService(void) throw(TException);
-  static void PackDefaultSgservice(const std::string &str_svr_appkey,
-                                   const std::string &str_local_ip,
-                                   const uint16_t &u16_port,
-                                   meituan_mns::SGService *p_sgservice);
+    CthriftNameService(void) throw(TException);
+    static void PackDefaultSgservice(const std::string &str_svr_appkey,
+                                     const std::string &str_local_ip,
+                                     const uint16_t &u16_port,
+                                     meituan_mns::SGService *p_sgservice);
 
-  static std::string SGService2String(const meituan_mns::SGService &sgservice);
+    static std::string SGService2String(const meituan_mns::SGService &sgservice);
 
-  static double FetchOctoWeight(const double &fweight, const double &weight);
+    static double FetchOctoWeight(const double &fweight, const double &weight);
 
-  static int32_t InitNS();
-  static void UnInitNS();
+    static int32_t InitNS();
+    static void UnInitNS();
 
- static int GetSrvListFrom(ServicePtr service);
+    static int GetSrvListFrom(ServicePtr service);
 
- static int RegisterService(const meituan_mns::SGService &oservice);
+    static int RegisterService(const meituan_mns::SGService &oservice);
 };
 
 extern const meituan_cthrift::CthriftNameService g_cthrift_ns;

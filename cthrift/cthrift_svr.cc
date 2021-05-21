@@ -80,6 +80,7 @@ int32_t CthriftSvr::Init(void) {
 
     int ret = g_cthrift_config.LoadConfig(false);
     if (ret != SUCCESS) {
+        printf("srv load cfg failed\n");
         CTHRIFT_LOG_ERROR("Fail to load config. errno" <<  ret);
         return ret;
     }
@@ -147,13 +148,11 @@ int32_t CthriftSvr::Init(void) {
                                              CthriftNameService::str_local_ip_,
                                              u16_svr_port_,
                                              &sg_service_);
-
     countdown_connthread_init.wait();
-    CTHRIFT_LOG_INFO("conn thread init done ---");
+    CTHRIFT_LOG_INFO("srv conn thread init done ---");
 
-    // init worker thread
     string str_pool_name("cthrift_svr_worker_event_thread_pool");
-    muduo::CountDownLatch countdown_workerthread_init(i16_worker_thread_num_);
+    muduo::CountDownLatch countdown_workerthread_init(i16_worker_thread_num_);// init worker thread
 
     for (int i = 0; i < i16_worker_thread_num_; i ++) {
         char buf[str_pool_name.size() + 32];
@@ -329,10 +328,10 @@ void CthriftSvr::Process(const int32_t &i32_req_size,
         static_cast<double>(i32_svr_overtime_ms_) / MILLISENCOND_COUNT_IN_SENCOND;
 
     // check if more than svr overtime
-    if (i32_svr_overtime_ms_ && CheckOverTime(timestamp_from_recv, d_svr_overtime_secs, 0)) {
-        CTHRIFT_LOG_WARN("before business handle, already overtime, maybe queue congest, drop the request");
-        return;
-    }
+//    if (i32_svr_overtime_ms_ && CheckOverTime(timestamp_from_recv, d_svr_overtime_secs, 0)) {
+//        CTHRIFT_LOG_WARN("before business handle, already overtime, maybe queue congest, drop the request");
+//        return;
+//    }
 
     (*sp_p_input_tmemorybuffer_)->resetBuffer(p_ui8_req_buf, i32_req_size, TMemoryBuffer::COPY);
     (*sp_p_output_tmemorybuffer_)->resetBuffer();
@@ -506,7 +505,7 @@ void CthriftSvr::ConnThreadInit(muduo::CountDownLatch* p_countdown_connthread_in
     double dLoopInter = (0.0 == con_collection_interval_) ?
                 ((kTMaxCliIdleTimeSec) / kI8TimeWheelGridNum) :
                 (con_collection_interval_ / kI8TimeWheelGridNum);
-    CTHRIFT_LOG_DEBUG("dLoopInter " << dLoopInter);
+    CTHRIFT_LOG_INFO("dLoopInter=" << dLoopInter);
 
     EventLoop::getEventLoopOfCurrentThread()->runEvery(dLoopInter,
                                                        boost::bind(&CthriftSvr::TimewheelKick, this));

@@ -72,45 +72,45 @@ void CthriftClientChannel::sendAndRecvMessage(
     sp_shared_worker_transport_->wp_b_timeout = boost::make_shared<bool>();
 
     // protocol already call SetID2Transport to set id
-//    CTHRIFT_LOG_DEBUG(" seqid " << sp_shared_worker_transport_->str_id);
+    CTHRIFT_LOG_INFO(" seqid " << sp_shared_worker_transport_->str_id);
 
-    muduo::Condition& cond = sp_cthrift_client_worker_->cond_avaliable_conn_ready();
-    muduo::MutexLock& mtx = sp_cthrift_client_worker_->mutexlock_avaliable_conn_ready();
+//    muduo::Condition& cond = sp_cthrift_client_worker_->cond_avaliable_conn_ready();
+//    muduo::MutexLock& mtx = sp_cthrift_client_worker_->mutexlock_avaliable_conn_ready();
 
-    bool b_timeout;
-    double d_wait_secs = 0.0;
-    const double d_timeout_secs =
-            static_cast<double>(sp_cthrift_client_->GetTimeout()) / MILLISENCOND_COUNT_IN_SENCOND;
+//    bool b_timeout;
+//    double d_wait_secs = 0.0;
+//    const double d_timeout_secs =
+//            static_cast<double>(sp_cthrift_client_->GetTimeout()) / MILLISENCOND_COUNT_IN_SENCOND;
 
-    while (0 >= sp_cthrift_client_worker_->atomic_avaliable_conn_num())
-    {  // while, NOT if
-        CTHRIFT_LOG_WARN("No good conn from client worker, waiting");
+//    while (0 >= sp_cthrift_client_worker_->atomic_avaliable_conn_num())
+//    {  // while, NOT if
+//        CTHRIFT_LOG_WARN("No good conn from client worker, waiting");
 
-        if (!CheckOverTime(sp_shared_worker_transport_->timestamp_start, d_timeout_secs, &d_wait_secs)) {
-            do {
-                muduo::MutexLockGuard lock(mtx);
-                b_timeout = cond.waitForSeconds(d_wait_secs);
-            } while (0);
+//        if (!CheckOverTime(sp_shared_worker_transport_->timestamp_start, d_timeout_secs, &d_wait_secs)) {
+//            do {
+//                muduo::MutexLockGuard lock(mtx);
+//                b_timeout = cond.waitForSeconds(d_wait_secs);
+//            } while (0);
 
-            if (b_timeout) {
-                if (CTHRIFT_UNLIKELY(0 < sp_cthrift_client_worker_->atomic_avaliable_conn_num())) {
-                    CTHRIFT_LOG_INFO("miss notify, but already get avaliable conn");
-                } else {
-                    CTHRIFT_LOG_ERROR("wait " << d_wait_secs << " secs for good conn timeout");
-                    throw TTransportException(TTransportException::TIMED_OUT,
-                                              "wait for good conn timeout, maybe conn all be occupied or server list empty");
-                }
-            }
+//            if (b_timeout) {
+//                if (CTHRIFT_UNLIKELY(0 < sp_cthrift_client_worker_->atomic_avaliable_conn_num())) {
+//                    CTHRIFT_LOG_INFO("miss notify, but already get avaliable conn");
+//                } else {
+//                    CTHRIFT_LOG_ERROR("wait " << d_wait_secs << " secs for good conn timeout");
+//                    throw TTransportException(TTransportException::TIMED_OUT,
+//                                              "wait for good conn timeout, maybe conn all be occupied or server list empty");
+//                }
+//            }
 
-            if (CTHRIFT_UNLIKELY(CheckOverTime(sp_shared_worker_transport_->timestamp_start, d_timeout_secs, 0))) {
-                CTHRIFT_LOG_WARN(sp_cthrift_client_->GetTimeout()
-                                 << "ms countdown to 0, but no good conn ready, maybe server busy");
+//            if (CTHRIFT_UNLIKELY(CheckOverTime(sp_shared_worker_transport_->timestamp_start, d_timeout_secs, 0))) {
+//                CTHRIFT_LOG_WARN(sp_cthrift_client_->GetTimeout()
+//                                 << "ms countdown to 0, but no good conn ready, maybe server busy");
 
-                throw TTransportException(TTransportException::TIMED_OUT,
-                                          "wait for good conn timeout, maybe conn all be occupied or server list empty");
-            }
-        }
-    }
+//                throw TTransportException(TTransportException::TIMED_OUT,
+//                                          "wait for good conn timeout, maybe conn all be occupied or server list empty");
+//            }
+//        }
+//    }
 
     size_t sz_queue_size = sp_cthrift_client_worker_->getP_event_loop_()->queueSize();
 

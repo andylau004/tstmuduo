@@ -88,6 +88,8 @@ foreach (TEST_FILE_NAME ${TEST_FILE_LIST})
 
     get_filename_component(test_name ${TEST_FILE_NAME} NAME_WE)
     add_executable(${test_name} ${TEST_FILE_NAME})
+    add_dependencies(${test_name} cthrift)
+
 
     target_link_libraries(${test_name} util_unit_test_main
         -Xlinker "-("libboost_system.a libcthrift.a libmns_sdk.a libmuduo_base_cpp11.a libmuduo_net_cpp11.a ${MUDUO_HTTP_LIBRARY}
@@ -109,6 +111,18 @@ link_directories(/host_WorkDir/mygitwork/tstmuduo/build/)
 link_directories(/host_WorkDir/mygitwork/tstmuduo/build/muduo/base/)
 link_directories(/host_WorkDir/mygitwork/tstmuduo/build/muduo/net/)
 
+
+
+add_executable(main_unittest main.cc ${unit_echo})
+target_link_libraries(main_unittest
+        -Xlinker "-("libz.so libboost_system.a libcthrift.a libmns_sdk.a libmuduo_base_cpp11.a libmuduo_net_cpp11.a ${MUDUO_HTTP_LIBRARY}
+        ${ZOOKEEPER_LIBRARY} liboctoidl.a  pthread rt  liblog4cplus.so
+        libthrift.a  libthriftnb.a
+        gtest -Xlinker "-)"
+        )
+add_dependencies(main_unittest cthrift)
+cthrift_add_test(main_unittest main_unittest CONFIGURATIONS Debug)
+
 add_executable(main_async_unittest main_async.cc cthrift_client_worker_unittest.cc)
 target_link_libraries(main_async_unittest util_unit_test_main_async
         -Xlinker "-("libz.so libboost_system.a libcthrift.a libmns_sdk.a libmuduo_base_cpp11.a libmuduo_net_cpp11.a ${MUDUO_HTTP_LIBRARY}
@@ -116,6 +130,8 @@ target_link_libraries(main_async_unittest util_unit_test_main_async
         libthrift.a  libthriftnb.a   
         gtest -Xlinker "-)"
         )
+    add_dependencies(main_async_unittest cthrift)
+
 cthrift_add_test(main_async_unittest main_async_unittest CONFIGURATIONS Debug)
 
 #add_custom_target(copyTarget1
@@ -132,6 +148,8 @@ target_link_libraries(main_svr_unittest util_unit_test_main_async
          libthrift.a  libthriftnb.a
          gtest -Xlinker "-)"
          )
+     add_dependencies(main_svr_unittest cthrift)
+
 cthrift_add_test(main_svr_unittest main_svr_unittest CONFIGURATIONS Debug)
 
 
@@ -142,6 +160,8 @@ target_link_libraries(main_all_unittest util_unit_test_main_async
          libthrift.a  libthriftnb.a
          gtest -Xlinker "-)"
          )
+     add_dependencies(main_all_unittest cthrift)
+
 cthrift_add_test(main_all_unittest main_all_unittest CONFIGURATIONS Debug)
 
 

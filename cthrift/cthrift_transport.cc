@@ -6,8 +6,8 @@ using namespace apache::thrift::transport;
 using namespace meituan_cthrift;
 
 uint32_t CthriftTransport::read_virt(uint8_t *buf, uint32_t len) throw(TTransportException) {
-    bool b_timeout;
-    double d_left_secs = 0.0;
+//    bool b_timeout;
+//    double d_left_secs = 0.0;
 
     while (1) {
         if (0 == ReadBufAvaliableReadSize()) {
@@ -16,31 +16,31 @@ uint32_t CthriftTransport::read_virt(uint8_t *buf, uint32_t len) throw(TTranspor
             return ReadBufRead(buf, len);
         }
 
-        if (!CheckOverTime(sp_shared_worker_transport_->timestamp_start,
-                           static_cast<double>(sp_shared_worker_transport_->i32_timeout_ms) / MILLISENCOND_COUNT_IN_SENCOND,
-                           &d_left_secs)) {
-            {
-                muduo::MutexLockGuard lock(mutexlock_conn_ready);
-                b_timeout = sp_shared_worker_transport_->p_cond_ready_read->waitForSeconds(d_left_secs);
-            }
+//        if (!CheckOverTime(sp_shared_worker_transport_->timestamp_start,
+//                           static_cast<double>(sp_shared_worker_transport_->i32_timeout_ms) / MILLISENCOND_COUNT_IN_SENCOND,
+//                           &d_left_secs)) {
+//            {
+//                muduo::MutexLockGuard lock(mutexlock_conn_ready);
+//                b_timeout = sp_shared_worker_transport_->p_cond_ready_read->waitForSeconds(d_left_secs);
+//            }
 
-            if (b_timeout) {
-                if (CTHRIFT_UNLIKELY(ReadBufAvaliableReadSize())) {
-                    CTHRIFT_LOG_DEBUG("miss notify, but buf already get");
-                    return ReadBufRead(buf, len);
-                }
-                break;
-            }
+//            if (b_timeout) {
+//                if (CTHRIFT_UNLIKELY(ReadBufAvaliableReadSize())) {
+//                    CTHRIFT_LOG_DEBUG("miss notify, but buf already get");
+//                    return ReadBufRead(buf, len);
+//                }
+//                break;
+//            }
 
-        } else if (ReadBufAvaliableReadSize()) {  // check again for safe
-            CTHRIFT_LOG_DEBUG("get read buf for appkey " << str_svr_appkey_
-                                                         << " id "
-                                                         << sp_shared_worker_transport_->str_id);
-            // TODO(正常读取消息的场景下不用删除map中的context？)
-            return ReadBufRead(buf, len);
-        } else {
-            break;
-        }
+//        } else if (ReadBufAvaliableReadSize()) {  // check again for safe
+//            CTHRIFT_LOG_DEBUG("get read buf for appkey " << str_svr_appkey_
+//                                                         << " id "
+//                                                         << sp_shared_worker_transport_->str_id);
+//            // TODO(正常读取消息的场景下不用删除map中的context？)
+//            return ReadBufRead(buf, len);
+//        } else {
+//            break;
+//        }
     }
 
 //    CTHRIFT_LOG_WARN("wait appkey " << str_svr_appkey_ << " id " <<
@@ -93,39 +93,39 @@ void CthriftTransport::flush(void) throw(TTransportException) {
     double d_wait_secs = 0.0;
     const double d_timeout_secs = static_cast<double>(i32_timeout_ms_) / MILLISENCOND_COUNT_IN_SENCOND;
 
-    while (0 >= sp_cthrift_client_worker_->atomic_avaliable_conn_num()) {  // while, NOT if
-//        CTHRIFT_LOG_WARN("No good conn for appkey " << str_svr_appkey_
-//                         << " from worker, wait");
+//    while (0 >= sp_cthrift_client_worker_->atomic_avaliable_conn_num()) {  // while, NOT if
+////        CTHRIFT_LOG_WARN("No good conn for appkey " << str_svr_appkey_
+////                         << " from worker, wait");
 
-        if (!CheckOverTime(sp_shared_worker_transport_->timestamp_start, d_timeout_secs, &d_wait_secs)) {
-            do {
-                muduo::MutexLockGuard lock(mtx);
-                b_timeout = cond.waitForSeconds(d_wait_secs);
-            } while (0);
+//        if (!CheckOverTime(sp_shared_worker_transport_->timestamp_start, d_timeout_secs, &d_wait_secs)) {
+//            do {
+//                muduo::MutexLockGuard lock(mtx);
+//                b_timeout = cond.waitForSeconds(d_wait_secs);
+//            } while (0);
 
-            if (b_timeout) {
-                if (CTHRIFT_UNLIKELY(0 < sp_cthrift_client_worker_->atomic_avaliable_conn_num())) {
-                    CTHRIFT_LOG_DEBUG("miss notify, but already get avaliable conn");
-                } else {
-                    CTHRIFT_LOG_ERROR("wait " << d_wait_secs << " secs for good conn timeout");
+//            if (b_timeout) {
+//                if (CTHRIFT_UNLIKELY(0 < sp_cthrift_client_worker_->atomic_avaliable_conn_num())) {
+//                    CTHRIFT_LOG_DEBUG("miss notify, but already get avaliable conn");
+//                } else {
+//                    CTHRIFT_LOG_ERROR("wait " << d_wait_secs << " secs for good conn timeout");
 
-                    throw TTransportException(TTransportException::TIMED_OUT,
-                                              "flusha wait for good conn timeout, maybe conn all "
-                                              "be occupied or server list empty");
-                }
-            }
+//                    throw TTransportException(TTransportException::TIMED_OUT,
+//                                              "flusha wait for good conn timeout, maybe conn all "
+//                                              "be occupied or server list empty");
+//                }
+//            }
 
-            if (CTHRIFT_UNLIKELY(CheckOverTime(sp_shared_worker_transport_->timestamp_start, d_timeout_secs, 0))) {
-//                CTHRIFT_LOG_WARN(i32_timeout_ms_
-//                                 << "ms countdown to 0, "
-//                                    "but no good conn ready, maybe server busy");
+//            if (CTHRIFT_UNLIKELY(CheckOverTime(sp_shared_worker_transport_->timestamp_start, d_timeout_secs, 0))) {
+////                CTHRIFT_LOG_WARN(i32_timeout_ms_
+////                                 << "ms countdown to 0, "
+////                                    "but no good conn ready, maybe server busy");
 
-                throw TTransportException(TTransportException::TIMED_OUT,
-                                          "flushb wait for good conn timeout, maybe conn "
-                                          "all be occupied or server list empty");
-            }
-        }
-    }
+//                throw TTransportException(TTransportException::TIMED_OUT,
+//                                          "flushb wait for good conn timeout, maybe conn "
+//                                          "all be occupied or server list empty");
+//            }
+//        }
+//    }
 
     // in case transport return,
     // then worker fill readbuf before erase id, for safe

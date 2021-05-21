@@ -88,9 +88,7 @@ void TestGetSvrList(const string &str_svr_appkey,
         return;
     }
     //确保业务EchoClient的生命期和线程生命期同，不要一次请求创建销毁一次EchoClient！！
-    EchoClient
-            client
-            (cthrift_client.GetCthriftProtocol());
+    EchoClient client(cthrift_client.GetCthriftProtocol());
     string strRet;
     string str_tmp;
     size_t sz;
@@ -329,7 +327,7 @@ int main(int argc, char **argv) {
             boost::make_shared<muduo::Thread>(boost::bind(&TestRegSvr, &event_loop));
     g_sp_thread_svr->start();
 
-    muduo::CurrentThread::sleepUsec(3000 * 1000); //wait 3s for reg svr
+    muduo::CurrentThread::sleepUsec(1000 * 1000); //wait 5s for reg svr
 
     g_sp_thread_cli =
             boost::make_shared<muduo::Thread>(boost::bind(&TestGetSvrList,

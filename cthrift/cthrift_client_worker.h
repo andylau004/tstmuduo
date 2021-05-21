@@ -28,13 +28,12 @@ private:
     std::multimap<double, TcpClientWeakPtr, WeightSort> *p_map_weight_tcpclientwp_;
 
     // for relate to weight index, if not be deleted, safe
-    std::multimap<double, TcpClientWeakPtr>::iterator
-    it_map_weight_tcpclientwp_index_;
+    std::multimap<double, TcpClientWeakPtr>::iterator it_map_weight_tcpclientwp_index_;
 
 public:
-    ConnInfo(//const meituan_mns::SGService &sgservice_tmp,
+    ConnInfo(const meituan_mns::SGService &sgservice_tmp,
              std::multimap<double,TcpClientWeakPtr,WeightSort> *p_map_weight_tcpclientwp)
-        : //sgservice_(sgservice_tmp),
+        : sgservice_(sgservice_tmp),
           p_map_weight_tcpclientwp_(p_map_weight_tcpclientwp)
     {}
 
@@ -49,13 +48,13 @@ public:
         }
     }
 
-//    const meituan_mns::SGService &GetSgservice(void) const {
-//        return sgservice_;
-//    }
+    const meituan_mns::SGService &GetSgservice(void) const {
+        return sgservice_;
+    }
 
     bool CheckConnHealthy(void) const;
 
-//    void UptSgservice(const meituan_mns::SGService &sgservice);
+    void UptSgservice(const meituan_mns::SGService &sgservice);
 
     void setSp_tcpclient_(const TcpClientSharedPtr &sp_tcpclient);
 
@@ -151,8 +150,7 @@ private:
     int16_t i16_server_port_;
     bool b_user_set_ip;
 
-//    boost::unordered_map<std::string, meituan_mns::SGService>
-//    map_ipport_sgservice_;  // use compare and update svrlist
+    boost::unordered_map<std::string, meituan_mns::SGService> map_ipport_sgservice_;  // use compare and update svrlist
 
     // boost::shared_ptr<CthriftTransport> sp_cthrift_transport_sgagent_;
     boost::shared_ptr<CthriftClient> sp_cthrift_client_;
@@ -209,7 +207,7 @@ private:
     void OnWriteComplete(const muduo::net::TcpConnectionPtr &conn);
     void OnHighWaterMark(const muduo::net::TcpConnectionPtr &conn, size_t len);
 
-//    void UpdateSvrList(const std::vector<meituan_mns::SGService> &vec_sgservice);
+    void UpdateSvrList(const std::vector<meituan_mns::SGService> &vec_sgservice);
 
     void InitWorker(void);
     void InitSgagentHandlerThread(void);

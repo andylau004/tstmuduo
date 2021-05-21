@@ -71,76 +71,76 @@ void CthriftNameService::PackDefaultSgservice(
 }
 
 string CthriftNameService::SGService2String(const meituan_mns::SGService &sgservice) {
-  string str_ret
-      ("appkey:" + sgservice.appkey + " version:" + sgservice.version + " ip:" + sgservice.ip);
+    string str_ret
+            ("appkey:" + sgservice.appkey + " version:" + sgservice.version + " ip:" + sgservice.ip);
 
-  try {
-    str_ret.append(" port:" + boost::lexical_cast<string>(sgservice.port));
-  } catch (boost::bad_lexical_cast &e) {
-    CTHRIFT_LOG_ERROR("boost::bad_lexical_cast :" << e.what()
-                                                  << "sgservice.port : "
-                                                  << sgservice.port);
-  }
+    try {
+        str_ret.append(" port:" + boost::lexical_cast<string>(sgservice.port));
+    } catch (boost::bad_lexical_cast &e) {
+        CTHRIFT_LOG_ERROR("boost::bad_lexical_cast :" << e.what()
+                          << "sgservice.port : "
+                          << sgservice.port);
+    }
 
-  try {
-    str_ret.append(
-        " weight:" + boost::lexical_cast<string>(sgservice.weight));
-  } catch (boost::bad_lexical_cast &e) {
+    try {
+        str_ret.append(
+                    " weight:" + boost::lexical_cast<string>(sgservice.weight));
+    } catch (boost::bad_lexical_cast &e) {
 
-    CTHRIFT_LOG_ERROR("boost::bad_lexical_cast :" << e.what()
-                                                  << "sgservice.weight : "
-                                                  << sgservice.weight);
-  }
+        CTHRIFT_LOG_ERROR("boost::bad_lexical_cast :" << e.what()
+                          << "sgservice.weight : "
+                          << sgservice.weight);
+    }
 
-  try {
-    str_ret.append(
-        " status:" + boost::lexical_cast<string>(sgservice.status));
-  } catch (boost::bad_lexical_cast &e) {
+    try {
+        str_ret.append(
+                    " status:" + boost::lexical_cast<string>(sgservice.status));
+    } catch (boost::bad_lexical_cast &e) {
 
-      CTHRIFT_LOG_ERROR("boost::bad_lexical_cast :" << e.what()
-                                                        << "sgservice.status : "
-                                                        << sgservice.status);
-  }
+        CTHRIFT_LOG_ERROR("boost::bad_lexical_cast :" << e.what()
+                          << "sgservice.status : "
+                          << sgservice.status);
+    }
 
-  try {
-    str_ret.append(" role:" + boost::lexical_cast<string>(sgservice.role));
-  } catch (boost::bad_lexical_cast &e) {
+    try {
+        str_ret.append(" role:" + boost::lexical_cast<string>(sgservice.role));
+    } catch (boost::bad_lexical_cast &e) {
 
-      CTHRIFT_LOG_ERROR("boost::bad_lexical_cast :" << e.what()
-                        << "sgservice.role : "
-                        << sgservice.role);
-  }
+        CTHRIFT_LOG_ERROR("boost::bad_lexical_cast :" << e.what()
+                          << "sgservice.role : "
+                          << sgservice.role);
+    }
 
-  try {
-    str_ret.append(
-        " envir:" + boost::lexical_cast<string>(sgservice.envir));
-  } catch (boost::bad_lexical_cast &e) {
+    try {
+        str_ret.append(
+                    " envir:" + boost::lexical_cast<string>(sgservice.envir));
+    } catch (boost::bad_lexical_cast &e) {
 
-    CTHRIFT_LOG_ERROR("boost::bad_lexical_cast :" << e.what()
-                                                  << "sgservice.envir : "
-                                                  << sgservice.envir);
-  }
+        CTHRIFT_LOG_ERROR("boost::bad_lexical_cast :" << e.what()
+                          << "sgservice.envir : "
+                          << sgservice.envir);
+    }
 
-  try {
-    str_ret.append(
-        " fweight:" + boost::lexical_cast<string>(sgservice.fweight));
-  } catch (boost::bad_lexical_cast &e) {
+    try {
+        str_ret.append(
+                    " fweight:" + boost::lexical_cast<string>(sgservice.fweight));
+    } catch (boost::bad_lexical_cast &e) {
 
-    //CTHRIFT_LOG_ERROR("boost::bad_lexical_cast :" << e.what()
-//                                                  << "sgservice.fweight : "
-//                                                  << sgservice.fweight);
-  }
+        CTHRIFT_LOG_ERROR("boost::bad_lexical_cast :" << e.what()
+                                                          << "sgservice.fweight : "
+                                                          << sgservice.fweight);
+    }
 
-  try {
-    str_ret.append(" serverType:"
+    try {
+        str_ret.append(" serverType:"
                        + boost::lexical_cast<string>(sgservice.serverType));
-  } catch (boost::bad_lexical_cast &e) {
+    } catch (boost::bad_lexical_cast &e) {
 
-    //CTHRIFT_LOG_ERROR("boost::bad_lexical_cast :" << e.what()
-//                                                  << "sgservice.serverType : "
-//                                                  << sgservice.serverType);
-  }
-  return str_ret;
+        CTHRIFT_LOG_ERROR("boost::bad_lexical_cast :" << e.what()
+                                                          << "sgservice.serverType : "
+                                                          << sgservice.serverType);
+    }
+    return str_ret;
 }
 
 void CthriftNameService::IntranetIp(char ip[INET_ADDRSTRLEN]) {
@@ -251,22 +251,22 @@ double CthriftNameService::FetchOctoWeight(const double &fweight,
 }
 
 int CthriftNameService::GetSrvListFrom(ServicePtr service) {
-   if (!b_is_init_ns_) {
-       CTHRIFT_LOG_ERROR("GetSrvListFrom b_is_init_ns_ false");
-       return -1;
-   }
+    if (!b_is_init_ns_) {
+        CTHRIFT_LOG_ERROR("GetSrvListFrom b_is_init_ns_ false");
+        return -1;
+    }
 
-   return ns_interface_.GetSrvList(service);
+    return ns_interface_.GetSrvList(service);
 }
 
 int CthriftNameService::RegisterService(
-   const meituan_mns::SGService &oservice) {
- if (!b_is_init_ns_) {
-   CTHRIFT_LOG_ERROR("GetSrvListFrom b_is_init_ns_ false");
-   return -1;
- }
+        const meituan_mns::SGService &oservice) {
+    if (!b_is_init_ns_) {
+        CTHRIFT_LOG_ERROR("GetSrvListFrom b_is_init_ns_ false");
+        return -1;
+    }
 
- return ns_interface_.RegisterService(oservice);
+    return ns_interface_.RegisterService(oservice);
 }
 
 int32_t CthriftNameService::InitNS() {
@@ -300,22 +300,22 @@ int32_t CthriftNameService::InitNS() {
         ////CTHRIFT_LOG_INFO("----------ns use mns------------------");
     }else{
         // 用户可以设置自己的注册及获取服务列表函数 桥接模式
-//        ns_interface_.SetDesFunction(
-//                    boost::bind(&CthriftNsImp::Destroy, &g_cthrift_ns_default));
-//        ns_interface_.SetGetFunction(
-//                    boost::bind(&CthriftNsImp::GetSrvList, &g_cthrift_ns_default, _1, _2));
-//        ns_interface_.SetInitFunction(
-//                    boost::bind(&CthriftNsImp::Init, &g_cthrift_ns_default));
-//        ns_interface_.SetRegFunction(
-//                    boost::bind(&CthriftNsImp::RegisterService, &g_cthrift_ns_default,
-//                                _1, _2, _3));
+        //        ns_interface_.SetDesFunction(
+        //                    boost::bind(&CthriftNsImp::Destroy, &g_cthrift_ns_default));
+        //        ns_interface_.SetGetFunction(
+        //                    boost::bind(&CthriftNsImp::GetSrvList, &g_cthrift_ns_default, _1, _2));
+        //        ns_interface_.SetInitFunction(
+        //                    boost::bind(&CthriftNsImp::Init, &g_cthrift_ns_default));
+        //        ns_interface_.SetRegFunction(
+        //                    boost::bind(&CthriftNsImp::RegisterService, &g_cthrift_ns_default,
+        //                                _1, _2, _3));
         ////CTHRIFT_LOG_INFO("----------ns use zk------------------");
     }
 
-//    if (ns_interface_.Init() != 0) {
-//        ////CTHRIFT_LOG_ERROR("InitNS failed");
-//        return -1;
-//    }
+    //    if (ns_interface_.Init() != 0) {
+    //        ////CTHRIFT_LOG_ERROR("InitNS failed");
+    //        return -1;
+    //    }
 
     b_is_init_ns_ = true;
     return 0;
