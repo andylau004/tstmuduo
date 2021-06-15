@@ -76,7 +76,9 @@
         "variant": "cpp",
         "*.ipp": "cpp",
         "any": "cpp",
-        "bit": "cpp"
+        "bit": "cpp",
+        "hash_set": "cpp",
+        "*.def": "cpp"
     },
     "cmake.configureOnOpen": false
 }

@@ -5023,8 +5023,9 @@ int main(int argc, char *argv[])
     Logger::setLogLevel(Logger::DEBUG);
     LOG_INFO << "pid = " << getpid() << ", tid=" << CurrentThread::tid();
 
-tst_perf();
-return 1;
+//    return 1;
+//tst_perf();
+//return 1;
 
     // --------------------function entry--------------------
 //    tst_qs_new(); return 1;
@@ -5049,11 +5050,13 @@ return 1;
             std::cout << std::endl;
 
             lc_Entry(); return 1;
-        } else {
+        } else if (strcmp( argv[1], "l" ) == 0 ) {
             std::cout << "tst list code ---" << std::endl;
             std::cout << std::endl;
 
             Test_ListEntry(); return 1;
+        } else if ( strcmp( argv[1], "dp" ) == 0 ) {
+            tst_dpfun_entry(); return 1;
         }
     } else {
         std::cout << " argc < 1, argc=" << argc;
@@ -5272,7 +5275,6 @@ return 1;
     tst_hash_fun_entry(); return 1;
 
     tst_HeapSortEntry_(); return 1;
-    tst_dpfun_entry(); return 1;
 
 
     call_find_max_in_array(); return 1;

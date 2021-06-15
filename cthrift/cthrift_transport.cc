@@ -83,15 +83,14 @@ void CthriftTransport::flush(void) throw(TTransportException) {
     sp_shared_worker_transport_->wp_b_timeout = sp_bool_timeout_;
 
     // protocol already call SetID2Transport to set id
-//    CTHRIFT_LOG_DEBUG("appkey " << str_svr_appkey_ << " seqid "
-//                      << sp_shared_worker_transport_->str_id);
+    CTHRIFT_LOG_INFO("appkey=" << str_svr_appkey_ << ", seqid="<< sp_shared_worker_transport_->str_id);
 
-    muduo::Condition &cond = sp_cthrift_client_worker_->cond_avaliable_conn_ready();
-    muduo::MutexLock &mtx = sp_cthrift_client_worker_->mutexlock_avaliable_conn_ready();
+//    muduo::Condition &cond = sp_cthrift_client_worker_->cond_avaliable_conn_ready();
+//    muduo::MutexLock &mtx = sp_cthrift_client_worker_->mutexlock_avaliable_conn_ready();
 
-    bool b_timeout;
-    double d_wait_secs = 0.0;
-    const double d_timeout_secs = static_cast<double>(i32_timeout_ms_) / MILLISENCOND_COUNT_IN_SENCOND;
+//    bool b_timeout;
+//    double d_wait_secs = 0.0;
+//    const double d_timeout_secs = static_cast<double>(i32_timeout_ms_) / MILLISENCOND_COUNT_IN_SENCOND;
 
 //    while (0 >= sp_cthrift_client_worker_->atomic_avaliable_conn_num()) {  // while, NOT if
 ////        CTHRIFT_LOG_WARN("No good conn for appkey " << str_svr_appkey_
@@ -134,13 +133,13 @@ void CthriftTransport::flush(void) throw(TTransportException) {
     /*boost::shared_ptr<muduo::net::EventLoopThread>
       sp_worker_thread = sp_cthrift_client_worker_->GetWorkerThreadSP();*/
 
-    size_t sz_queue_size = sp_cthrift_client_worker_->getP_event_loop_()->queueSize();
+//    size_t sz_queue_size = sp_cthrift_client_worker_->getP_event_loop_()->queueSize();
 
-    if (CTHRIFT_UNLIKELY(10 <= sz_queue_size)) {
-        CTHRIFT_LOG_WARN("worker queue size " << sz_queue_size);
-    } else {
-        CTHRIFT_LOG_DEBUG("worker queue size " << sz_queue_size);
-    }
+//    if (CTHRIFT_UNLIKELY(10 <= sz_queue_size)) {
+//        CTHRIFT_LOG_WARN("worker queue size " << sz_queue_size);
+//    } else {
+//        CTHRIFT_LOG_DEBUG("worker queue size " << sz_queue_size);
+//    }
 
     SharedContSharedPtr sp_shared
             = boost::make_shared<SharedBetweenWorkerTransport>(*sp_shared_worker_transport_);

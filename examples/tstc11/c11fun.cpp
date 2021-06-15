@@ -15,6 +15,11 @@
 #include <string>
 #include <mutex>
 
+#include <sys/mman.h>
+#include <sys/stat.h>
+
+
+
 #include <cmath>
 #include <future>
 #include <functional>
@@ -2047,10 +2052,37 @@ void tstFuture() {
 
 
 
+void tst_share_memory_entry(int argc, char *argv[]) {
+
+    if ( strcmp( argv[1], "w" ) == 0 ) {
+
+        int wrFd = shm_open ( "posixsm", O_CREAT | O_RDWR, 0666 );
+        ftruncate(wrFd, 0x400000);
+
+        char* p = (char*)mmap(nullptr, 0x400000,
+                       PROT_READ | PROT_WRITE, MAP_SHARED, wrFd, 0 );
+
+        memset(p, 'A', 0x400000);
+        munmap(p, 0x400000);
+
+    } else if ( strcmp( argv[1], "r" ) == 0 ) {
+        int rdFd = shm_open ( "posixsm", O_RDONLY, 0666 );
+        ftruncate(rdFd, 0x400000);
+
+        char* p = (char*)mmap(nullptr, 0x400000,
+                       PROT_READ, MAP_SHARED, rdFd, 0 );
+
+        printf("%c %c %c %c\n", p[0], p[1], p[2], p[3]);
+        munmap(p, 0x400000);
+    }
+
+}
 
 // 2020-6-20
 // add new 测试分支预测
 void tst_c11fun_entry(int argc, char *argv[]) {
+
+    tst_share_memory_entry(argc, argv); return;
 
     tst_shared_ptr_2(); return;
 

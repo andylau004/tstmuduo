@@ -2406,7 +2406,34 @@ vector<string> Permutation(string str) {
     return ans;
 }
 
+
+
+int partition(vector<int>& nums, int l, int r) {
+    return 1;
+}
+void random_qs(std::vector<int>& nums, int l, int r) {
+    int i = rand() % (r - l + 1);
+    std::swap(nums[i], nums[r]);
+    partition(nums, l, r);
+}
+vector<int> sortArray(vector<int>& nums) {
+    srand(time(nullptr));
+    random_qs(nums, 0, (int)nums.size() - 1);
+    return nums;
+}
+void tst_qs() {
+    std::vector<int> nums{ 1009, 321, -1, 998, 27, 36, 13, 9 };
+    auto ret = sortArray(nums);
+    for (auto i = 0; i < nums.size(); i ++ ) {
+        std::cout <<  " " << ret[i];
+    }
+    std::cout << std::endl;
+}
+
 int Test_ListEntry() {
+
+
+    tst_reverselist(); return 1;
 
     tst_longestCommonPrefix(); return 1;
 
@@ -2433,8 +2460,6 @@ int Test_ListEntry() {
     tst_getKthFromEnd(); return 1;
 
     tst_lingxingjicheng(); return 1;
-
-    tst_reverselist(); return 1;
 
     tst_deleteNodeEx(); return 1;
 

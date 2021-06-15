@@ -64,7 +64,50 @@ int GetMaxAddOfArray(int* arr, int sz) {
     return max;
 }
 
+#include <boost/algorithm/string.hpp>
+void tst_lengthOfLIS() {
+
+//    std::vector<int> v{ 3, 1, -14, 1, 5, 9, 23, 24 };
+//    std::vector<int>::iterator result;
+
+//    result = std::max_element(v.begin(), v.end());
+//    std::cout << "result: " << *result << '\n';
+//    std::cout << "max element at: " << std::distance(v.begin(), result) << '\n';
+
+    {
+        std::string  str  = "time\tLOG_INFO\tlog good thing happened!!!";
+        std::vector< std::string > tokens;
+        boost::split(tokens, str, [](char c) { return c == '\t'; } );
+        for (auto t : tokens) {
+            std::cout << " " << t;
+        }
+        std::cout << std::endl;
+        return;
+    }
+
+    {
+        std::vector<int> nums{ 2, 3, -6, 4, 6, 2, -2, 5, -9 };
+        std::vector<int> dp(nums.size(), 1);
+
+        int result = 0;
+        for (size_t i = 1; i < nums.size(); i++) {
+            for (size_t j = 0; j < i; j++) {
+                if (nums[i] > nums[j]) dp[i] = max(dp[i], dp[j] + 1);
+            }
+            if (dp[i] > result) result = dp[i]; // 取长的子序列
+        }
+        std::cout << "res=" << result << std::endl;
+        return;
+    }
+
+}
+
 void tst_dpfun_entry() {
+
+    tst_lengthOfLIS(); return;
+
+
+
     int array[] = { 2, 3, -6, 4, 6, 2, -2, 5, -9 };
     int sz = sizeof(array) / sizeof(array[0]);
 

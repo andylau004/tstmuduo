@@ -24,6 +24,7 @@ using namespace apache::thrift::async;
 class CthriftChannelTest : public testing::Test {
 public:
     CthriftChannelTest() {
+        std::cout << "cst thrift channel test" << std::endl;
         boost::shared_ptr<CthriftClient>
                 cthrift_client = boost::make_shared<CthriftClient>("test.appkey", 30);
         p_cthrift_channel_ = new CthriftClientChannel(cthrift_client);
@@ -41,36 +42,36 @@ public:
     CthriftClientChannel *p_cthrift_channel_;
 };
 
-TEST_F(CthriftChannelTest, Handle_Good) {
-    EXPECT_TRUE(p_cthrift_channel_->good()
-                );
-}
+//TEST_F(CthriftChannelTest, Handle_Good) {
+//    EXPECT_TRUE(p_cthrift_channel_->good());
+//}
 
-TEST_F(CthriftChannelTest, Handle_Error) {
-    EXPECT_TRUE(p_cthrift_channel_->error() != true);
-}
+//TEST_F(CthriftChannelTest, Handle_Error) {
+//    EXPECT_TRUE(p_cthrift_channel_->error() != true);
+//}
 
-TEST_F(CthriftChannelTest, Handle_TimeOut) {
-    EXPECT_TRUE(p_cthrift_channel_->timedOut() != true);
-}
+//TEST_F(CthriftChannelTest, Handle_TimeOut) {
+//    EXPECT_TRUE(p_cthrift_channel_->timedOut() != true);
+//}
 
-TEST_F(CthriftChannelTest, Handle_sendMessage) {
+//TEST_F(CthriftChannelTest, Handle_sendMessage) {
 
-    TAsyncChannel::VoidCallback cob;
-    apache::thrift::transport::TMemoryBuffer *message = NULL;
-    std::string error;
+//    TAsyncChannel::VoidCallback cob;
+//    apache::thrift::transport::TMemoryBuffer *message = NULL;
+//    std::string error;
 
-    try {
-        p_cthrift_channel_->sendMessage(cob, message);
-    } catch (TException &tx) {
-        error = tx.what();
-    }
+//    try {
+//        p_cthrift_channel_->sendMessage(cob, message);
+//    } catch (TException &tx) {
+//        error = tx.what();
+//    }
 
-    EXPECT_TRUE(error == "Unexpected call to TEvhttpClientChannel::sendMessage");
-
-}
+//    EXPECT_TRUE(error == "Unexpected call to TEvhttpClientChannel::sendMessage");
+//}
 
 TEST_F(CthriftChannelTest, Handle_recvMessage) {
+
+    std::cout << "beg ------------ Handle_recvMessage" << std::endl;
 
     TAsyncChannel::VoidCallback cob;
     apache::thrift::transport::TMemoryBuffer *message = NULL;
@@ -83,5 +84,4 @@ TEST_F(CthriftChannelTest, Handle_recvMessage) {
     }
 
     EXPECT_TRUE(error == "Unexpected call to TEvhttpClientChannel::recvMessage");
-
 }

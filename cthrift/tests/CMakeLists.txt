@@ -90,7 +90,6 @@ foreach (TEST_FILE_NAME ${TEST_FILE_LIST})
     add_executable(${test_name} ${TEST_FILE_NAME})
     add_dependencies(${test_name} cthrift)
 
-
     target_link_libraries(${test_name} util_unit_test_main
         -Xlinker "-("libboost_system.a libcthrift.a libmns_sdk.a libmuduo_base_cpp11.a libmuduo_net_cpp11.a ${MUDUO_HTTP_LIBRARY}
         ${ZOOKEEPER_LIBRARY} liboctoidl.a  pthread rt libz.so liblog4cplus.so

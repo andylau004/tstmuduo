@@ -135,8 +135,8 @@ bool ConnInfo::CheckConnHealthy(void) const {
 
     if (CTHRIFT_UNLIKELY(sp_context->b_highwater || sp_context->b_occupied)) {
         CTHRIFT_LOG_WARN("address: " << (sp_tcpconn->peerAddress()).toIpPort() <<
-                         " b_highwater " << sp_context->b_highwater
-                         << " b_occupied "
+                         ", b_highwater " << sp_context->b_highwater
+                         << ", b_occupied "
                          << sp_context->b_occupied << " ignore");
         return false;
     }
@@ -277,11 +277,10 @@ int8_t CthriftClientWorker::ChooseNextReadyConn(TcpClientWeakPtr *p_wp_tcpcli) {
     if (1 == (it_map->second).size()) {
         *p_wp_tcpcli = *((it_map->second).begin());
     } else {
-        CTHRIFT_LOG_DEBUG((it_map->second).size() << " conn need be choose one equally");
+        CTHRIFT_LOG_INFO((it_map->second).size() << " conn need be choose one equally");
 
         *p_wp_tcpcli = (it_map->second)[rand() % ((it_map->second).size())];
     }
-
     return 0;
 }
 
@@ -429,8 +428,8 @@ void CthriftClientWorker::InitWorker(void) {
     p_multimap_weight_wptcpcli_ = new multimap<double, TcpClientWeakPtr, WeightSort>;  // exit del, safe
 
     if (b_user_set_ip) {
-        CTHRIFT_LOG_INFO("InitWorker b_user_set_ip  ip:"
-                         << str_server_ip_ << " port:" << i16_server_port_);
+        CTHRIFT_LOG_INFO("InitWorker b_user_set_ip ip:"
+                         << str_server_ip_ << ", port:" << i16_server_port_);
 
         vector<meituan_mns::SGService> list;
         meituan_mns::SGService sg;
@@ -679,10 +678,10 @@ void CthriftClientWorker::OnConn(const muduo::net::TcpConnectionPtr &conn) {
             return;
         }
 
-        // check in map
-        UnorderedMapIpPort2ConnInfoSP unordered_map_iter;
-        unordered_map_iter =
-                map_ipport_spconninfo_.find((conn->peerAddress()).toIp() + ":" + str_port);
+        std::string findKey = (conn->peerAddress()).toIp() + ":" + str_port;
+        UnorderedMapIpPort2ConnInfoSP unordered_map_iter;// check in map
+        unordered_map_iter = map_ipport_spconninfo_.find(findKey);
+        CTHRIFT_LOG_INFO("findKey=" << findKey);
 
         if (CTHRIFT_UNLIKELY(unordered_map_iter == map_ipport_spconninfo_.end())) {
             CTHRIFT_LOG_ERROR("conn peerAddr " << (conn->peerAddress()).toIpPort()
@@ -725,20 +724,18 @@ void CthriftClientWorker::OnConn(const muduo::net::TcpConnectionPtr &conn) {
                 return;
             }
 
-        /* clear send queue
-      for (int i = 0; i < static_cast<int>((sp_context->queue_send).size());
-           i++) {
-        map_id_sharedcontextsp_.erase((sp_context->queue_send).front());
-        (sp_context->queue_send).pop();
-      }*/
+            // clear send queue
+//            for (int i = 0; i < static_cast<int>((sp_context->queue_send).size()); i++) {
+//                map_id_sharedcontextsp_.erase((sp_context->queue_send).front());
+//                (sp_context->queue_send).pop();
+//            }
 
-            // make sure this conn NOT decrement num before, and then check current
-            // available num
+            // make sure this conn NOT decrement num before, and then check current available num
             if (!(sp_context->b_highwater) && !(sp_context->b_occupied)
                     && (0 >= (atomic_avaliable_conn_num_.decrementAndGet()))) {
                 atomic_avaliable_conn_num_.getAndSet(0);  // adjust for safe
 
-                CTHRIFT_LOG_WARN("atomic_avaliable_conn_num_ 0");
+                CTHRIFT_LOG_WARN("atomic_avaliable_conn_num_ == 0");
             }
         }
     }
@@ -776,7 +773,6 @@ void CthriftClientWorker::HandleThriftMsg(const muduo::net::TcpConnectionPtr &co
     if (CTHRIFT_UNLIKELY(map_id_sharedcontextsp_.end() == map_iter)) {
         CTHRIFT_LOG_ERROR("Not find id " << str_id << " maybe timeout, conn from:"
                           << (conn->peerAddress()).toIpPort());
-
     } else {
         SharedContSharedPtr& sp_shared = map_iter->second;
 
@@ -937,10 +933,12 @@ void CthriftClientWorker::SendTransportReq(SharedContSharedPtr sp_shared) {
     if (0 != sp_shared->GetWriteBuf(&send_buf)) {
         return;
     }
-    CTHRIFT_LOG_INFO("send_buf.size " << send_buf.readableBytes());
+    CTHRIFT_LOG_INFO("send_buf.size=" << send_buf.readableBytes());
 
     TcpClientWeakPtr wp_tcpcli;
     if (ChooseNextReadyConn(&wp_tcpcli)) {
+        CTHRIFT_LOG_ERROR("send trans req, No candidate connection to send packet, "
+                          "async task will be dropped");
         return;
     }
 
@@ -1075,12 +1073,11 @@ void CthriftClientWorker::AsyncSendReq(SharedContSharedPtr sp_shared) {
     if (0 != sp_shared->GetAsyncWriteBuf(&send_buf)) {
         return;
     }
-
-    CTHRIFT_LOG_DEBUG("send_buf.size " << send_buf.readableBytes());
+    CTHRIFT_LOG_INFO("async send req, send_buf.size=" << send_buf.readableBytes());
 
     TcpClientWeakPtr wp_tcpcli;
     if (ChooseNextReadyConn(&wp_tcpcli)) {
-        CTHRIFT_LOG_ERROR("No candidate connection to send packet, "
+        CTHRIFT_LOG_ERROR("async send trans req, No candidate connection to send packet, "
                           "async task will be dropped");
         return;
     }

@@ -116,7 +116,7 @@ void TcpConnection::send(const StringPiece& message)
         }
         else
         {
-            LOG_INFO << "send message no in loop";
+//            LOG_INFO << "send message no in loop";
             loop_->runInLoop(
                         boost::bind(&TcpConnection::sendInLoop,
                                     this,     // FIXME
@@ -147,7 +147,7 @@ void TcpConnection::send(Buffer* buf)
     {
         if (loop_->isInLoopThread())
         {
-            LOG_INFO << "send oper isInLoopThread()";
+//            LOG_INFO << "send oper isInLoopThread()";
             sendInLoop(buf->peek(), buf->readableBytes());
             buf->retrieveAll();
         }
